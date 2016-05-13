@@ -2378,7 +2378,7 @@ END;
 <table id="DATA-TABLE">
 	<thead>
 		<tr class="NumberCell">
-			<td scope="row"><input type="button" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])" value="ログインした時間"></td>
+			<td scope="row" colspan=2><input type="button" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])" value="ログインした時間"></td>
 			<td scope="row"><input type="button" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" value="島ＩＤ"></td>
 			<td scope="row"><input type="button" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" value="島の名前"></td>
 			<td scope="row"><input type="button" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" value="ＩＰ情報"></td>
@@ -2395,13 +2395,10 @@ END;
 			// ファイルから一行読み込む
 			$line = fgets($fp);
 			if($line !== FALSE) {
-				$line = substr_replace($line, ",<center>", 32, 1);
-				$wpos = strpos($line, ',', 33);
-				$line = substr_replace($line, "</center>,", $wpos, 1);
-				$num  = preg_replace( "/,/", "</TD><TD>", $line);
-				echo "<TR>\n";
-				echo "<TD scope=\"col\">{$num}</TD>\n";
-				echo "</TR>\n";
+				$num = str_replace([' ', ','], "</td><td scope=\"col\">", $line);
+				echo "<tr>\n";
+				echo "<td scope=\"col\">{$num}</td>\n";
+				echo "</tr>\n";
 			}
 		}
 		fclose($fp);
