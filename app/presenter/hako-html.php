@@ -2554,7 +2554,7 @@ END;
 
 		$num = $data['ALLYID'];
 		$ally = $hako->ally[$hako->idToAllyNumber[$num]];
-		$allyName = "<FONT COLOR=\"{$ally['color']}\"><B>{$ally['mark']}</B></FONT>{$ally['name']}";
+		$allyName = "<span style=\"color:{$ally['color']};font-weight:bold;\">{$ally['mark']}</span>{$ally['name']}";
 
 		echo <<<END
 <div class='text-center'>

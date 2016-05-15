@@ -68,7 +68,7 @@ class LogIO {
 				}
 			}
 			if($row == 1) {
-				echo "<h2>{$init->tagNumber_}ターン{$turn}の出来事{$init->_tagNumber}</h2>\n";
+				echo "<h3>{$init->tagNumber_}ターン{$turn}の出来事{$init->_tagNumber}</h3>\n";
 				$row++;
 			}
 			echo "<ul class='list-unstyled'>";
