@@ -25,8 +25,8 @@ class HTML {
 		global $init;
 		require_once(VIEWS.'/header.php');
 	}
-	
-	
+
+
 	/**
 	 * HTML <footer>
 	 * @return [type] [description]
@@ -125,7 +125,7 @@ class HtmlTop extends HTML {
 			$island        = $hako->islands[$i];
 			$island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
 
-			$j            = isset($island['isBF']) ? '★' : $i + 1;
+			$j            = ($island['isBF']) ? '★' : $i + 1;
 			$id           = $island['id'];
 			$pop          = $island['pop'] . $init->unitPop;
 			$area         = $island['area'] . $init->unitArea;
