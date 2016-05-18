@@ -1826,7 +1826,6 @@ END;
 	</form>
 </div>
 
-<div class="text-center">
 <table class="table table-bordered">
 <tr valign="top">
 <td $init->bgInputCell>
