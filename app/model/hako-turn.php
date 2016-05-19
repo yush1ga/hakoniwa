@@ -5578,8 +5578,10 @@ class Turn {
 			// 農業だけで手一杯の場合
 			$island['food'] += $pop; // 全員野良仕事
 		}
+		// $island[present][item]が0の時、
+		// [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている。
 		if ( isset($island['present']) ) {
-			if ( $island['present'] == 0 ) {
+			if ( $island['present']['item'] == 0 ) {
 				if ( $island['present']['px'] != 0 ) {
 					$island['money'] += $island['present']['px'];
 					$this->log->presentMoney($island['id'], $island['name'], $island['present']['px']);
