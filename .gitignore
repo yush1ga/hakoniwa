@@ -1,3 +1,7 @@
 nbproject/*
 logs/*
 password.php
+sftp-config.json
+*.ts
+/manual/*
+
