@@ -3402,6 +3402,13 @@ class Turn {
 
 		}
 		$monsterMove = array();
+		$shipMove    = array();
+		for($i=0;$i<$init->islandSize;$i++){
+			for($j=0;$j<$init->islandSize;$j++){
+				$shipMove[$i][$j]    = 0;
+				$monsterMove[$i][$j] = 0;
+			}
+		}
 		$bx = 0;
 		$by = 0;
 
@@ -4318,11 +4325,12 @@ class Turn {
 						//船がまだ動いていない時
 						$ship = Util::navyUnpack($landValue[$x][$y]);
 						$lName = $init->shipName[$ship[1]];
-						$tLname .= "（{$this->islands[$ship[0]]['name']}島所属）";
+						// $belongIsland = (isset($hako->islands[$ship[0]]['name']))? $hako->islands[$ship[0]]['name']."島所属" : "島籍不明";
+						// $lName .= "（{$belongIsland}）";
 
-						$tn = $hako->idToNumber[$ship[0]];
+						$tn = &$hako->idToNumber[$ship[0]];
 						$tIsland = &$hako->islands[$tn];
-						$tName = $hako->idToName[$ship[0]];
+						$tName = &$hako->idToName[$ship[0]];
 
 						if($init->shipCost[$ship[1]] > $tIsland['money'] && $ship[0] != 0) {
 							// 維持費を払えなくなり海の藻屑となる
@@ -4382,11 +4390,11 @@ class Turn {
 										// 対象となる怪獣の各要素取り出し
 										$monsSpec = Util::monsterSpec($landValue[$sx][$sy]);
 										$tLv = $landValue[$sx][$sy];
-										$tspecial  = $init->monsterSpecial[$monsSpec['tkind']];
+										$tspecial  = $init->monsterSpecial[$monsSpec['kind']];
 										$tmonsName = $monsSpec['name'];
 										// 硬化中?
-										if((($special & 0x4) && (($hako->islandTurn % 2) == 1)) ||
-											(($special & 0x10) && (($hako->islandTurn % 2) == 0))) {
+										if((($tspecial & 0x4) && (($hako->islandTurn % 2) == 1)) ||
+											(($tspecial & 0x10) && (($hako->islandTurn % 2) == 0))) {
 											// 硬化中なら効果なし
 											break;
 										}
@@ -4402,7 +4410,7 @@ class Turn {
 											$value = $init->monsterValue[$monsSpec['kind']];
 											if($value > 0) {
 												$island['money'] += $value;
-												$this->log->msMonMoney($id, $target, $tmonsName, $value);
+												$this->log->msMonMoney($id, '', $tmonsName, $value);
 											}
 										}
 										$tName = $hako->idToName[$ship[0]];
@@ -4510,7 +4518,7 @@ class Turn {
 											} elseif($land[$sx][$sy] == $init->landShip) {
 												// 船舶の場合
 												$tShip = Util::navyUnpack($landValue[$sx][$sy]);
-												$tName = $hako->idToName[$tShip[0]];
+												$tName = &$hako->idToName[$tShip[0]];
 												$tshipName = $init->shipName[$tShip[1]];
 												if($tShip[1] < 10) {
 													// 海賊船の攻撃
