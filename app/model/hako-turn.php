@@ -1110,8 +1110,8 @@ class Turn {
 						if($landKind == $init->landHatuden) {
 							// すでに発電所の場合
 							$landValue[$x][$y] += 40; // 規模 + 40000kw
-							if($landValue[$x][$y] > 250) {
-								$landValue[$x][$y] = 250; // 最大 250000kw
+							if($landValue[$x][$y] > 300) {
+								$landValue[$x][$y] = 300; // 最大 300000kw
 							}
 						} else {
 							// 目的の場所を発電所に
@@ -1945,6 +1945,9 @@ class Turn {
 						// 0の場合は撃てるだけ
 						$arg = $island['fire'];
 					}
+					if($kind == $init->comMissileST) {
+						$arg = 1;
+					}
 					$comp = $arg;
 					// ターゲット取得
 					$tn = $hako->idToNumber[$target];
@@ -2505,10 +2508,10 @@ class Turn {
 									}
 									$tLandValue[$tx][$ty] -= 5;
 								} elseif((($tL == $init->landFactory) && ($tLv > 100)) ||
-									(($tL == $init->landHatuden) && ($tLv > 500)) ||
+									(($tL == $init->landHatuden) && ($tLv > 150)) ||
 									(($tL == $init->landCommerce) && ($tLv > 150)) ||
 									(($tL == $init->landProcity) && ($tLv >= 160))) {
-									// 工場、発電所、商業ビル、防災都市（規模減少）
+									// 工場、大型発電所、商業ビル、防災都市（規模減少）
 									if($kind == $init->comMissileST) {
 										// ステルス
 										$this->log->msGensyoS($id, $target, $name, $tName, $comName, $tLname, $point, $tPoint);
@@ -4768,16 +4771,23 @@ class Turn {
 
 		// 宝くじ判定
 		if(($hako->islandTurn % $init->lottery) == 0) {
-			if((Util::random(500) < $island['lot']) && ($island['lot'] > 0)) {
-				// 何等賞に当選するか？
-				$syo   = Util::random(2) + 1;
-				$value = $init->lotmoney / $syo;
-				$island['money'] += $value;
-				$str = "{$value}{$init->unitMoney}";
-				// 収入ログ
-				$this->log->LotteryMoney($id, $name, $str, $syo);
+			// 宝くじを買ってた
+			if ($island['lot'] > 0) {
+				// 当てた
+				if(Util::random(500) < $island['lot']) {
+					// 何等賞に当選するか？
+					$syo   = Util::random(2) + 1;
+					$value = $init->lotmoney / $syo;
+					$island['money'] += $value;
+					$str = "{$value}{$init->unitMoney}";
+					// 収入ログ
+					$this->log->LotteryMoney($id, $name, $str, $syo);
+				// 外れた
+				} else {
+					$this->log->LotteryBlank($id, $name);
+				}
 			}
-			// 宝くじの枚数リセット
+			// 宝くじの所有枚数リセット
 			$island['lot'] = 0;
 		}
 
@@ -5033,13 +5043,8 @@ class Turn {
 		}
 
 		// 怪獣判定
-		if($island['isBF'] == 1) {
-			$r = Util::random(500);
-			$pop = $island['pop'];
-		} else {
-			$r = Util::random(10000);
-			$pop = $island['pop'];
-		}
+		$r = ($island['isBF'] == 1)? Util::random(500): Util::random(10000);
+		$pop = $island['pop'];
 		$isMons = (($presentItem == 3) && ($pop >= $init->disMonsBorder1));
 
 		if ( !isset($island['monstersend']) ) {
@@ -5176,7 +5181,7 @@ class Turn {
 		}
 
 		// 巨大隕石判定
-		if (((Util::random(1000) < ($init->disHugeMeteo - (int)($island['eisei'][2] / 50))) && ($island['id'] != 1))
+		if (((Util::random(1000) < ($init->disHugeMeteo - (int)($island['eisei'][2] / 50))) && ($island['isBF'] != 1))
 			|| ($presentItem == 6)) {
 			// 落下
 			if ( $presentItem == 6 ) {
@@ -5517,7 +5522,7 @@ class Turn {
 					($landKind == $init->landWaste) ||
 					($landKind == $init->landMountain) ||
 					($landKind == $init->landSbase)) {
-					continue;
+						continue;
 				} elseif(($landKind == $init->landMonster) || ($landKind == $init->landSleeper)) {
 					$land[$sx][$sy] = $init->landWaste;
 					$landValue[$sx][$sy] = 0;
