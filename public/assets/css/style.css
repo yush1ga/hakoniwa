@@ -10,7 +10,7 @@
 /* 基本構成 ---------------------------------------------------------*/
 
 body {
-    font-family: "游ゴシック体", "Yu Gothic", YuGothic, sans-serif;
+    font-family: "游ゴシック体", "Yu Gothic", YuGothic, Meiryo, sans-serif;
     color: #333;
     background-color: #f6fbfd;
 }

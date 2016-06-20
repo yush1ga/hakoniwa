@@ -156,24 +156,15 @@ class Util {
 	//---------------------------------------------------
 	static function encode($s) {
 		global $init;
-
-		if($init->cryptOn) {
-			return crypt($s, 'h2');
-		} else {
-			return $s;
-		}
+		return ($init->cryptOn)? crypt($s, 'h2'): $s;
 	}
 
 	//---------------------------------------------------
 	// 0 ～ num -1 の乱数生成
 	//---------------------------------------------------
 	static function random($num = 0) {
-		if($num <= 1) {
-			return 0;
-		}
-		return mt_rand(0, $num - 1);
+		return ($num <= 1)? 0: mt_rand(0, $num - 1);
 	}
-
 
 	//---------------------------------------------------
 	// ランダムな座標を生成

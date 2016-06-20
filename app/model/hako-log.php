@@ -638,6 +638,10 @@ class Log extends LogIO {
 	function LotteryMoney($id, $name, $str, $syo) {
 		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}が<strong>宝くじ{$syo}等賞</strong>に当選！<strong>{$str}</strong>の当選金を受け取りました。",$id);
 	}
+	// 宝くじはずれ
+	function LotteryBlank($id, $name) {
+		$this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}{$this->init->_tagName}</a>が購入していた宝くじは、全て外れてしまいました…。",$id);
+	}
 	// 遊園地からの収入
 	function ParkMoney($id, $name, $lName, $point, $str) {
 		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<B>{$lName}</B>から、<B>{$str}</B>の収益が上がりました。",$id);
@@ -784,7 +788,7 @@ class Log extends LogIO {
 	}
 	// 怪獣による食料増加
 	function MonsFood($id, $name, $mName, $point, $str) {
-		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<strong>怪獣{$mName}</strong>が撒き散らした栄養たっぷり💩の影響で、{$this->init->nameFood}が<strong>{$str}</strong>増産されました。",$id);
+		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<strong>怪獣{$mName}</strong>が大地を踏み肥やした影響で、{$this->init->nameFood}が<strong>{$str}</strong>増産されました。",$id);
 	}
 	// 怪獣による資金減少
 	function MonsMoney2($id, $name, $mName, $point, $str) {
@@ -792,7 +796,7 @@ class Log extends LogIO {
 	}
 	// 怪獣による食料減少
 	function MonsFood2($id, $name, $mName, $point, $str) {
-		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<strong>怪獣{$mName}</strong>が撒き散らした悪臭漂う💩の影響で、{$this->init->nameFood}が<strong>{$str}</strong>腐敗しました。",$id);
+		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<strong>怪獣{$mName}</strong>が大地を踏み荒らした影響で、{$this->init->nameFood}が<strong>{$str}</strong>腐敗しました。",$id);
 	}
 	// 地盤沈下発生
 	function falldown($id, $name) {

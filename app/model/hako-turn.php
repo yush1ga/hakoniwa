@@ -256,7 +256,7 @@ class Turn {
 				$island['absent']++;
 
 				// 自動放棄
-				if($island['absent'] >= $init->giveupTurn) {
+				if($island['absent'] > $init->giveupTurn) {
 					$comArray[0] = array (
 						'kind'   => $init->comGiveup,
 						'target' => 0,
@@ -1969,7 +1969,7 @@ class Turn {
 					$tLand      = &$tIsland['land'];
 					$tLandValue = &$tIsland['landValue'];
 
-					if((($hako->islandTurn - $island['starturn']) < $init->noMissile) || (($hako->islandTurn - $tIsland['starturn']) < $init->noMissile)) {
+					if(($island['isBF']!='1' && $tIsland['isBF']!='1') && ((($hako->islandTurn - $island['starturn']) < $init->noMissile) || (($hako->islandTurn - $tIsland['starturn']) < $init->noMissile))) {
 						// 実行許可ターンを経過したか？
 						$this->log->Forbidden($id, $name, $comName);
 						$returnMode = 0;
@@ -3294,7 +3294,7 @@ class Turn {
 
 			case $init->comLot:
 				// 宝くじ購入
-				if($island['lot'] > 30){
+				if($island['lot'] >= 30){
 					// 宝くじ完売
 					$this->log->noLot($id, $name, $comName);
 					$returnMode = 0;
@@ -3314,7 +3314,7 @@ class Turn {
 				// 金を差し引く
 				$island['money'] -= $value;
 
-				$returnMode =  1;
+				$returnMode = 0;
 				break;
 
 			case $init->comPropaganda:
@@ -3384,7 +3384,7 @@ class Turn {
 
 		if ( isset($island['food']) ) {}
 		if ( !isset($island['propaganda']) ) {
-			$island['propaganda'] = "";
+			$island['propaganda'] = 0;
 		}
 
 		if($island['food'] <= 0) {
@@ -3393,14 +3393,14 @@ class Turn {
 		} elseif(($island['ship'][10] + $island['ship'][11] + $island['ship'][12] + $island['ship'][13] + $island['ship'][14]) > 0) {
 			// 海賊船が出没中は成長しない
 			$addpop = 0;
-		} elseif($island['park'] > 0) {
-			// 遊園地があると人が集まる
-			$addpop  += 10;
-			$addpop2 += 1;
 		} elseif($island['propaganda'] == 1) {
 			// 誘致活動中
 			$addpop = 30;
 			$addpop2 = 3;
+		} elseif($island['park'] > 0) {
+			// 遊園地があると人が集まる
+			$addpop  += 10;
+			$addpop2 += 1;
 		} else {
 
 		}
@@ -4618,8 +4618,8 @@ class Turn {
 							}
 						}
 					}
-					}
-					break;
+				}
+				break;
 			}
 			// すでに$init->landTownがcase文で使われているのでswitchを別に用意
 			switch($landKind) {
@@ -4857,10 +4857,15 @@ class Turn {
 						if(($landKind == $init->landSeaCity) || ($landKind == $init->landFroCity) ||
 							($landKind == $init->landSfarm)) {
 							$land[$x][$y] = $init->landSea;
+							$landValue[$x][$y] = 0;
+						} elseif($landKind==$init->landSeaSide) {
+							$land[$x][$y] = $init->landSea;
+							$landValue[$x][$y] = 1;
 						} else {
 							$land[$x][$y] = $init->landWaste;
+							$landValue[$x][$y] = 0;
 						}
-						$landValue[$x][$y] = 0;
+
 					}
 				}
 				if((($landKind == $init->landBigtown) && ($lv >= 100)) ||
@@ -5161,7 +5166,7 @@ class Turn {
 					($landKind == $init->landHaribote)) {
 					// 1d12 <= (6 - 周囲の森) で崩壊
 					if(Util::random(12) <
-						(6 - Turn::countAround($land, $x, $y, 7, array($init->landForest, $init->landFusy, $init->landMonument)))) {
+						(6 - Turn::countAround($land, $x, $y, 7, array($init->landForest, $init->landFusya, $init->landMonument)))) {
 						$this->log->typhoonDamage($id, $name, $this->landName($landKind, $lv), "({$x}, {$y})");
 						if (($landKind == $init->landSeaSide)||($landKind == $init->landNursery)){
 							//砂浜か養殖場ならは浅瀬
@@ -5456,7 +5461,7 @@ class Turn {
 	//---------------------------------------------------
 	// 広域被害ルーチン
 	//---------------------------------------------------
-	function wideDamage($id, $name, $land, $landValue, $x, $y) {
+	function wideDamage($id, $name, &$land, &$landValue, $x, $y) {
 		global $init;
 
 		for($i = 0; $i < 19; $i++) {
@@ -5468,6 +5473,7 @@ class Turn {
 			}
 			$landKind = $land[$sx][$sy];
 			$lv = $landValue[$sx][$sy];
+			// ログ用の情報用意
 			$landName = $this->landName($landKind, $lv);
 			$point = "({$sx}, {$sy})";
 			// 範囲外判定

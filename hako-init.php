@@ -168,7 +168,7 @@ class Init {
 	// お金の単位
 	public $unitMoney   = "億円";
 	// 怪獣の単位
-	public $unitMonster = "匹";
+	public $unitMonster = "頭";
 
 	// 保有せず
 	public $notHave 	= "保有せず";
@@ -227,7 +227,7 @@ class Init {
 	public $lengthAllyMessage = 1500; // 「同盟の情報」欄の上に表示される盟主メッセージ
 
 	// スタイルシートを改変していないので、ここに記述
-	public $tagMoney_  = '<span style="color:#999933; font-weight:bold;">';
+	public $tagMoney_  = '<span style="color:#993; font-weight:bold;">';
 	public $_tagMoney  = '</span>';
 
 	// コメントの自動リンク (0:しない 1:する)
@@ -677,8 +677,8 @@ class Init {
 	public $pointNumber;
 
 	// 周囲2ヘックスの座標
-	public $ax = array(0, 1, 1, 1, 0,-1, 0, 1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
-	public $ay = array(0,-1, 0, 1, 1, 0,-1,-2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2);
+	public $ax = array(0,  1, 1, 1, 0,-1, 0,  1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
+	public $ay = array(0, -1, 0, 1, 1, 0,-1, -2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2);
 
 	// コメントなどに、予\定のように\が勝手に追加される
 	public $stripslashes;
