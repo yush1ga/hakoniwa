@@ -1055,15 +1055,7 @@ class Main {
 		}
 		if(!empty($_POST)) {
 			while(list($name, $value) = each($_POST)) {
-				$value = str_replace(",", "", $value);
-				// JcodeConvert($value, 0, 2);
-				// $value = HANtoZEN_UTF8($value);
-
-				if($init->stripslashes == true) {
-					$this->dataSet["{$name}"] = stripslashes($value);
-				} else {
-					$this->dataSet["{$name}"] = $value;
-				}
+				$this->dataSet["{$name}"] = str_replace(",", "", $value);
 			}
 			if( isset($this->dataSet['Allypact']) ) {
 				$this->mode = "AllypactUp";

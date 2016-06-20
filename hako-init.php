@@ -7,8 +7,8 @@
  */
 
 class Init {
-   //function __construct() {}
-   //function __destruct() {}
+    //function __construct() {}
+    //function __destruct() {}
 
 	// 各種設定値
 
@@ -680,9 +680,6 @@ class Init {
 	public $ax = array(0,  1, 1, 1, 0,-1, 0,  1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
 	public $ay = array(0, -1, 0, 1, 1, 0,-1, -2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2);
 
-	// コメントなどに、予\定のように\が勝手に追加される
-	public $stripslashes;
-
 
 	//////////////////////////////////////////////////
 
@@ -915,7 +912,6 @@ class Init {
 		$this->setpubliciable();
 		mt_srand($_SERVER['REQUEST_TIME']);
 		// 日本時間にあわせる
-		$this->stripslashes = get_magic_quotes_gpc();
 	}
 
 }

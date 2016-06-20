@@ -28,12 +28,7 @@ class CgiImitation {
 
 		if(!empty($_POST)) {
 			while(list($name, $value) = each($_POST)) {
-				$value = str_replace(",", "", $value);
-				if($init->stripslashes == true) {
-					$this->dataSet["{$name}"] = stripslashes($value);
-				} else {
-					$this->dataSet["{$name}"] = $value;
-				}
+				$this->dataSet["{$name}"] = str_replace(",", "", $value);
 			}
 			if(!empty($_POST['Sight'])) {
 				$this->dataSet['ISLANDID'] = $_POST['Sight'];

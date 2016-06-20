@@ -2161,7 +2161,6 @@ END;
 		echo <<<END
 <strong>ターン$lastTurn</strong><br>
 <strong>最終更新時間</strong>:$timeString<br>
-<strong>最終更新時間(秒数表示)</strong>:1970年1月1日から$lastTime 秒<br>
 <form action="{$this_file}" method="post">
 <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 <input type="hidden" name="mode" value="DELETE">
