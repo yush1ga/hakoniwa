@@ -253,11 +253,16 @@ class Util {
 		if($number == count($command) - 1) {
 			return;
 		}
-		for($i = $init->commandMax - 1; $i >= $number; $i--) {
-			if ( preg_match('/[^0-9]/', $i) ) {
-				$command[$i] = $command[$i - 1];
-			}
+		for($i = (int)$init->commandMax - 1; $i > $number; $i--) {
+			$command[$i] = $command[$i - 1];
 		}
+		$command[$i] = array(
+			'kind'   => $init->comDoNothing,
+			'target' => 0,
+			'x'      => 0,
+			'y'      => 0,
+			'arg'    => 0
+		);
 	}
 
 	//---------------------------------------------------
