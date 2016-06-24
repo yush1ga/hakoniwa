@@ -465,7 +465,7 @@ END;
 		<strong>船舶の種類</strong>
 		<select name="SHIP">
 END;
-		for($i = 0; $i < 15; $i++) {
+		for($i = 0, $c=count($init->shipName); $i < $c; $i++) {
 			if($init->shipName[$i] != "") {
 				if($i == $data['defaultSHIP']) {
 					echo "<option value=\"{$i}\" selected>{$init->shipName[$i]}</option>\n";
@@ -521,7 +521,7 @@ END;
 		$y = $data['POINTY'];
 		$ld = $data['LAND'];
 		$mons = $data['MONSTER'];
-		$ships = $data['SHIP'];
+		$ships = (int)$data['SHIP'];
 		$level = $data['LEVEL'];
 
 		if($ld == $init->landMonster || $ld == $init->landSleeper) {
@@ -536,7 +536,7 @@ END;
 			$level = $mons * 100 + $level;
 		} elseif($ld == $init->landShip) {
 			// 船舶のレベル設定
-			$level = Util::navyPack($id, $ships, $init->shipHP[$ships], 0, 0);
+			$level = Util::navyPack((int)$id, $ships, $init->shipHP[$ships], 0, 0);
 		}
 
 		// 更新データ設定

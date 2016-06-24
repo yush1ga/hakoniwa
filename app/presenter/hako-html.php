@@ -253,13 +253,13 @@ class HtmlTop extends HTML {
 
 			$lots = "";
 			if($lot > 0) {
-				$lots .= " <IMG SRC=\"{$init->imgDir}/lot.gif\" ALT=\"{$lot}枚\" title=\"{$lot}枚\">";
+				$lots .= " <IMG SRC=\"{$init->imgDir}/lot.gif\" ALT=\"くじ：{$lot}枚\" title=\"{$lot}枚\">";
 			}
 
 			$viking = "";
-			for($v = 10; $v < 15; $v++) {
+			for($v = $init->shipKind, $c=count($init->shipName); $v < $c; $v++) {
 				if($island['ship'][$v] > 0) {
-					$viking .= " <IMG SRC=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" ALT=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
+					$viking .= " <img src=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" alt=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
 				}
 			}
 

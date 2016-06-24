@@ -264,18 +264,18 @@ class Util {
 
 		// bit 意味
 		//-----------
-		//  7  島ID
-		//  4  種類
+		//  5  島ID
+		//  3  種類
 		//  4  耐久力
-		//  5  経験値
+		//  4  経験値
 		//  4  フラグ
-		// 24  合計
+		// 20  合計
 
 		$flag = $lv & 0x0f; $lv >>= 4;
-		$exp  = $lv & 0x1f; $lv >>= 5;
+		$exp  = $lv & 0x0f; $lv >>= 4;
 		$hp   = $lv & 0x0f; $lv >>= 4;
-		$kind = $lv & 0x0f; $lv >>= 4;
-		$id   = $lv;
+		$kind = $lv & 0x07; $lv >>= 3;
+		$id   = $lv & 0x1f;
 
 		return array($id, $kind, $hp, $exp, $flag);
 	}
@@ -288,22 +288,45 @@ class Util {
 
 		// bit 意味
 		//-----------
-		//  7  島ID
-		//  4  種類
+		//  5  島ID
+		//  3  種類
 		//  4  耐久力
-		//  5  経験値
+		//  4  経験値
 		//  4  フラグ
-		// 24  合計
+		// 20  合計
 
-		$lv = 0;
-		$lv |= $id   & 0x7f; $lv <<= 4;
-		$lv |= $kind & 0x0f; $lv <<= 4;
-		$lv |= $hp   & 0x0f; $lv <<= 5;
-		$lv |= $exp  & 0x1f; $lv <<= 4;
-		$lv |= $flag & 0x0f;
+		if($id>0x1f) throw new Exception("船籍ID不正", 1);
+
+		$exp  = min($exp,  15);
+		$flag = min($flag, 15);
+
+		$lv   = 0; $lv |= $id   & 0x1f;
+		$lv <<= 3; $lv |= $kind & 0x07;
+		$lv <<= 4; $lv |= $hp   & 0x0f;
+		$lv <<= 4; $lv |= $exp  & 0x0f;
+		$lv <<= 4; $lv |= $flag & 0x0f;
 
 		return $lv;
 	}
+
+	/**
+	 * 島の船データから、災害船舶（海賊船とか）を所持しているかを判定する
+	 * @param  arr     $ships 島データ内、船舶部分
+	 * @return boolean        災害船舶が1隻でも存在していたらtrue
+	 */
+	static function hasBadShip($ships)
+	{
+		global $init;
+		$arrSize    = count($ships);
+		$badShipsId = $init->shipKind;
+		$badShips   = 0;
+		for ($i=$badShipsId; $i < $arrSize; $i++) {
+			$badShips++;
+		}
+		return ($badShips!==0)? true: false;
+	}
+
+
 
 	//---------------------------------------------------
 	// ファイルをロックする

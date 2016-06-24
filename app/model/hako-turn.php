@@ -679,7 +679,7 @@ class Turn {
 					break;
 				}
 				$ownShip = 0;
-				for($i = 0; $i < 10; $i++) {
+				for($i = 0, $c=$init->shipKind; $i < $c; $i++) {
 					$ownShip += $island['ship'][$i];
 				}
 				if($init->shipMax <= $ownShip){
@@ -723,7 +723,7 @@ class Turn {
 					$this->log->landFail($id, $name, $comName, "船舶以外の地形", $point);
 					$returnMode = 0;
 					break;
-				} elseif($ship[1] >= 10) {
+				} elseif($ship[1] >= $init->shipKind) {
 					// 対象が海賊船の場合
 					$this->log->landFail($id, $name, $comName, $init->shipName[$ship[1]], $point);
 					$returnMode = 0;
@@ -792,7 +792,7 @@ class Turn {
 					$this->log->landFail($id, $name, $comName, "船舶以外の地形", $point);
 					$returnMode = 0;
 					break;
-				} elseif($ship[1] >= 10) {
+				} elseif($ship[1] >= $init->shipKind) {
 					// 対象が海賊船の場合
 					$this->log->landFail($id, $name, $comName, $init->shipName[$ship[1]], $point);
 					$returnMode = 0;
@@ -3390,7 +3390,7 @@ class Turn {
 		if($island['food'] <= 0) {
 			// 食料不足
 			$addpop = -30;
-		} elseif(($island['ship'][10] + $island['ship'][11] + $island['ship'][12] + $island['ship'][13] + $island['ship'][14]) > 0) {
+		} elseif(Util::hasBadShip($island['ship'])) {
 			// 海賊船が出没中は成長しない
 			$addpop = 0;
 		} elseif($island['propaganda'] == 1) {
@@ -3401,9 +3401,8 @@ class Turn {
 			// 遊園地があると人が集まる
 			$addpop  += 10;
 			$addpop2 += 1;
-		} else {
+		} else {}
 
-		}
 		$monsterMove = array();
 		$shipMove    = array();
 		for($i=0;$i<$init->islandSize;$i++){
@@ -4445,7 +4444,7 @@ class Turn {
 											$tShip = Util::navyUnpack($landValue[$sx][$sy]);
 											$tName = $hako->idToName[$ship[0]];
 											$tshipName = $init->shipName[$tShip[1]];
-											if($tShip[1] >= 10) {
+											if($tShip[1] > $init->shipKind) {
 												// 海賊船だった場合攻撃する
 												$tShip[2] -= 2;
 												if($tShip[2] <= 0) {
@@ -4474,7 +4473,7 @@ class Turn {
 								// 1ターンに1度しか攻撃できない
 								$ship[4] = intval($hako->islandTurn) % 10;
 							}
-						} elseif($ship[1] >= 10) {
+						} elseif($ship[1] > $init->shipKind) {
 							// 海賊船
 							if(Util::random(1000) < $init->disVikingRob) {
 								// 強奪
@@ -4489,7 +4488,6 @@ class Turn {
 								$treasure += $vMoney;
 								$ship[3] = $treasure / 1000;
 								$ship[4] = ($treasure - $ship[1] * 1000) / 100;
-								if($ship[3] > 32) $ship[3] = 32;
 								// 海賊船ステータス更新
 								$landValue[$x][$y] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
 							}
@@ -4937,7 +4935,7 @@ class Turn {
 
 		// 海賊船判定
 		$ownShip = 0;
-		for($i = 0; $i < 10; $i++) {
+		for($i = 0, $c=$init->shipKind; $i < $c; $i++) {
 			$ownShip += $island['ship'][$i];
 		}
 		if(Util::random(1000) < $init->disViking * $ownShip){
@@ -4950,7 +4948,7 @@ class Turn {
 				if(($landKind == $init->landSea) && ($lv == 0)) {
 					// 海賊船登場
 					$land[$x][$y] = $init->landShip;
-					$landValue[$x][$y] = Util::navyPack(0, 10, $init->shipHP[10], 0, 0);
+					$landValue[$x][$y] = Util::navyPack(0, array_search('海賊船', $init->shipName), $init->shipHP[10], 0, 0);
 					$this->log->VikingCome($id, $name, "($x,$y)");
 					break;
 				}
@@ -5616,7 +5614,7 @@ class Turn {
 
 		// 船
 		$shipCost = 0;
-		for($i = 0; $i < 10; $i++) {
+		for($i = 0, $c=$init->shipKind; $i < $c; $i++) {
 			$shipCost += $init->shipCost[$i] * $island['ship'][$i];
 		}
 		$island['money'] -= $shipCost;
@@ -5635,7 +5633,7 @@ class Turn {
 		global $init;
 
 		// 船舶数初期化
-		for($i = 0; $i < 15; $i++) {
+		for($i = 0, $c=count($init->shipName); $i < $c; $i++) {
 			$island['ship'][$i] = 0;
 		}
 	}

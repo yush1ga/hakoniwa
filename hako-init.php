@@ -285,41 +285,34 @@ class Init {
 	public $shipMax  = 5;
 
 	// 船舶の種類（造船対象の船舶）
-	public $shipKind = 4; // 最大15
+	public $shipKind = 4; // 最大7
 
-	// 船舶の名前（10以降は災害船舶と定義）
+	// 船舶の名前（5,6のみ災害船舶と定義）
 	public $shipName = array (
-		'輸送船',         # 0
-		'漁船',           # 1
-		'海底探索船',     # 2
-		'戦艦',           # 3
-		'',               # 4
-		'',               # 5
-		'',               # 6
-		'',               # 7
-		'',               # 8
-		'',               # 9
-		'海賊船',         # 10
-		'',               # 11
-		'',               # 12
-		'',               # 13
-		''                # 14
+		'輸送船',    // 0
+		'漁船',      // 1
+		'海底探索船', // 2
+		'戦艦',      // 3
+		'',         // 4
+		'',         // 5
+		'海賊船'     // 6
 		);
 
 	// 船舶維持費
-	public $shipCost = array(100, 200, 300, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	public $shipCost = array(100, 200, 300, 500, 0, 0, 0);
 
 	// 船舶体力（最大15）
-	public $shipHP   = array(1, 2, 3, 10, 1, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1);
+	public $shipHP   = array(1, 2, 3, 10, 0, 0, 10);
 
-	// 船舶経験値の最大値（最大でも255まで）
-	public $shipEX   = 100;
+	// 船舶経験値の最大値（最大でも15まで）
+	public $shipEX   = 15;
 
 	// レベルの最大値
-	public $shipLv   = 5;
+	public $shipLv   = 3;
 
 	// 経験値がいくつでレベルアップか
-	public $shipLevelUp   = array(10, 30, 60, 100);
+	public $shipLevelUp   = array(4, 14);
+	// public $shipLevelUp   = array(10, 30, 60, 100);
 
 	// 船舶設定値（確率：設定値 x 0.1%）
 	public $shipIncom          =  200; // 輸送船収入

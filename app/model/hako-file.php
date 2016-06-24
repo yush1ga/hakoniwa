@@ -781,7 +781,7 @@ class Hako extends File {
 					} else {
 						$naviText = "{$owner}島所属";
 					}
-				} elseif($ship[1] < 10) {
+				} elseif($ship[1] < $init->shipKind) {
 					$naviText = "{$owner}島所属<br>破損率：{$hp}%";
 				} else {
 					// 海賊船
@@ -1287,7 +1287,7 @@ class HakoEdit extends File {
 					} else {
 						$naviText = "{$owner}島所属";
 					}
-				} elseif($ship[1] < 10) {
+				} elseif($ship[1] < $init->shipKind) {
 					$naviText = "{$owner}島所属<br>破損率：{$hp}%";
 				} else {
 					// 海賊船
