@@ -65,7 +65,7 @@ class HtmlTop extends HTML {
 	function main($hako, $data) {
 		global $init;
 		$this_file = $init->baseDir . "/hako-main.php";
-		$allyfile = $init->baseDir . "/hako-ally.php";
+		$allyfile  = $init->baseDir . "/hako-ally.php";
 
 		$radio  = "checked";
 		$radio2 = "";
@@ -125,7 +125,7 @@ class HtmlTop extends HTML {
 			$island        = $hako->islands[$i];
 			$island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
 
-			$j            = ($island['isBF']) ? '★' : $i + 1;
+			$j            = ($island['isBF'])? '★': $i + 1;
 			$id           = $island['id'];
 			$pop          = $island['pop'] . $init->unitPop;
 			$area         = $island['area'] . $init->unitArea;
@@ -137,13 +137,13 @@ class HtmlTop extends HTML {
 			$lot          = $island['lot'];
 			$food         = $island['food'] . $init->unitFood;
 			$unemployed   = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
-			$unemployed   = '<font color="' . ($unemployed < 0 ? 'black' : '#C7243A') . '">' . sprintf("%-3d%%", $unemployed) . '</font>';
-			$farm         = ($island['farm'] <= 0) ? $init->notHave : $island['farm'] * 10 . $init->unitPop;
-			$factory      = ($island['factory'] <= 0) ? $init->notHave : $island['factory'] * 10 . $init->unitPop;
-			$commerce     = ($island['commerce'] <= 0) ? $init->notHave : $island['commerce'] * 10 . $init->unitPop;
-			$mountain     = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
-			$hatuden      = ($island['hatuden'] <= 0) ? $init->notHave : $island['hatuden'] * 10 . $init->unitPop;
-			$taiji        = ($island['taiji'] <= 0) ? "0匹" : $island['taiji'] * 1 . $init->unitMonster;
+			$unemployed   = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
+			$farm         = ($island['farm']     <= 0)? $init->notHave: $island['farm']    *10 . $init->unitPop;
+			$factory      = ($island['factory']  <= 0)? $init->notHave: $island['factory'] *10 . $init->unitPop;
+			$commerce     = ($island['commerce'] <= 0)? $init->notHave: $island['commerce']*10 . $init->unitPop;
+			$mountain     = ($island['mountain'] <= 0)? $init->notHave: $island['mountain']*10 . $init->unitPop;
+			$hatuden      = ($island['hatuden']  <= 0)? $init->notHave: $island['hatuden'] *10 . $init->unitPop;
+			$taiji        = ($island['taiji']    <= 0)? "0".$init->unitMonster: $island['taiji']. $init->unitMonster;
 			$peop         = ($island['peop'] < 0) ? "{$island['peop']}{$init->unitPop}" : "+{$island['peop']}{$init->unitPop}";
 			$okane        = ($island['gold'] < 0) ? "{$island['gold']}{$init->unitMoney}" : "+{$island['gold']}{$init->unitMoney}";
 			$gohan        = ($island['rice'] < 0) ? "{$island['rice']}{$init->unitFood}" : "+{$island['rice']}{$init->unitFood}";
@@ -178,11 +178,7 @@ class HtmlTop extends HTML {
 				$name = "{$init->tagName2_}{$name}({$island['absent']}){$init->_tagName2}";
 			}
 
-			if(!empty($island['owner'])) {
-				$owner = $island['owner'];
-			} else {
-				$owner = "コメント";
-			}
+			$owner = (!empty($island['owner']))? $island['owner']: "コメント";
 
 			$prize = $island['prize'];
 			$prize = $hako->getPrizeList($prize);
@@ -190,26 +186,26 @@ class HtmlTop extends HTML {
 			$point = $island['point'];
 
 			// /*if($init->commentNew > 0 && ($comment_turn + $init->commentNew) > $hako->islandTurn) { */
-			if( $comment_turn > $hako->islandTurn) {
-				$comment .= " <span class=\"new\">New</span>";
-			}
+			// if( $comment_turn > $hako->islandTurn) {
+			// 	$comment .= " <span class=\"new\">New</span>";
+			// }
 
 			$sora = "";
 			switch ($tenki) {
 				case 1:
-					$sora = "☀";//"<IMG SRC=\"{$init->imgDir}/tenki1.gif\" ALT=\"晴れ\" title=\"晴れ\">";
+					$sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
 					break;
 				case 2:
-					$sora = "☁";//"<IMG SRC=\"{$init->imgDir}/tenki2.gif\" ALT=\"曇り\" title=\"曇り\">";
+					$sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
 					break;
 				case 3:
-					$sora = "☂";//"<IMG SRC=\"{$init->imgDir}/tenki3.gif\" ALT=\"雨\" title=\"雨\">";
+					$sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
 					break;
 				case 4:
-					$sora = "⛈";//"<IMG SRC=\"{$init->imgDir}/tenki4.gif\" ALT=\"雷\" title=\"雷\">";
+					$sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
 					break;
 				default :
-					$sora = "☃";//"<IMG SRC=\"{$init->imgDir}/tenki5.gif\" ALT=\"雪\" title=\"雪\">";
+					$sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
 			}
 
 
@@ -525,19 +521,19 @@ class HtmlMap extends HTML {
 		$sora = "";
 		switch ($tenki) {
 			case 1:
-				$sora = "☀";//"<IMG SRC=\"{$init->imgDir}/tenki1.gif\" ALT=\"晴れ\" title=\"晴れ\">";
+				$sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
 				break;
 			case 2:
-				$sora = "☁";//"<IMG SRC=\"{$init->imgDir}/tenki2.gif\" ALT=\"曇り\" title=\"曇り\">";
+				$sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
 				break;
 			case 3:
-				$sora = "☂";//"<IMG SRC=\"{$init->imgDir}/tenki3.gif\" ALT=\"雨\" title=\"雨\">";
+				$sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
 				break;
 			case 4:
-				$sora = "⛈";//"<IMG SRC=\"{$init->imgDir}/tenki4.gif\" ALT=\"雷\" title=\"雷\">";
+				$sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
 				break;
 			default :
-				$sora = "☃";//"<IMG SRC=\"{$init->imgDir}/tenki5.gif\" ALT=\"雪\" title=\"雪\">";
+				$sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
 		}
 
 		$eiseis = "";
@@ -1837,7 +1833,7 @@ END;
 
 	<div class="text-center">
 
-	<input type="submit" class="btn btn-primary" value="計画送信" name="SENDPROJECT">
+	<input type="submit" class="btn btn-primary btn-lg" value="計画送信" name="SENDPROJECT">
 
 	<hr>
 
@@ -1959,8 +1955,8 @@ END;
 	<hr>
 
 	<h3>目標の島</h3>
-	<select name="TARGETID" onchange="settarget(this);">$hako->targetList</select>
-	<input type="button" value="目標捕捉" onClick="javascript: targetopen();">
+	<select name="TARGETID" onchange="settarget(this);">$hako->targetList</select><br>
+	<input type="button" class="btn btn-default btn-sm" value="目標捕捉" onClick="javascript: targetopen();">
 
 	<hr>
 
@@ -1974,19 +1970,19 @@ END;
 
 	<input type="hidden" name="ISLANDID" value="{$island['id']}">
 	<input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
-	<input type="submit" class="btn btn-primary" value="計画送信" name="SENDPROJECT">
+	<input type="submit" class="btn btn-primary btn-lg" value="計画送信" name="SENDPROJECT">
 
-	<p>最後に<font color="#C7243A">計画送信ボタン</font>を押すのを忘れないように。</p>
+	<p>最後に<span style="color:#c7243a;">計画送信ボタン</span>を<br>押すのを忘れないように。</p>
 
 </div>
 </form>
 
-<ul>
-	<li>ミサイル発射上限数[<b> {$island['fire']} </b>]発</li>
-	<li>所有船舶数[<b> {$ownship} </b>]隻</li>
+<ul class="list-unstyled">
+<li>ミサイル発射上限数[<b> {$island['fire']} </b>]発</li>
+<li>所有船舶数[<b> {$ownship} </b>]隻</li>
 </ul>
 
-<p>
+<!-- <p>
 <a href="javascript:void(0)" title='数字=数量　BS=一つ前削除
 DEL=削除　INS=資金繰り
 A=整地　J=地ならし
@@ -1997,7 +1993,7 @@ S=採掘場整備
 D=防衛施設建設
 M=ミサイル基地建設
 F=海底基地建設'>ショートカットキー入力簡易説明</a>
-</p>
+</p> -->
 
 </td>
 <td $init->bgMapCell id="plan" onmouseout="mc_out();return false;">
@@ -2019,24 +2015,17 @@ END;
 <hr>
 
 <div id='CommentBox'>
-	<h2>コメント更新</h2>
-	<form action="{$this_file}" method="post">
-		<div class="row">
-		  <div class="col-xs-12">
-			<div class="input-group">
-				<input type="text" name="MESSAGE" class="form-control" size="80" value="{$island['comment']}" placeholder="コメントする">
-				<input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
-				<input type="hidden" name="mode" value="comment">
-				<input type="hidden" name="ISLANDID" value="{$island['id']}">
-				<input type="hidden" name="DEVELOPEMODE" value="cgi">
-			  <span class="input-group-btn">
-				<input type="submit" class="btn btn-primary" value="コメント更新">
-			  </span>
-			</div>
-		  </div>
-		</div>
-
-	</form>
+<h2>コメント更新</h2>
+<form action="{$this_file}" method="post">
+<div class="input-group">
+<input type="text" name="MESSAGE" class="form-control" size="80" value="{$island['comment']}" placeholder="コメントする">
+<input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
+<input type="hidden" name="mode" value="comment">
+<input type="hidden" name="ISLANDID" value="{$island['id']}">
+<input type="hidden" name="DEVELOPEMODE" value="cgi">
+<span class="input-group-btn"><input type="submit" class="btn btn-primary" value="コメント更新"></span>
+</div>
+</form>
 </div>
 END;
 	}
@@ -2567,21 +2556,14 @@ END;
 		}
 		// メッセージ・盟約の表示
 		if($ally['message'] != '') {
-			$allyTitle = $ally['title'];
-			if($allyTitle == '') {
-				$allyTitle = '盟主からのメッセージ';
-			}
+			$allyTitle   = ($allyTitle != '')? $ally['title']: '盟主からのメッセージ';
 			$allyMessage = $ally['message'];
-			if($init->autoLink) {
-				//preg_replace("/(^|[^=\\\"'])(http:\/\/[[:alnum:]\+\$\;\?\.%,!#~*\/:@&=_-]+)/", "<a href='$2' target='_blank'>$2</a>", $allyMessage);
-				$allyMessage = Util::string_autolink($allyMessage);
-			}
 			echo <<<END
 <hr>
 
 <table class="table table-bordered" width="80%">
-	<TR><TH {$init->bgTitleCell}>{$init->tagTH_}$allyTitle{$init->_tagTH}</TH></TR>
-	<TR><TD {$init->bgCommentCell}><blockquote>$allyMessage</blockquote></TD></TR>
+	<tr><th {$init->bgTitleCell}>{$init->tagTH_}$allyTitle{$init->_tagTH}</th></tr>
+	<tr><td {$init->bgCommentCell}><blockquote>$allyMessage</blockquote></td></tr>
 </table>
 END;
 		}

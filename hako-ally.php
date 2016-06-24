@@ -929,13 +929,7 @@ class AllyUtil {
 	// パスワードのエンコード
 	//---------------------------------------------------
 	static function encode($s) {
-		global $init;
-
-		if($init->cryptOn) {
-			return crypt($s, 'h2');
-		} else {
-			return $s;
-		}
+		return crypt($s, 'h2');
 	}
 
 	//---------------------------------------------------

@@ -13,15 +13,9 @@ class Util {
 	static function aboutMoney($money = 0) {
 		global $init;
 
-		if($init->moneyMode) {
-			if($money < 500) {
-				return "推定 500{$init->unitMoney}未満";
-			} else {
-				return "推定 " . round($money / 1000) . "000" . $init->unitMoney;
-			}
-		} else {
-			return $money . $init->unitMoney;
-		}
+		return    ((int)$init->moneyMode <= 0)? $money .$init->unitMoney
+				: ($money < (int)$init->moneyMode )? "推定{$init->moneyMode}{$init->unitMoney}未満"
+				: '推定'. round($money / (int)$init->moneyMode ) * (int)$init->moneyMode . $init->unitMoney;
 	}
 
 	//---------------------------------------------------
@@ -90,7 +84,7 @@ class Util {
 			$i = $idToAllyNumber[$id];
 			$mark  = $ally[$i]['mark'];
 			$color = $ally[$i]['color'];
-			$name .= '<FONT COLOR="' . $color . '"><B>' . $mark . '</B></FONT> ';
+			$name .= '<span style="color:'.$color.';font-weight:bold;>' . $mark . '</span> ';
 		}
 		$name .= $island['name'] . "島";
 
@@ -155,8 +149,7 @@ class Util {
 	// パスワードのエンコード
 	//---------------------------------------------------
 	static function encode($s) {
-		global $init;
-		return ($init->cryptOn)? crypt($s, 'h2'): $s;
+		return crypt($s, 'h2');
 	}
 
 	//---------------------------------------------------
@@ -379,16 +372,5 @@ class Util {
 	 */
 	static function rand_string($max = 32) {
 		return substr(md5(uniqid(rand_number(), true)), 0, $max);
-	}
-
-	/**
-	 * 文字列内のURLをリンクにする
-	 * @param  [type] $string [description]
-	 * @return [type]         [description]
-	 */
-	static function string_autolink($string) {
-		$string = preg_replace('/(^|[^\"\w\.\~\-\/\?\&\#\+\=\:\;\@\%\!])(https?\:\/\/[\w\.\~\-\/\?\&\#\+\=\:\;\@\%\!]+)/', '$1<a href="$2" target="_blank">$2</a>', $string);
-
-		return $string;
 	}
 }

@@ -23,7 +23,7 @@ define("READ_LINE", 1024);
 
 
 // 開発用の設定
-if($DEBUG)
+if(DEBUG)
 {
     ini_set('display_errors', 1);
     set_time_limit(0);

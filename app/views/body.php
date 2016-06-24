@@ -1,7 +1,7 @@
 <body>
 <div class="container-fluid">
 	<header>
-		<ul class="list-inline">
+		<ul class="list-inline" style="font-size:.8em;">
 			<li><a href="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html" target="_blank">箱庭諸島スクリプト配布元</a> <a href="http://scrlab.g-7.ne.jp">[PHP]</a></li>
 			<li><a href="http://hakoniwa.symphonic-net.com" target="_blank">箱庭諸島S.E配布元</a></li>
 			<li><a href="http://snufkin.jp.land.to" target="_blank">沙布巾の箱庭</a></li>

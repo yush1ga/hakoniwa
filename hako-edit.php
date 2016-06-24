@@ -189,9 +189,6 @@ END;
 			} else {
 				$owner = "コメント";
 			}
-			if($init->commentNew > 0 && ($comment_turn + $init->commentNew) > $hako->islandTurn) {
-				$comment .= " <span class=\"new\">New</span>";
-			}
 			if($hako->islandNumber - $i == $hako->islandNumberBF) {
 				echo "</table>\n</div>\n";
 				echo "<BR>\n";

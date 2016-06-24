@@ -1012,7 +1012,7 @@ class Hako extends File {
 				$image = 'hatuden.gif';
 				$naviTitle = '発電所';
 				$naviText = "{$lv}000kw";
-				if($lv > 100) {
+				if($lv > 150) {
 				// 大型発電所
 				$image = 'hatuden2.gif';
 				$naviTitle = '大型発電所';
@@ -1226,6 +1226,7 @@ class HakoEdit extends File {
 		global $init;
 		$point = "({$x},{$y})";
 		$naviExp = "''";
+		$comStr = implode(",", $comStr);
 
 		if($x < $init->islandSize / 2) {
 			$naviPos = 0;
@@ -1517,7 +1518,7 @@ class HakoEdit extends File {
 				$image = 'hatuden.gif';
 				$naviTitle = '発電所';
 				$naviText = "{$lv}000kw";
-				if($lv > 100) {
+				if($lv > 150) {
 					// 大型発電所
 					$image = 'hatuden2.gif';
 					$naviTitle = '大型発電所';

@@ -34,8 +34,6 @@ class Init {
 	// ディレクトリ作成時のパーミション
 	public $dirMode = 0777;
 
-	//パスワードの暗号化 true: 暗号化、false: 暗号化しない
-	public $cryptOn      = true;
 	// パスワード・ファイル
 	public $passwordFile = "password.php";
 
@@ -59,7 +57,7 @@ class Init {
 	// ターン更新時の連続更新を許可するか？(0:しない、1:する)
 	public $contUpdate   = 1; // 1にすると負荷対策になります
 
-	// 島の最大数（最大250島まで）
+	// 島の最大数（最大100島まで）
 	public $maxIsland    = 30; // これ以上増やすとバグが生じやすくなります
 
 	// 島の大きさ
@@ -106,8 +104,10 @@ class Init {
 	// TOPページに一度に表示する島の数(0なら全島表示)
 	public $islandListRange = 10;//10;
 
-	// 資金表示モード
-	public $moneyMode  = true; // true: 100の位で四捨五入, false: そのまま
+	/* 資金表示モード
+	 * 0：そのまま表示、 1以上：指定された数値で丸める
+	 * 推奨値： 1000, 2000, 5000. デフォルト： 5000. */
+	public $moneyMode  = 5000;
 	// トップページに表示するログのターン数
 	public $logTopTurn = 4;
 	// ログファイル保持ターン数
@@ -168,7 +168,7 @@ class Init {
 	// お金の単位
 	public $unitMoney   = "億円";
 	// 怪獣の単位
-	public $unitMonster = "頭";
+	public $unitMonster = "体";
 
 	// 保有せず
 	public $notHave 	= "保有せず";
@@ -227,11 +227,8 @@ class Init {
 	public $lengthAllyMessage = 1500; // 「同盟の情報」欄の上に表示される盟主メッセージ
 
 	// スタイルシートを改変していないので、ここに記述
-	public $tagMoney_  = '<span style="color:#993; font-weight:bold;">';
+	public $tagMoney_  = '<span style="color:#993;font-weight:bold;">';
 	public $_tagMoney  = '</span>';
-
-	// コメントの自動リンク (0:しない 1:する)
-	public $autoLink   = 1;
 
 	// 以下は、表示関連で使用しているだけで、実際の機能を有していません、さらなる改造で実現可能です。
 
