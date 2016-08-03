@@ -54,7 +54,7 @@ class Util {
 		// 名前
 		$name = $init->monsterName[$kind];
 		// 体力
-		$hp = $lv - ($kind * 100);
+		$hp = $lv % 100;
 		return array( 'kind' => $kind, 'name' => $name, 'hp' => $hp );
 	}
 	//---------------------------------------------------

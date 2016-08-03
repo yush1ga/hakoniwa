@@ -30,14 +30,8 @@
  				$html->main($this->dataSet, $hako);
  				break;
 
- 			case "enter":
- 				if($this->passCheck()) {
- 					$html->main($this->dataSet, $hako);
- 				}
- 				break;
-
  			default:
- 				$html->enter();
+ 				$html->main($this->dataSet, $hako);
  				break;
  		}
  		$html->footer();

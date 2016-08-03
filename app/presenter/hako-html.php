@@ -2047,14 +2047,6 @@ class HtmlAdmin extends HTML {
 
 class HtmlPresent extends HTML {
 
-	function enter() {
-		global $init;
-		$this_file = $init->baseDir . "/hako-present.php";
-		$main_file = $init->baseDir . "/hako-main.php";
-
-		require_once(VIEWS.'/admin/present/top.php');
-	}
-
 	function main($data, $hako) {
 		global $init;
 		$this_file = $init->baseDir . "/hako-present.php";
@@ -2062,7 +2054,6 @@ class HtmlPresent extends HTML {
 
 		$width  = $init->islandSize * 32 + 50;
 		$height = $init->islandSize * 32 + 100;
-		//$defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
 		$defaultTarget = "";
 
 		require_once(VIEWS.'/admin/present/main.php');
@@ -2358,7 +2349,6 @@ END;
 
 		echo "<HR>";
 		echo <<<END
-<br>
 <h2>アクセスログ</h2>
 <form action="#">
 <input type="button" value="オートフィルタ表示" onclick="Button_DispFilter(this, 'DATA-TABLE')" onkeypress="Button_DispFilter(this, 'DATA-TABLE')">
