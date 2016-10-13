@@ -10,11 +10,8 @@ require_once HELPERPATH.'/message/error.php';
 require_once HELPERPATH.'/message/success.php';
 require_once APPPATH.'/model/hako-log.php';
 
+
 class HTML {
-	/**
-	 * HTML <head>
-	 * @return [type] [description]
-	 */
 	static function header() {
 		global $init;
 		require_once(VIEWS.'/header.php');
@@ -501,7 +498,7 @@ class HtmlMap extends HTML {
 		$commerce   = ($island['commerce'] <= 0) ? $init->notHave : $island['commerce'] * 10 . $init->unitPop;
 		$mountain   = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
 		$hatuden    = ($island['hatuden'] <= 0) ? $init->notHave : $island['hatuden'] * 10 . $init->unitPop;
-		$taiji      = ($island['taiji'] <= 0) ? "0匹" : $island['taiji'] * 1 . $init->unitMonster;
+		$taiji      = ($island['taiji'] <= 0) ? "0" .$init->unitMonster : $island['taiji'] * 1 . $init->unitMonster;
 		$tenki      = $island['tenki'];
 		$team       = $island['team'];
 		$shiai      = $island['shiai'];
@@ -780,7 +777,7 @@ END;
 			case $init->comMissileLU:
 				// ミサイル系
 				$n = ($arg == 0) ? '無制限' : "{$arg}発";
-				$str = "{$target}{$point}へ{$comName}({$init->tagName_}{$n}{$init->_tagName})";
+				$str = "{$target}{$point}へ{$comName}（{$init->tagName_}{$n}{$init->_tagName}）";
 				break;
 
 			case $init->comEisei:
@@ -833,7 +830,7 @@ END;
 			case $init->comDestroy:
 				// 掘削
 				if($arg != 0) {
-					$str = "{$point}で{$comName}(予算{$value})";
+					$str = "{$point}で{$comName}（予算{$value}）";
 				} else {
 					$str = "{$point}で{$comName}";
 				}
@@ -846,7 +843,7 @@ END;
 				} elseif ($arg > 30) {
 					$arg = 30;
 				}
-				$str = "{$comName}(予算{$value})";
+				$str = "{$comName}（予算{$value}）";
 				break;
 
 			case $init->comDbase:
@@ -856,7 +853,7 @@ END;
 				} elseif ($arg > $init->dBaseHP) {
 					$arg = $init->dBaseHP;
 				}
-				$str = "{$point}で{$comName}(耐久力{$arg})";
+				$str = "{$point}で{$comName}（耐久力{$arg}）";
 				break;
 
 			case $init->comSdbase:
@@ -866,7 +863,7 @@ END;
 				} elseif ($arg > $init->sdBaseHP) {
 					$arg = $init->sdBaseHP;
 				}
-				$str = "{$point}で{$comName}(耐久力{$arg})";
+				$str = "{$point}で{$comName}（耐久力{$arg}）";
 				break;
 
 			case $init->comSoukoM:
@@ -874,12 +871,12 @@ END;
 			case $init->comSoukoF:
 				// 倉庫建設
 				if($arg == 0) {
-					$str = "{$point}で{$comName}(セキュリティ強化)";
+					$str = "{$point}で{$comName}（セキュリティ強化）";
 				} else {
 					if($flagm == 1) {
-						$str = "{$point}で{$comName}({$value})";
+						$str = "{$point}で{$comName}（{$value}）";
 					} else {
-						$str = "{$point}で{$comName}({$value})";
+						$str = "{$point}で{$comName}（{$value}）";
 					}
 				}
 				break;
@@ -889,7 +886,7 @@ END;
 				if ($arg == 0) {
 					$arg = 1;
 				}
-				$str = "{$comName}({$value})";
+				$str = "{$comName}（{$value}）";
 				break;
 
 			case $init->comMakeShip:
@@ -897,7 +894,7 @@ END;
 				if ($arg >= $init->shipKind) {
 					$arg = $init->shipKind - 1;
 				}
-				$str = "{$point}で{$comName}({$init->shipName[$arg]})";
+				$str = "{$point}で{$comName}（{$init->shipName[$arg]}）";
 				break;
 
 			case $init->comShipBack:
@@ -917,7 +914,7 @@ END;
 				if($arg == 0) {
 					$str = "{$point}で{$comName}";
 				} else {
-					$str = "{$point}で{$comName}({$arg}回)";
+					$str = "{$point}で{$comName}（{$arg}回）";
 				}
 				break;
 
@@ -926,7 +923,7 @@ END;
 			case $init->comDefense:
 			case $init->comPractice:
 				// 強化
-				$str = "{$comName}({$arg}回)";
+				$str = "{$comName}（{$arg}回）";
 				break;
 
 			case $init->comPlaygame:
@@ -1118,7 +1115,7 @@ var p = $defaultTarget;
 
 // ＪＡＶＡスクリプト開発画面配布元
 // あっぽー庵箱庭諸島（ http://appoh.execweb.cx/hakoniwa/ ）
-// Programmed by Jynichi Sakai(あっぽー)
+// Programmed by Jynichi Sakai（あっぽー）
 // ↑ 削除しないで下さい。
 var str;
 var g  = [$com_max];
@@ -1978,8 +1975,8 @@ END;
 </form>
 
 <ul class="list-unstyled">
-<li>ミサイル発射上限数[<b> {$island['fire']} </b>]発</li>
-<li>所有船舶数[<b> {$ownship} </b>]隻</li>
+<li>ミサイル発射上限数[<strong> {$island['fire']} </strong>]発</li>
+<li>所有船舶数[<strong> {$ownship} </strong>]隻</li>
 </ul>
 
 <!-- <p>
@@ -2166,13 +2163,13 @@ END;
 	<input type="text" size="2" name="NSEC" value="{$time['tm_sec']}">秒
 	<input type="submit" value="変更">
 </form>
-<form action="{$this_file}" method="post">
+<!--<form action="{$this_file}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="STIME">
 	<input type="hidden" name="NUMBER" value="{$suf}">
 	1970年1月1日から<input type="text" size="32" name="SSEC" value="$lastTime">秒
 	<input type="submit" value="秒指定で変更">
-</form>
+</form>-->
 END;
 		}
 	}
@@ -2272,7 +2269,7 @@ END;
 		echo <<<END
 <strong>ターン$lastTurn</strong><br>
 <strong>最終更新時間</strong>:$timeString<br>
-<strong>最終更新時間(秒数表示)</strong>:1970年1月1日から$lastTime 秒<br>
+<strong>最終更新時間（秒数表示）</strong>:1970年1月1日から$lastTime 秒<br>
 <form action="{$this_file}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="DELETE">
@@ -2327,9 +2324,10 @@ class HtmlAxes extends HTML {
 		$this_file = $init->baseDir . "/hako-axes.php";
 
 		echo <<<END
-<h1 class="title">{$init->title}<br>アクセスログ閲覧室</h1>
+<h1 class="title">{$init->title}</h1>
+<h2>アクセスログ閲覧室</h2>
 <form action="{$this_file}" method="post">
-	<strong>パスワード：</strong>
+	<strong>パスワード？：</strong>
 	<input type="password" size="32" maxlength="32" name="PASSWORD">
 	<input type="hidden" name="mode" value="enter">
 	<input type="submit" value="入室する">
@@ -2339,7 +2337,7 @@ END;
 
 	function main($data) {
 		global $init;
-		echo "<h1 class=\"title\">アクセスログ閲覧室</h1>\n";
+		echo('<h1 class="title">', $init->title, ' <small class="text-muted">アクセスログ閲覧室</small></h1>',PHP_EOL);
 		$this->dataPrint($data);
 	}
 
@@ -2347,7 +2345,7 @@ END;
 	function dataPrint($data, $suf = "") {
 		global $init;
 
-		echo "<HR>";
+		echo "<hr>";
 		echo <<<END
 <h2>アクセスログ</h2>
 <form action="#">
@@ -2442,7 +2440,7 @@ END;
 		}
 
 		echo <<<END
-占有率は、同盟加盟の<b>総人口</b>により算出されたものです。
+占有率は、同盟加盟の<strong>総人口</strong>により算出されたものです。
 <div id="IslandView" class="table-responsive">
 <table class="table table-bordered">
 <thead>
@@ -2517,7 +2515,7 @@ END;
 		echo <<<END
 </table>
 </div>
-<p>※ 同盟の名前をクリックすると「同盟の情報」欄へ、盟主島の名前だと「コメント変更」欄へ移動します。</p>
+<p>※ 同盟の名前をクリックすると「同盟の情報」欄へ、盟主の島名をクリックすると「コメント変更」欄へ移動します。</p>
 END;
 
 	}
@@ -2557,7 +2555,7 @@ END;
 </table>
 END;
 		}
-        // メンバー一覧の表示
+		// メンバー一覧の表示
 		echo <<<END
 <HR>
 <TABLE class="table table-bordered">
@@ -2654,14 +2652,14 @@ END;
 			<INPUT TYPE="hidden"  NAME="ALLYID" VALUE="{$ally['id']}">
 			<INPUT TYPE="submit" VALUE="送信" NAME="AllypactButton"><BR>
 
-			<B>コメント</B><small>(全角{$init->lengthAllyComment}字まで：トップページの「各同盟の状況」欄に表示されます)</small>
+			<B>コメント</B><small>（全角{$init->lengthAllyComment}字まで：トップページの「各同盟の状況」欄に表示されます）</small>
 			<INPUT TYPE="text" NAME="ALLYCOMMENT" VALUE="{$ally['comment']}" MAXLENGTH="50" class="form-control">
 
-			<B>メッセージ・盟約など</B><small>(「同盟の情報」欄の上に表示されます)</small><BR>
-			タイトル<small>(全角{$init->lengthAllyTitle}字まで)</small>
+			<B>メッセージ・盟約など</B><small>（「同盟の情報」欄の上に表示されます）</small><BR>
+			タイトル<small>（全角{$init->lengthAllyTitle}字まで）</small>
 			<INPUT TYPE="text" NAME="ALLYTITLE"  VALUE="{$ally['title']}" MAXLENGTH="50" class="form-control">
 
-			メッセージ<small>(全角{$init->lengthAllyMessage}字まで)</small>
+			メッセージ<small>（全角{$init->lengthAllyMessage}字まで）</small>
 			<TEXTAREA COLS=50 ROWS=16 NAME="ALLYMESSAGE" WRAP="soft" class="form-control">{$allyMessage}</TEXTAREA>
 			<BR>
 			「タイトル」を空欄にすると『盟主からのメッセージ』というタイトルになります。<BR>
@@ -2778,14 +2776,14 @@ END;
 			$jsAllyMarkList .= "];\n";
 			$jsAllyColorList .= "];\n";
 		}
-		$str1 = $adminMode ? '(メンテナンス)' : $init->allyJoinComUse ? '' : '・加盟・脱退';
+		$str1 = $adminMode ? '（メンテナンス）' : $init->allyJoinComUse ? '' : '・加盟・脱退';
 		$str2 = $adminMode ? '' : 'onChange="colorPack()" onClick="colorPack()"';
 		$makeCost = $init->costMakeAlly ? "{$init->costMakeAlly}{$init->unitMoney}" : '無料';
 		$keepCost = $init->costKeepAlly ? "{$init->costKeepAlly}{$init->unitMoney}" : '無料';
 		$joinCost = isset($init->comCost[$init->comAlly]) ? "{$init->comCost[$init->comAlly]}{$init->unitMoney}" : '無料';
 		$joinStr = $init->allyJoinComUse ? '' : "加盟・脱退の際の費用は、{$init->tagMoney_}$joinCost{$init->_tagMoney}です。<BR>";
 		$str3 = $adminMode ? "特殊パスワードは？（必須）<BR>
-<INPUT TYPE=\"password\" NAME=\"OLDPASS\" VALUE=\"{$data['defaultPassword']}\" SIZE=32 MAXLENGTH=32 class=f><BR>同盟" : "<div class='alert alert-info'><span class='attention'>(注意)</span><BR>
+<INPUT TYPE=\"password\" NAME=\"OLDPASS\" VALUE=\"{$data['defaultPassword']}\" SIZE=32 MAXLENGTH=32 class=f><BR>同盟" : "<div class='alert alert-info'><span class='attention'>（注意）</span><BR>
 同盟の結成・変更の費用は、{$init->tagMoney_}{$makeCost}{$init->_tagMoney}です。<BR>
 また、毎ターン必要とされる維持費は{$init->tagMoney_}$keepCost{$init->_tagMoney}です。<BR>
 （維持費は同盟に所属する島で均等に負担することになります）<BR>
@@ -2824,11 +2822,11 @@ END;
 <BR>
 END;
 		}
-		$str7 = $adminMode ? "盟主島の変更(上のメニューで同盟を選択)<BR> or 同盟の新規作成(上のメニューは無効)<BR><SELECT NAME=\"ALLYID\"><option value=\"$max\">新規作成\n{$hako->islandList}</option></SELECT><BR>" : "<BR><B>［{$str0}変更］</B><BR>";
+		$str7 = $adminMode ? "盟主島の変更（上のメニューで同盟を選択）<BR> or 同盟の新規作成（上のメニューは無効）<BR><SELECT NAME=\"ALLYID\"><option value=\"$max\">新規作成\n{$hako->islandList}</option></SELECT><BR>" : "<BR><B>［{$str0}変更］</B><BR>";
 		echo <<<END
 <BR>
 {$str7}
-同盟の名前（変更）<small>(全角{$init->lengthAllyName}字まで)</small><BR>
+同盟の名前（変更）<small>(全角{$init->lengthAllyName}字まで）</small><BR>
 <INPUT TYPE="text" NAME="ALLYNAME" VALUE="$allyname" SIZE=32 MAXLENGTH=32 class="form-control"><BR>
 マーク（変更）<BR>
 <SELECT NAME="MARK" onChange="colorPack()" onClick="colorPack()">{$markList}</SELECT>
@@ -2846,21 +2844,21 @@ END;
 </TR>
 <TR>
 	<TD>
-		<SELECT NAME="COLOR1" onChange="colorPack()" onClick="colorPack()">{$colorList[1]}</SELECT>
-		<SELECT NAME="COLOR2" onChange="colorPack()" onClick="colorPack()">{$colorList[2]}</SELECT>
+		<SELECT name="COLOR1" onChange="colorPack()" onClick="colorPack()">{$colorList[1]}</SELECT>
+		<SELECT name="COLOR2" onChange="colorPack()" onClick="colorPack()">{$colorList[2]}</SELECT>
 	</TD>
 	<TD>
-		<SELECT NAME="COLOR3" onChange="colorPack()" onClick="colorPack()">{$colorList[3]}</SELECT>
-		<SELECT NAME="COLOR4" onChange="colorPack()" onClick="colorPack()">{$colorList[4]}</SELECT>
+		<SELECT name="COLOR3" onChange="colorPack()" onClick="colorPack()">{$colorList[3]}</SELECT>
+		<SELECT name="COLOR4" onChange="colorPack()" onClick="colorPack()">{$colorList[4]}</SELECT>
 	</TD>
 	<TD>
-		<SELECT NAME="COLOR5" onChange="colorPack()" onClick="colorPack()">{$colorList[5]}</SELECT>
-		<SELECT NAME="COLOR6" onChange="colorPack()" onClick="colorPack()">{$colorList[6]}</SELECT>
+		<SELECT name="COLOR5" onChange="colorPack()" onClick="colorPack()">{$colorList[5]}</SELECT>
+		<SELECT name="COLOR6" onChange="colorPack()" onClick="colorPack()">{$colorList[6]}</SELECT>
 	</TD>
 </TR>
 </TABLE>
 
-<INPUT TYPE="submit" VALUE="結成 (変更)" NAME="NewAllyButton" class="btn btn-primary">
+<input type="submit" value="結成 （変更）" name="NewAllyButton" class="btn btn-primary">
 END;
 		if(!$adminMode) {
 			echo <<<END
@@ -2879,8 +2877,7 @@ function colorPack() {
 
 	str = "#" + a + b + c + d + e + f;
 
-	str = '表示サンプル：『<B><span class="number"><FONT color="' + str +'">' + mark + '</FONT></B>'
-		+ island[number] + '島</span>』';
+	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span>' + island[number] + '島</span>』';
 
 	document.getElementById("CTBL").innerHTML = str;
 
@@ -2918,8 +2915,7 @@ function colorPack() {
 
 	var str = "#" + a + b + c + d + e + f;
 
-	str = '表示サンプル：『<B><span class="number"><FONT color="' + str +'">' + mark + '</FONT></B>'
-		+ 'さんぷる島</span>』';
+	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span> ●●●島</span>』';
 
 	document.getElementById("CTBL").innerHTML = str;
 
