@@ -16,7 +16,7 @@ date_default_timezone_set('Asia/Tokyo');
 
 // 箱庭の設定
 $ISLAND_TURN; // ターン数
-define("DEBUG", false);                     // true: デバッグ false: 通常
+define("DEBUG", false);                 // true: デバッグ false: 通常
 define("LOCK_RETRY_COUNT", 10);         // ファイルロック処理のリトライ回数
 define("LOCK_RETRY_INTERVAL", 1000);    // 再ロック処理実施までの時間(ミリ秒)。最低でも500くらいを指定
 define("READ_LINE", 1024);

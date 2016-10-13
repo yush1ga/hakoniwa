@@ -2324,11 +2324,9 @@ class HtmlAxes extends HTML {
 		$this_file = $init->baseDir . "/hako-axes.php";
 
 		echo <<<END
-<h1 class="title">{$init->title}</h1>
-<h2>アクセスログ閲覧室</h2>
+<h1 class="title">{$init->title} <small class="text-muted">アクセスログ閲覧室</small></h1>
 <form action="{$this_file}" method="post">
-	<strong>パスワード？：</strong>
-	<input type="password" size="32" maxlength="32" name="PASSWORD">
+	<label>パスワード確認：<input type="password" size="32" maxlength="32" name="PASSWORD"></label>
 	<input type="hidden" name="mode" value="enter">
 	<input type="submit" value="入室する">
 </form>
@@ -2345,22 +2343,23 @@ END;
 	function dataPrint($data, $suf = "") {
 		global $init;
 
-		echo "<hr>";
 		echo <<<END
+<hr>
+
 <h2>アクセスログ</h2>
-<form action="#">
+<form>
 <input type="button" value="オートフィルタ表示" onclick="Button_DispFilter(this, 'DATA-TABLE')" onkeypress="Button_DispFilter(this, 'DATA-TABLE')">
 <table id="DATA-TABLE">
-	<thead>
-		<tr class="NumberCell">
-			<td scope="row" colspan=2><input type="button" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])" value="ログインした時間"></td>
-			<td scope="row"><input type="button" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" value="島ＩＤ"></td>
-			<td scope="row"><input type="button" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" value="島の名前"></td>
-			<td scope="row"><input type="button" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" value="ＩＰ情報"></td>
-			<td scope="row"><input type="button" tabindex="5" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" value="ホスト情報"></td>
-		</tr>
-	</thead>
-	<tbody>
+<thead>
+	<tr class="NumberCell">
+		<td scope="row" colspan=2><input type="button" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])" value="ログインした時間"></td>
+		<td scope="row"><input type="button" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" value="島ＩＤ"></td>
+		<td scope="row"><input type="button" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" value="島の名前"></td>
+		<td scope="row"><input type="button" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" value="ＩＰ情報"></td>
+		<td scope="row"><input type="button" tabindex="5" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" value="ホスト情報"></td>
+	</tr>
+</thead>
+<tbody>
 END;
 		// ファイルを読み込み専用でオープンする
 		$fp = fopen("{$init->dirName}/{$init->logname}", 'r');
@@ -2371,9 +2370,7 @@ END;
 			$line = fgets($fp);
 			if($line !== FALSE) {
 				$num = str_replace([' ', ','], "</td><td scope=\"col\">", $line);
-				echo "<tr>\n";
-				echo "<td scope=\"col\">{$num}</td>\n";
-				echo "</tr>\n";
+				echo("\t<tr><td scope=\"col\">{$num}</td></tr>",PHP_EOL);
 			}
 		}
 		fclose($fp);
