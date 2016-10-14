@@ -6,12 +6,9 @@
  * @author hiro <@hiro0218>
  */
 
-// set default charset
+// set default charset / TimeZone settings
 ini_set('default_charset', 'UTF-8');
-
-// TimeZone settings
 date_default_timezone_set('Asia/Tokyo');
-
 
 
 // 箱庭の設定
@@ -33,16 +30,16 @@ if(DEBUG)
 }
 
 
-// PATHの定数
-define('DOCROOT', __DIR__.DIRECTORY_SEPARATOR);  // ドキュメントルート パス
-define('APPPATH', realpath(__DIR__.'/app/').DIRECTORY_SEPARATOR);  // アプリケーションディレクトリ パス
-define('CONTROLLERPATH', realpath(APPPATH.'/controller/').DIRECTORY_SEPARATOR);  // コントローラ パス
-define('HELPERPATH', realpath(APPPATH.'/helper/').DIRECTORY_SEPARATOR);  // ヘルパー パス
-define('MODELPATH', realpath(APPPATH.'/model/').DIRECTORY_SEPARATOR);  // モデル パス
-define('PRESENTER', realpath(APPPATH.'/presenter/').DIRECTORY_SEPARATOR);  // プレゼンター パス
-define('VIEWS', realpath(APPPATH.'/views/').DIRECTORY_SEPARATOR);  //
+// 各種ディレクトリ
+define('DOCROOT', __DIR__.DIRECTORY_SEPARATOR);  // ドキュメントルート
+define('APPPATH', realpath(__DIR__.'/app/').DIRECTORY_SEPARATOR);  // アプリケーションディレクトリ
+define('CONTROLLERPATH', realpath(APPPATH.'/controller/').DIRECTORY_SEPARATOR);  // コントローラ
+define('HELPERPATH', realpath(APPPATH.'/helper/').DIRECTORY_SEPARATOR);  // ヘルパー
+define('MODELPATH', realpath(APPPATH.'/model/').DIRECTORY_SEPARATOR);  // モデル
+define('PRESENTER', realpath(APPPATH.'/presenter/').DIRECTORY_SEPARATOR);  // プレゼンター
+define('VIEWS', realpath(APPPATH.'/views/').DIRECTORY_SEPARATOR);  // ビュー
 
 
 // 共通
 require_once DOCROOT.'hako-init.php';
-require_once APPPATH.'/helper/util.php';
+require_once APPPATH.'helper/util.php';

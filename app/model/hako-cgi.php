@@ -16,7 +16,7 @@ class Cgi {
 	function parseInputData() {
 		global $init;
 
-		$this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
+		$this->mode = $_POST['mode'] ?? "";
 
 		if(!empty($_POST)) {
 			while(list($name, $value) = each($_POST)) {
@@ -48,18 +48,13 @@ class Cgi {
 				$init->adminMode = 1;
 				}
 		}
+		// この段階でmodeにturnがセットされるのは不正アクセスの場合のみなのでクリアする
 		if($this->mode == "turn") {
-			// この段階で mode に turn がセットされるのは不正アクセスがある場合のみなのでクリアする
 			$this->mode = '';
 		}
-		if(!empty($_GET['islandListStart'])) {
-			$this->dataSet['islandListStart'] = $_GET['islandListStart'];
-		} else {
-			$this->dataSet['islandListStart'] = 1;
-		}
-
-		$this->dataSet["ISLANDNAME"]  = (isset( $this->dataSet['ISLANDNAME'] ))  ? mb_substr($this->dataSet["ISLANDNAME"], 0, 16) : "";
-		$this->dataSet["MESSAGE"]     = (isset( $this->dataSet['MESSAGE'] ))     ? mb_substr($this->dataSet["MESSAGE"], 0, 60) : "";
+		$this->dataSet['islandListStart'] = (!empty($_GET['islandListStart']))? $_GET['islandListStart'] : 1;
+		$this->dataSet["ISLANDNAME"] = (isset($this->dataSet['ISLANDNAME']))? mb_substr($this->dataSet["ISLANDNAME"], 0, 16) : "";
+		$this->dataSet["MESSAGE"] = (isset($this->dataSet['MESSAGE']))? mb_substr($this->dataSet["MESSAGE"], 0, 60) : "";
 	}
 
 

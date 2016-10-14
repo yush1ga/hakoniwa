@@ -20,13 +20,13 @@
  		$html->header();
 
  		switch($this->mode) {
- 			case "enter":
+ 			case "auth":
  				if($this->passCheck()) {
  					$html->main($this->dataSet);
  				}
  				break;
  			default:
- 				$html->enter();
+ 				$html->passwdChk();
  				break;
  		}
  		$html->footer();

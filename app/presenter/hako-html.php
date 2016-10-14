@@ -2319,15 +2319,18 @@ END;
 }
 
 class HtmlAxes extends HTML {
-	function enter() {
+	function pageHeader($title) {
+		echo('<h1 class="title">',$title,' <small class="text-muted">アクセスログ閲覧</small></h1>', PHP_EOL);
+	}
+
+	function passwdChk() {
 		global $init;
 		$this_file = $init->baseDir . "/hako-axes.php";
-
+		$this->pageHeader($init->title);
 		echo <<<END
-<h1 class="title">{$init->title} <small class="text-muted">アクセスログ閲覧室</small></h1>
 <form action="{$this_file}" method="post">
 	<label>パスワード確認：<input type="password" size="32" maxlength="32" name="PASSWORD"></label>
-	<input type="hidden" name="mode" value="enter">
+	<input type="hidden" name="mode" value="auth">
 	<input type="submit" value="入室する">
 </form>
 END;
@@ -2335,7 +2338,7 @@ END;
 
 	function main($data) {
 		global $init;
-		echo('<h1 class="title">', $init->title, ' <small class="text-muted">アクセスログ閲覧室</small></h1>',PHP_EOL);
+		$this->pageHeader($init->title);
 		$this->dataPrint($data);
 	}
 
@@ -2347,17 +2350,17 @@ END;
 <hr>
 
 <h2>アクセスログ</h2>
-<form>
-<input type="button" value="オートフィルタ表示" onclick="Button_DispFilter(this, 'DATA-TABLE')" onkeypress="Button_DispFilter(this, 'DATA-TABLE')">
-<table id="DATA-TABLE">
+<form class="container">
+<button class="btn btn-default" onclick="Button_DispFilter(this, 'DATA-TABLE')" onkeypress="Button_DispFilter(this, 'DATA-TABLE')">オートフィルタ表示</button>
+<table id="DATA-TABLE" class="table">
 <thead>
-	<tr class="NumberCell">
-		<td scope="row" colspan=2><input type="button" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])" value="ログインした時間"></td>
-		<td scope="row"><input type="button" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" value="島ＩＤ"></td>
-		<td scope="row"><input type="button" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" value="島の名前"></td>
-		<td scope="row"><input type="button" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" value="ＩＰ情報"></td>
-		<td scope="row"><input type="button" tabindex="5" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" value="ホスト情報"></td>
-	</tr>
+<tr class="NumberCell">
+	<th scope="col" colspan=2><button class="btn btn-default" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])">ログインした時間</button></th>
+	<th scope="col"><button class="btn btn-default" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])">島ＩＤ</button></th>
+	<th scope="col"><button class="btn btn-default" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])">島の名前</button></th>
+	<th scope="col"><button class="btn btn-default" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])">ＩＰ情報</button></th>
+	<th scope="col"><button class="btn btn-default" tabindex="5" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])">ホスト情報</button></th>
+</tr>
 </thead>
 <tbody>
 END;
@@ -2369,8 +2372,8 @@ END;
 			// ファイルから一行読み込む
 			$line = fgets($fp);
 			if($line !== FALSE) {
-				$num = str_replace([' ', ','], "</td><td scope=\"col\">", $line);
-				echo("\t<tr><td scope=\"col\">{$num}</td></tr>",PHP_EOL);
+				$num = str_replace([' ', ','], "</td><td>", $line);
+				echo('<tr><td scope="row">',$num,'</td></tr>',PHP_EOL);
 			}
 		}
 		fclose($fp);

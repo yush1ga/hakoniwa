@@ -52,7 +52,7 @@ class Init {
 	public $twitterID    = "hiro0218";
 
 	// 1ターンが何秒か
-	public $unitTime     = 10800; // 3時間（これ以上短くすることはオススメ出来ません）
+	public $unitTime     = 10800; // "10800"（3時間）より短くすることはオススメ出来ません
 
 	// ターン更新時の連続更新を許可するか？(0:しない、1:する)
 	public $contUpdate   = 1; // 1にすると負荷対策になります

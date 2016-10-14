@@ -5,21 +5,20 @@
  */
 
 class Admin {
-    public $mode;
-    public $dataSet = array();
+	public $mode;
+	public $dataSet = array();
 
-    function parseInputData() {
-        $this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
+	function parseInputData() {
+		$this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
 
-        if(!empty($_POST)) {
-            while(list($name, $value) = each($_POST)) {
-                $value = str_replace(",", "", $value);
-                $this->dataSet["{$name}"] = $value;
-            }
-        }
-    }
+		if(!empty($_POST)) {
+			while(list($name, $value) = each($_POST)) {
+				$this->dataSet["{$name}"] = str_replace(",", "", $value);
+			}
+		}
+	}
 
-    function passCheck() {
+	function passCheck() {
 		global $init;
 
 		if(file_exists("{$init->passwordFile}")) {
@@ -27,11 +26,11 @@ class Admin {
 			$masterPassword = chop(fgets($fp, READ_LINE));
 			fclose($fp);
 		}
-        if ( !isset($this->dataSet['PASSWORD']) ) {
-            HakoError::wrongPassword();
-            return 0;
-        }
-		if(strcmp(crypt($this->dataSet['PASSWORD'], 'ma'), $masterPassword) == 0) {
+		if ( !isset($this->dataSet['PASSWORD']) ) {
+			HakoError::wrongPassword();
+			return 0;
+		}
+		if(strcmp(crypt($this->dataSet['PASSWORD'], 'ma'), $masterPassword) === 0) {
 			return 1;
 		} else {
 			HakoError::wrongPassword();
