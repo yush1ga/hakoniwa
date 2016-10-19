@@ -34,10 +34,10 @@ class Cgi {
 		}
 
 		$getMode = (array_key_exists('mode', $_GET)) ? $_GET['mode'] : "";
-		if($getMode == "conf") {
+		if($getMode === "conf") {
 			$this->mode = "conf";
 		}
-		if($getMode == "log") {
+		if($getMode === "log") {
 			$this->mode = "log";
 		}
 		$init->adminMode = 0;
@@ -49,7 +49,7 @@ class Cgi {
 				}
 		}
 		// この段階でmodeにturnがセットされるのは不正アクセスの場合のみなのでクリアする
-		if($this->mode == "turn") {
+		if($this->mode === "turn") {
 			$this->mode = '';
 		}
 		$this->dataSet['islandListStart'] = (!empty($_GET['islandListStart']))? $_GET['islandListStart'] : 1;
