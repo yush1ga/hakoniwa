@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": [
+            "dom",
+            "es2017"
+        ],
+        "listFiles": true,
+        "module": "amd",
+        "moduleResolution": "node",
+        "noEmitOnError": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "preserveConstEnums": true,
+        "removeComments": true,
+        "strictNullChecks": true,
+        "sourceMap": false,
+        "target": "es5"
+    },
+    "include": [
+        "/**/page.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
