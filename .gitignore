@@ -3,5 +3,5 @@ logs/*
 password.php
 sftp-config.json
 /manual/*
-npm_modules/
+node_modules/
 

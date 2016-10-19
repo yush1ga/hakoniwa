@@ -2,29 +2,30 @@ import Backbone = require("backbone");
 import _ = require("underscore");
 
 
-class Model extends Backbone.Model {
-	constructor(args: any) {
+class dataModel extends Backbone.Model {
+	public attributes:any
+	constructor(args?:any) {
 		super(args);
 	}
 }
 
-class View extends Backbone.View<Model> {
-	private template: any = _.template(document.getElementById('Tpl').innerHTML()) || 'aa'
-	private elm: any = 'Out'
-	private model = Model
-	private events = {
-		"click" : "sort"
-	}
-	constructor(args: any) {
+class dataView extends Backbone.View <Backbone.Model> {
+	template:any;
+	constructor(args?:any) {
 		super(args);
-		console.dir(this.events);
+		this.el = document.getElementById('Out');
+		this.template = _.template(document.getElementById('Tpl').innerHTML) || 'aa';
+		this.model = new dataModel({});
+
+
 	}
 	render(){
-		this.elm.innerHTML = _.compile(this.template(this.model));
+		this.el.innerHTML = this.template(this.model.attributes);
+		return this;
 	}
 	sort(ev:any){
 		console.dir(ev);
 	}
 }
 
-()=>{ new View({});}
+()=>{ new dataView({});}

@@ -23,7 +23,7 @@
         "target": "es5"
     },
     "include": [
-        "/**/page.ts"
+        "**/page.ts"
     ],
     "exclude": [
         "node_modules"
