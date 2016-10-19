@@ -1,0 +1,21 @@
+{
+  "name": "hakoniwa",
+  "version": "1.0.0",
+  "description": "<s>某林檎社的ネーミングセンス</s>",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sotalbireo/hakoniwa.git"
+  },
+  "author": "Sota NAKAGAMI",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sotalbireo/hakoniwa/issues"
+  },
+  "homepage": "https://github.com/Sotalbireo/hakoniwa#readme"
+}
