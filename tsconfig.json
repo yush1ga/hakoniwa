@@ -3,6 +3,7 @@
         "allowJs": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
+        "jsx": "preserve",
         "lib": [
             "dom",
             "es2017"
@@ -17,10 +18,11 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "preserveConstEnums": true,
+        "pretty": true,
         "removeComments": true,
         "strictNullChecks": true,
         "sourceMap": false,
-        "target": "es5"
+        "target": "es6"
     },
     "include": [
         "**/page.ts"

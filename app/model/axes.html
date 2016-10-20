@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+	</title>
+</head>
+<body>
+<table id="LogView">
+<thead><tr>
+	<th>日付</th><th>時間</th><th>島ID</th><th>島名</th><th>接続元IP</th><th>接続元名</th>
+</tr></thead>
+<tbody id="Out" style="display:none">
+	<tr><th scope="row"><%- date %></th><th scope="row"><%- time %></th><td><%- islId %></td><td><%- islName %></td><td><%- deptIp %></td><td><%- deptHostName %></td></tr>
+</tbody>
+<tfoot><tr>
+	<th>日付</th><th>時間</th><th>島ID</th><th>島名</th><th>接続元IP</th><th>接続元名</th>
+</tr></tfoot>
+</table>
+
+<!-- <div id="Out"></div> -->
+
+<script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../../node_modules/underscore/underscore-min.js"></script>
+<script src="../../node_modules/backbone/backbone-min.js"></script>
+<script src="page.js"></script>
+</body>
+</html>
