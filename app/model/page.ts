@@ -1,28 +1,18 @@
 // import $ = require("jquery");
-// // import _ = require("underscore");
+// import _ = require("underscore");
 // import Backbone = require("backbone");
 
 
 class dataModel extends Backbone.Model {
-	constructor(args?:any) {
+	constructor(args:any) {
 		super(args);
 		this.getLogData()
 			.done((data)=>{
-				this.set(this.parse(data,','));
+				this.set(data);
 			}).fail((err)=>{
-				this.set(err);
 				console.error('err');
+				console.dir(err);
 		});
-	}
-	parse(data:any, options:string){
-		options = options;
-		return data;
-		// let parsedData: any[] = [];
-		// for (let i=0, len=data.length; i < len; i++){
-
-		// 	parsedData[i] = data[i].split(options);
-		// }
-		// return parsedData;
 	}
 	private getLogData(){
 		let defer = $.Deferred();
@@ -38,16 +28,15 @@ class dataModel extends Backbone.Model {
 	}
 }
 
-// class LogCollection extends Backbone.Collection <Backbone.Model> {
-// 	constructor(args?:any) {
-// 		super(args);
-// 		this.model = 'dataModel';
-// 	}
-// }
+class LogCollection extends Backbone.Collection <dataModel> {
+	constructor(args:any) {
+		super(args);
+	}
+}
 
 class dataView extends Backbone.View <Backbone.Model> {
 	template: any;
-	constructor(args?:any) {
+	constructor(args:any) {
 		super(args);
 		this.el = document.getElementById('Out');
 		this.template = _.template(this.el.innerHTML);
@@ -57,12 +46,7 @@ class dataView extends Backbone.View <Backbone.Model> {
 	render(){
 		_.each(this.model.attributes, (v)=>{
 			console.dir(v);
-			let a = [v]
 			this.el.innerHTML += this.template(a);
-			// _.map(v,(w:any, i:string)=>{
-			// 	this.el.innerHTML += "("+i+")"+w + "　";
-			// });
-			// this.el.innerHTML += "<br>\n";
 		})
 		this.el.style.display = '';
 		console.dir(this.model.attributes);
