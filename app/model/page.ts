@@ -3,7 +3,7 @@
 // import Backbone = require("backbone");
 
 
-class dataModel extends Backbone.Model {
+class LogModel extends Backbone.Model {
 	constructor(args:any) {
 		super(args);
 		this.getLogData()
@@ -26,11 +26,18 @@ class dataModel extends Backbone.Model {
 		});
 		return defer.promise();
 	}
+	validate(attrs: any){
+		if(!_.isNumber(attrs.islId)) {
+			return "wrong island ID data";
+		}
+		return;
+	}
 }
 
-class LogCollection extends Backbone.Collection <dataModel> {
+class LogCollection extends Backbone.Collection <LogModel> {
 	constructor(args:any) {
 		super(args);
+		this.model = LogModel;
 	}
 }
 
@@ -40,16 +47,16 @@ class dataView extends Backbone.View <Backbone.Model> {
 		super(args);
 		this.el = document.getElementById('Out');
 		this.template = _.template(this.el.innerHTML);
-		this.model = new dataModel({});
-		this.listenTo(this.model, 'change', this.render);
+		this.collection = new LogCollection({});
+		// this.model = new LogModel({});
+		this.listenTo(this.collection, 'fetch', this.render);
 	}
 	render(){
-		_.each(this.model.attributes, (v)=>{
+		_.each(this.collection.models, (v)=>{
 			console.dir(v);
-			this.el.innerHTML += this.template(a);
+			this.el.innerHTML += this.template(v);
 		})
 		this.el.style.display = '';
-		console.dir(this.model.attributes);
 		return this;
 	}
 	sort(ev:any){
