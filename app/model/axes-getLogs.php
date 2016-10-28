@@ -20,7 +20,7 @@ if($file!==false){
 	foreach ($file as $value) {
 		list($datetime, $islId, $islName, $deptIp, $deptHostName) = explode(',', $value);
 		list($date, $time) = explode(' ', $datetime);
-		$parsedFile[] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptHostName');
+		$parsedFile["data"][] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptHostName');
 	}
 
 }else{

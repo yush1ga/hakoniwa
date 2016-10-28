@@ -6,28 +6,9 @@
 class LogModel extends Backbone.Model {
 	constructor(args:any) {
 		super(args);
-		this.on('invalid', (model,error)=>{
-			console.log(model,error);
+		this.listenTo(this, 'invalid', (model:any, error:any) => {
+			console.log(model, error);
 		});
-		// this.getLogData()
-		// 	.done((data)=>{
-		// 		this.set(data, {validate: true});
-		// 	}).fail((err)=>{
-		// 		console.error('err');
-		// 		console.dir(err);
-		// });
-	}
-	private getLogData(){
-		let defer = $.Deferred();
-		$.ajax({
-			url : "axes-getLogs.php",
-			data: "axesLog", // [TODO]: gets.phpとしてまとめて引数で管理したい旨
-			dataType: 'json',
-			method  : 'POST',
-			success : defer.resolve,
-			error   : defer.reject
-		});
-		return defer.promise();
 	}
 	validate(attrs: any){
 		if(!_.isNumber(attrs.islId)) {
@@ -43,7 +24,7 @@ class LogCollection extends Backbone.Collection <LogModel> {
 		this.model = LogModel;
 		this.url = 'axes-getLogs.php';
 	}
-	parse(resp){
+	parse(resp:any){
 		if(resp.error){
 			console.error(resp.error.message);
 		}
@@ -55,25 +36,21 @@ class dataView extends Backbone.View <Backbone.Model> {
 	template: any;
 	constructor(args:any) {
 		super(args);
-		this.events = {
-			"click #a": "sort"
-		};
 		this.el = document.getElementById('Out');
-		this.template = _.template(this.el.innerHTML);
+		this.template = _.template($('#LogTemplate').html());
 		this.collection = new LogCollection({});
 		this.collection.fetch({
-			data: "axesLog", // [TODO]: gets.phpとしてまとめて引数で管理したい旨
-			dataType: 'json',
-			method  : 'POST'
+			data: "axesLog" // [TODO]: gets.phpとしてまとめて引数で管理したい旨
 		});
-		// this.model = new LogModel({});
 		this.listenTo(this.collection, 'sync', this.render);
+		// this.events = {
+		// 	"click .a": "sort"
+		// };
 	}
 	render(){
 		this.collection.each((model)=>{
 			this.el.innerHTML += this.template(model.toJSON());
 		});
-		this.el.style.display = '';
 		return this;
 	}
 	sort(ev:any){
