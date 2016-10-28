@@ -16,11 +16,18 @@ $init = new Init();
 $filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init->logname;
 $file = file("{$filePath}", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $parsedFile = [];
-foreach ($file as $value) {
-	list($datetime, $islId, $islName, $deptIp, $deptHostName) = explode(',', $value);
-	list($date, $time) = explode(' ', $datetime);
-	$parsedFile[] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptHostName');
+if($file!==false){
+	foreach ($file as $value) {
+		list($datetime, $islId, $islName, $deptIp, $deptHostName) = explode(',', $value);
+		list($date, $time) = explode(' ', $datetime);
+		$parsedFile[] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptHostName');
+	}
+
+}else{
+	$parsedFile["error"] = [
+		"code"    => "400",
+		"message" => "ファイルの受信に失敗しました"
+	];
 }
 
 print_r(json_encode($parsedFile));
-
