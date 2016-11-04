@@ -26,36 +26,43 @@ class LogCollection extends Backbone.Collection <LogModel> {
 	}
 	parse(resp:any){
 		if(resp.error){
-			console.error(resp.error.message);
+			console.error(resp.error.code,resp.error.message);
 		}
 		return resp.data;
 	}
 }
 
-class dataView extends Backbone.View <Backbone.Model> {
+class LogView extends Backbone.View <Backbone.Model> {
 	template: any;
 	constructor(args:any) {
 		super(args);
-		this.el = document.getElementById('Out');
+		this.el = $('#LogView tbody')[0];
 		this.template = _.template($('#LogTemplate').html());
 		this.collection = new LogCollection({});
 		this.collection.fetch({
 			data: "axesLog" // [TODO]: gets.phpとしてまとめて引数で管理したい旨
 		});
 		this.listenTo(this.collection, 'sync', this.render);
-		// this.events = {
-		// 	"click .a": "sort"
-		// };
 	}
 	render(){
 		this.collection.each((model)=>{
 			this.el.innerHTML += this.template(model.toJSON());
 		});
+		this.setEvents();
 		return this;
 	}
-	sort(ev:any){
-		console.dir(ev);
+	setEvents(){
+		_.each(document.querySelectorAll("#LogView th"), (v)=>{
+			v.addEventListener('click', (ev:any)=>{
+				console.log(ev);
+			}, false);
+		});
+		document.querySelector('#ResetFilter').addEventListener('click', (ev:any)=>{
+			console.log(ev);
+		});
 	}
+
 }
 
-new dataView({});
+
+new LogView({});

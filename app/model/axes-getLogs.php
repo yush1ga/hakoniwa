@@ -1,4 +1,10 @@
 <?php
+header('Content-Type: application/octet-stream');
+header('X-Content-Type-Options: nosniff');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+
 function _dirName($path, $levels = 1) {
 	if(phpversion()<7){
 		while ($levels--) {
@@ -16,11 +22,12 @@ $init = new Init();
 $filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init->logname;
 $file = file("{$filePath}", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $parsedFile = [];
-if($file!==false){
+// if($file!==false){
+if(false){
 	foreach ($file as $value) {
-		list($datetime, $islId, $islName, $deptIp, $deptHostName) = explode(',', $value);
+		list($datetime, $islId, $islName, $deptIp, $deptName) = explode(',', $value);
 		list($date, $time) = explode(' ', $datetime);
-		$parsedFile["data"][] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptHostName');
+		$parsedFile["data"][] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptName');
 	}
 
 }else{

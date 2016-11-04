@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>
-	</title>
+	<meta charset="utf-8">
+	<meta>
+	<title></title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
 </head>
 <body>
-<table id="LogView">
-<thead><tr>
-	<th>日付</th><th>時間</th><th>島ID</th><th>島名</th><th>接続元IP</th><th>接続元名</th>
-</tr></thead>
-<tbody id="Out">
-</tbody>
-<tfoot><tr>
-	<th>日付</th><th>時間</th><th>島ID</th><th>島名</th><th>接続元IP</th><th>接続元名</th>
-</tr></tfoot>
+
+<section class="container">
+<h1>Access Log Viewer</h1>
+<button id="ResetFilter" type="reset" class="btn btn-sm btn-warning">Reset Filter</button>
+<table id="LogView" class="table table-sm table-hover">
+<thead class="thead-default"><tr><th name="Date">日付</th><th name="Time">時間</th><th name="IslId">島ID</th><th name="IslName">島名</th><th name="DeptIp">接続元IP</th><th name="DeptName">接続元名</th></tr></thead>
+<tbody></tbody>
+<tfoot class="thead-default"><tr><th name="Date">日付</th><th name="Time">時間</th><th name="IslId">島ID</th><th name="IslName">島名</th><th name="DeptIp">接続元IP</th><th name="DeptName">接続元名</th></tr></tfoot>
 </table>
 <script type="text/x-template" id="LogTemplate">
-	<tr><th scope="row"><%= date %></th><th scope="row"><%- time %></th><td><%- islId %></td><td><%- islName %></td><td><%- deptIp %></td><td><%- deptHostName %></td></tr>
+	<tr><th scope="row" name="DateAt"><%= date %></th><td><%- time %></td><td><%- islId %></td><td><%- islName %></td><td><%- deptIp %></td><td><%- deptName %></td></tr>
 </script>
+</section>
 
 <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
 <script src="../../node_modules/underscore/underscore-min.js"></script>
