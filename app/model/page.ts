@@ -45,11 +45,17 @@ class LogView extends Backbone.View <Backbone.Model> {
 		this.listenTo(this.collection, 'sync', this.render);
 	}
 	render(){
+		this.renderReset({});
+		this.setEvents();
+		return this;
+	}
+	renderReset(ev:any){
+		ev='';
+		console.log(ev);
+		this.el.innerHTML = '';
 		this.collection.each((model)=>{
 			this.el.innerHTML += this.template(model.toJSON());
 		});
-		this.setEvents();
-		return this;
 	}
 	setEvents(){
 		_.each(document.querySelectorAll("#LogView th"), (v)=>{
@@ -57,8 +63,7 @@ class LogView extends Backbone.View <Backbone.Model> {
 				console.log(ev);
 			}, false);
 		});
-		document.querySelector('#ResetFilter').addEventListener('click', (ev:any)=>{
-			console.log(ev);
+		document.querySelector('#ResetFilter').addEventListener('click', (ev)=>{this.renderReset(ev);
 		});
 	}
 
