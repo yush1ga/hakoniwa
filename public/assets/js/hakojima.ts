@@ -1,178 +1,197 @@
 'use strict'
-/*
-	table のオートフィルタ
-	http://neko.dosanko.us/script/auto-filter/
-	2006-12-4 版
-*/
 
-function classAutofilter() {
-  // 設定 ここから↓
-  this.LABEL_FILTER_BLANK = "(空欄)";
-  this.LABEL_FILTER_ALL = "すべて";
+class AutoFilter {
+  private _labelFilterBlank: string;
+  private _labelFilterAll  : string;
+  private _valFilterAll    : string;
+  private _elmTBody        : any;
 
-  this.VAL_FILTER_ALL = "__all__";
+  constructor() {
+    // config
+    this._labelFilterBlank = "(Empty)";
+    this._labelFilterAll   = "All";
+    this._valFilterAll     = "__all__";
+    // /config
+    this._elmTBody = null;
+  }
 
-  // 設定 ここまで↑
+  /* フィルタ生成
+    @param  tblId :string オートフィルタを表示する table の ID
+    @return       :number 状態 (1:フィルタ生成済、0:実行完了)
+  */
+  public createFilter(tblId: string): number {
+    // Guard
+    if (this._elmTBody != null) return 1
 
-  this.elmTbody = null; // 復元用 tbody
-} // classAutofilter //
+    let elmTable = <HTMLElement>document.getElementById(tblId);
+    let elmTbody = <HTMLElement>elmTable.getElementsByTagName("tbody").item(0);
+    let elmTr = elmTbody.getElementsByTagName("tr");
+    let elmFilter = this.createElement({ el:"tr" });
 
+    // table の内容取得とフィルタ表示用の要素生成
+    let arrayCols = new Array();
+    for (let row_i = 0, len_i = elmTr.length; row_i < len_i; row_i++) {
+      let alias_childNodes = elmTr[row_i].childNodes;
 
-// ----- public な関数として扱う -----
+      for (let col_j = 0, len_j = alias_childNodes.length; col_j < len_j; col_j++) {
+        let alias_col = alias_childNodes[col_j];
 
-
-//
-// フィルタ生成
-//
-//	@param  strId オートフィルタを表示する table の ID
-//	@return       状態 (1:フィルタ生成済み、0:実行完了、-1:未対応ブラウザ)
-//
-classAutofilter.prototype.Create_Filter = function(strId :string) {
-  if (this.elmTbody != null) return 1;
-
-  if (!document.getElementById || !document.removeChild) return -1;
-
-  var elmTable = <HTMLElement>document.getElementById(strId);
-  var elmTbody = elmTable.getElementsByTagName("tbody").item(0);
-  var elmTr_body = elmTbody.getElementsByTagName("tr");
-  var elmTr_filter = this._Create_Element({
-    element: "tr"
-  });
-
-  // table の内容取得とフィルタ表示用の要素生成
-  var arrayCols = new Array();
-  var numLen_tr = elmTr_body.length;
-  for (var numRow = 0; numRow < numLen_tr; numRow++) {
-    var alias_childNodes = elmTr_body[numRow].childNodes;
-    for (var numCol = 0; numCol < alias_childNodes.length; numCol++) {
-      var alias_col = alias_childNodes[numCol];
-
-      if (alias_col.nodeType != 1) {
-        // 要素以外を取り除く
-        elmTr_body[numRow].removeChild(alias_col);
-        numCol--;
-        continue;
-      } // if //
-
-      if (numRow == 0) {
-        var elmTh_head = this._Create_Element({
-          element: "th",
-          attr: {
-            scope: "row"
-          }
-        });
-        elmTr_filter.appendChild(elmTh_head);
-
-        arrayCols[numCol] = new Array();
-      } // if //
-
-      arrayCols[numCol][numRow] = this._Get_TextContent(alias_col);
-    } // for //
-  } // for //
-  this.elmTbody = elmTbody.cloneNode(true);
-
-  // フィルタを 1 つずつ追加していくとカクカクとした表示となるため
-  // “display : none”にして追加を行う
-  var elmThead = elmTable.getElementsByTagName("thead").item(0);
-  elmTr_filter.style.display = "none";
-  elmThead.appendChild(elmTr_filter);
-  this._Rewrite_Filter(elmTr_filter, arrayCols);
-  try {
-    elmTr_filter.style.display = "table-row";
-  } catch (e) {
-    elmTr_filter.style.display = "block";
-  } // try //
-
-  return 0;
-}; // classAutofilter.prototype.Create_Filter //
-
-//
-// フィルタを適用
-//
-//	@param elmSelect select 要素
-//
-classAutofilter.prototype.Select_Filter = function(elmSelect :any) {
-  var arrayFilters = new Array(); // 現在選択されているフィルタの値
-  var boolAll = true; // 全フィルタが VAL_FILTER_ALL か
-  var elmTr_filter = elmSelect.parentNode.parentNode;
-  var elm_select = elmTr_filter.getElementsByTagName("select");
-  var numLen_select = elm_select.length;
-  for (var numCol = 0; numCol < numLen_select; numCol++) {
-    arrayFilters[numCol] = this._Get_SelectValue(elm_select[numCol]);
-
-    if (arrayFilters[numCol] != this.VAL_FILTER_ALL) {
-      // 全フィルタを VAL_FILTER_ALL にしたとき
-      // 少しでも早く表示を元に戻すため、全フィルタをチェック
-
-      boolAll = false;
-    } // if //
-  } // for //
-
-  var elmTbody_new = this.elmTbody.cloneNode(true);
-  var elmTr_body = elmTbody_new.getElementsByTagName("tr");
-  var numRow = 0;
-  if (!boolAll) {
-    // いずれかのフィルタで VAL_FILTER_ALL 以外を選択
-
-    for (numRow = 0; numRow < elmTr_body.length; numRow++) {
-      var alias_row = elmTr_body[numRow];
-      var numLen_childNodes = alias_row.childNodes.length;
-      for (numCol = 0; numCol < numLen_childNodes; numCol++) {
-        if (arrayFilters[numCol] == this.VAL_FILTER_ALL) {
+        if (alias_col.nodeType !== 1) {
+          // 要素以外を取り除く
+          elmTr[row_i].removeChild(alias_col);
+          col_j--;
           continue;
         } // if //
 
-        var strCell = this._Get_TextContent(alias_row.childNodes[numCol]);
-        if (strCell == null) strCell = ""; // 空欄
+        if (row_i === 0) {
+          const elmTh_head = this.createElement({
+            element: "th",
+            attr: {
+              scope: "row"
+            }
+          });
+          elmFilter.appendChild(elmTh_head);
 
-        if (arrayFilters[numCol] != this.VAL_FILTER_ALL && arrayFilters[numCol] != strCell) {
-          // フィルタ適用
+          arrayCols[col_j] = new Array();
+        } // if
 
-          elmTbody_new.removeChild(alias_row);
-          numRow--;
-          break;
-        } // if //
-      } // for //
-    } // for //
-  } // if //
+        // tips: 縦列を使ってフィルタするので、(列.行)のほうが都合が良いっぽい
+        arrayCols[col_j][row_i] = alias_col.textContent;
+      } // for
+    } // for
+    this._elmTbody = elmTbody.cloneNode(true);
 
-  var arrayCols = new Array(); // フィルタ用の列データ
-  var numLen_tr = elmTr_body.length;
-  for (numRow = 0; numRow < numLen_tr; numRow++) {
-    var alias_row = elmTr_body[numRow];
-    var numLen_childNodes = alias_row.childNodes.length;
-    for (numCol = 0; numCol < numLen_childNodes; numCol++) {
-      if (arrayCols[numCol] == null) {
-        arrayCols[numCol] = new Array();
-      } // if //
-      arrayCols[numCol][numRow] = this._Get_TextContent(alias_row.childNodes[numCol]);
-    } // for //
-  } // for //
+    // フィルタを 1 つずつ追加していくとカクカクとした表示となるため
+    // “display : none”にして追加を行う
+    var elmThead = elmTable.getElementsByTagName("thead").item(0);
+    elmFilter.style.display = "none";
+    elmThead.appendChild(elmFilter);
+    this._Rewrite_Filter(elmFilter, arrayCols);
+    try {
+      elmFilter.style.display = "table-row";
+    } catch () {
+      elmFilter.style.display = "block";
+    }
 
-  this._Rewrite_Filter(elmTr_filter, arrayCols);
+    return 0;
+  }
 
-  var elmThead = elmTr_filter.parentNode;
-  var elmTable = elmThead.parentNode;
-  var elmTbody = elmTable.getElementsByTagName("tbody").item(0);
-  elmTable.removeChild(elmTbody);
-  elmTable.appendChild(elmTbody_new);
-}; // classAutofilter.prototype.Select_Filter //
 
-//
-// フィルタ生成時の比較
-//
-//	@param  val_a 比較対象 A
-//	@param  val_b 比較対象 B
-//	@return       比較結果
-//
-classAutofilter.prototype.Compare_Filter = function(val_a, val_b) {
-  if (!isNaN(val_a) && !isNaN(val_b)) {
-    val_a = Number(val_a);
-    val_b = Number(val_b);
-  } // if //
+  /* 要素生成
+    @param  argv :Object  要素の情報
+    @return      :HTMLElement  生成された要素
+  */
+  private createElement(argv :{el:string,attr?:string,content?:string}): HTMLElement {
+    let elm = document.createElement(argv.el);
+    if (argv.attr) {
+      const attrs = argv.attr;
+      const attr_keys  = Object.keys(attrs);
+      for (let i in attr_keys) {
+        elm.setAttribute(attr_keys[i], attrs[i]);
+      } // for
+    } // if
+    if (argv.content) {
+      elm.appendChild(document.createTextNode(argv.content));
+    } // if
+    return elm;
+  }
 
-  return (val_a < val_b) ? 1 : (val_a > val_b) ? -1 : 0;
-}; // classAutofilter.prototype.Compare_Filter //
+  /* select要素の選択されているvalue属性値を取得
+    @param  elmSelect  select要素
+    @return            選択されている value 属性値
+   */
+  private getSelectValue(elmSelect:any): string|number {
+    return elmSelect.options[elmSelect.selectedIndex].value;
+  }
+
+
+} // class AutoFilter
+
+
+class ClassAutoFilter {
+  private _labelFilterBlank :string = '(blank)'
+  private _labelFilterAll :string = 'ALL'
+  private _valFilterAll :string = '__all__'
+  private elmTbody :any = null
+
+  SelectFilter(elmSelect :HTMLElement){
+    let arrayFilters = new Array()
+    let areAllFilters_valFilterAll :boolean = true
+    let elmTrFilter = elmSelect.parentNode.parentNode
+    // let elmSelect = elmTrFilter.getElementsByTagName('select')
+
+    for (let colN = 0, len = elmSelect.length ; colN < len; ++colN) {
+      arrayFilters[colN] = this._getSelectValue(elmSelect[colN])
+      if(arrayFilters[colN]!==this._valFilterAll) areAllFilters_valFilterAll = false
+    }
+
+    let elmTbody_new = this.elmTbody.cloneNode(true)
+    let elmTRBody = <HTMLElement>elmTbody_new.getElementsByTagName('tr')
+
+    if(!areAllFilters_valFilterAll){
+    // いずれかのフィルタで VAL_FILTER_ALL 以外を選択
+
+      for (let row_i = 0, len_i = elmTRBody.length; row_i < len_i; row_i++) {
+        let alias_row = elmTRBody[row_i]
+        for (let colN = 0, childNodesLen = alias_row.childNodes.length; colN < childNodesLen; colN++) {
+          if (arrayFilters[colN] === areAllFilters_valFilterAll) continue
+
+          let strCell = this._getTextContent(alias_row.childNodes[colN])
+          if (strCell === null) strCell = ""
+
+          if (arrayFilters[colN] !== areAllFilters_valFilterAll && arrayFilters[colN] !== strCell) {
+            // フィルタ適用
+            elmTbody_new.removeChild(alias_row);
+            row_i--;
+            break;
+          }
+        }
+      }
+    }
+
+    let arrayCols = new Array(); // フィルタ用の列データ
+    for (let row_i = 0, len = elmTRBody.length; row_i < len; row_i++) {
+      let alias_row = elmTRBody[row_i]
+      for (let col_j = 0, childNodesLen = alias_row.childNodes.length; col_j < childNodesLen; col_j++) {
+        if (arrayCols[col_j] === null) arrayCols[col_j] = new Array()
+        arrayCols[col_j][row_i] = this._getTextContent(alias_row.childNodes[col_j]);
+      }
+    }
+    this._rewriteFilter(elmTrFilter, arrayCols);
+
+    let elmThead = elmTrFilter.parentNode;
+    var elmTable = elmThead.parentNode;
+    var elmTbody = elmTable.getElementsByTagName("tbody").item(0);
+    elmTable.removeChild(elmTbody);
+    elmTable.appendChild(elmTbody_new);
+
+  }
+  /**
+   * ufo演算子相当
+   * @param {any}:maybe Number a
+   * @param {any}:maybe Number b
+   * @return number a:-1,0,1:b
+   */
+  compareFilter(a :any, b :any) :number{
+    try{
+      if(!isNaN(a) && !isNaN(b)) {
+        a = Number(a)
+        b = Number(b)
+      }
+    }catch(e:any){
+      console.error(e)
+    }
+    return (a < b)? 1: (a > b)? -1: 0
+  }
+
+  private _rewriteFilter(elmTrFilter, arrayCols){
+    let elmSelect = <HTMLElement>elmTrFilter.getElementsByTagName('select')
+
+  }
+
+
+}
+
 
 
 // ----- private な関数として扱う -----
@@ -181,7 +200,7 @@ classAutofilter.prototype.Compare_Filter = function(val_a, val_b) {
 //
 // フィルタの select 要素の生成/書き換え
 //
-//	@param arrayCols 列データ
+//    @param arrayCols 列データ
 //
 classAutofilter.prototype._Rewrite_Filter = function(elmTr_filter, arrayCols) {
   var elm_select = elmTr_filter.getElementsByTagName("select");
@@ -263,52 +282,7 @@ classAutofilter.prototype._Rewrite_Filter = function(elmTr_filter, arrayCols) {
   } // for //
 }; // classAutofilter.prototype._Rewrite_Filter //
 
-//
-// 要素生成
-//
-//	@param  argv 要素の情報
-//	@return      生成された要素
-//
-classAutofilter.prototype._Create_Element = function(argv) {
-  var elm = document.createElement(argv.element);
 
-  if (argv.attr) {
-    var alias_attr = argv.attr;
-
-    for (var i in alias_attr) {
-      // ブラウザによっては動作に問題のある setAttribute を用いない
-
-      elm[i] = alias_attr[i];
-    } // for //
-  } // if //
-
-  if (argv.content) {
-    var nodeText = document.createTextNode(argv.content);
-    elm.appendChild(nodeText);
-  } // if //
-
-  return elm;
-}; // classAutofilter.prototype._Create_Element //
-
-//
-// select 要素で選択されている value 属性値を取得
-//
-//	@param  elmSelect select 要素
-//	@return           選択されている value 属性値
-//
-classAutofilter.prototype._Get_SelectValue = function(elmSelect) {
-  return elmSelect.options[elmSelect.selectedIndex].value;
-}; // classAutofilter.prototype._Get_SelectValue //
-
-//
-// 要素からテキストのみ取得
-//
-//	@param  elm 要素
-//	@return     テキスト
-//
-classAutofilter.prototype._Get_TextContent = function(elm) {
-  return (typeof(elm.textContent) != "undefined") ? elm.textContent : elm.innerText;
-}; // classAutofilter.prototype._Get_TextContent //
 
 
 // ===== ボタンの処理 =========================================
@@ -317,8 +291,8 @@ classAutofilter.prototype._Get_TextContent = function(elm) {
 //
 // オートフィルタを表示するボタン
 //
-//	@param elmInput ボタンの要素
-//	@param strId    オートフィルタを表示する table の ID
+//    @param elmInput ボタンの要素
+//    @param strId    オートフィルタを表示する table の ID
 //
 function Button_DispFilter(elmInput, strId) {
   // “display : none”を用いてオートフィルタの表示/非表示を切り替えると
@@ -353,16 +327,15 @@ function Button_DispFilter(elmInput, strId) {
 } // Button_DispFilter //
 
 /*
-	table のソート 2
-	http://neko.dosanko.us/script/sort_table2/
-	2006-12-4 版
+    table のソート 2
+    http://neko.dosanko.us/script/sort_table2/
+    2006-12-4 版
 
-	とほほのWWW入門の「テーブルをソートする(2003/2/2版)」がベース
-	http://www.tohoho-web.com/wwwxx038.htm
+    とほほのWWW入門の「テーブルをソートする(2003/2/2版)」がベース
+    http://www.tohoho-web.com/wwwxx038.htm
 */
 
 function classSortTable() {
-  this:any;
   // 設定 ここから↓
 
   this.MES_ALERT = "お使いのブラウザではソート機能を利用できません";
@@ -385,8 +358,8 @@ var g_cSortTable = new classSortTable();
 //
 // ソートボタン
 //
-//	@param strId_table 対象 table の id
-//	@param arrayColumn ソート条件とする列(第一、第二…とソートする優先順に配列で指定)
+//    @param strId_table 対象 table の id
+//    @param arrayColumn ソート条件とする列(第一、第二…とソートする優先順に配列で指定)
 //
 classSortTable.prototype.Button_Sort = function(strId_table, arrayColumn) {
   var class_pointer = this;
@@ -409,9 +382,9 @@ classSortTable.prototype.Button_Sort = function(strId_table, arrayColumn) {
 //
 // 行の比較
 //
-//	@param  elmTr_a 比較対象の行 A
-//	@param  elmTr_b 比較対象の行 B
-//	@return         比較結果
+//    @param  elmTr_a 比較対象の行 A
+//    @param  elmTr_b 比較対象の行 B
+//    @return         比較結果
 //
 classSortTable.prototype.Compare = function(elmTr_a, elmTr_b) {
   var arrayColumn = this.arrayColumn; // 優先順位
@@ -456,10 +429,10 @@ classSortTable.prototype.Compare = function(elmTr_a, elmTr_b) {
 
 
 //
-//	ソート
+//    ソート
 //
-//	@param strId_table 対象 table の id
-//	@param arrayColumn ソート条件とする列(第一、第二…とソートする優先順に配列で指定)
+//    @param strId_table 対象 table の id
+//    @param arrayColumn ソート条件とする列(第一、第二…とソートする優先順に配列で指定)
 //
 classSortTable.prototype._Sort_Table = function(strId_table, arrayColumn) {
   // 対象外ブラウザのチェック
@@ -519,24 +492,24 @@ classSortTable.prototype._Sort_Table = function(strId_table, arrayColumn) {
 // 開発画面用
 //======================================================================
 // 開発、観光画面
-function Navi(position :number, img :string, title :string, pos, text :string, exp :any) {
+function Navi(position, img, title, pos, text, exp) {
 
-    var StyElm = <HTMLElement>document.getElementById("NaviView");
+    var StyElm = document.getElementById("NaviView");
     StyElm.style.visibility = "visible";
 
     var posx = pos.indexOf(",");
-    // var posy = pos.indexOf(")");
+    var posy = pos.indexOf(")");
     var x = pos.substring(1, posx);
     var winEvent = windowEvent();
 
     if (position == 1) {
         // right
-        StyElm.style.marginLeft = ((x - 19) * 32 + 478) + 'px';
-        StyElm.style.top = document.body.scrollTop + winEvent.clientY + 150 + 'px';
+        StyElm.style.marginLeft = (x - 19) * 32 + 478;
+        StyElm.style.top = document.body.scrollTop + winEvent.clientY + 150;
     } else {
         // left
-        StyElm.style.marginLeft = ((x - 19) * 32 + 668) + 'px';
-        StyElm.style.top = document.body.scrollTop + winEvent.clientY + 150 + 'px';
+        StyElm.style.marginLeft = (x - 19) * 32 + 668;
+        StyElm.style.top = document.body.scrollTop + winEvent.clientY + 150;
     }
 
     StyElm.innerHTML = "<table><tr><td class='M'><img class='NaviImg' src=" + img + "></td><td class='M'><div class='NaviTitle'>" + title + " " + pos + "<\/div><div class='NaviText'>" + text.replace("\n", "<br>") + "</div></td></tr></table>";
@@ -546,8 +519,8 @@ function Navi(position :number, img :string, title :string, pos, text :string, e
 }
 
 function NaviClose() {
-    var StyElm = <HTMLElement>document.getElementById("NaviView");
-    StyElm.style.display = "none";
+    var StyElm = document.getElementById("NaviView");
+    StyElm.style.visibility = "hidden";
 }
 
 function windowEvent() {
