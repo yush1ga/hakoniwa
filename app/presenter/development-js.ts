@@ -343,8 +343,9 @@ class MapDevelopment {
 		return strn1;
 	}
 
-	disp(str, bgColor) {
+	disp(str, bgColor? :string) {
 		if(str==null) str = "";
+		if(bgColor===undefined) bgColor = '#fff';
 		LayWrite('LINKMSG1', str);
 		SetBG('plan', bgColor);
 	}
@@ -483,11 +484,11 @@ class MapDevelopment {
 		return moveLay.move();
 	}
 
-	LayWrite(layName, str) {
+	LayWrite(layName:string, str:string) {
 		document.getElementById(layName).innerHTML = str;
 	}
 
-	SetBG(layName, bgColor) {
+	setBGColor(layName:string, bgColor:string) {
 		document.getElementById(layName).style.backgroundColor = bgColor;
 	}
 
