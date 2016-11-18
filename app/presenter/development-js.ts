@@ -18,6 +18,9 @@ class MapDevelopment {
 
 	private php_com_count :number;
 	private php_commandMax :number;
+	private php_commands :any;
+	private php_costs :any;
+	private php_init :any;
 
 	constructor(args :any) {
 
@@ -172,104 +175,116 @@ class MapDevelopment {
 			let kind = '{$init->tagComName_}' + this.g[i] + '{$init->_tagComName}';
 			let x = _cmd[1];
 			let y = _cmd[2];
-			let tgt = _cmd[4];
+			let targ = _cmd[4];
 			let point = '{$init->tagName_}' + "(" + x + "," + y + ")" + '{$init->_tagName}';
 
-			for(let j = 0; j < islname.length ; j++) {
-				if(tgt == islname[j][0]){
-					tgt = '{$init->tagName_}' + islname[j][1] + "島" + '{$init->_tagName}';
+			for(let j = 0, islLen = this.islName.length; j < islLen; j++) {
+				if(targ == this.islName[j][0]){
+					targ = '{$init->tagName_}' + this.islName[j][1] + "島" + '{$init->_tagName}';
 				}
 			}
 
-			if(c[0] == $init->comMissileSM || c[0] == $init->comDoNothing || c[0] == $init->comGiveup){
-				// ミサイル撃ち止め、資金繰り、島の放棄
-				strn2 = kind;
-			}else if(c[0] == $init->comMissileNM || // ミサイル関連
-				c[0] == $init->comMissilePP ||
-				c[0] == $init->comMissileST ||
-				c[0] == $init->comMissileBT ||
-				c[0] == $init->comMissileSP ||
-				c[0] == $init->comMissileLD ||
-				c[0] == $init->comMissileLU){
-				if(c[3] == 0) {
-					arg = "（無制限）";
-				} else {
-					arg = "（" + c[3] + "発）";
-				}
-				strn2 = tgt + point + "へ" + kind + arg;
-			} else if((c[0] == $init->comSendMonster) || (c[0] == $init->comSendSleeper)) { // 怪獣派遣
-				strn2 = tgt + "へ" + kind;
-			} else if(c[0] == $init->comSell) { // 食料輸出
-				if(c[3] == 0){ c[3] = 1; }
-				arg = c[3] * 100;
-				arg = "（" + arg + "{$init->unitFood}）";
-				strn2 = kind + arg;
-			} else if(c[0] == $init->comSellTree) { // 木材輸出
-				if(c[3] == 0){ c[3] = 1; }
-				arg = c[3] * 10;
-				arg = "（" + arg + "{$init->unitTree}）";
-				strn2 = kind + arg;
-			} else if(c[0] == $init->comMoney) { // 資金援助
-				if(c[3] == 0){ c[3] = 1; }
-				arg = c[3] * {$init->comCost[$init->comMoney]};
-				arg = "（" + arg + "{$init->unitMoney}）";
-				strn2 = tgt + "へ" + kind + arg;
-			} else if(c[0] == $init->comFood) { // 食料援助
-				if(c[3] == 0){ c[3] = 1; }
-				arg = c[3] * 100;
-				arg = "（" + arg + "{$init->unitFood}）";
-				strn2 = tgt + "へ" + kind + arg;
-			} else if(c[0] == $init->comDestroy) { // 掘削
-				if(c[3] == 0){
-					strn2 = point + "で" + kind;
-				} else {
-					arg = c[3] * {$init->comCost[$init->comDestroy]};
-					arg = "（予\算" + arg + "{$init->unitMoney}）";
-					strn2 = point + "で" + kind + arg;
-				}
-			} else if(c[0] == $init->comLot) { // 宝くじ購入
-				if(c[3] == 0) c[3] = 1;
-				if(c[3] > 30) c[3] = 30;
-					arg = c[3] * {$init->comCost[$init->comLot]};
-					arg = "（予\算" + arg + "{$init->unitMoney}）";
+			switch(c[0]) {
+				// ▼ミサイル撃ち止め、資金繰り、島の放棄
+				case this.php_commands.missileSM:
+				case this.php_commands.doNothing:
+				case this.php_commands.giveup:
+					strn2 = kind;
+					break;
+				// ▼ミサイル関連
+				case this.php_commands.missileNM:
+				case this.php_commands.missilePP:
+				case this.php_commands.missileST:
+				case this.php_commands.missileBT:
+				case this.php_commands.missileSP:
+				case this.php_commands.missileLD:
+				case this.php_commands.missileLU:
+					arg = (c[3]===0)? "（無制限）": "（" + c[3] + "発）";
+					strn2 = targ + point + "へ" + kind + arg;
+					break;
+				// ▼怪獣派遣・怪獣転嫁
+				case this.php_commands.sendMonster:
+				case this.php_commands.sendSleeper:
+					strn2 = targ + "へ" + kind;
+					break;
+				// ▼食料輸出
+				case this.php_commands.sellFood:
+					arg = "（" + Math.max(1,c[3])*100 + this.php_init.unitFood + "）";
 					strn2 = kind + arg;
-			} else if(c[0] == $init->comDbase) { // 防衛施設
-				if(c[3] == 0) c[3] = 1;
-				if(c[3] > $init->dBaseHP) c[3] = $init->dBaseHP;
-					arg = c[3];
-					arg = "(耐久力" + arg + "）";
+					break;
+				// ▼木材輸出
+				case this.php_commands.sellWood:
+					arg = "（" + Math.max(1,c[3])*10 + this.php_init.unitWood + "）";
+					strn2 = kind + arg;
+					break;
+				// ▼資金援助
+				case this.php_commands.aidMoney:
+					arg = "（" + Math.max(1,c[3])*this.php_costs.aidMoney + this.php_init.unitMoney + "）";
+					strn2 = targ + "へ" + kind + arg;
+					break;
+				// ▼食料援助
+				case this.php_commands.aidFood:
+					arg = "（" + Math.max(1,c[3])*100 + this.php_init.unitFood + "）";
+					strn2 = targ + "へ" + kind + arg;
+					break;
+				// ▼掘削
+				case this.php_commands.excavate:
+					arg = "（予算：" + Math.max(1,c[3])*this.php_costs.excavate + this.php_init.unitMoney + "）";
 					strn2 = point + "で" + kind + arg;
-			} else if(c[0] == $init->comSdbase) { // 海底防衛施設
-				if(c[3] == 0) c[3] = 1;
-				if(c[3] > $init->sdBaseHP) c[3] = $init->sdBaseHP;
-					arg = c[3];
-					arg = "(耐久力" + arg + "）";
+					break;
+				// ▼宝くじ購入
+				case this.php_commands.buyLot:
+					arg = "（予算：" + Math.max(1,Math.min(c[3],30))*this.php_costs.buyLot + this.php_init.unitMoney + "）";
+					strn2 = kind + arg;
+					break;
+				// ▼防衛施設
+				case this.php_commands.barrierLand:
+						arg = "（耐久力" + Math.max(1,Math.min(c[3],this.php_init.barrierLandHP)) + "）";
+						strn2 = point + "で" + kind + arg;
+					break;
+				// ▼海底防衛施設
+				case this.php_commands.barrierOffshore:
+					arg = "（耐久力" + Math.max(1,Math.min(c[3],this.php_init.barrierOffshoreHP)) + "）";
 					strn2 = point + "で" + kind + arg;
-			} else if(c[0] == $init->comShipBack){ // 船の破棄
+					break;
+				// ▼船の破棄
+				case this.php_commands.shipReject:
 					strn2 = point + "で" + kind;
-			} else if(c[0] == $init->comSoukoM){ // 倉庫建設(貯金)
-				if(c[3] == 0) {
-					arg = "(セキュリティ強化)";
+					break;
+				// ▼倉庫建設（資金）
+				case this.php_commands.repositoryMoney:
+					arg = "（" + (()=>{return (c[3]===0)?"（セキュリティ強化）":c[3]*1000;}) + this.php_init.unitMoney + "）";
 					strn2 = point + "で" + kind + arg;
-				} else {
-					arg = c[3] * 1000;
-					arg = "(" + arg + "{$init->unitMoney})";
+					break;
+				// ▼倉庫建設（食料）
+				case this.php_commands.repositoryFood:
+					arg = "（" + (()=>{return (c[3]===0)?"（セキュリティ強化）":c[3]*1000;}) + this.php_init.unitMoney + "）";
 					strn2 = point + "で" + kind + arg;
-				}
-			} else if(c[0] == $init->comSoukoF){ // 倉庫建設(貯食)
-				if(c[3] == 0) {
-					arg = "(セキュリティ強化)";
-					strn2 = point + "で" + kind + arg;
-				} else {
-					arg = c[3] * 1000;
-					arg = "(" + arg + "{$init->unitFood})";
-					strn2 = point + "で" + kind + arg;
-				}
-			} else if(c[0] == $init->comHikidasi) { // 倉庫引き出し
+					break;
+				// ▼倉庫引き出し
+				case this.php_commands.repositoryWithdraw:
 				if(c[3] == 0) c[3] = 1;
 				arg = c[3] * 1000;
 				arg = "（" + arg + "{$init->unitMoney} or " + arg + "{$init->unitFood}）";
 				strn2 = point + "で" + kind + arg;
+
+					break;
+				case this.php_commands.:
+					break;
+				case this.php_commands.:
+					break;
+				case this.php_commands.:
+					break;
+				case this.php_commands.:
+					break;
+				case this.php_commands.:
+					break;
+				default:
+					// code...
+					break;
+			}
+
+			if(c[0] == this.php_commands.missileSM || c[0] == this.php_commands.doNothing || c[0] == this.php_commands.giveup){
 			} else if(c[0] == $init->comFarm || // 農場、海底農場、工場、商業ビル、採掘場整備、発電所、僕の引越し
 				c[0] == $init->comSfarm ||
 				c[0] == $init->comFactory ||
@@ -294,7 +309,7 @@ class MapDevelopment {
 					strn2 = kind;
 				}
 			} else if(c[0] == $init->comPlaygame) { // 試合
-				strn2 = tgt + "と" + kind;
+				strn2 = targ + "と" + kind;
 			} else if(c[0] == $init->comMakeShip){ // 造船
 				if(c[3] >= $init->shipKind) {
 					c[3] = $init->shipKind - 1;
@@ -302,9 +317,9 @@ class MapDevelopment {
 				arg = c[3];
 				strn2 = point + "で" + kind + " (" + shiplist[arg] + ")";
 			} else if(c[0] == $init->comSendShip){ // 船派遣
-				strn2 = tgt + "へ" + point + "の" + kind;
+				strn2 = targ + "へ" + point + "の" + kind;
 			} else if(c[0] == $init->comReturnShip){ // 船帰還
-				strn2 = tgt + point + "の" + kind;
+				strn2 = targ + point + "の" + kind;
 			} else if(c[0] == $init->comEisei){ // 人工衛星打ち上げ
 				if(c[3] >= $init->EiseiNumber) {
 					c[3] = 0;
@@ -322,9 +337,9 @@ class MapDevelopment {
 					c[3] = 0;
 				}
 				arg = c[3];
-				strn2 = tgt + "へ" + '{$init->tagComName_}' + eiseilist[arg] + "破壊砲発射" + '{$init->_tagComName}';
+				strn2 = targ + "へ" + '{$init->tagComName_}' + eiseilist[arg] + "破壊砲発射" + '{$init->_tagComName}';
 			} else if(c[0] == $init->comEiseiLzr) { // 衛星レーザー
-				strn2 = tgt + point + "へ" + kind;
+				strn2 = targ + point + "へ" + kind;
 			}else{
 				strn2 = point + "で" + kind;
 			}
