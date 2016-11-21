@@ -366,15 +366,15 @@ class MapDevelopment {
 	}
 
 	outp() {
-		comary = "";
+		let comary = "";
 
-		for(k = 0; k < command.length; k++){
-			comary = comary + command[k][0]
-				+ " " + command[k][1]
-				+ " " + command[k][2]
-				+ " " + command[k][3]
-				+ " " + command[k][4]
-				+ " " ;
+		for(let k = 0, len = this.command.length; k < len; k++){
+			comary = comary + this.command[k][0]
+				+ " " + this.command[k][1]
+				+ " " + this.command[k][2]
+				+ " " + this.command[k][3]
+				+ " " + this.command[k][4]
+				+ " ";
 		}
 		document.InputPlan.COMARY.value = comary;
 	}
@@ -395,8 +395,8 @@ class MapDevelopment {
 	}
 
 	set_com(x, y, land) {
-		com_str = land + " ";
-		for(i = 0; i < $init->commandMax; i++) {
+		let com_str = land + " ";
+		for(let i = 0; i < this.php_commandMax; i++) {
 			c = command[i];
 			x2 = c[1];
 			y2 = c[2];
@@ -483,14 +483,14 @@ class MapDevelopment {
 		}
 	}
 
-	moveLAYER(layName,x,y){
-		let el = <HTMLElement>document.getElementById(layName);
+	moveLayer(layerId:string, x:number, y:number){
+		let el = <HTMLElement>document.getElementById(layId);
 		el.style.left = x + "px";
 		el.style.top  = y + "px";
 	}
 
 	menuclose() {
-		moveLAYER("menu", -500, -500);
+		this.moveLayer("menu", -500, -500);
 	}
 
 	Mmove(e){
@@ -499,8 +499,8 @@ class MapDevelopment {
 		return moveLay.move();
 	}
 
-	LayWrite(layName:string, str:string) {
-		document.getElementById(layName).innerHTML = str;
+	LayerWrite(layerId:string, str:string) {
+		document.getElementById(layerId).innerHTML = str;
 	}
 
 	setBGColor(layName:string, bgColor:string) {
@@ -581,25 +581,28 @@ function MoveComList(num) {
 	}
 }
 
-function showElement(layName) {
-	var element = document.getElementById(layName).style;
-	element.display = "block";
-	element.visibility ='visible';
+class Util {
+	static showElement(layerId:string) {
+		var element = document.getElementById(layerId).style;
+		element.display = "block";
+		element.visibility ='visible';
+	}
+	static hideElement(layerId:string) {
+		var element = document.getElementById(layerId).style;
+		element.display = "none";
+	}
+
 }
 
-function hideElement(layName) {
-	var element = document.getElementById(layName).style;
-	element.display = "none";
-}
 
 function chNum(num) {
 	document.ch_numForm.AMOUNT.options.length = 100;
-	for(var i=0; i<document.ch_numForm.AMOUNT.options.length; i++){
+	for(let i=0, len=document.ch_numForm.AMOUNT.options.length; i<len; i++){
 		if(document.ch_numForm.AMOUNT.options[i].value == num){
 			document.ch_numForm.AMOUNT.selectedIndex = i;
 			document.ch_numForm.AMOUNT.options[i].selected = true;
-			moveLAYER('ch_num', mx-10, my-60);
-			showElement('ch_num');
+			moveLayer('ch_num', mx-10, my-60);
+			Util.showElement('ch_num');
 			break;
 		}
 	}
@@ -611,64 +614,85 @@ function chNumDo() {
 	hideElement('ch_num');
 }
 
-function Kdown(e){
-	var c, el;
-	var m = document.InputPlan.AMOUNT.selectedIndex;
-	if(m > 9) {
-		m = 0;
-	}
+function Kdown(e:KeyboardEvent){
+	if (e.defaultPrevented) return;
+	if (e.altKey || e.ctrlKey || e.shiftKey) return;
+	if (e.target.tagName === 'input') return;
 
-	if (e.altKey || e.ctrlKey || e.shiftKey) {
-		return;
-	}
-	c = e.which;
-	el = new String(e.target.tagName);
-	el = el.toUpperCase();
-	if (el == "INPUT") {
-		return;
-	}
-
-	c = String.fromCharCode(c);
+	let char = e.key.toLowerCase();
+	let m = (document.InputPlan.AMOUNT.selectedIndex >9)? document.InputPlan.AMOUNT.selectedIndex: 0;
 
 	// 押されたキーに応じて計画番号を設定する
-	switch (c) {
-		case 'A': c = $init->comPrepare; break; // 整地
-		case 'J': c = $init->comPrepare2; break; // 地ならし
-		case 'U': c = $init->comReclaim; break; // 埋め立て
-		case 'K': c = $init->comDestroy; break; // 掘削
-		case 'B': c = $init->comSellTree; break; // 伐採
-		case 'P': c = $init->comPlant; break; // 植林
-		case 'N': c = $init->comFarm; break; // 農場整備
-		case 'I': c = $init->comFactory; break; // 工場建設
-		case 'S': c = $init->comMountain; break; // 採掘場整備
-		case 'D': c = $init->comDbase; break; // 防衛施設建設
-		case 'M': c = $init->comBase; break; // ミサイル基地建設
-		case 'F': c = $init->comSbase; break; // 海底基地建設
-		case '-': c = $init->comDoNothing; break; //INS 資金繰り
-		case '.': cominput(InputPlan,3); return; //DEL 削除
+	switch (char) {
+		case 'a': // 整地
+			char = this.php_command.Prepare; break;
+		case 'j': // 地ならし
+			char = this.php_command.Prepare2; break;
+		case 'u': char = this.php_command.Reclaim; break; // 埋め立て
+		case 'k': char = this.php_command.Destroy; break; // 掘削
+		case 'b': // 伐採
+			char = this.php_command.SellTree; break;
+		case 'p': char = this.php_command.Plant; break; // 植林
+		case 'n': char = this.php_command.Farm; break; // 農場整備
+		case 'i': // 工場建設
+			char = this.php_command.Factory; break;
+		case 's': char = this.php_command.Mountain; break; // 採掘場整備
+		case 'd': // 防衛施設建設
+			char = this.php_command.Dbase; break;
+		case 'm': char = this.php_command.Base; break; // ミサイル基地建設
+		case 'f': // 海底基地建設
+			char = this.php_command.Sbase; break;
+		case '-': //INS 資金繰り
+			char = this.php_command.DoNothing; break;
+		case '.': //DEL 削除
+			cominput(InputPlan,3); return;
 		case'\b': //BS 一つ前削除
-		var no = document.InputPlan.COMMAND.selectedIndex;
-		if(no > 0) {
-			document.InputPlan.COMMAND.selectedIndex = no - 1;
-		}
-		cominput(InputPlan,3);
-		return;
-		case '0':case'`': document.InputPlan.AMOUNT.selectedIndex = m*10+0; return;
-		case '1':case'a': document.InputPlan.AMOUNT.selectedIndex = m*10+1; return;
-		case '2':case'b': document.InputPlan.AMOUNT.selectedIndex = m*10+2; return;
-		case '3':case'c': document.InputPlan.AMOUNT.selectedIndex = m*10+3; return;
-		case '4':case'd': document.InputPlan.AMOUNT.selectedIndex = m*10+4; return;
-		case '5':case'e': document.InputPlan.AMOUNT.selectedIndex = m*10+5; return;
-		case '6':case'f': document.InputPlan.AMOUNT.selectedIndex = m*10+6; return;
-		case '7':case'g': document.InputPlan.AMOUNT.selectedIndex = m*10+7; return;
-		case '8':case'h': document.InputPlan.AMOUNT.selectedIndex = m*10+8; return;
-		case '9':case'i': document.InputPlan.AMOUNT.selectedIndex = m*10+9; return;
-		case 'Z':case'j': document.InputPlan.AMOUNT.selectedIndex = 0; return;
+			let no = document.InputPlan.COMMAND.selectedIndex;
+			if(no > 0) {
+				document.InputPlan.COMMAND.selectedIndex = no - 1;
+			}
+			cominput(InputPlan,3);
+			return;
+		case '0':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+0;
+			return;
+		case '1':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+1;
+			return;
+		case '2':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+2;
+			return;
+		case '3':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+3;
+			return;
+		case '4':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+4;
+			return;
+		case '5':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+5;
+			return;
+		case '6':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+6;
+			return;
+		case '7':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+7;
+			return;
+		case '8':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+8;
+			return;
+		case '9':
+			document.InputPlan.AMOUNT.selectedIndex = m*10+9;
+			return;
+		case 'Z':
+			document.InputPlan.AMOUNT.selectedIndex = 0;
+			return;
 		default:
-		// IE ではリロードのための F5 まで拾うので、ここに処理をいれてはいけない
-		return;
+			// [WARN]ここに処理を入れない：IEではF5も拾えるため
+			return;
 	}
-	cominput(document.InputPlan, 6, c);
+	cominput(document.InputPlan, 6, char);
+	e.preventDefault();
+	return;
 }
 
 	function setTarget(part){
@@ -676,6 +700,7 @@ function Kdown(e){
 	}
 
 	function targetOpen() {
+		// [TODO]: ウィンドウじゃなくてモーダルに。スマホ対応は別途検討。
 		let w = window.open("{$this_file}?target=" + p, "","width={$width},height={$height},scrollbars=1,resizable=1,toolbar=1,menubar=1,location=1,directories=0,status=1");
 	}
 
