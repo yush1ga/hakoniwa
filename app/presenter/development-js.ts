@@ -28,7 +28,7 @@ class MapDevelopment {
 	private php_costs :any;
 	private php_init :any;
 
-	public dragDrop;
+	public events;
 
 	constructor() {
 
@@ -60,7 +60,7 @@ class MapDevelopment {
 		this.str = this._msgs.sync.already + this.str;
 		this.disp(this.str);
 
-		this.dragDrop = new DragDrop('plan');
+		this.events = new Events('plan');
 
 		document.forms.ch_numForm.AMOUNT.length = 100;
 		for(let i = 0; i < document.forms.ch_numForm.AMOUNT.length; i++){
@@ -93,18 +93,18 @@ class MapDevelopment {
 
 	/**
 	 * => cominput()
-	 * @param {[type]} theForm [description]
-	 * @param {number} x       [description]
-	 * @param {[type]} k       [description]
+	 * @param {HTMLFormElement} form [description]
+	 * @param {number} x       Function's action selectoring number from 1 to 8.
+	 * @param {number|undefined} k       Plan number
 	 * @param {[type]} z       [description]
 	 */
-	cmdInput(theForm, x, k, z) {
-		let numb = theForm.number[theForm.number.selectedIndex].value;
-		let comd = theForm.COMMAND[theForm.COMMAND.selectedIndex].value;
-		let pt_x = theForm.POINTX[theForm.POINTX.selectedIndex].value;
-		let pt_y = theForm.POINTY[theForm.POINTY.selectedIndex].value;
-		let amnt = theForm.AMOUNT[theForm.AMOUNT.selectedIndex].value;
-		let targ = theForm.TARGETID[theForm.TARGETID.selectedIndex].value;
+	cmdInput(form:HTMLFormElement, x:number, k?:number, z) {
+		let numb:number = form.number[form.number.selectedIndex].value;
+		let comd:number = form.COMMAND[form.COMMAND.selectedIndex].value;
+		let pt_x:number = form.POINTX[form.POINTX.selectedIndex].value;
+		let pt_y:number = form.POINTY[form.POINTY.selectedIndex].value;
+		let amnt:number = form.AMOUNT[form.AMOUNT.selectedIndex].value;
+		let targ:number = form.TARGETID[form.TARGETID.selectedIndex].value;
 
 
 		let newNs = numb;
@@ -141,7 +141,6 @@ class MapDevelopment {
 		} else if(x === 4) {
 			let i = Math.floor(numb);
 			if (i === 0) return true;
-			i = Math.floor(numb);
 			this.tmpCommand[0][i] = this.command[i];
 			this.tmpCommand[1][i] = this.command[i-1];
 			this.command[i-1] = this.tmpCommand[0][i];
@@ -197,7 +196,7 @@ class MapDevelopment {
 		this.str = this._msgs.sync.notyet + this.str;
 		this.disp(this.str);
 		outp();
-		theForm.SENDPROJECT.disabled = false;
+		form.SENDPROJECT.disabled = false;
 		this.numberSelect(newNs);
 
 		return true;
@@ -210,12 +209,12 @@ class MapDevelopment {
 		for(let i = 0; i < this.php_commandMax; i++) {
 			let _cmd :any[] = this.command[i];
 			let targ = _cmd[4];
-			const kind = '<span class="command">' + this.g[i] + '</span>';
-			const point = '<span class="islName">(' + _cmd[1] + ',' + _cmd[2] + ')</span>';
+			const kind = `<span class="command">${this.g[i]}</span>`;
+			const point = `<span class="islName">(${_cmd[1]},${_cmd[2]})</span>`;
 
 			for(let j = 0, islLen = this.islName.length; j < islLen; j++) {
 				if(targ === this.islName[j][0]){
-					targ = '<span class="islName">' + this.islName[j][1] + '島</span>';
+					targ = `<span class="islName">${this.islName[j][1]}島</span>`;
 				}
 			}
 
@@ -369,12 +368,8 @@ class MapDevelopment {
 					break;
 			}
 
-			const preffix_i = (i < 9)? '0': '';
-			returnVal +=
-				'<div id="com_'+i+'" '+
-					'onmouseover="mc_over('+i+');return false;" '+
-					'><a href="javascript:void(0);" onclick="ns('+i+')" onkeypress="ns('+i+')" '+
-					'onmousedown="return comListMove('+i+');" '+'ondblclick="chNum('+_cmd[3]+');return false;">'+preffix_i+(i+1)+': '+cmdText+'</a></div>\n';
+			const fixed_i = (i < 9)? '0'+(i+1): i+1;
+			returnVal += `<div id="com_${i}" onmouseover="mc_over(${i});return false;"><a href="javascript:void(0);" onclick="ns(${i})" onkeypress="ns(${i})" onmousedown="return comListMove(${i});" ondblclick="chNum(${_cmd[3]})">${fixed_i}: ${cmdText}</a></div>\n`;
 		}
 
 		return returnVal;
@@ -529,6 +524,7 @@ class MapDevelopment {
 				break;
 			}
 		}
+		return false;
 	}
 
 	chNumDo() {
@@ -537,102 +533,12 @@ class MapDevelopment {
 		Util.hideElement('ch_num');
 	}
 
-	Keydown(e:KeyboardEvent){
-		if (e.defaultPrevented) return;
-		if (e.target.tagName === 'input') return;
-		if (e.altKey || e.ctrlKey || e.shiftKey) return;
-
-		let char = e.key.toLowerCase();
-		let m = (document.InputPlan.AMOUNT.selectedIndex >9)? document.InputPlan.AMOUNT.selectedIndex: 0;
-
-		// 押されたキーに応じて計画を設定する
-		switch (char) {
-			case 'a': // ▼整地
-				char = this.php_command.Prepare; break;
-			case 'j': // ▼地ならし
-				char = this.php_command.Prepare2; break;
-			case 'u': // ▼埋め立て
-				char = this.php_command.Reclaim; break;
-			case 'k': // ▼掘削
-				char = this.php_command.Destroy; break;
-			case 'b': // ▼伐採
-				char = this.php_command.SellTree; break;
-			case 'p': // ▼植林
-				char = this.php_command.Plant; break;
-			case 'n': // ▼農場整備
-				char = this.php_command.Farm; break;
-			case 'i': // ▼工場建設
-				char = this.php_command.Factory; break;
-			case 's': // ▼採掘場整備
-				char = this.php_command.Mountain; break;
-			case 'd': // ▼防衛施設建設
-				char = this.php_command.Dbase; break;
-			case 'm': // ▼ミサイル基地建設
-				char = this.php_command.Base; break;
-			case 'f': // ▼海底基地建設
-				char = this.php_command.Sbase; break;
-			case '-': // ▼INS 資金繰り
-				char = this.php_command.DoNothing; break;
-			case '.': // ▼DEL 削除
-				cominput(InputPlan,3); return;
-			case'\b': // ▼BS 一つ前削除
-				let no = document.InputPlan.COMMAND.selectedIndex;
-				if(no > 0) {
-					document.InputPlan.COMMAND.selectedIndex = no - 1;
-				}
-				cominput(InputPlan,3);
-				return;
-			case '0':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+0;
-				return;
-			case '1':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+1;
-				return;
-			case '2':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+2;
-				return;
-			case '3':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+3;
-				return;
-			case '4':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+4;
-				return;
-			case '5':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+5;
-				return;
-			case '6':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+6;
-				return;
-			case '7':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+7;
-				return;
-			case '8':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+8;
-				return;
-			case '9':
-				document.InputPlan.AMOUNT.selectedIndex = m*10+9;
-				return;
-			case 'Z':
-				document.InputPlan.AMOUNT.selectedIndex = 0;
-				return;
-			default:
-				// ▼[WARN]ここに処理を入れない：IEではF5も拾えるため
-				return;
-		}
-		this.cominput(document.InputPlan, 6, char);
-		e.preventDefault();
-		return;
-	}
-
-
-
-
 }
 
 /**
- * コマンド ドラッグ＆ドロップ用追加スクリプト
+ * イベント管理
  */
-class DragDrop {
+class Events {
 	private moveLay = new MoveFalse();
 	private newLineIndex :number = -2;
 	private Mcommand :boolean = false;
@@ -640,9 +546,9 @@ class DragDrop {
 
 	constructor(targId:string) {
 		let el = document.getElementById(targId);
-		el.addEventListener('mouseover', this.evMouseOver(e), false);
-		el.addEventListener('mouseup', this.evMouseUp(e), false);
-		document.addEventListener('keydown', this.evKeyDown(e), false);
+		el.addEventListener('mouseover', this.evMouseOver, false);
+		el.addEventListener('mouseup', this.evMouseUp, false);
+		document.addEventListener('keydown', this.evKeydown, false);
 	}
 	Mmove(e){
 		this.mx = e.pageX;
@@ -705,6 +611,73 @@ class DragDrop {
 			up: up,
 			move: move
 		};
+	}
+	evKeydown(e:KeyboardEvent){
+		if (e.defaultPrevented) return;
+		if (e.target.tagName === 'input') return;
+		if (e.altKey || e.ctrlKey || e.shiftKey) return;
+
+		let char = e.key.toLowerCase();
+
+		// 押されたキーに応じて計画を設定する
+		switch (char) {
+			case 'a': // ▼整地
+				char = this.php_command.Prepare; break;
+			case 'j': // ▼地ならし
+				char = this.php_command.Prepare2; break;
+			case 'u': // ▼埋め立て
+				char = this.php_command.Reclaim; break;
+			case 'k': // ▼掘削
+				char = this.php_command.Destroy; break;
+			case 'b': // ▼伐採
+				char = this.php_command.SellTree; break;
+			case 'p': // ▼植林
+				char = this.php_command.Plant; break;
+			case 'n': // ▼農場整備
+				char = this.php_command.Farm; break;
+			case 'i': // ▼工場建設
+				char = this.php_command.Factory; break;
+			case 's': // ▼採掘場整備
+				char = this.php_command.Mountain; break;
+			case 'd': // ▼防衛施設建設
+				char = this.php_command.Dbase; break;
+			case 'm': // ▼ミサイル基地建設
+				char = this.php_command.Base; break;
+			case 'f': // ▼海底基地建設
+				char = this.php_command.Sbase; break;
+			case '-': // ▼INS 資金繰り
+				char = this.php_command.DoNothing; break;
+			case '.': // ▼DEL 削除
+				cominput(InputPlan,3); return;
+			case'\b': // ▼BS 一つ前削除
+				let no = document.InputPlan.COMMAND.selectedIndex;
+				if(no > 0) {
+					document.InputPlan.COMMAND.selectedIndex = no - 1;
+				}
+				cominput(InputPlan,3);
+				return;
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				let m = document.InputPlan.AMOUNT.selectedIndex * 10;
+				document.InputPlan.AMOUNT.selectedIndex = (m + parseInt(char,10)) % 100;
+				return;
+			case 'Z':
+				document.InputPlan.AMOUNT.selectedIndex = 0;
+				return;
+			default:
+				// ▼[WARN]ここに処理を入れない：IEではF5も拾えるため
+				return;
+		}
+		this.cominput(document.InputPlan, 6, char);
+		e.preventDefault();
 	}
 }
 
