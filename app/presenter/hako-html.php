@@ -1830,7 +1830,7 @@ END;
 
 	<div class="text-center">
 
-	<input type="submit" class="btn btn-primary btn-lg" value="計画送信" name="SENDPROJECT">
+	<button type="submit" name="sendProj" class="btn btn-primary btn-block">計画送信</button>
 
 	<hr>
 
@@ -1843,22 +1843,17 @@ END;
 
 	<hr>
 
-	<b>計画番号</b>
-	<select name="NUMBER">
+	<h4>計画番号</h4>
+	<select name="number">
 END;
 		// 計画番号
-		for($i = 0; $i < $init->commandMax; $i++) {
-			$j = $i + 1;
-			echo "<option value=\"$i\">$j</option>\n";
+		for($i = 0; $i < $init->commandMax;) {
+			echo '<option value="', $i, '">', ++$i, '</option>', "\n";
 		}
 
 		$open = "";
 		if ( isset($data['MENUOPEN']) ) {
-			if ($data['MENUOPEN'] == 'on') {
-				$open = "CHECKED";
-			} else {
-				$open = "";
-			}
+			$open = ($data['MENUOPEN'] == 'on')? 'checked': '';
 		}
 
 		echo <<<END
@@ -1867,14 +1862,10 @@ END;
 	<hr>
 
 	<h3>開発計画</h3>
-	<label class="checkbox-inline">
-	  <input type="checkbox" name="NAVIOFF" $open>NaviOff
-	</label>
-	<label class="checkbox-inline">
-	  <input type="checkbox" name="MENUOPEN" $open>PopupOff<br>
-	</label>
-
-	<br>
+	<div>
+		<label class="checkbox-inline"><input type="checkbox" name="NAVIOFF" $open> NaviOff</label>
+		<label class="checkbox-inline"><input type="checkbox" name="MENUOPEN" $open> PopupOff</label>
+	</div>
 
 	<select name="menu" onchange="SelectList(InputPlan)">
 	<option value="">全種類</option>
@@ -1886,22 +1877,13 @@ END;
 		echo <<<END
 	</select>
 	<br>
-	<select name="COMMAND">
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
+	<select name="commands">
+		<option></option>
 	</select>
 
 	<hr>
 
-	<b>座標(</b>
+	<b>座標： (</b>
 	<select name="POINTX">
 END;
 		for($i = 0; $i < $init->islandSize; $i++) {
@@ -1967,7 +1949,7 @@ END;
 
 	<input type="hidden" name="ISLANDID" value="{$island['id']}">
 	<input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
-	<input type="submit" class="btn btn-primary btn-lg" value="計画送信" name="SENDPROJECT">
+	<button type="submit" name="sendProj" class="btn btn-primary btn-block">計画送信</button>
 
 	<p>最後に<span style="color:#c7243a;">計画送信ボタン</span>を<br>押すのを忘れないように。</p>
 
@@ -2000,11 +1982,7 @@ END;
 		echo <<<END
 </td>
 <td $init->bgCommandCell id="plan">
-<ilayer name="PARENT_LINKMSG" width="100%" height="100%">
-<layer name="LINKMSG1" width="200"></layer>
-<span id="LINKMSG1"></span>
-</ilayer>
-<br>
+<div id="IsSynced"></div>
 </td>
 </tr>
 </table>

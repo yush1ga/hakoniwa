@@ -4,4 +4,4 @@ password.php
 sftp-config.json
 /manual/*
 node_modules/
-
+page.js

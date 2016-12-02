@@ -1,10 +1,14 @@
+/// <reference path="../../node_modules/underscore/underscore-min.js" />
+
 class MapDevelopment {
+	private _msgs;
 	private w;
 	private p; // = $defaultTarget;
+
 	private str;
-	private g :any[]; // = [$com_max];
-	private k1 :any[]; // = [$com_max];
-	private k2 :any[]; // = [$com_max];
+	private g :string[]; // = [$com_max] => [0,0,0,0, ... 0]
+	private k1 :string[]; // = [$com_max]
+	private k2 :string[]; // = [$com_max]
 	private tmpCommand = [[[0,0,0,0,0]], [[0,0,0,0,0]]];
 	private command :any[]; // = [$set_com];
 	private listCommand :any[]; // = [$set_listcom];
@@ -18,71 +22,104 @@ class MapDevelopment {
 
 	private php_com_count :number;
 	private php_commandMax :number;
+	private php_All_listCom :number;
+	private php_default_Kind :number;
 	private php_commands :any;
 	private php_costs :any;
 	private php_init :any;
 
-	constructor(args :any) {
+	public dragDrop;
 
-		for (let val in args) {
-			this[val] = args[val];
+	constructor() {
+
+		let args = this.getPhpConfigs();
+		for (let key in args) {
+			this[key] = args[key];
 		}
+		this._msgs.sync.notyet  = '<div style="color:#c7243a;font-weight:bold;">■ 未送信 ■</div>';
+		this._msgs.sync.already = '<div style="color:#00c">■ 送信済 ■</div>';
 
 
-		for(let i = 0; i < this.command.length; i++) {
+		// this.command内のコマンドIDとthis.listCommand内のコマンドID・名称対照
+		// @return :string[] 計画中コマンド群の名称リスト
+		for(let i = 0, len = this.command.length; i < len; i++) {
 			for(let s = 0; s < this.php_com_count; s++) {
 				let comlist2 = this.listCommand[s];
-				for(let j = 0; j < comlist2.length; j++) {
+				for(let j = 0, len_j = comlist2.length; j < len_j; j++) {
 					if(this.command[i][0] == comlist2[j][0]) {
 						this.g[i] = comlist2[j][1];
 					}
 				}
 			}
 		}
-		SelectList('');
-		outp();
-		this.str = plchg();
-		this.str = '<div style="color:#00c">■ 送信済み ■<\\/div>' + this.str;
-		disp(this.str, "");
-		document.onmousemove = Mmove;
-		// if(document.layers) {
-		//  //document.captureEvents(Event.MOUSEMOVE | Event.MOUSEUP);
-		//  document.addEventListener("DOMContentLoaded", Event.MOUSEMOVE | Event.MOUSEUP, false);
-		// }
-		document.onmouseup = Mup;
-		document.onmousemove = Mmove;
-		document.onkeydown = Kdown;
-		document.ch_numForm.AMOUNT.options.length = 100;
-		for(let i = 0; i < document.ch_numForm.AMOUNT.options.length; i++){
-			document.ch_numForm.AMOUNT.options[i].value = i;
-			document.ch_numForm.AMOUNT.options[i].text = i;
+
+		// コマンドリスト初期表示
+		this.selectList();
+		this.writeCmdArray();
+		this.str = this.changePlan();
+		this.str = this._msgs.sync.already + this.str;
+		this.disp(this.str);
+
+		this.dragDrop = new DragDrop('plan');
+
+		document.forms.ch_numForm.AMOUNT.length = 100;
+		for(let i = 0; i < document.forms.ch_numForm.AMOUNT.length; i++){
+			document.forms.ch_numForm.AMOUNT[i].value = i;
+			document.forms.ch_numForm.AMOUNT[i].text = i;
 		}
-		document.InputPlan.SENDPROJECT.disabled = true;
-		ns(0);
+		document.forms.InputPlan.sendProj.disabled = true;
+		this.numberSelect(0);
 	}
 
-	cmdInput(theForm, x, k, z) {
-		let numb = theForm.NUMBER.options[theForm.NUMBER.selectedIndex].value;
-		let comd = theForm.COMMAND.options[theForm.COMMAND.selectedIndex].value;
-		let pt_x = theForm.POINTX.options[theForm.POINTX.selectedIndex].value;
-		let pt_y = theForm.POINTY.options[theForm.POINTY.selectedIndex].value;
-		let amnt = theForm.AMOUNT.options[theForm.AMOUNT.selectedIndex].value;
-		let targ = theForm.TARGETID.options[theForm.TARGETID.selectedIndex].value;
+	private getPhpConfigs(){
+		let request = new XMLHttpRequest();
+		let ret = {};
+		request.open('GET', 'mapDevelopment.php', false);
+		request.onload = function() {
+			if (request.status >= 200 && request.status < 400) {
+				// Success!
+				ret = JSON.parse(request.responseText);
+			} else {
+				console.error(request.responseText);
+				throw "We reached our target server, but it returned an error";
+			}
+		};
+		request.onerror = function() {
+			throw 'There was a connection error of some sort';
+		};
+		request.send();
+		return ret;
+	}
 
-		if(x === 6){
-			comd = k; menuclose();
-		}
+	/**
+	 * => cominput()
+	 * @param {[type]} theForm [description]
+	 * @param {number} x       [description]
+	 * @param {[type]} k       [description]
+	 * @param {[type]} z       [description]
+	 */
+	cmdInput(theForm, x, k, z) {
+		let numb = theForm.number[theForm.number.selectedIndex].value;
+		let comd = theForm.COMMAND[theForm.COMMAND.selectedIndex].value;
+		let pt_x = theForm.POINTX[theForm.POINTX.selectedIndex].value;
+		let pt_y = theForm.POINTY[theForm.POINTY.selectedIndex].value;
+		let amnt = theForm.AMOUNT[theForm.AMOUNT.selectedIndex].value;
+		let targ = theForm.TARGETID[theForm.TARGETID.selectedIndex].value;
+
 
 		let newNs = numb;
 		if (x === 1 || x === 2 || x === 6){
-			if(x === 6) comd = k;
+			if(x === 6){
+				comd = k;
+				menuclose();
+			}
 			if(x !== 2) {
 				for(let i = this.php_commandMax - 1; i > numb; i--) {
 					this.command[i] = this.command[i-1];
 					this.g[i] = this.g[i-1];
 				}
 			}
-			for(let s = 0; s < this.php_com_count ;s++) {
+			for(let s = 0; s < this.php_com_count; s++) {
 				for(let i = 0, comlist2 = this.listCommand[s]; i < comlist2.length; i++){
 					if(comlist2[i][0] == comd){
 						this.g[numb] = comlist2[i][1];
@@ -116,8 +153,8 @@ class MapDevelopment {
 			this.g[i-1] = this.k1[i];
 			ns(--i);
 			this.str = plchg();
-			this.str = '<div style="color:#c7243a;font-weight:bold;">■ 未送信 ■<\\/div>' + this.str;
-			disp(this.str,"white");
+			this.str = this._msgs.sync.notyet + this.str;
+			disp(this.str);
 			outp();
 			newNs = i+1;
 		} else if(x === 5) {
@@ -157,39 +194,37 @@ class MapDevelopment {
 			this.command[numb][3] = k;
 		}
 		this.str = plchg();
-		this.str = '<div style="color:#c7243a;font-weight:bold;">■ 未送信 ■<\\/div>' + this.str;
-		disp(this.str, "");
+		this.str = this._msgs.sync.notyet + this.str;
+		this.disp(this.str);
 		outp();
 		theForm.SENDPROJECT.disabled = false;
-		ns(newNs);
+		this.numberSelect(newNs);
 
 		return true;
 	}
 
-	plchg() {
-		let strn1 = "";
-		let strn2 = "";
+	changePlan() {
+		let returnVal = "";
+		let cmdText = "";
 		let arg = "";
 		for(let i = 0; i < this.php_commandMax; i++) {
-			let _cmd = this.command[i];
-			let kind = '{$init->tagComName_}' + this.g[i] + '{$init->_tagComName}';
-			let x = _cmd[1];
-			let y = _cmd[2];
+			let _cmd :any[] = this.command[i];
 			let targ = _cmd[4];
-			let point = '{$init->tagName_}' + "(" + x + "," + y + ")" + '{$init->_tagName}';
+			const kind = '<span class="command">' + this.g[i] + '</span>';
+			const point = '<span class="islName">(' + _cmd[1] + ',' + _cmd[2] + ')</span>';
 
 			for(let j = 0, islLen = this.islName.length; j < islLen; j++) {
-				if(targ == this.islName[j][0]){
-					targ = '{$init->tagName_}' + this.islName[j][1] + "島" + '{$init->_tagName}';
+				if(targ === this.islName[j][0]){
+					targ = '<span class="islName">' + this.islName[j][1] + '島</span>';
 				}
 			}
 
-			switch(c[0]) {
+			switch(_cmd[0]) {
 				// ▼ミサイル撃ち止め、資金繰り、島の放棄
 				case this.php_commands.missileSM:
 				case this.php_commands.doNothing:
 				case this.php_commands.giveup:
-					strn2 = kind;
+					cmdText = kind;
 					break;
 				// ▼ミサイル関連
 				case this.php_commands.missileNM:
@@ -199,198 +234,184 @@ class MapDevelopment {
 				case this.php_commands.missileSP:
 				case this.php_commands.missileLD:
 				case this.php_commands.missileLU:
-					arg = (c[3]===0)? "（無制限）": "（" + c[3] + "発）";
-					strn2 = targ + point + "へ" + kind + arg;
+					arg = (_cmd[3]===0)? '（無制限）': '（' + _cmd[3] + '発）';
+					cmdText = targ + point + "へ" + kind + arg;
 					break;
 				// ▼怪獣派遣・怪獣転嫁
 				case this.php_commands.sendMonster:
 				case this.php_commands.sendSleeper:
-					strn2 = targ + "へ" + kind;
+					cmdText = targ + "へ" + kind;
 					break;
 				// ▼食料輸出
 				case this.php_commands.sellFood:
-					arg = "（" + Math.max(1,c[3])*100 + this.php_init.unitFood + "）";
-					strn2 = kind + arg;
+					arg = "（" + Math.max(1,_cmd[3])*100 + this.php_init.unitFood + "）";
+					cmdText = kind + arg;
 					break;
 				// ▼木材輸出
 				case this.php_commands.sellWood:
-					arg = "（" + Math.max(1,c[3])*10 + this.php_init.unitWood + "）";
-					strn2 = kind + arg;
+					arg = "（" + Math.max(1,_cmd[3])*10 + this.php_init.unitWood + "）";
+					cmdText = kind + arg;
 					break;
 				// ▼資金援助
 				case this.php_commands.aidMoney:
-					arg = "（" + Math.max(1,c[3])*this.php_costs.aidMoney + this.php_init.unitMoney + "）";
-					strn2 = targ + "へ" + kind + arg;
+					arg = "（" + Math.max(1,_cmd[3])*this.php_costs.aidMoney + this.php_init.unitMoney + "）";
+					cmdText = targ + "へ" + kind + arg;
 					break;
 				// ▼食料援助
 				case this.php_commands.aidFood:
-					arg = "（" + Math.max(1,c[3])*100 + this.php_init.unitFood + "）";
-					strn2 = targ + "へ" + kind + arg;
+					arg = "（" + Math.max(1,_cmd[3])*100 + this.php_init.unitFood + "）";
+					cmdText = targ + "へ" + kind + arg;
 					break;
 				// ▼掘削
 				case this.php_commands.excavate:
-					arg = "（予算：" + Math.max(1,c[3])*this.php_costs.excavate + this.php_init.unitMoney + "）";
-					strn2 = point + "で" + kind + arg;
+					arg = "（予算：" + Math.max(1,_cmd[3])*this.php_costs.excavate + this.php_init.unitMoney + "）";
+					cmdText = point + "で" + kind + arg;
 					break;
 				// ▼宝くじ購入
 				case this.php_commands.buyLot:
-					arg = "（予算：" + Math.max(1,Math.min(c[3],30))*this.php_costs.buyLot + this.php_init.unitMoney + "）";
-					strn2 = kind + arg;
+					arg = "（予算：" + Math.max(1,Math.min(_cmd[3],30))*this.php_costs.buyLot + this.php_init.unitMoney + "）";
+					cmdText = kind + arg;
 					break;
 				// ▼防衛施設
 				case this.php_commands.barrierLand:
-						arg = "（耐久力" + Math.max(1,Math.min(c[3],this.php_init.barrierLandHP)) + "）";
-						strn2 = point + "で" + kind + arg;
+						arg = "（耐久力" + Math.max(1,Math.min(_cmd[3],this.php_init.barrierLandHP)) + "）";
+						cmdText = point + "で" + kind + arg;
 					break;
 				// ▼海底防衛施設
 				case this.php_commands.barrierOffshore:
-					arg = "（耐久力" + Math.max(1,Math.min(c[3],this.php_init.barrierOffshoreHP)) + "）";
-					strn2 = point + "で" + kind + arg;
+					arg = "（耐久力" + Math.max(1,Math.min(_cmd[3],this.php_init.barrierOffshoreHP)) + "）";
+					cmdText = point + "で" + kind + arg;
 					break;
 				// ▼船の破棄
 				case this.php_commands.shipReject:
-					strn2 = point + "で" + kind;
+					cmdText = point + "で" + kind;
 					break;
 				// ▼倉庫建設（資金）
 				case this.php_commands.repositoryMoney:
-					arg = "（" + (()=>{return (c[3]===0)?"（セキュリティ強化）":c[3]*1000;}) + this.php_init.unitMoney + "）";
-					strn2 = point + "で" + kind + arg;
+					arg = (_cmd[3]===0)? "（セキュリティ強化）": ('（' + _cmd[3]*1000 + this.php_init.unitMoney + '）');
+					cmdText = point + "で" + kind + arg;
 					break;
 				// ▼倉庫建設（食料）
 				case this.php_commands.repositoryFood:
-					arg = "（" + (()=>{return (c[3]===0)?"（セキュリティ強化）":c[3]*1000;}) + this.php_init.unitMoney + "）";
-					strn2 = point + "で" + kind + arg;
+					arg = "（" + (()=>{return (_cmd[3]===0)?"（セキュリティ強化）":_cmd[3]*1000;}) + this.php_init.unitMoney + "）";
+					cmdText = point + "で" + kind + arg;
 					break;
 				// ▼倉庫引き出し
 				case this.php_commands.repositoryWithdraw:
-				if(c[3] == 0) c[3] = 1;
-				arg = c[3] * 1000;
-				arg = "（" + arg + "{$init->unitMoney} or " + arg + "{$init->unitFood}）";
-				strn2 = point + "で" + kind + arg;
-
+					arg = "（" + Math.max(1,_cmd[3])*1000 + this.php_init.unitMoney + " or " + Math.max(1,_cmd[3])*1000 + this.php_init.unitFood + "）";
+					cmdText = point + "で" + kind + arg;
 					break;
-				case this.php_commands.:
+				// ▼農場、海底農場、工場、商業ビル、採掘場整備、発電所、僕の引越し
+				case this.php_commands.farm:
+				case this.php_commands.farmOffshore:
+				case this.php_commands.factory:
+				case this.php_commands.commerce:
+				case this.php_commands.mountain:
+				case this.php_commands.dynamo:
+				case this.php_commands.transport:
+					arg = (_cmd[3] === 0)? '': "（" + _cmd[3] + "回）";
+					cmdText = point + "で" + kind + arg;
 					break;
-				case this.php_commands.:
+				// ▼誘致活動・スポーツ強化
+				case this.php_commands.propaganda:
+				case this.php_commands.sportsOffence:
+				case this.php_commands.sportsDefence:
+				case this.php_commands.sportsPractice:
+					arg = (_cmd[3] === 0)? '': "（" + _cmd[3] + "回）";
+					cmdText = kind + arg;
 					break;
-				case this.php_commands.:
+				// ▼スポーツ試合
+				case this.php_commands.sportsGame:
+					cmdText = targ + "と" + kind;
 					break;
-				case this.php_commands.:
+				// ▼造船
+				case this.php_commands.shipMake:
+					cmdText = point + "で" + kind + " (" + this.php_init.shiplist[Math.min(_cmd[3], this.php_init.shipKind-1)] + "）";
 					break;
-				case this.php_commands.:
+				// ▼船派遣
+				case this.php_commands.shipSend:
+					cmdText = targ + "へ" + point + "の" + kind;
+					break;
+				// ▼船帰還
+				case this.php_commands.shipReturn:
+					cmdText = targ + point + "の" + kind;
+					break;
+				// ▼人工衛星打ち上げ
+				case this.php_commands.eisei:
+					if(_cmd[3] >= $init->EiseiNumber) {
+						_cmd[3] = 0;
+					}
+					arg = _cmd[3];
+					cmdText = this.php_init.eiseilist[arg] + "打ち上げ";
+					break;
+				// ▼人工衛星修復
+				case this.php_commands.eiseiMente:
+					if(_cmd[3] >= $init->EiseiNumber) {
+						_cmd[3] = 0;
+					}
+					arg = _cmd[3];
+					cmdText = '{$init->tagComName_}' + eiseilist[arg] + "修復" + '{$init->_tagComName}';
+					break;
+				// ▼人工衛星破壊
+				case this.php_commands.eiseiDestroy:
+					if(_cmd[3] >= $init->EiseiNumber) {
+						_cmd[3] = 0;
+					}
+					arg = _cmd[3];
+					cmdText = targ + "へ" + '{$init->tagComName_}' + eiseilist[arg] + "破壊砲発射" + '{$init->_tagComName}';
+					break;
+				// 衛星レーザー
+				case this.php_commands.eiseiLayser:
+					cmdText = targ + point + "へ" + kind;
 					break;
 				default:
-					// code...
+					cmdText = point + "で" + kind;
 					break;
 			}
 
-			if(c[0] == this.php_commands.missileSM || c[0] == this.php_commands.doNothing || c[0] == this.php_commands.giveup){
-			} else if(c[0] == $init->comFarm || // 農場、海底農場、工場、商業ビル、採掘場整備、発電所、僕の引越し
-				c[0] == $init->comSfarm ||
-				c[0] == $init->comFactory ||
-				c[0] == $init->comCommerce ||
-				c[0] == $init->comMountain ||
-				c[0] == $init->comHatuden ||
-				c[0] == $init->comBoku) {
-				if(c[3] != 0){
-					arg = "（" + c[3] + "回）";
-					strn2 = point + "で" + kind + arg;
-				}else{
-					strn2 = point + "で" + kind;
-				}
-			} else if(c[0] == $init->comPropaganda || // 誘致活動
-				c[0] == $init->comOffense || // 強化
-				c[0] == $init->comDefense ||
-				c[0] == $init->comPractice) {
-				if(c[3] != 0){
-					arg = "（" + c[3] + "回）";
-					strn2 = kind + arg;
-				}else{
-					strn2 = kind;
-				}
-			} else if(c[0] == $init->comPlaygame) { // 試合
-				strn2 = targ + "と" + kind;
-			} else if(c[0] == $init->comMakeShip){ // 造船
-				if(c[3] >= $init->shipKind) {
-					c[3] = $init->shipKind - 1;
-				}
-				arg = c[3];
-				strn2 = point + "で" + kind + " (" + shiplist[arg] + ")";
-			} else if(c[0] == $init->comSendShip){ // 船派遣
-				strn2 = targ + "へ" + point + "の" + kind;
-			} else if(c[0] == $init->comReturnShip){ // 船帰還
-				strn2 = targ + point + "の" + kind;
-			} else if(c[0] == $init->comEisei){ // 人工衛星打ち上げ
-				if(c[3] >= $init->EiseiNumber) {
-					c[3] = 0;
-				}
-				arg = c[3];
-				strn2 = '{$init->tagComName_}' + eiseilist[arg] + "打ち上げ" + '{$init->_tagComName}';
-			} else if(c[0] == $init->comEiseimente){ // 人工衛星修復
-				if(c[3] >= $init->EiseiNumber) {
-					c[3] = 0;
-				}
-				arg = c[3];
-				strn2 = '{$init->tagComName_}' + eiseilist[arg] + "修復" + '{$init->_tagComName}';
-			} else if(c[0] == $init->comEiseiAtt){ // 人工衛星破壊
-				if(c[3] >= $init->EiseiNumber) {
-					c[3] = 0;
-				}
-				arg = c[3];
-				strn2 = targ + "へ" + '{$init->tagComName_}' + eiseilist[arg] + "破壊砲発射" + '{$init->_tagComName}';
-			} else if(c[0] == $init->comEiseiLzr) { // 衛星レーザー
-				strn2 = targ + point + "へ" + kind;
-			}else{
-				strn2 = point + "で" + kind;
-			}
-			tmpnum = '';
-			if(i < 9){ tmpnum = '0'; }
-			strn1 +=
+			const preffix_i = (i < 9)? '0': '';
+			returnVal +=
 				'<div id="com_'+i+'" '+
 					'onmouseover="mc_over('+i+');return false;" '+
-					'><a HREF="javascript:void(0);" onclick="ns('+i+')" onkeypress="ns('+i+')" '+
-					'onmousedown="return comListMove('+i+');" '+'ondblclick="chNum('+c[3]+');return false;" '+
-					'><nobr>'+
-					tmpnum+(i+1)+':'+
-					strn2+'<\\/nobr><\\/a><\\/div>\\n';
+					'><a href="javascript:void(0);" onclick="ns('+i+')" onkeypress="ns('+i+')" '+
+					'onmousedown="return comListMove('+i+');" '+'ondblclick="chNum('+_cmd[3]+');return false;">'+preffix_i+(i+1)+': '+cmdText+'</a></div>\n';
 		}
 
-		return strn1;
+		return returnVal;
 	}
 
-	disp(str, bgColor? :string) {
-		if(str==null) str = "";
-		if(bgColor===undefined) bgColor = '#fff';
-		LayWrite('LINKMSG1', str);
-		SetBG('plan', bgColor);
+	disp(str, bgColor?:string) {
+		str = str || '';
+		bgColor = bgColor || '#fff';
+		Util.layerWrite('IsSynced', str);
+		Util.setBGColor('plan', bgColor);
 	}
 
-	outp() {
-		let comary = "";
+	writeCmdArray() {
+		let cmdArray = '';
 
 		for(let k = 0, len = this.command.length; k < len; k++){
-			comary = comary + this.command[k][0]
-				+ " " + this.command[k][1]
-				+ " " + this.command[k][2]
-				+ " " + this.command[k][3]
-				+ " " + this.command[k][4]
-				+ " ";
+			cmdArray += this.command[k][0] + " " + this.command[k][1]
+				+ " " + this.command[k][2] + " " + this.command[k][3]
+				+ " " + this.command[k][4] + " ";
 		}
-		document.InputPlan.COMARY.value = comary;
+		document.forms.InputPlan.COMARY.value = cmdArray;
 	}
 
-	ps(x, y) {
-		document.InputPlan.POINTX.options[x].selected = true;
-		document.InputPlan.POINTY.options[y].selected = true;
-		if(!(document.InputPlan.MENUOPEN.checked)) {
+	// => ps()
+	pointSelect(x, y) {
+		document.forms.InputPlan.POINTX[x].selected = true;
+		document.forms.InputPlan.POINTY[y].selected = true;
+		if(!(document.forms.InputPlan.MENUOPEN.checked)) {
 			moveLAYER("menu", mx+10, my-50);
 		}
 		NaviClose();
 		return true;
 	}
 
-	ns(x) {
-		if (x !== this.php_commandMax) document.InputPlan.NUMBER.options[x].selected = true;
+	// => ns()
+	numberSelect(x) {
+		if (x !== this.php_commandMax) document.forms.InputPlan.number[x].selected = true;
 		return true;
 	}
 
@@ -408,14 +429,14 @@ class MapDevelopment {
 						com_str += kind;
 					} else {
 						arg = c[3] * 200;
-						arg = "（予\算" + arg + "{$init->unitMoney}）";
+						arg = "（予算" + arg + "{$init->unitMoney}）";
 						com_str += kind + arg;
 					}
 				} else if(c[0] == $init->comLot){
 					if(c[3] == 0) c[3] = 1;
 					if(c[3] > 30) c[3] = 30;
 						arg = c[3] * 300;
-						arg = "（予\算" + arg + "{$init->unitMoney}）";
+						arg = "（予算" + arg + "{$init->unitMoney}）";
 						com_str += kind + arg;
 				} else if(c[0] == $init->comFarm ||
 					c[0] == $init->comSfarm ||
@@ -440,267 +461,272 @@ class MapDevelopment {
 				com_str += " ";
 			}
 		}
-		document.InputPlan.COMSTATUS.value= com_str;
+		document.forms.InputPlan.COMSTATUS.value= com_str;
 	}
 
-	SelectList(theForm) {
-		var u, selected_ok;
-		if(!theForm) { s = '' }
-		else { s = theForm.menu.options[theForm.menu.selectedIndex].value; }
-		if(s == ''){
-			u = 0; selected_ok = 0;
-			document.InputPlan.COMMAND.options.length = $All_listCom;
-			for (i=0; i<this.listCommand.length; i++) {
-				var command = this.listCommand[i];
-				for (a=0; a<command.length; a++) {
-					comName = command[a][1] + "(" + command[a][2] + ")";
-					document.InputPlan.COMMAND.options[u].value = command[a][0];
-					document.InputPlan.COMMAND.options[u].text = comName;
-					if(command[a][0] == $default_Kind){
-						document.InputPlan.COMMAND.options[u].selected = true;
-						selected_ok = 1;
+	// => SelectList()
+	selectList(form?) {
+		let isSelect :boolean = false;
+		let s = (!form)? '': form.menu.value;
+		if(s === '') {
+			let u :number = 0;
+			document.forms.InputPlan.commands.length = this.php_All_listCom;
+			for (let i = 0, len = this.listCommand.length; i < len; i++) {
+				let command = this.listCommand[i];
+				for (let j = 0, len_command = command.length; j < len_command; j++) {
+					let comName = command[j][1] + "(" + command[j][2] + ")";
+					document.forms.InputPlan.commands[u].value = command[j][0];
+					document.forms.InputPlan.commands[u].text  = comName;
+					if(command[j][0] === this.php_default_Kind){
+						document.forms.InputPlan.commands[u].selected = true;
+						isSelect = true;
 					}
 					u++;
 				}
 			}
-			if(selected_ok == 0)
-				document.InputPlan.COMMAND.selectedIndex = 0;
 		} else {
-			var command = this.listCommand[s];
-			document.InputPlan.COMMAND.options.length = command.length;
-			for (i=0; i<command.length; i++) {
-				comName = command[i][1] + "(" + command[i][2] + ")";
-				document.InputPlan.COMMAND.options[i].value = command[i][0];
-				document.InputPlan.COMMAND.options[i].text = comName;
-				if(command[i][0] == $default_Kind){
-					document.InputPlan.COMMAND.options[i].selected = true;
-					selected_ok = 1;
+			let command = this.listCommand[s];
+			document.forms.InputPlan.commands.length = command.length;
+			for (let i = 0, len = command.length; i < len; i++) {
+				let cmdName = command[i][1] + "(" + command[i][2] + ")";
+				document.forms.InputPlan.commands[i].value = command[i][0];
+				document.forms.InputPlan.commands[i].text  = cmdName;
+				if(command[i][0] === this.php_default_Kind){
+					document.forms.InputPlan.commands[i].selected = true;
+					isSelect = true;
 				}
 			}
-			if(selected_ok == 0) {
-				document.InputPlan.COMMAND.selectedIndex = 0;
-			}
 		}
+		if(!isSelect) document.forms.InputPlan.commands.selectedIndex = 0;
 	}
 
-	moveLayer(layerId:string, x:number, y:number){
-		let el = <HTMLElement>document.getElementById(layId);
+	offsetLayer(layerId:string, x:number, y:number){
+		let el = <HTMLElement>document.getElementById(layerId);
 		el.style.left = x + "px";
 		el.style.top  = y + "px";
 	}
 
-	menuclose() {
-		this.moveLayer("menu", -500, -500);
+	menuClose() {
+		Util.hideElement('menu');
 	}
 
-	Mmove(e){
-		mx = e.pageX;
-		my = e.pageY;
-		return moveLay.move();
-	}
-
-	LayerWrite(layerId:string, str:string) {
-		document.getElementById(layerId).innerHTML = str;
-	}
-
-	setBGColor(layName:string, bgColor:string) {
-		document.getElementById(layName).style.backgroundColor = bgColor;
-	}
 
 	selCommand(num) {
-		let oldNum=0;
+		let oldNum = 0;
 		document.getElementById('com_'+oldNum).style.backgroundColor = '';
 		document.getElementById('com_'+num).style.backgroundColor = '#ffa';
 		oldNum = num;
 	}
 
-}
-
-/* コマンド ドラッグ＆ドロップ用追加スクリプト */
-var moveLay = new MoveFalse();
-var newLnum = -2;
-var Mcommand = false;
-
-function Mup() {
-	moveLay.up();
-	moveLay = new MoveFalse();
-}
-
-function setBorder(num, color) {
-	if(color.length == 4) {
-		document.getElementById('com_'+num).style.borderTop = ' 1px solid '+color;
-	} else {
-		document.getElementById('com_'+num).style.border = '0px';
-	}
-}
-
-function mc_out() {
-	if(Mcommand && newLnum >= 0) {
-		setBorder(newLnum, '');
-		newLnum = -1;
-	}
-}
-
-function mc_over(num) {
-	if(Mcommand) {
-		if(newLnum >= 0) setBorder(newLnum, '');
-		newLnum = num;
-		setBorder(newLnum, '#116'); // blue
-	}
-}
-
-function comListMove(num) {
-	moveLay = new MoveComList(num);
-	return (document.layers) ? true : false;
-}
-
-function MoveFalse() {
-	this.move = function() { }
-	this.up = function() { }
-}
-
-function MoveComList(num) {
-	var setLnum = num;
-	Mcommand = true;
-	LayWrite('mc_div', '<NOBR><strong>'+(num+1)+': '+g[num]+'</strong></NOBR>');
-	this.move = function() {
-		moveLAYER('mc_div', mx+10, my-30);
-		return false;
-	}
-	this.up = function() {
-		if(newLnum >= 0) {
-			var com = command[setLnum];
-			cominput(document.InputPlan,7,setLnum,newLnum);
-		} else if(newLnum == -1) {
-			cominput(document.InputPlan,3,setLnum+1);
+	chNum(num) {
+		document.forms.ch_numForm.AMOUNT.length = 100;
+		for(let i=0, len=document.forms.ch_numForm.AMOUNT.length; i<len; i++){
+			if(document.forms.ch_numForm.AMOUNT[i].value === num){
+				document.forms.ch_numForm.AMOUNT.selectedIndex = i;
+				document.forms.ch_numForm.AMOUNT[i].selected = true;
+				this.offsetLayer('ch_num', this.mx-10, this.my-60);
+				Util.showElement('ch_num');
+				break;
+			}
 		}
-		mc_out();
-		newLnum = -2;
-		Mcommand = false;
-		moveLAYER("mc_div",-50,-50);
+	}
+
+	chNumDo() {
+		let num = document.forms.ch_numForm.AMOUNT.value;
+		cominput(document.forms.InputPlan, 8, num);
+		Util.hideElement('ch_num');
+	}
+
+	Keydown(e:KeyboardEvent){
+		if (e.defaultPrevented) return;
+		if (e.target.tagName === 'input') return;
+		if (e.altKey || e.ctrlKey || e.shiftKey) return;
+
+		let char = e.key.toLowerCase();
+		let m = (document.InputPlan.AMOUNT.selectedIndex >9)? document.InputPlan.AMOUNT.selectedIndex: 0;
+
+		// 押されたキーに応じて計画を設定する
+		switch (char) {
+			case 'a': // ▼整地
+				char = this.php_command.Prepare; break;
+			case 'j': // ▼地ならし
+				char = this.php_command.Prepare2; break;
+			case 'u': // ▼埋め立て
+				char = this.php_command.Reclaim; break;
+			case 'k': // ▼掘削
+				char = this.php_command.Destroy; break;
+			case 'b': // ▼伐採
+				char = this.php_command.SellTree; break;
+			case 'p': // ▼植林
+				char = this.php_command.Plant; break;
+			case 'n': // ▼農場整備
+				char = this.php_command.Farm; break;
+			case 'i': // ▼工場建設
+				char = this.php_command.Factory; break;
+			case 's': // ▼採掘場整備
+				char = this.php_command.Mountain; break;
+			case 'd': // ▼防衛施設建設
+				char = this.php_command.Dbase; break;
+			case 'm': // ▼ミサイル基地建設
+				char = this.php_command.Base; break;
+			case 'f': // ▼海底基地建設
+				char = this.php_command.Sbase; break;
+			case '-': // ▼INS 資金繰り
+				char = this.php_command.DoNothing; break;
+			case '.': // ▼DEL 削除
+				cominput(InputPlan,3); return;
+			case'\b': // ▼BS 一つ前削除
+				let no = document.InputPlan.COMMAND.selectedIndex;
+				if(no > 0) {
+					document.InputPlan.COMMAND.selectedIndex = no - 1;
+				}
+				cominput(InputPlan,3);
+				return;
+			case '0':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+0;
+				return;
+			case '1':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+1;
+				return;
+			case '2':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+2;
+				return;
+			case '3':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+3;
+				return;
+			case '4':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+4;
+				return;
+			case '5':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+5;
+				return;
+			case '6':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+6;
+				return;
+			case '7':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+7;
+				return;
+			case '8':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+8;
+				return;
+			case '9':
+				document.InputPlan.AMOUNT.selectedIndex = m*10+9;
+				return;
+			case 'Z':
+				document.InputPlan.AMOUNT.selectedIndex = 0;
+				return;
+			default:
+				// ▼[WARN]ここに処理を入れない：IEではF5も拾えるため
+				return;
+		}
+		this.cominput(document.InputPlan, 6, char);
+		e.preventDefault();
+		return;
+	}
+
+
+
+
+}
+
+/**
+ * コマンド ドラッグ＆ドロップ用追加スクリプト
+ */
+class DragDrop {
+	private moveLay = new MoveFalse();
+	private newLineIndex :number = -2;
+	private Mcommand :boolean = false;
+	private lineColor :string = '#116'; // blue
+
+	constructor(targId:string) {
+		let el = document.getElementById(targId);
+		el.addEventListener('mouseover', this.evMouseOver(e), false);
+		el.addEventListener('mouseup', this.evMouseUp(e), false);
+		document.addEventListener('keydown', this.evKeyDown(e), false);
+	}
+	Mmove(e){
+		this.mx = e.pageX;
+		this.my = e.pageY;
+		return moveLay.move();
+	}
+	moveUp() {
+		this.moveLay.up();
+		this.moveLay = new MoveFalse();
+	}
+	setBorder(num:number, colorCode?:string) {
+		if(typeof colorCode !== undefined) {
+			document.getElementById('com_'+num).style.borderTop = '1px solid '+colorCode;
+		} else {
+			document.getElementById('com_'+num).style.border = '0';
+		}
+	}
+	mc_out() {
+		if(this.Mcommand && this.newLineIndex >= 0) {
+			this.setBorder(this.newLineIndex);
+			this.newLineIndex = -1;
+		}
+	}
+	mc_over(num:number) {
+		if(this.Mcommand) {
+			if(this.newLineIndex >= 0) this.setBorder(this.newLineIndex);
+			this.newLineIndex = num;
+			this.setBorder(this.newLineIndex, this.lineColor);
+		}
+	}
+	comListMove(num:number) {
+		this.moveLay = new MoveComList(num);
+		return (document.layers)? true: false;
+	}
+	MoveFalse() {
+		this.move = function() { }
+		this.up = function() { }
+	}
+	MoveComList(num) {
+		let setLineNum = num;
+		this.Mcommand = true;
+		layerWrite('mc_div', '<span>'+(num+1)+': '+g[num]+'<span>');
+		const move = ()=>{
+			offsetLayer('mc_div', this.mx+10, this.my-30);
+			return false
+		};
+		const up = ()=>{
+			if(this.newLineIndex >= 0) {
+				let com = command[setLineNum];
+				cominput(document.forms.InputPlan, 7, this.setLineNum, this.newLineIndex);
+			} else if(this.newLineIndex === -1) {
+				cominput(document.forms.InputPlan, 3, setLineNum+1);
+			}
+			mc_out();
+			this.newLineIndex = -2;
+			this.Mcommand = false;
+			offsetLayer('mc_div', -50, -50);
+		};
+		return {
+			up: up,
+			move: move
+		};
 	}
 }
 
 class Util {
-	static showElement(layerId:string) {
-		var element = document.getElementById(layerId).style;
-		element.display = "block";
-		element.visibility ='visible';
+	static showElement(elementId:string) {
+		document.getElementById(elementId).style.display = "block";
 	}
-	static hideElement(layerId:string) {
-		var element = document.getElementById(layerId).style;
-		element.display = "none";
+	static hideElement(elementId:string) {
+		document.getElementById(elementId).style.display = "none";
 	}
-
-}
-
-
-function chNum(num) {
-	document.ch_numForm.AMOUNT.options.length = 100;
-	for(let i=0, len=document.ch_numForm.AMOUNT.options.length; i<len; i++){
-		if(document.ch_numForm.AMOUNT.options[i].value == num){
-			document.ch_numForm.AMOUNT.selectedIndex = i;
-			document.ch_numForm.AMOUNT.options[i].selected = true;
-			moveLayer('ch_num', mx-10, my-60);
-			Util.showElement('ch_num');
-			break;
-		}
+	static layerWrite(elementId:string, str?:string) {
+		str = str || '';
+		document.getElementById(elementId).innerHTML = str;
+	}
+	static setBGColor(elementId:string, bgColor?:string) {
+		bgColor = bgColor || '#fff';
+		document.getElementById(elementId).style.backgroundColor = bgColor;
 	}
 }
 
-function chNumDo() {
-	var num = document.ch_numForm.AMOUNT.options[document.ch_numForm.AMOUNT.selectedIndex].value;
-	cominput(document.InputPlan,8,num);
-	hideElement('ch_num');
+function targetOpen(part) {
+	// [TODO]: ウィンドウじゃなくてモーダルに。スマホ対応は別途検討。
+	let p = part.value;
+	let w = window.open("{$this_file}?target=" + p, "","width={$width},height={$height},scrollbars=1,resizable=1,toolbar=1,menubar=1,location=1,directories=0,status=1");
 }
-
-function Kdown(e:KeyboardEvent){
-	if (e.defaultPrevented) return;
-	if (e.altKey || e.ctrlKey || e.shiftKey) return;
-	if (e.target.tagName === 'input') return;
-
-	let char = e.key.toLowerCase();
-	let m = (document.InputPlan.AMOUNT.selectedIndex >9)? document.InputPlan.AMOUNT.selectedIndex: 0;
-
-	// 押されたキーに応じて計画番号を設定する
-	switch (char) {
-		case 'a': // 整地
-			char = this.php_command.Prepare; break;
-		case 'j': // 地ならし
-			char = this.php_command.Prepare2; break;
-		case 'u': char = this.php_command.Reclaim; break; // 埋め立て
-		case 'k': char = this.php_command.Destroy; break; // 掘削
-		case 'b': // 伐採
-			char = this.php_command.SellTree; break;
-		case 'p': char = this.php_command.Plant; break; // 植林
-		case 'n': char = this.php_command.Farm; break; // 農場整備
-		case 'i': // 工場建設
-			char = this.php_command.Factory; break;
-		case 's': char = this.php_command.Mountain; break; // 採掘場整備
-		case 'd': // 防衛施設建設
-			char = this.php_command.Dbase; break;
-		case 'm': char = this.php_command.Base; break; // ミサイル基地建設
-		case 'f': // 海底基地建設
-			char = this.php_command.Sbase; break;
-		case '-': //INS 資金繰り
-			char = this.php_command.DoNothing; break;
-		case '.': //DEL 削除
-			cominput(InputPlan,3); return;
-		case'\b': //BS 一つ前削除
-			let no = document.InputPlan.COMMAND.selectedIndex;
-			if(no > 0) {
-				document.InputPlan.COMMAND.selectedIndex = no - 1;
-			}
-			cominput(InputPlan,3);
-			return;
-		case '0':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+0;
-			return;
-		case '1':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+1;
-			return;
-		case '2':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+2;
-			return;
-		case '3':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+3;
-			return;
-		case '4':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+4;
-			return;
-		case '5':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+5;
-			return;
-		case '6':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+6;
-			return;
-		case '7':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+7;
-			return;
-		case '8':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+8;
-			return;
-		case '9':
-			document.InputPlan.AMOUNT.selectedIndex = m*10+9;
-			return;
-		case 'Z':
-			document.InputPlan.AMOUNT.selectedIndex = 0;
-			return;
-		default:
-			// [WARN]ここに処理を入れない：IEではF5も拾えるため
-			return;
-	}
-	cominput(document.InputPlan, 6, char);
-	e.preventDefault();
-	return;
-}
-
-	function setTarget(part){
-		let p = part.options[part.selectedIndex].value;
-	}
-
-	function targetOpen() {
-		// [TODO]: ウィンドウじゃなくてモーダルに。スマホ対応は別途検討。
-		let w = window.open("{$this_file}?target=" + p, "","width={$width},height={$height},scrollbars=1,resizable=1,toolbar=1,menubar=1,location=1,directories=0,status=1");
-	}
-
