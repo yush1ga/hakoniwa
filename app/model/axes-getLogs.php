@@ -22,11 +22,14 @@ $init = new Init();
 $filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init->logname;
 $file = file("{$filePath}", FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $parsedFile = [];
-// if($file!==false){
-if(false){
+if($file!==false){
+// if(false){
 	foreach ($file as $value) {
 		list($datetime, $islId, $islName, $deptIp, $deptName) = explode(',', $value);
 		list($date, $time) = explode(' ', $datetime);
+
+		$deptIp = "127.0.0.1"; $deptName = "(Test mode)";
+
 		$parsedFile["data"][] = compact('date', 'time', 'islId', 'islName', 'deptIp', 'deptName');
 	}
 

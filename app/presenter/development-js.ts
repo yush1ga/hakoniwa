@@ -36,8 +36,8 @@ class MapDevelopment {
 		for (let key in args) {
 			this[key] = args[key];
 		}
-		this._msgs.sync.notyet  = '<div style="color:#c7243a;font-weight:bold;">■ 未送信 ■</div>';
-		this._msgs.sync.already = '<div style="color:#00c">■ 送信済 ■</div>';
+		this._msgs.sync.notyet  = `<div style="color:#c7243a;font-weight:bold;">■ 未送信 ■</div>`;
+		this._msgs.sync.already = `<div style="color:#00c">■ 送信済 ■</div>`;
 
 
 		// this.command内のコマンドIDとthis.listCommand内のコマンドID・名称対照
@@ -192,11 +192,10 @@ class MapDevelopment {
 		}else if(x == 8){
 			this.command[numb][3] = k;
 		}
-		this.str = plchg();
-		this.str = this._msgs.sync.notyet + this.str;
+		this.str = this._msgs.sync.notyet + this.changePlan();
 		this.disp(this.str);
 		outp();
-		form.SENDPROJECT.disabled = false;
+		form.sendProj.disabled = false;
 		this.numberSelect(newNs);
 
 		return true;
