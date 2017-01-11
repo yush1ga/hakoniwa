@@ -1,0 +1,74 @@
+@charset "UTF-8";
+/*!
+ * Aska v0.0.1
+ * © 2017 Sota NAKAGAMI, Sixth-Neighbours.
+ * Licensed under MIT
+ */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Open Sans', 'Arial', 'ヒラギノ角ゴ ProN W3', 'Hiragino Kaku Gothic ProN', 'メイリオ', Meiryo, sans-serif;
+}
+
+button, input, optgroup, select, textarea {
+  font-family: inherit;
+}
+
+a {
+  color: #4f6f8f;
+}
+
+a:focus, a:hover {
+  color: #2b3c4e;
+}
+
+.text-primary {
+  color: #46637f !important;
+}
+
+.text-secondary {
+  color: #5e3356 !important;
+}
+
+a.text-primary {
+  color: #4f6f8f !important;
+}
+
+a.text-primary:focus, a.text-primary:hover {
+  color: #2b3c4e !important;
+}
+
+.btn-primary {
+  background-color: #46637f;
+  border-color: #46637f;
+}
+
+.btn-primary:hover {
+  background-color: #2b3c4e;
+  border-color: #22303d;
+}
+
+.btn-outline-primary {
+  color: #46637f;
+  background-color: transparent;
+  border-color: #46637f;
+}
+
+.btn-outline-primary:hover {
+  color: white;
+  background-color: #46637f;
+  border-color: #46637f;
+}
+
+.btn-outline-primary:disabled {
+  color: #46637f;
+}
+
+@media (max-width: 767px) {
+  .navbar-toggleable-sm > .container {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+.nbr {
+  white-space: nowrap !important;
+}
