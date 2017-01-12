@@ -28,6 +28,10 @@ a:focus, a:hover {
   color: #5e3356 !important;
 }
 
+.bg-info {
+  background-color: #67bdba !important;
+}
+
 a.text-primary {
   color: #4f6f8f !important;
 }
@@ -81,6 +85,20 @@ a.text-primary:focus, a.text-primary:hover {
   padding: 0.5em !important;
 }
 
+#Ranking .card-header, #Ranking .card-footer {
+  padding: 0.25em 0.5em;
+}
+
+#IslandMap tr, #IslandMap th, #IslandMap td {
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+#IslandPlan li {
+  padding: 0.25rem 0.5rem;
+}
+
 @media (max-width: 767px) {
   .navbar-toggleable-sm > .container {
     margin-left: 0;
@@ -90,6 +108,14 @@ a.text-primary:focus, a.text-primary:hover {
 
 table .label {
   background-color: rgba(0, 0, 0, 0.075);
+}
+
+table td {
+  text-align: right;
+}
+
+table td[data-type="str"] {
+  text-align: left;
 }
 
 .nbr {

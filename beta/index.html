@@ -29,7 +29,7 @@
 	<nav class="navbar navbar-toggleable-sm navbar-light bg-faded"><div class="container">
 		<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#gNav" aria-controls="gNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
 		<a class="navbar-brand text-primary" href="#">
-			<img src="../public/assets/img/monster1.gif" width="30" height="30" class="d-inline-block align-top" alt="">&nbsp;箱庭諸島
+			<img src="../public/assets/img/monster1.gif" width="30" height="30" class="d-inline-block align-top" alt="">&nbsp;Re:箱庭諸島SE
 		</a>
 		<div class="collapse navbar-collapse" id="gNav">
 			<ul class="navbar-nav">
@@ -47,14 +47,14 @@
 
 
 <section class="container mb-5">
-	<h1 class="mb-5 text-primary">箱庭諸島 <small class="text-muted">トップ</small></h1>
+	<h1 class="mb-5 text-primary">Re:箱庭諸島SE <small class="text-muted">トップ</small></h1>
 
 	<section class="mb-3">
 		<h2>ターン： 1234</h2>
 		<p>最終更新時刻： 2017年1月11日 4時 <wbr><small class="text-muted nbr">（次のターンまで、残りおよそ3時間57分）</small></p>
 	</section>
 
-	<section class="mb-5">
+	<section class="mb-5" style="border:1px solid #ccc">
 		<form class="form-inline">
 			<label class="sr-only" for="SigninId">User ID</label>
 			<input type="text" class="form-control mr-sm-3 mb-2" id="SigninId" placeholder="ID">
@@ -65,137 +65,136 @@
 			<label class="form-check-label mr-3 mb-2"><input type="checkbox" class="form-check-input"> Remember ID/Pass</label>
 			<button type="submit" class="btn btn-primary mb-2">Sign in</button>
 		</form>
-	</section>
 
-	<section class="mb-5">
-		<h2>Your Island: <a href="#">________ isl.</a></h2>
-			<table class="table table-bordered table-sm mb-1"><tbody>
-				<tr><th rowspan=5 style="width:3ex">#xx</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th><th class="label">農業規模</th><th class="label">工業規模</th><th class="label">商業規模</th><th class="label">採掘規模</th><th class="label">発電規模</th><th class="label">怪獣討伐数</th><th class="label">船舶</th></tr>
-				<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
-				<tr><th class="label">天候</th><th class="label">失業率</th><th class="label">送電率</th><th class="label">軍事Lv</th><th class="label">ミサイル</th><th class="label">衛星</th><td colspan=2>xxxx</td><th class="label">妖精</th><td colspan=2>xxxx</td></tr>
-				<tr><td>xxxx</td><td>xxxx%</td><td>xxxx%</td><td>xxxx</td><td>xxxx</td><th class="label">アイテム</th><td colspan=5>xxxx</td></tr>
-				<tr><td colspan=12><strong>コメント: </strong>xxxx</td></tr>
-			</tbody></table>
+		<h2>あなたの島: <a href="#">________島</a></h2>
+		<table class="table table-bordered table-sm mb-1"><tbody>
+			<tr><th rowspan=5 class="bg-info" style="width:3ex">#xx</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th><th class="label">農業規模</th><th class="label">製造業規模</th><th class="label">商業規模</th><th class="label">鉱業規模</th><th class="label">発電規模</th><th class="label">怪獣討伐数</th><th class="label">船舶</th></tr>
+			<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
+			<tr><th class="label">天候</th><th class="label">失業率</th><th class="label">送電率</th><th class="label">軍事Lv</th><th class="label">ミサイル</th><th class="label">衛星</th><td colspan=2>xxxx</td><th class="label">妖精</th><td colspan=2>xxxx</td></tr>
+			<tr><td data-type="str">xxxx</td><td>xxxx%</td><td>xxxx%</td><td>xxxx</td><td>xxxx</td><th class="label">アイテム</th><td colspan=5 data-type="str">xxxx</td></tr>
+			<tr><td colspan=12 data-type="str"><strong>コメント: </strong>xxxx</td></tr>
+		</tbody></table>
 	</section>
 
 
 
 	<section id="Ranking" class="mb-5">
-		<h2>Ranking</h2>
+		<h2 class="mb-3">カテゴリランキング</h2>
 
 		<div class="row">
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">総合pt</div>
+					<div class="card-header card-info">総合pts</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">2498446<wbr>pt</div>
+					<div class="card-footer">2498446<wbr>pts</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">成長</div>
+					<div class="card-header card-info">成長</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">24080<wbr>pt</div>
+					<div class="card-footer">24080<wbr>pts</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">資金</div>
+					<div class="card-header card-info">資金</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">99999<wbr>億円</div>
+					<div class="card-footer">99999<wbr>億円</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">食料</div>
+					<div class="card-header card-info">食料</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">99999<wbr>00トン</div>
+					<div class="card-footer">99999<wbr>00トン</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">人口</div>
+					<div class="card-header card-info">人口</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">5776<wbr>00人</div>
+					<div class="card-footer">5776<wbr>00人</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">島面積</div>
+					<div class="card-header card-info">島面積</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">120<wbr>mile<sup>2</sup></div>
+					<div class="card-footer">120<wbr>mile<sup>2</sup></div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">収入</div>
+					<div class="card-header card-info">収入</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">2011<wbr>億円</div>
+					<div class="card-footer">2011<wbr>億円</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">収穫</div>
+					<div class="card-header card-info">収穫</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">1296<wbr>00トン</div>
+					<div class="card-footer">1296<wbr>00トン</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">人口増加</div>
+					<div class="card-header card-info">人口増加</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">10<wbr>00人</div>
+					<div class="card-footer">10<wbr>00人</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">農業規模</div>
+					<div class="card-header card-info">農業規模</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">220<wbr>000人</div>
+					<div class="card-footer">220<wbr>000人</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">工業規模</div>
+					<div class="card-header card-info">製造業規模</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">120<wbr>000人</div>
+					<div class="card-footer">120<wbr>000人</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">商業規模</div>
+					<div class="card-header card-info">商業規模</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">283<wbr>000人</div>
+					<div class="card-footer">283<wbr>000人</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">採掘規模</div>
+					<div class="card-header card-info">鉱業規模</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">50<wbr>000人</div>
+					<div class="card-footer">50<wbr>000人</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">発電規模</div>
+					<div class="card-header card-info">発電規模</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">200<wbr>MW</div>
+					<div class="card-footer">200<wbr>MW</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">怪獣退治数</div>
+					<div class="card-header card-info">怪獣退治数</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">322<wbr>体</div>
+					<div class="card-footer">322<wbr>体</div>
 				</div>
 			</div>
 			<div class="col-xs-6 col-md-3 mb-3">
 				<div class="card text-center">
-					<div class="card-header px-2 py-1 card-info">スポーツ</div>
+					<div class="card-header card-info">スポーツ</div>
 					<div class="p-2">島</div>
-					<div class="card-footer px-2 py-1">145<wbr>pt</div>
+					<div class="card-footer">145<wbr>pt</div>
 				</div>
-			</div></div>
+			</div>
+		</div>
 	</section>
 
 
@@ -206,22 +205,22 @@
 			<table class="table table-bordered table-sm mb-1">
 				<col width="3ex"><col width="30%">
 			<tbody>
-				<tr><th rowspan=5 class="h3">#xx</th><td rowspan=3><h3><a href="#">IslandName</a></h3></td><th class="label">Point</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th></tr>
+				<tr><th rowspan=5 class="h3">#xx</th><th rowspan=3><h3><a href="#">西表島</a></h3></th><th class="label">pts</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th></tr>
 				<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
-				<tr><th class="label">天候</th><th class="label">農業規模</th><th class="label">Industry</th><th class="label">発電規模</th><th class="label">n/a</th></tr>
-				<tr><td>badges</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>n/a</td></tr>
-				<tr><td colspan=6><strong>Author</strong>&gt; コメント</td></tr>
+				<tr><th class="label">天候</th><th class="label">農業規模</th><th class="label">工業規模</th><th class="label">発電規模</th><th class="label">n/a</th></tr>
+				<tr><td data-type="str">badges</td><td data-type="str">xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td data-type="str">n/a</td></tr>
+				<tr><td colspan=6 data-type="str"><strong>オーナー</strong>&gt; コメント</td></tr>
 			</tbody></table>
 		</section>
 		<section>
 			<table class="table table-bordered table-sm mb-1">
 				<col width="3ex"><col width="30%">
 			<tbody>
-				<tr><th rowspan=5 class="h3">#xx</th><td rowspan=3><h3><a href="#">IslandName</a></h3></td><th class="label">Point</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th></tr>
+				<tr><th rowspan=5 class="h3">#xx</th><th rowspan=3><h3><a href="#">IslandName</a></h3></th><th class="label">pts</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th></tr>
 				<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
-				<tr class="label"><th>天候</th><th>農業規模</th><th>Industry</th><th>発電規模</th><th>n/a</th></tr>
-				<tr><td>badges</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>n/a</td></tr>
-				<tr><td colspan=6><strong>Author</strong>&gt; コメント</td></tr>
+				<tr class="label"><th>天候</th><th>農業規模</th><th>工業規模</th><th>発電規模</th><th>n/a</th></tr>
+				<tr><td data-type="str">badges</td><td data-type="str">xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td data-type="str">n/a</td></tr>
+				<tr><td colspan=6 data-type="str"><strong>Author</strong>&gt; コメント</td></tr>
 			</tbody></table>
 		</section>
 		<div class="row">
@@ -239,18 +238,18 @@
 			<table class="table table-bordered table-sm mb-1">
 				<col width="40%"><col width="15%"><col width="15%"><col width="15%"><col width="15%">
 			<tbody>
-				<tr><th rowspan=2><h3><a href="#">IslandName</a></h3></th><th class="label">Enemy</th><th class="label">人口</th><th class="label">島面積</th><th class="label">天候</th></tr>
-				<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
-				<tr><td colspan=5>xxxx</td></tr>
+				<tr><th rowspan=2><h3><a href="#">沖ノ鳥島</a></h3></th><th class="label">Enemy</th><th class="label">天候</th><th class="label">人口</th><th class="label">島面積</th></tr>
+				<tr><td>xxxx</td><td data-type="str">xxxx</td><td>xxxx</td><td>xxxx</td></tr>
+				<tr><td colspan=5 data-type="str">xxxx</td></tr>
 			</tbody></table>
 		</section>
 		<section>
 			<table class="table table-bordered table-sm mb-1">
 				<col width="40%"><col width="15%"><col width="15%"><col width="15%"><col width="15%">
 			<tbody>
-				<tr><th rowspan=2><h3><a href="#">IslandName</a></h3></th><th class="label">Enemy</th><th class="label">人口</th><th class="label">島面積</th><th class="label">天候</th></tr>
-				<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
-				<tr><td colspan=5>xxxx</td></tr>
+				<tr><th rowspan=2><h3><a href="#">IslandName</a></h3></th><th class="label">Enemy</th><th class="label">天候</th><th class="label">人口</th><th class="label">島面積</th></tr>
+				<tr><td>xxxx</td><td data-type="str">xxxx</td><td>xxxx</td><td>xxxx</td></tr>
+				<tr><td colspan=5 data-type="str">xxxx</td></tr>
 			</tbody></table>
 		</section>
 	</section>

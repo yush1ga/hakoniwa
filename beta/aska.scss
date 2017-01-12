@@ -34,6 +34,9 @@ a {
 .text-secondary {
 	color: $color-secondary!important;
 }
+.bg-info {
+	background-color: $color-info!important;
+}
 a.text-primary {
 	color: $color-a-primary!important;
 	&:focus, &:hover {
@@ -79,12 +82,22 @@ a.text-primary {
 	.p-2 {
 		padding: 0.5em!important;
 	}
-	// .card-header {
-	// 	padding: 0.25em 1em;
-	// }
-	// .card-footer {
-	// 	padding: 0.25em 1em;
-	// }
+	.card-header, .card-footer {
+		padding: 0.25em 0.5em;
+	}
+}
+
+#IslandMap {
+	tr, th, td {
+		margin: 0;
+		border: 0;
+		padding: 0;
+	}
+}
+#IslandPlan {
+	li {
+		padding: 0.25rem 0.5rem;
+	}
 }
 
 @media (max-width: 767px){
@@ -96,6 +109,12 @@ a.text-primary {
 
 table .label {
 	background-color: rgba(0,0,0,.075);
+}
+table td {
+	text-align: right;
+}
+table td[data-type="str"] {
+	text-align: left;
 }
 
 
