@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/underscore/underscore-min.js" />
-
 class MapDevelopment {
 	private _msgs;
 	private w;

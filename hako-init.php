@@ -32,13 +32,13 @@ class Init {
 	// データディレクトリの名前（必ず変更してください）
 	public $dirName = "logs/data";
 	// ディレクトリ作成時のパーミション
-	public $dirMode = 0777;
+	public $dirMode = 0775;
 
 	// パスワード・ファイル
 	public $passwordFile = "password.php";
 
 	// アクセスログファイルの名前
-	public $logname = "ip.csv";
+	public $logname = "log.csv";
 	// アクセスログ最大記録レコード数
 	public $axesmax = 300;
 
@@ -73,13 +73,13 @@ class Init {
 	public $initialLand  = "";
 
 	// 資金最大値
-	public $maxMoney     = 99999; // バランス的にこのくらいが妥当かと
+	public $maxMoney     = 99999; // バランス的に99999くらいが妥当かと
 	// 食料最大値
 	public $maxFood      = 99999;
 	// 木材最大値
 	public $maxWood      = 10000;
 
-	// 新規島の登録モード (0:通常、1:管理人)
+	// 新規島の登録モード (0:全体開放、1:管理人のみ)
 	public $registerMode   = 0;
 	// 管理人モード
 	public $adminMode;
@@ -162,9 +162,9 @@ class Init {
 	// 食料の単位
 	public $unitFood    = "00トン";
 	// 広さの単位
-	public $unitArea    = "00万坪";
-	// 木の数の単位
-	public $unitTree    = "00本";
+	public $unitArea    = "mi<sup>2</sup>"; // 平方マイル
+	// 木材の数の単位
+	public $unitTree    = "00石";
 	// お金の単位
 	public $unitMoney   = "億円";
 	// 怪獣の単位
@@ -173,13 +173,13 @@ class Init {
 	// 保有せず
 	public $notHave 	= "保有せず";
 
-	// 木の単位当たりの売値
+	// 木材の売り単価
 	public $treeValue   = 10;
 
 	// 名前変更のコスト
 	public $costChangeName = 500;
 
-	// 人口1単位あたりの食料消費料
+	// 人口1単位あたりの食料消費量
 	public $eatenFood   = 0.2;
 
 	// 油田の収入
@@ -309,7 +309,6 @@ class Init {
 
 	// 経験値がいくつでレベルアップか
 	public $shipLevelUp   = array(4, 14);
-	// public $shipLevelUp   = array(10, 30, 60, 100);
 
 	// 船舶設定値（確率：設定値 x 0.1%）
 	public $shipIncom          =  200; // 輸送船収入
@@ -340,11 +339,11 @@ class Init {
 	public $disTenki      =  30;  // 天気
 	public $disTrain      = 300;  // 電車
 	public $disPoo        =  30;  // 失業暴動
-	public $disPooPop     = 500;  // 暴動が発生する最低人口（50000人）
+	public $disPooPop     = 500;  // 暴動が発生する最低人口
 
 	// 地盤沈下
-	public $disFallBorder = 290;//100; // 安全限界の広さ(Hex数)
-	public $disFalldown   = 10;//30;  // その広さを超えた場合の確率
+	public $disFallBorder = 260; //default: 100; // 安全限界の広さ(Hex数)
+	public $disFalldown   = 10;  //default:  30; // その広さを超えた場合の発生確率
 
 	//---------------------------------------------------
 	// 怪獣に関する設定
@@ -354,7 +353,7 @@ class Init {
 	public $disMonsBorder3 = 6000;  // 人口基準3(怪獣レベル3)
 	public $disMonsBorder4 = 8000;  // 人口基準4(怪獣レベル4)
 	public $disMonsBorder5 = 10000; // 人口基準5(怪獣レベル5)
-	public $disMonster     = 2.5;   // 単位面積あたりの出現率(0.01%単位)
+	public $disMonster     = 2.5;   // 面積あたりの出現率(0.01%単位)
 
 	public $monsterLevel1  = 4;     // サンジラまで
 	public $monsterLevel2  = 9;     // いのらゴーストまで

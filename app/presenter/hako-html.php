@@ -10,7 +10,6 @@ require_once HELPERPATH.'/message/error.php';
 require_once HELPERPATH.'/message/success.php';
 require_once APPPATH.'/model/hako-log.php';
 
-
 class HTML {
 	static function header() {
 		global $init;
@@ -1162,13 +1161,13 @@ function init() {
 		document.ch_numForm.AMOUNT.options[i].value = i;
 		document.ch_numForm.AMOUNT.options[i].text = i;
 	}
-	document.InputPlan.SENDPROJECT.disabled = true;
+	document.InputPlan.sendProj.disabled = true;
 	ns(0);
 }
 
 function cominput(theForm, x, k, z) {
-	var a = theForm.NUMBER.options[theForm.NUMBER.selectedIndex].value;
-	var b = theForm.COMMAND.options[theForm.COMMAND.selectedIndex].value;
+	var a = theForm.number.options[theForm.number.selectedIndex].value;
+	var b = theForm.commands.options[theForm.commands.selectedIndex].value;
 	var c = theForm.POINTX.options[theForm.POINTX.selectedIndex].value;
 	var d = theForm.POINTY.options[theForm.POINTY.selectedIndex].value;
 	var e = theForm.AMOUNT.options[theForm.AMOUNT.selectedIndex].value;
@@ -1260,7 +1259,7 @@ function cominput(theForm, x, k, z) {
 	str = '<font color="#C7243A"><b>■ 未送信 ■<\\/b><\\/font><br>' + str;
 	disp(str, "");
 	outp();
-	theForm.SENDPROJECT.disabled = false;
+	theForm.sendProj.disabled = false;
 	ns(newNs);
 
 	return true;
@@ -1327,14 +1326,14 @@ function plchg() {
 				strn2 = point + "で" + kind;
 			} else {
 				arg = c[3] * {$init->comCost[$init->comDestroy]};
-				arg = "（予\算" + arg + "{$init->unitMoney}）";
+				arg = "（予算" + arg + "{$init->unitMoney}）";
 				strn2 = point + "で" + kind + arg;
 			}
 		} else if(c[0] == $init->comLot) { // 宝くじ購入
 			if(c[3] == 0) c[3] = 1;
 			if(c[3] > 30) c[3] = 30;
 				arg = c[3] * {$init->comCost[$init->comLot]};
-				arg = "（予\算" + arg + "{$init->unitMoney}）";
+				arg = "（予算" + arg + "{$init->unitMoney}）";
 				strn2 = kind + arg;
 		} else if(c[0] == $init->comDbase) { // 防衛施設
 			if(c[3] == 0) c[3] = 1;
@@ -1450,7 +1449,7 @@ function disp(str,bgclr) {
 	if(str==null) {
 		str = "";
 	}
-	LayWrite('LINKMSG1', str);
+	LayWrite('IsSynced', str);
 	SetBG('plan', bgclr);
 }
 
@@ -1482,7 +1481,7 @@ function ns(x) {
 	if (x == $init->commandMax){
 		return true;
 	}
-	document.InputPlan.NUMBER.options[x].selected = true;
+	document.InputPlan.number.options[x].selected = true;
 	return true;
 }
 
@@ -1500,14 +1499,14 @@ function set_com(x, y, land) {
 					com_str += kind;
 				} else {
 					arg = c[3] * 200;
-					arg = "（予\算" + arg + "{$init->unitMoney}）";
+					arg = "（予算" + arg + "{$init->unitMoney}）";
 					com_str += kind + arg;
 				}
 			} else if(c[0] == $init->comLot){
 				if(c[3] == 0) c[3] = 1;
 				if(c[3] > 30) c[3] = 30;
 					arg = c[3] * 300;
-					arg = "（予\算" + arg + "{$init->unitMoney}）";
+					arg = "（予算" + arg + "{$init->unitMoney}）";
 					com_str += kind + arg;
 			} else if(c[0] == $init->comFarm ||
 				c[0] == $init->comSfarm ||
@@ -1541,36 +1540,36 @@ function SelectList(theForm) {
 	else { s = theForm.menu.options[theForm.menu.selectedIndex].value; }
 	if(s == ''){
 		u = 0; selected_ok = 0;
-		document.InputPlan.COMMAND.options.length = $All_listCom;
+		document.InputPlan.commands.options.length = $All_listCom;
 		for (i=0; i<comlist.length; i++) {
 			var command = comlist[i];
 			for (a=0; a<command.length; a++) {
 				comName = command[a][1] + "(" + command[a][2] + ")";
-				document.InputPlan.COMMAND.options[u].value = command[a][0];
-				document.InputPlan.COMMAND.options[u].text = comName;
+				document.InputPlan.commands.options[u].value = command[a][0];
+				document.InputPlan.commands.options[u].text = comName;
 				if(command[a][0] == $default_Kind){
-					document.InputPlan.COMMAND.options[u].selected = true;
+					document.InputPlan.commands.options[u].selected = true;
 					selected_ok = 1;
 				}
 				u++;
 			}
 		}
 		if(selected_ok == 0)
-			document.InputPlan.COMMAND.selectedIndex = 0;
+			document.InputPlan.commands.selectedIndex = 0;
 	} else {
 		var command = comlist[s];
-		document.InputPlan.COMMAND.options.length = command.length;
+		document.InputPlan.commands.options.length = command.length;
 		for (i=0; i<command.length; i++) {
 			comName = command[i][1] + "(" + command[i][2] + ")";
-			document.InputPlan.COMMAND.options[i].value = command[i][0];
-			document.InputPlan.COMMAND.options[i].text = comName;
+			document.InputPlan.commands.options[i].value = command[i][0];
+			document.InputPlan.commands.options[i].text = comName;
 			if(command[i][0] == $default_Kind){
-				document.InputPlan.COMMAND.options[i].selected = true;
+				document.InputPlan.commands.options[i].selected = true;
 				selected_ok = 1;
 			}
 		}
 		if(selected_ok == 0) {
-			document.InputPlan.COMMAND.selectedIndex = 0;
+			document.InputPlan.commands.selectedIndex = 0;
 		}
 	}
 }
@@ -1738,9 +1737,9 @@ function Kdown(e){
 		case '-': c = $init->comDoNothing; break; //INS 資金繰り
 		case '.': cominput(InputPlan,3); return; //DEL 削除
 		case'\b': //BS 一つ前削除
-		var no = document.InputPlan.COMMAND.selectedIndex;
+		var no = document.InputPlan.commands.selectedIndex;
 		if(no > 0) {
-			document.InputPlan.COMMAND.selectedIndex = no - 1;
+			document.InputPlan.commands.selectedIndex = no - 1;
 		}
 		cominput(InputPlan,3);
 		return;
@@ -2298,7 +2297,7 @@ END;
 
 class HtmlAxes extends HTML {
 	function pageHeader($title) {
-		echo('<h1 class="title">',$title,' <small class="text-muted">アクセスログ閲覧</small></h1>', PHP_EOL);
+		echo '<h1 class="title">', $title, ' <small class="text-muted">アクセスログ閲覧</small></h1>', "\n";
 	}
 
 	function passwdChk() {
@@ -2351,7 +2350,7 @@ END;
 			$line = fgets($fp);
 			if($line !== FALSE) {
 				$num = str_replace([' ', ','], "</td><td>", $line);
-				echo('<tr><td scope="row">',$num,'</td></tr>',PHP_EOL);
+				echo '<tr><td scope="row">',$num,'</td></tr>',"\n";
 			}
 		}
 		fclose($fp);

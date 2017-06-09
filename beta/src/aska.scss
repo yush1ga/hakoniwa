@@ -72,23 +72,11 @@ a.text-primary {
 .card-outline-info {
 	border-color: $color-info;
 }
-
-#Ranking {
-	.py-1 {
-		padding-top: 0.25em!important;
-		padding-bottom: 0.25em!important;
-	}
-	.px-2 {
-		padding-left: 0.5em!important;
-		padding-right: 0.5em!important;
-	}
-	.p-2 {
-		padding: 0.5em!important;
-	}
-	.card-header, .card-footer {
-		padding: 0.25em 0.5em;
-	}
+.container {
+	width: 100%!important;
+	max-width: 960px;
 }
+
 
 #IslandMap {
 	tr, th, td {
@@ -122,9 +110,3 @@ table td[data-type="str"] {
 
 
 
-.nbr {
-	white-space: nowrap!important;
-}
-.w-20 {
-	width: 20%!important;
-}

@@ -23,7 +23,7 @@
 
 
         if ($remainSec <= 0) {
-            $echoVal = '<span style="color:#c00;">ページを更新してください</span>';
+            $echoVal = '<div class="alert alert-danger" role="alert"><strong><a href="javascript:location.reload()">ページを更新してください</a></strong></div>';
         }
         return $echoVal;
     }

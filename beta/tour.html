@@ -5,86 +5,141 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
 	<title>Re:箱庭諸島SE</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>	<link rel="stylesheet" type="text/css" href="aska.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/semantic.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/aska.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/utilities.css">
 	<link rel="shortcut icon" href="../public/assets/img/monster1.gif">
-	<script type="text/javascript" src=""></script>
+	<script type="text/javascript" src="assets/js/hakoniwa.js" async></script>
+	<style type="text/css">
+		.ui.segment { margin-top: 2rem; padding-bottom: 2rem; max-width: 1127px; margin-left: auto; margin-right: auto; }
+		tbody th { border-top: 1px solid rgba(34, 36, 38, 0.1); padding: 0.92857143em; }
+		th.label { background: #F9FAFB; }
+		table.card thead, table.card tbody { text-align: center; }
+		table.card tfoot { text-align: right; }
+		table.card thead td, table.card tbody td, table.card tfoot tr { display: inline-block; }
+		.flex-g0 { -webkit-box-flex: 0!important; -webkit-flex-grow: 0!important; -ms-flex-positive: 0!important; flex-grow: 0!important; }
+		.ui.horizontal.statistics .statistic > .label, .ui.horizontal.statistic > .label { margin-left: 2px; }
+
+		table#Map { line-height:0; }
+	</style>
 </head>
 <body>
 
 
 
 <header class="mb-5">
-	<ul class="list-inline small" style="display:none">
-		<li class="list-inline-item"><a href="http://www.bekkoame.ne.jp/~tokuoka/hakoniwa.html" target="_blank">箱庭諸島スクリプト配布元</a> <a href="http://scrlab.g-7.ne.jp/">[PHP]</a></li>
-		<li class="list-inline-item"><a href="http://hakoniwa.symphonic-net.com/" target="_blank">箱庭諸島S.E配布元</a></li>
-		<li class="list-inline-item"><a href="http://snufkin.jp.land.to/" target="_blank">沙布巾の箱庭</a></li>
-		<li class="list-inline-item"><a href="http://www.s90259900.onlinehome.us/" target="_blank">箱庭の箱庭</a></li>
-		<li class="list-inline-item"><a href="http://no-one.s53.xrea.com/" target="_blank">The Return of Neptune</a></li>
-		<li class="list-inline-item"><a href="http://minnano.min-ai.net/ocn/" target="_blank">みんなのあいらんど</a></li>
-	</ul>
-
-	<nav class="navbar navbar-toggleable-sm navbar-light bg-faded"><div class="container">
-		<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#gNav" aria-controls="gNav" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-		<a class="navbar-brand text-primary" href="index.html">
-			<img src="../public/assets/img/monster1.gif" width="30" height="30" class="d-inline-block align-top" alt="">&nbsp;Re:箱庭諸島SE
-		</a>
-		<div class="collapse navbar-collapse" id="gNav">
-			<ul class="navbar-nav">
-				<li class="nav-item"><a href="#" class="nav-link">島の登録</a></li>
-				<li class="nav-item"><a href="#" class="nav-link">同盟管理</a></li>
-				<li class="nav-item"><a href="#" class="nav-link">最近の出来事</a></li>
-					<li class="nav-item"><a href="#" class="nav-link">管理人からのおしらせ</a></li>
-				<li class="nav-item"><a href="#" class="nav-link">資料</a></li>
-			</ul>
-		</div>
-	</div></nav>
-	<marquee class="text-white bg-inverse" style="line-height:1.5;vertical-align:middle;">ここにお知らせが流れます（Turn:1233） Recommend to use portrait mode.</marquee>
+<div class="ui basic segment p-0">
+	<nav class="ui menu">
+		<a class="header item" href="/beta/"><img src="../public/assets/img/monster1.gif">&nbsp;Re:箱庭諸島SE</a>
+		<a class="item">同盟</a><a class="item">広報</a><a class="item">資料</a><a class="item"></a><a class="item"></a>
+	</nav>
+</div>
+	<marquee class="" style="line-height:1.5;vertical-align:middle;">ここにお知らせが流れます（Turn:1233） Recommend to use portrait mode.</marquee>
 </header>
 
 
 
-<section class="container mb-5">
-	<h1 class="mb-5 text-primary">Re:箱庭諸島SE <small class="text-muted">開発計画</small></h1>
+<section class="ui basic segment">
+	<h1 class="ui dividing header">Re:箱庭諸島SE <small class="sub header">観光</small></h1>
 
-	<section class="mb-2">
-	<h2>西表島 <small class="text-muted font-italic" style="font-size:.6em">Author: ほげほげ</small></h2>
-	<table class="table table-bordered table-sm mb-1"><tbody>
-		<tr><th rowspan=5 class="bg-info" style="width:3ex">#xx</th><th class="label">人口</th><th class="label">島面積</th><th class="label">資金</th><th class="label">食料</th><th class="label">農業規模</th><th class="label">製造業規模</th><th class="label">商業規模</th><th class="label">鉱業規模</th><th class="label">発電規模</th><th class="label">怪獣討伐数</th><th class="label">船舶</th></tr>
-		<tr><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td><td>xxxx</td></tr>
-		<tr><th class="label">天候</th><th class="label">失業率</th><th class="label">送電率</th><th class="label">軍事Lv</th><th class="label">ミサイル</th><th class="label">衛星</th><td colspan=2 data-type="str">xxxx</td><th class="label">妖精</th><td colspan=2 data-type="str">xxxx</td></tr>
-		<tr><td data-type="str">xxxx</td><td>xxxx%</td><td>xxxx%</td><td colspan=2>[CENCERED]</td><th class="label">アイテム</th><td colspan=5 data-type="str">xxxx</td></tr>
-		<tr><td colspan=12 data-type="str"><strong>コメント: </strong>xxxx</td></tr>
-	</tbody></table>
-	</section>
-
-	<section class="mb-4">
-	<h2 style="display:none">Island map</h2>
-	<div class="card card-outline-info text-center w-50 mx-auto p-2">
-		<h3 class="card-title" style="display:none">map</h3>
-		<table id="IslandMap" class="mx-auto">
-			<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
-			<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
-			<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
-			<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
-			<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
+	<section class="ui basic segment">
+		<h2 class="ui header">西表島 <small class="sub header" style="font-style:italic;font-size:.6em">Author: ほげほげ</small></h2>
+		<table class="ui unstackable compact celled structured table" id="MyIsl">
+			<colgroup>
+				<col style="width:5em">
+				<col style="width:10%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%"><col style="width:9%">
+			</colgroup>
+			<tbody>
+				<tr>
+					<td rowspan=4 class="pr-0" style="padding-left:1.1rem"><div class="ui big green ribbon label">#01</div></td>
+					<th class="label">人口</th>
+					<th class="label">島面積</th>
+					<th class="label">資金</th>
+					<th class="label">食料</th>
+					<th class="label">農業規模</th>
+					<th class="label">製造業規模</th>
+					<th class="label">商業規模</th>
+					<th class="label">鉱業規模</th>
+					<th class="label">発電規模</th>
+					<th class="label">怪獣討伐数</th>
+					<th class="label">船舶</th>
+				</tr>
+				<tr>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+				</tr>
+				<tr>
+					<th class="label">天候</th>
+					<th class="label">失業率</th>
+					<th class="label">送電率</th>
+					<th class="label">軍事Lv</th>
+					<th class="label">ミサイル</th>
+					<th class="label">衛星</th>
+					<td colspan=2>xxxx</td>
+					<th class="label">妖精</th>
+					<td colspan=2>xxxx</td>
+				</tr>
+				<tr>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td>xxxx</td>
+					<td colspan=2>[Censored]</td>
+					<th class="label">アイテム</th>
+					<td colspan=5>xxxx</td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<th colspan=12><strong>コメント: </strong>xxxx</th>
+				</tr>
+			</tfoot>
 		</table>
-	</div>
 	</section>
 
-	<section>
-	<h3>ほかの島を観光する</h3>
-	<form class="form-inline">
-		<label class="sr-only" for="Toward">行き先</label>
-		<select id="Toward" class="form-control mr-2">
-			<option>-------</option>
-			<option>択捉島</option>
-		</select>
-		<button type="submit" class="btn btn-primary">移動</button>
-	</form>
+	<section class="ui basic segment">
+		<h2 class="ui top attached header">Island map</h2>
+		<div class="ui attached segment">
+			<table id="Map" class="mx-auto">
+				<tr><td data-inverted="" data-html=""><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
+				<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
+				<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
+				<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
+				<tr><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td><td><img src="../public/assets/img/land0.gif"></td></tr>
+			</table>
+		</div>
 	</section>
+
+
+
+	<section class="w-50 mx-auto">
+		<h3 class="ui top attached header">ほかの島を観光する</h3>
+		<div class="ui attached segment">
+			<form class="ui form">
+				<div class="fields">
+					<div class="twelve wide field">
+						<select id="Toward">
+							<option>-------</option>
+							<option>択捉島</option>
+						</select>
+					</div>
+					<div class="four wide field">
+						<button type="submit" class="ui fluid button"">移動</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</section>
+
+
 
 </section>
 
@@ -92,15 +147,21 @@
 
 
 
-
-<footer style="border-top:2px solid #ccc">
-<div class="container mt-3">
-	<p>Managed by <a href="https://twitter.com/sota_n/" target="_blank">佐々木奏.cyl</a> （<a href="http://siky.hateblo.jp/" target="_blank">blog</a>） <br><small>&copy; 2016-2017 Sota NAKAGAMI, Sixth-Neighrours.</small></p>
-</div>
+<footer class="ui inverted vertical footer segment mw-100">
+	<div class="ui container">
+		<div class="ui stackable inverted divided equal height stackable grid">
+			<div class="eight wide column">
+				<h4>Main menu</h4>
+			</div>
+			<div class="eight wide column">
+				<p>This site being managed by <a href="https://twitter.com/sota_n/" target="_blank">佐々木奏.cyl</a> （<a href="http://siky.hateblo.jp/" target="_blank">blog</a>） <br><small>"Re:箱庭諸島SE" © 2016-2017 Sota NAKAGAMI, Sixth-Neighrours.</small></p>
+			</div>
+		</div>
+	</div>
 </footer>
 
-<script>
-if (typeof(init) === 'function') document.addEventListener('DOMContentLoaded', init(), false)
-</script>
+
+
+<script>if(typeof(init)==='function')document.addEventListener('DOMContentLoaded',init)</script>
 </body>
 </html>

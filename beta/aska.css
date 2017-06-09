@@ -71,6 +71,15 @@ a.text-primary:focus, a.text-primary:hover {
   border-color: #67bdba;
 }
 
+.card-outline-info {
+  border-color: #67bdba;
+}
+
+.container {
+  width: 100% !important;
+  max-width: 960px;
+}
+
 #Ranking .py-1 {
   padding-top: 0.25em !important;
   padding-bottom: 0.25em !important;
@@ -116,12 +125,4 @@ table td {
 
 table td[data-type="str"] {
   text-align: left;
-}
-
-.nbr {
-  white-space: nowrap !important;
-}
-
-.w-20 {
-  width: 20% !important;
 }
