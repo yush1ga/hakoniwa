@@ -7,9 +7,13 @@
  */
 //hako-turn.php
 
+
+/**
+ * ログ関連各種関数
+ */
 class LogIO {
-    public $this_file = '';
-    public $init;
+	public $this_file = '';
+	public $init;
 
 	private $logPool       = array();
 	private $secretLogPool = array();
@@ -18,13 +22,13 @@ class LogIO {
 
 	public function __construct() {
 		global $init;
-        $this->init = $init;
+		$this->init = $init;
 		$this->this_file = $init->baseDir . "/hako-main.php";
 	}
 
 	/**
 	 * ログファイルを後ろにずらす
-	 * @return [type] [description]
+	 * @return void
 	 */
 	function slideBackLogFile() {
 		for($i = $this->init->logMax - 1; $i >= 0; $i--) {
@@ -39,9 +43,13 @@ class LogIO {
 			}
 		}
 	}
-	//---------------------------------------------------
-	// 最近の出来事を出力
-	//---------------------------------------------------
+	/**
+	 * 最近の出来事を出力
+	 * @param  integer $num  [description]
+	 * @param  integer $id   [description]
+	 * @param  integer $mode [description]
+	 * @return void          [description]
+	 */
 	function logFilePrint($num = 0, $id = 0, $mode = 0) {
 		global $init;
 		$fileName = $init->dirName . "/hakojima.log" . $num;
@@ -103,23 +111,23 @@ class LogIO {
 		}
 
 	}
-	//---------------------------------------------------
-	// 発見の記録を保存
-	//---------------------------------------------------
+	/**
+	 * 発見の記録を保存
+	 *
+	 * @todo file_put_contents()で代替できないか
+	 */
 	function history($str) {
 		$fileName = "{$this->init->dirName}/hakojima.his";
-
 		if(!is_file($fileName)) {
 			touch($fileName);
 		}
 		$fp = fopen($fileName, "a");
 		fputs($fp, "{$GLOBALS['ISLAND_TURN']},{$str}\n");
 		fclose($fp);
-		// chmod($fileName, 0666);
 	}
-	//---------------------------------------------------
-	// 発見の記録ログ調整
-	//---------------------------------------------------
+	/**
+	 * 発見の記録ログ調整
+	 */
 	function historyTrim() {
 		$count = 0;
 		$fileName = "{$this->init->dirName}/hakojima.his";
@@ -133,16 +141,13 @@ class LogIO {
 				$count++;
 			}
 			fclose($fp);
+
 			if($count > $this->init->historyMax) {
-				if(!is_file($fileName)) {
-					touch($fileName);
-				}
 				$fp = fopen($fileName, "w");
 				for($i = ($count - $this->init->historyMax); $i < $count; $i++) {
 					fputs($fp, "{$line[$i]}\n");
 				}
 				fclose($fp);
-				// chmod($fileName, 0666);
 			}
 		}
 	}
@@ -197,7 +202,7 @@ class LogIO {
 
 	/**
 	 * お知らせを出力
-	 * @return [type] [description]
+	 * @return void
 	 */
 	function infoPrint() {
 		if($this->init->noticeFile == "") {
@@ -219,6 +224,9 @@ class LogIO {
 	}
 }
 
+/**
+ * 活動履歴テンプレート
+ */
 class Log extends LogIO {
 
 	function discover($id, $name) {

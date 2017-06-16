@@ -23,7 +23,7 @@
 
 
         if ($remainSec <= 0) {
-            $echoVal = '<div class="alert alert-danger" role="alert"><strong><a href="javascript:location.reload()">ページを更新してください</a></strong></div>';
+            $echoVal = '<div><button type="button" class="btn btn-danger btn-lg btn-block" onClick="location.reload()"><strong>ページを更新してください<br>ページが最新状態まで更新されない限り、全ての操作を行うことができません。</strong></button></div>';
         }
         return $echoVal;
     }

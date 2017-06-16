@@ -2,42 +2,18 @@
     <table class="table table-bordered table-condensed">
         <thead>
             <tr>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameRank ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->namePopulation ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameArea ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFunds ?><?= $init->_tagTH ?><?= $lots ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFood ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameUnemploymentRate ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFarmSize ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFactoryScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameCommercialScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameMineScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->namePowerPlantScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->namePowerSupplyRate ?><?= $init->_tagTH ?>
-                </th>
+                <th><?= $init->nameRank ?></th>
+                <th><?= $init->namePopulation ?></th>
+                <th><?= $init->nameArea ?></th>
+                <th><?= $init->nameFunds ?><?= $lots ?></th>
+                <th><?= $init->nameFood ?></th>
+                <th><?= $init->nameUnemploymentRate ?></th>
+                <th><?= $init->nameFarmSize ?></th>
+                <th><?= $init->nameFactoryScale ?></th>
+                <th><?= $init->nameCommercialScale ?></th>
+                <th><?= $init->nameMineScale ?></th>
+                <th><?= $init->namePowerPlantScale ?></th>
+                <th><?= $init->namePowerSupplyRate ?></th>
             </tr>
         </thead>
         <tr>
@@ -79,19 +55,19 @@
             </td>
         </tr>
         <tr>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameWeather ?><?= $init->_tagTH ?></th>
+            <th><?= $init->nameWeather ?></th>
             <td class="TenkiCell"><?= $sora ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameMilitaryTechnology ?><?= $init->_tagTH ?></th>
+            <th><?= $init->nameMilitaryTechnology ?></th>
             <td <?= $init->bgInfoCell ?>><?= $arm ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameMonsterExterminationNumber ?><?= $init->_tagTH ?></th>
+            <th><?= $init->nameMonsterExterminationNumber ?></th>
             <td <?= $init->bgInfoCell ?>><?= $taiji ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameSatellite ?><?= $init->_tagTH ?></th>
+            <th><?= $init->nameSatellite ?></th>
             <td class="ItemCell" colspan="4"><?= $eiseis ?></td>
         </tr>
         <tr>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?>ジン<?= $init->_tagTH ?></th>
+            <th>ジン</th>
             <td class="ItemCell" colspan="5"><?= $zins ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?>アイテム<?= $init->_tagTH ?></th>
+            <th>アイテム</th>
             <td class="ItemCell" colspan="4"><?= $items ?></td>
         </tr>
         <tr>

@@ -65,7 +65,7 @@ class Make {
 		$hako->islandNextID++;
 		$island['starturn'] = $hako->islandTurn;
 		$island['isBF'] = $island['keep'] = 0;
-		$island['absent'] = $init->giveupTurn - 3;
+		$island['absent'] = $init->giveupTurn - (max(86400 / $init->unitTime, $init->unitTime / 86400));
 		$island['comment'] = '(未登録)';
 		$island['comment_turn'] = $hako->islandTurn;
 		$island['password'] = Util::encode($data['PASSWORD']);

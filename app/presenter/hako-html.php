@@ -44,8 +44,8 @@ class HTML {
 
 	/**
 	 * [timeToString description]
-	 * @param  [type] $t [description]
-	 * @return [type]    [description]
+	 * @param  Integer $t [description]
+	 * @return String     [description]
 	 */
 	function timeToString($t) {
 		$time = localtime($t, TRUE);
@@ -63,11 +63,11 @@ class HtmlTop extends HTML {
 		$this_file = $init->baseDir . "/hako-main.php";
 		$allyfile  = $init->baseDir . "/hako-ally.php";
 
-		$radio  = "checked";
-		$radio2 = "";
-		if( !empty($data['defaultDevelopeMode']) && $data['defaultDevelopeMode'] == "javascript") {
-			$radio  = "";
-			$radio2 = "checked";
+		$radio  = "";
+		$radio2 = "checked";
+		if( !empty($data['defaultDevelopeMode']) && $data['defaultDevelopeMode'] != "javascript") {
+			$radio  = "checked";
+			$radio2 = "";
 		}
 
 		// セットするパスワードのチェック

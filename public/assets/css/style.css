@@ -1,48 +1,36 @@
 body {
-    font-family: "游ゴシック体", "Yu Gothic", YuGothic, Meiryo, sans-serif;
+    font-family: Lato, "游ゴシック体", "Yu Gothic", YuGothic, Meiryo, sans-serif;
     color: #333;
     background-color: #f6fbfd;
 }
 
 /* 区切り線 */
-
 hr,
 .cmnSection {
     border-bottom: 1px solid #5FAFD7;
 }
 
 /* テーブル */
-
-table {
-    border: none;
-}
-th, td {
-    /*border: solid #00BFFF 1px;*/
-    white-space: nowrap;
-}
-th {
-/*    border-color: #1E90FF;*/
-}
-td.M {
-    border: none;
-}
+table,
+td.M,
 img {
     border: none;
 }
+th, td {
+    white-space: nowrap;
+}
+
 
 /* TOPページ ---------------------------------------------------------*/
 
 
 /* タイトル */
-
 h1 {
-    color: #C0C0C0;
-/*    letter-spacing: 5px;
-    text-transform: uppercase;*/
+    color: #ccc;
 }
-.title:first-letter {
+.title::first-letter {
     color: #4169E1;
-    font-size: 48px;
+    font-size: 1.6em;
 }
 .Turn {
     display: block;
@@ -53,23 +41,19 @@ h1 {
 h2 {
     font-weight: bold;
     color: #6BBED5;
-    text-transform: uppercase;
 }
 
 /* 最近の出来事 */
-
 #HistoryLog, #RecentlyLog {
     white-space: nowrap;
 }
 
 /* 大きい文字 */
-
 .big {
     font-size: 24px;
 }
 
 /* リアルタイマー */
-
 .timer {
     color: #6BBED5;
     font-weight: bold;
@@ -83,7 +67,7 @@ h2 {
     visibility: hidden;
     z-index: 1;
     position: absolute;
-    background-color: #000000;
+    background-color: #000;
     min-width: 120px;
     max-width: 180px;
     margin-top: -224px;
@@ -94,7 +78,7 @@ h2 {
 .NaviTitle {
     font-size: 9px;
     padding: 5px 0;
-    color: #ffffff;
+    color: #fff;
     border: none;
 }
 .NaviImg {
@@ -103,7 +87,7 @@ h2 {
 .NaviText {
     margin: 6px 0;
     font-size: 11px;
-    color: #ffffff;
+    color: #fff;
 }
 
 /* 島情報テーブル */
@@ -117,248 +101,206 @@ h2 {
 }
 
 /* 観光者通信テーブル */
-
 #localBBS table th {
     background-color: #AFEEEE;
 }
-.islName, .islName2, .number, .head, .headToTo, .command, .disaster, .lbbsCell, .money, .food, .HCwin, .HClose, .attention, .bumon {
+
+.islName, .islName2, .number, .head, .headToTo,
+.command, .disaster, .lbbsCell, .money, .food,
+.HCwin, .HClose, .attention, .bumon {
     font-weight: bold;
 }
+
+/* 島の名前など */
 .islName {
     color: #A06040;
 }
 
-/* 島の名前など */
-
+/* 薄くなった島の名前 */
 .islName2 {
     color: #808080;
 }
 
-/* 薄くなった島の名前 */
-
+/* 順位の番号など */
 .number {
     color: #6BBED5;
 }
 
-/* 順位の番号など */
-
+/* 順位表における見だし */
+#islandInfo th,
+#Ranking th,
 .head {
     color: #000080;
 }
 
-/* 順位表における見だし */
-
+/* toto表における見だし */
 .headToTo {
     color: royalblue;
 }
 
-/* toto表における見だし */
-
+/* 開発計画名 */
 .command {
     color: #D08000;
 }
 
-/* 開発計画名 */
-
-.disaster {
-    color: #FF0000;
-}
-
 /* 災害 */
-
-.lbbsST {
-    color: gray;
+.disaster {
+    color: #f00;
 }
 
-
-/* お金 */
-
+/* 食料 */
 .food {
     color: lightseagreen;
 }
 
-/* 食料 */
-
+/* 箱庭カップ勝利 */
 .HCwin {
-    color: #0000FF;
+    color: #00f;
 }
 
-/* 箱庭カップ勝利 */
-
+/* 箱庭カップ敗北 */
 .HClose {
     color: #A06040;
 }
 
-/* 箱庭カップ敗北 */
-
-.attention {
-    color: #FF0000;
-}
-
 /* 注意 */
-
-.bumon {
-    color: #FFFFFF;
+.attention {
+    color: #f00;
 }
 
 /* ランキングの部門名 */
+.bumon {
+    color: #fff;
+}
 
+/* point */
 .point {
     color: royalblue;
 }
 
-/* point */
-
+/* 失業率- */
 .unemploy1 {
     color: royalblue;
 }
 
-/* 失業率- */
-
+/* 失業率+ */
 .unemploy2 {
-    color: red;
+    color: #f00;
 }
 
-/* 失業率+ */
-
+/* 首都名，ユニーク地形 */
 .shuto {
     color: mediumseagreen;
 }
 
-/* 首都名，ユニーク地形 */
-
+/* 島主の家，島ID */
 .house {
     color: salmon;
 }
 
-/* 島主の家，島ID */
-
+/* 人工衛星 */
 .eisei {
     color: lightseagreen;
 }
 
-/* 人工衛星 */
-
+/* 怪獣出現中！，成長率 */
 .monsm {
     color: hotpink;
 }
 
-/* 怪獣出現中！，成長率 */
-
+/* 通常の文字色 */
 .normal {
-    color: #000000;
+    color: #000;
 }
 
-/* 通常の文字色 */
+/**
+ * 背景色
+ */
 
-
-/* 背景色 */
-
+/* 順位表見出し */
+#islandInfo th,
+#Ranking th,
 .TitleCell {
     background-color: #97D3E3;
 }
 
-/* 順位表見出し */
-
+/* 順位表順位 */
 .NumberCell {
     background-color: #97D3E3;
 }
 
-/* 順位表順位 */
-
+/* 順位表島の名前 */
 .NameCell {
     background-color: #e9f6f9;
 }
 
-/* 順位表島の名前 */
-
+/* 順位表島の情報 */
 .InfoCell {
     background-color: #DBF0F6;
     text-align: right;
 }
 
 /* 順位表島の情報 */
-
-.MarkCell {
-    background-color: #DBF0F6;
-    text-align: center;
-}
-
-/* 順位表島の情報 */
-
+.MarkCell,
 .TenkiCell {
     background-color: #DBF0F6;
     text-align: center;
 }
 
 /* 順位表島の情報 */
-
 .ItemCell {
     background-color: #DBF0F6;
     text-align: left;
 }
 
-/* 順位表島の情報 */
-
+/* 順位表コメント欄 */
 .CommentCell {
-    background-color: #FFFFFF;
+    background-color: #fff;
     text-align: left;
 }
 
-/* 順位表コメント欄 */
-
+/* 開発計画フォーム */
 .InputCell {
     background-color: #AFEEEE;
 }
 
-/* 開発計画フォーム */
-
-.MapCell {
-    background-color: #FFFFFF;
-}
-
 /* 開発計画地図 */
-
-.CommandCell {
-    background-color: #FFFFFF;
-    white-space: normal;
+.MapCell {
+    background-color: #fff;
 }
 
 /* 開発計画入力済み計画 */
-
-.lbbsCell {
-    background-color: #FFFFFF;
+.CommandCell {
+    background-color: #fff;
+    white-space: normal;
 }
 
 /* 観光者通信の内容 */
-
-.PoinCell {
-    background-color: moccasin;
+.lbbsCell {
+    background-color: #fff;
 }
 
 /* Point欄 */
-
-.TotoCell {
-    background-color: white;
+.PoinCell {
+    background-color: #ffe4b5;/*-> moccasin*/
 }
 
 /* toto欄 */
-
-.RankingCell {
-    background-color: lightsteelblue;
+.TotoCell {
+    background-color: #fff;
 }
 
 /* ランキング欄 */
+.RankingCell {
+    background-color: #b0c4de;/*-> lightsteelblue*/
+}
 
+/* Popup コマンド入力欄 */
 .PopupCell {
     background-color: #DBF0F6;
 }
 
-/* Popup コマンド入力欄 */
-
-
 /* JSコマンド送信済み */
-
 .commandjs1 {
     border-width: 0px;
     color: blue;
@@ -368,22 +310,22 @@ h2 {
 }
 
 /* JSコマンド未送信 */
-
 .commandjs2 {
     border-width: 0px;
     color: red;
     width: 100%;
     height: 100%;
-    background-color: #FFFFFF;
+    background-color: #fff;
 }
 
-/* アクセスログ ---------------------------------------------------------*/
 
+/**
+ * アクセスログ
+ */
 
 /* アクセスログテーブル */
-
 #DATA-TABLE {
-    background-color: #ffffff;
+    background-color: #fff;
 }
 
 /**
