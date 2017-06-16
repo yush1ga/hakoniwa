@@ -17,6 +17,7 @@
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "assets/js/",
         "preserveConstEnums": true,
         "pretty": true,
         "removeComments": true,
@@ -25,7 +26,7 @@
         "target": "es6"
     },
     "include": [
-        "**/pages.ts"
+        "/src/**/pages.ts"
     ],
     "exclude": [
         "node_modules"

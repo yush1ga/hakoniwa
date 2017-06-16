@@ -17,7 +17,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "npm-run-all --parallel compile:*",
     "compile:ts": "tsc -p .",
-    "compile:scss": "node-sass --recursive --output-style=expanded --indent-type=space --indent-width=2 --linefeed=lf --output=beta/assets/css/ beta/src/absolute-wiki.scss",
+    "compile:scss": "node-sass --recursive --output-style=expanded --indent-type=space --indent-width=2 --linefeed=lf --output=beta/assets/css/",
     "copy": "npm-run-all --parallel copy:*"
   },
   "repository": {
