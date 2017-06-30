@@ -164,27 +164,17 @@ class HtmlTop extends HTML {
 			}
 
 			if($island['keep'] == 1) {
-				$comment = "<span class=\"attention\">この島は管理人預かり中です。</span>";
+				$comment = '<span class="attention">この島は管理人預かり中です。</span>';
 			}
 
 			$name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
-			if($island['absent'] == 0) {
-				$name = "{$init->tagName_}{$name}{$init->_tagName}";
-			} else {
-				$name = "{$init->tagName2_}{$name}({$island['absent']}){$init->_tagName2}";
-			}
+			$name = $island['absent'] == 0 ? "{$init->tagName_}{$name}{$init->_tagName}" : "{$init->tagName2_}{$name}({$island['absent']}){$init->_tagName2}";
 
 			$owner = (!empty($island['owner']))? $island['owner']: "コメント";
 
-			$prize = $island['prize'];
-			$prize = $hako->getPrizeList($prize);
+			$prize = $hako->getPrizeList($island['prize']);
 
 			$point = $island['point'];
-
-			// /*if($init->commentNew > 0 && ($comment_turn + $init->commentNew) > $hako->islandTurn) { */
-			// if( $comment_turn > $hako->islandTurn) {
-			// 	$comment .= " <span class=\"new\">New</span>";
-			// }
 
 			$sora = "";
 			switch ($tenki) {

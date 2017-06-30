@@ -45,12 +45,12 @@ class Turn {
 		$hako->islandTurn++;
 		$GLOBALS['ISLAND_TURN'] = $hako->islandTurn;
 
+		// 島がなければターン数を保存して以降の処理は省く
 		if($hako->islandNumber == 0) {
-			// 島がなければターン数を保存して以降の処理は省く
-			// ファイルに書き出し
 			$hako->writeIslandsFile();
 			return;
 		}
+
 		// プレゼントファイルを読み込む(終れば消去)
 		$hako->readPresentFile(true);
 
@@ -95,10 +95,8 @@ class Turn {
 			if($hako->islands[$order[$i]]['keep']) {
 				continue;
 			}
-
 			// 戻り値1になるまで繰り返し
 			while($this->doCommand($hako, $hako->islands[$order[$i]]) == 0);
-
 			// 整地ログ (まとめてログ出力)
 			if($init->logOmit) {
 				$this->logMatome($hako->islands[$order[$i]]);
@@ -164,6 +162,7 @@ class Turn {
 			$this->shipcounter($hako, $hako->islands[$order[$i]]);
 		}
 
+		// 点数・各種人数等計算
 		for($i = 0; $i < $hako->islandNumber; $i++) {
 			$this->estimate($hako, $hako->islands[$order[$i]]);
 		}
@@ -185,34 +184,33 @@ class Turn {
 		$this->log->historyTrim();
 	}
 
-	//---------------------------------------------------
-	// ログをまとめる
-	//---------------------------------------------------
+	/**
+	 * 整地ログをまとめる
+	 * @param  [type] $island [description]
+	 * @return void
+	 */
 	function logMatome($island) {
 		global $init;
 
 		$sno = $island['seichi'];
 		$point = "";
-		$i = 0;
 		if($sno > 0) {
 			if($init->logOmit == 1) {
 				$sArray = $island['seichipnt'];
-				for(; $i < $sno; $i++) {
+				for($i = 0; $i < $sno; $i++) {
 					$spnt = $sArray[$i];
 					if($spnt == "") {
 						break;
 					}
-					$x = $spnt['x'];
-					$y = $spnt['y'];
-					$point .= "($x, $y) ";
-					if(!(($i+1)%20)) {
-						// 全角空白３つ
-						$point .= "<br>　　　";
+					$point .= "({$spnt['x']}, {$spnt['y']}) ";
+					// 座標の数が16で改行
+					if(!(($i+1)%16)) {
+						$point .= "<br>　　　"; // 全角空白３つ
 					}
 				}
 			}
 			if($i > 1 || ($init->logOmit != 1)) {
-				$point .= "の<strong>{$sno}ケ所</strong>";
+				$point .= "の<strong>{$sno}箇所</strong>";
 			}
 		}
 		if($point != "") {
