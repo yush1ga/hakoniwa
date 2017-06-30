@@ -5,10 +5,12 @@
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {
+    "@types/navigo": "^4.0.1",
     "@types/react": "^15.0.21",
     "@types/react-dom": "^0.14.23",
     "@types/underscore": "^1.7.33",
     "cpx": "^1.5.0",
+    "navigo": "^5.2.0",
     "node-sass": "^4.5.2",
     "npm-run-all": "^4.0.2",
     "semantic-ui-react": "^0.68.5"
@@ -18,7 +20,8 @@
     "compile": "npm-run-all --parallel compile:*",
     "compile:ts": "tsc -p .",
     "compile:scss": "node-sass --recursive --output-style=expanded --indent-type=space --indent-width=2 --linefeed=lf --output=beta/assets/css/",
-    "copy": "npm-run-all --parallel copy:*"
+    "copy": "npm-run-all --parallel copy:*",
+    "copy:navigo": "cpx node_modules/navigo/lib/navigo.js assets/lib"
   },
   "repository": {
     "type": "git",

@@ -9,8 +9,6 @@
             "es2017"
         ],
         "listFiles": true,
-        "module": "amd",
-        "moduleResolution": "node",
         "noEmitOnError": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
@@ -29,6 +27,6 @@
         "/src/**/pages.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules/"
     ]
 }

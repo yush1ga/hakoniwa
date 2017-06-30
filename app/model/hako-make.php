@@ -723,7 +723,7 @@ class Make {
 		// 島テーブルの操作
 		$island['point'] = 0;
 		$island['pop'] = 0;
-		$island['dead'] = 1;
+		$island['isDead'] = true;
 		$tmpid = $island['id'];
 		$log->deleteIsland($tmpid, $island['name']);
 		if(is_file("{$init->dirName}/island.{$tmpid}")) {

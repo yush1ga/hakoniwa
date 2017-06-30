@@ -19,7 +19,8 @@ class Turn {
 	/**
 	 * ターン進行モード
 	 *
-	 *最終更新時刻の更新→ ログファイル更新準備→
+	 * 最終更新時刻の更新→ ログファイル更新準備→ 支出計算→
+	 *  コマンド処理→
 	 *
 	 * @param  [type] &$hako ゲームデータ管理オブジェクト
 	 * @param  [type] $data  [description]
@@ -97,7 +98,7 @@ class Turn {
 			}
 			// 戻り値1になるまで繰り返し
 			while($this->doCommand($hako, $hako->islands[$order[$i]]) == 0);
-			// 整地ログ (まとめてログ出力)
+			// 整地ログ（出力をまとめる場合）
 			if($init->logOmit) {
 				$this->logMatome($hako->islands[$order[$i]]);
 			}
@@ -113,37 +114,36 @@ class Turn {
 		}
 
 		// 島全体処理
+
+		// 残存判定のために現在の島数を一時保存
 		$remainNumber = $hako->islandNumber;
 
 		for($i = 0; $i < $hako->islandNumber; $i++) {
 			// 管理人預かり中の場合スキップ
-			if( isset($hako->islands[$order[$i]]['keep']) ) {
-				if($hako->islands[$order[$i]]['keep']) {
-					continue;
-				}
+			if($hako->islands[$order[$i]]['keep']) {
+				continue;
 			}
 			$island = $hako->islands[$order[$i]];
 			$this->doIslandProcess($hako, $island);
 
-			// 死滅判定
-			if ( isset($island['dead']) ) {
-				if($island['dead'] == 1) {
-					$island['pop']   = 0;
-					$island['point'] = 0;
-					$remainNumber--;
-				} elseif((($island['pop'] == 0) || ($island['point'] == 0)) && ($island['isBF'] != 1)) {
-					$island['dead'] = 1;
-					$remainNumber--;
-					// 死滅メッセージ
-					$tmpid = $island['id'];
-					$this->log->dead($tmpid, $island['name']);
-					if(is_file("{$init->dirName}/island.{$tmpid}")) {
-						unlink("{$init->dirName}/island.{$tmpid}");
-					}
-				}
+			// 島滅亡判定
+			if( ($island['isBF']!=1) && ($island['pop']==0 || $island['point']==0) ) {
+			  $island['isDead'] = true;
 			}
-			$hako->islands[$order[$i]] = $island;
-		}
+			if(isset($island['isDead']) && $island['isDead']) {
+				$island['pop']   = 0;
+				$island['point'] = 0;
+				// 死滅メッセージ
+				$this->log->dead($tmpid, $island['name']);
+
+  			$tmpid = $island['id'];
+	  		$remainNumber--;
+		  	if(is_file("{$init->dirName}/island.{$tmpid}")) {
+			  	unlink("{$init->dirName}/island.{$tmpid}");
+			  }
+			  $hako->islands[$order[$i]] = $island;
+		  }
+	  }
 
 		// 人口順にソート
 		$this->islandSort($hako);
@@ -1108,11 +1108,11 @@ class Turn {
 						$this->log->landSuc($id, $name, $comName, $point);
 						break;
 
+					// 発電所
 					case $init->comHatuden:
-						// 発電所
+						// すでに発電所の場合
 						if($landKind == $init->landHatuden) {
-							// すでに発電所の場合
-							$landValue[$x][$y] += 40; // 規模 + 40000kw
+							$landValue[$x][$y] += 40; // 規模 +40000kw
 							if($landValue[$x][$y] > 300) {
 								$landValue[$x][$y] = 300; // 最大 300000kw
 							}
@@ -3340,11 +3340,10 @@ class Turn {
 				$returnMode = 1;
 				break;
 
+			// 放棄
 			case $init->comGiveup:
-				// 放棄
+				$island['isDead'] = true;
 				$this->log->giveup($id, $name);
-				$island['dead'] = 1;
-				unlink("{$init->dirName}/island.{$id}");
 				$returnMode = 1;
 				break;
 		}
@@ -3853,8 +3852,8 @@ class Turn {
 					}
 					break;
 
+				// 遊園地
 				case $init->landPark:
-					// 遊園地
 					$lName = $this->landName($landKind, $lv);
 					//$value = floor($island['pop'] / 50); // 人口５千人ごとに１億円の収入
 					//収益は人口増加とともに横ばい傾向
@@ -4553,7 +4552,7 @@ class Turn {
 								}
 							}
 							if(Util::random(1000) < $init->disVikingAway) {
-								// 海賊船 去る
+								// 海賊船去る
 								$land[$x][$y] = $init->landSea;
 								$landValue[$x][$y] = 0;
 								$this->log->VikingAway($id, $name, "($x,$y)");
@@ -4595,7 +4594,7 @@ class Turn {
 										$island['item'][19] = 1;
 										$this->log->RedFound($id, $name, '赤い宝石');
 									}
-									// 油田見っけ
+									// 油田発見
 									if (Util::random(100) < 3) {
 										$lName = $init->shipName[$ship[1]];
 										$island['oil']++;
@@ -4772,7 +4771,7 @@ class Turn {
 			if ($island['lot'] > 0) {
 				// 当てた
 				if(Util::random(500) < $island['lot']) {
-					// 何等賞に当選するか？
+					// 何等？
 					$syo   = Util::random(2) + 1;
 					$value = $init->lotmoney / $syo;
 					$island['money'] += $value;
@@ -4827,7 +4826,7 @@ class Turn {
 		}
 
 		// 地震判定
-		$prepare2     = isset($island['prepare2']) ? (int)$island['prepare2'] : 0;
+		$prepare2 = isset($island['prepare2']) ? (int)$island['prepare2'] : 0;
 		if ((Util::random(1000) < (($prepare2 + 1) * $init->disEarthquake) - (int)($island['eisei'][1] / 15))
 			|| ($presentItem == 1) )
 		{
@@ -5379,15 +5378,16 @@ class Turn {
 		$island['gold'] = $island['money'] - $island['oldMoney'];
 		$island['rice'] = $island['food']  - $island['oldFood'];
 
-		// 食料があふれてたら換金
+		// 食料があふれたら換金
 		if($island['food'] > $init->maxFood) {
 			$island['money'] += round(($island['food'] - $init->maxFood) / 10);
 			$island['food'] = $init->maxFood;
 		}
-		// 金があふれてたら切り捨て
+		// 資金があふれたら切り捨て
 		if($island['money'] > $init->maxMoney) {
 			$island['money'] = $init->maxMoney;
 		}
+
 		// 各種の値を計算
 		Turn::estimate($hako, $island);
 
@@ -5539,9 +5539,11 @@ class Turn {
 		}
 	}
 
-	//---------------------------------------------------
-	// 人口順でソート
-	//---------------------------------------------------
+	/**
+	 * 人口順でソート
+	 * @param  [type] &$hako [description]
+	 * @return void
+	 */
 	static function islandSort(&$hako) {
 		global $init;
 		usort($hako->islands, 'popComp');
@@ -5550,7 +5552,7 @@ class Turn {
 	/**
 	 * 収入、消費フェイズ
 	 * @param  [type] &$island 島データ
-	 * @return [type]          [description]
+	 * @return void
 	 */
 	function income(&$island) {
 		global $init;
@@ -5570,33 +5572,23 @@ class Turn {
 
 		// 農業要員の他に人手が余る
 		if($pop > $farm) {
-			// 停電判定（天候が かつ 設定確率を満たす）
+			// 停電判定（天候が「雷」かつ設定確率を満たす）
 			if((Util::random(1000) < $init->disTenki) && ($island['tenki'] == 4)) {
-				if($island['zin'][5] == 1) {
-					// ジン所持時
-					$island['food'] += $farm * 2; // 全員野良仕事
-				} else {
-					$island['food'] += $farm; // 全員野良仕事
-				}
+				// 全員野良仕事（ジン所持時ブースト）
+				$island['food'] += ($island['zin'][5] == 1) ? $farm * 2: $farm;
 				$this->log->Teiden($island['id'], $island['name']);
 			} else {
-				if($island['zin'][5] == 1) {
-					// ジン所持時
-					$island['food'] += $farm * 2; // 農場フル稼働
-				} else {
-					$island['food'] += $farm; // 農場フル稼働
-				}
-				if($island['zin'][6] == 1) {
-					// サラマンダー所持時
-					$island['money'] += (min(round(($pop - $farm) / 10), $work)) * 2;
-				} else {
-					$island['money'] += min(round(($pop - $farm) / 10), $work);
-				}
+				// 農場フル稼働（ジン所持時ブースト）
+				$island['food'] += ($island['zin'][5] == 1) ? $farm * 2: $farm;
+				// サラマンダー所持時ブースト
+				$island['money'] += ($island['zin'][6] == 1) ? (min(round(($pop - $farm) / 10), $work)) * 2 : min(round(($pop - $farm) / 10), $work);
 			}
 		} else {
 			// 農業だけで手一杯の場合
-			$island['food'] += $pop; // 全員野良仕事
+			// 全員野良仕事
+			$island['food'] += $pop;
 		}
+
 		// $island[present][item]が0の時、
 		// [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている。
 		if ( isset($island['present']) ) {
@@ -5652,26 +5644,8 @@ class Turn {
 		$land      = $island['land'];
 		$landValue = $island['landValue'];
 
-		$area      = 0;
-		$pop       = 0;
-		$farm      = 0;
-		$factory   = 0;
-		$commerce  = 0;
-		$mountain  = 0;
-		$hatuden   = 0;
-		$home      = 0;
-		$monster   = 0;
-		$port      = 0;
-		$oil       = 0;
-		$soccer    = 0;
-		$park      = 0;
-		$stat      = 0;
-		$train     = 0;
-		$bank      = 0;
-		$m23       = 0;
-		$fire      = 0;
-		$rena      = 0;
-		$base      = 0;
+		// init
+		list($area, $pop, $farm, $factory, $commerce, $mountain, $hatuden, $home, $monster, $port, $oil, $soccer, $park, $stat, $train, $bank, $m23, $fire, $rena, $base) = array_pad([], 20, 0);
 
 		// 数える
 		for($y = 0; $y < $init->islandSize; $y++) {
@@ -5745,98 +5719,93 @@ class Turn {
 							$farm += $value;
 							break;
 
+						// 養殖場
 						case $init->landNursery:
-							// 養殖場
 							$farm += $value;
 							break;
 
+						// 工場
 						case $init->landFactory:
-							// 工場
 							$factory += $value;
 							break;
 
+						// 商業
 						case $init->landCommerce:
-							// 商業
 							$commerce += $value;
 							break;
 
+						// 山
 						case $init->landMountain:
-							// 山
 							$mountain += $value;
 							break;
 
+						// 発電所
 						case $init->landHatuden:
-							// 発電所
-							if($island['zin'][4] == 1) {
-								// ルナ所持
-								$hatuden += $value * 2;
-							} else {
-								$hatuden += $value;
-							}
+							// ルナ所持でボーナス
+							$hatuden += $island['zin'][4] == 1 ? $value *2 : $value;
 							break;
 
+						// ミサイル
 						case $init->landBase:
-							// ミサイル
 							$base += 2;
 							$fire += Util::expToLevel($kind, $value);
 							break;
 
+						// 怪獣
 						case $init->landMonster:
 						case $init->landSleeper:
-							// 怪獣
 							$monster++;
 							break;
 
+						// ぞらす
 						case $init->landZorasu:
-							// ぞらす
 							$hatuden += $value;
 							break;
 
+						// 港
 						case $init->landPort:
-							// 港
 							$port++;
 							break;
 
+						// 駅
 						case $init->landStat:
-							// 駅
 							$stat++;
 							break;
 
+						// 電車
 						case $init->landTrain:
-							// 電車
 							$train++;
 							break;
 
+						// スタジアム
 						case $init->landSoccer:
-							// スタジアム
 							$soccer++;
 							break;
 
+						// 遊園地
 						case $init->landPark:
-							// 遊園地
 							$park++;
 							break;
 
+						// 銀行
 						case $init->landBank:
-							// 銀行
 							$bank++;
 							break;
 
+						// 記念碑
 						case $init->landMonument:
-							// 記念碑
-							if($value == 23) {
-								$m23++;
-							}
+							if($value == 23) $m23++;
 							break;
 
+						// マイホーム
 						case $init->landMyhome:
-							// マイホーム
 							$home++;
 							break;
 					}
 				}
 			}
 		}
+
 		// 代入
 		$island['pop']      = $pop;
 		$island['area']     = $area;
@@ -5859,28 +5828,28 @@ class Turn {
 		$island['rena']     = $fire + $base;
 
 		// 電力消費量
+		// 「人口が農業枠未満」か「工業・商業・採掘場枠の合計がゼロ」→ 電力消費ゼロ
+		// 「工業・商業・採掘場枠の合計が正数」→
+		// 電力消費は「人口と農業枠の差の四捨五入」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
 		if(($island['pop'] - $island['farm']) <= 0 || ($island['factory'] + $island['commerce'] + $island['mountain']) <= 0) {
 			$island['enesyouhi'] = 0;
 		} elseif($island['factory'] + $island['commerce'] + $island['mountain'] > 0) {
-			$island['enesyouhi'] = min(round($island['pop'] - $island['farm']), ($island['factory'] * 2/3 + $island['commerce'] * 1/3 + $island['mountain'] * 1/4));
+			$island['enesyouhi'] = min(round($island['pop'] - $island['farm']), ($island['factory'] * 2/3 + $island['commerce'] /3 + $island['mountain'] /4));
 		}
 		// 電力過不足量
 		$island['enehusoku'] = $island['hatuden'] - $island['enesyouhi'];
 
+		// サッカーポイント計算
+		// 2*勝数 - 2*敗数 + 引分け + 攻撃力 + 防御力 + 得点数 - 失点数
 		if($island['soccer'] == 0) {
 			$island['kachi'] = $island['make'] = $island['hikiwake'] = $island['kougeki'] = $island['bougyo'] = $island['tokuten'] = $island['shitten'] = 0;
 		}
 		$island['team'] = $island['kachi']*2 - $island['make']*2 + $island['hikiwake'] + $island['kougeki'] + $island['bougyo'] + $island['tokuten'] - $island['shitten'];
 
-		if($island['pop'] == 0) {
-			$island['point'] = 0;
-		} else {
-			if($island['isBF'] == 1) {
-				$island['point'] = 0;
-			} else {
-				$island['point'] = ($island['pop']*15 + $island['money'] + $island['food'] + $island['farm']*2 + $island['factory'] + $island['commerce']*1.2 + $island['mountain']*2 + $island['hatuden']*3 + $island['team'] + $island['area']*5 + $island['taiji']*5 + $island['fire']*10 + $island['monster']*5)*10;
-			}
-		}
+		// 総合ポイント計算
+		// 「人口ゼロかBF」→ 0pt
+		// ほか→ 10*(15人口 + 資金 + 食料 + 2農業 + 工業 + 1.2商業 + 2採掘 + 3発電 + サッカー + 5土地 + 5討伐 + 10装弾 + 5怪獣)
+		$island['point'] = ($island['pop'] == 0 || $island['isBF'] == 1)? 0 : ($island['pop']*15 + $island['money'] + $island['food'] + $island['farm']*2 + $island['factory'] + $island['commerce']*1.2 + $island['mountain']*2 + $island['hatuden']*3 + $island['team'] + $island['area']*5 + $island['taiji']*5 + $island['fire']*10 + $island['monster']*5)*10;
 		$island['seichi'] = 0;
 	}
 
@@ -5956,22 +5925,21 @@ class Turn {
 		return $count;
 	}
 
-	//---------------------------------------------------
-	// 地形の呼び方
-	//---------------------------------------------------
+	/**
+	 * 地形の呼び方
+	 * @param  Integar $land 地形ID
+	 * @param  Integar $lv   メタデータ
+	 * @return String        対応した名称
+	 */
 	function landName($land, $lv) {
 		global $init;
 
 		switch($land) {
 			case $init->landSea:
-				if($lv == 1) {
-					return '浅瀬';
-				} else {
-					return '海';
-				}
+				return $lv == 1 ? '浅瀬' : '海';
 
+			// 船舶
 			case $init->landShip:
-				// 船舶
 				$ship = Util::navyUnpack($lv);
 				return $init->shipName[$ship[1]];
 
@@ -5994,16 +5962,9 @@ class Turn {
 				return '砂浜';
 
 			case $init->landSeaResort:
-				// 海の家
-				$n;
-				if($lv < 30) {
-					$n = '海の家';
-				} elseif($lv < 100) {
-					$n = '民宿';
-				} else {
-					$n = 'リゾートホテル';
-				}
-				return $n;
+				return $lv < 30 ? '海の家'
+					: $lv <100 ? '民宿'
+					: 'リゾートホテル';
 
 			case $init->landWaste:
 				return '荒地';
@@ -6015,15 +5976,10 @@ class Turn {
 				return '平地';
 
 			case $init->landTown:
-				if($lv < 30) {
-					return '村';
-				} elseif($lv < 100) {
-					return '町';
-				} elseif($lv < 200) {
-					return '都市';
-				} else {
-					return '大都市';
-				}
+				return $lv < 30 ? '村'
+					: $lv < 100 ? '町'
+					: $lv < 200 ? '都市'
+					: '大都市';
 
 			case $init->landProcity:
 				return '防災都市';
@@ -6134,14 +6090,14 @@ function popComp($x, $y) {
 	if ($y['isBF'] && !$x['isBF']) {
 			return -1;
 	}
+	if($x['point'] == $y['point']) {
+		return 0;
+	}
 	if ($x['point'] == 0) {
 		return 1;
 	}
 	if ($y['point'] == 0) {
 		return -1;
-	}
-	if($x['point'] == $y['point']) {
-		return 0;
 	}
 	return ($x['point'] > $y['point']) ? -1 : 1;
 }
