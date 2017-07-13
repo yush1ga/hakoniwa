@@ -752,7 +752,8 @@ class Log extends LogIO {
 	}
 	// 津波発生
 	function tsunami($id, $name) {
-		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}付近で{$this->init->tagDisaster_}津波{$this->init->_tagDisaster}発生！！",$id);
+		// $this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</a>{$this->init->_tagName}近海で{$this->init->tagDisaster_}津波{$this->init->_tagDisaster}発生！！",$id);
+		$this->out("<a href=\"{$this->this_file}?Sight={$id}\" class=\"islName\">{$name}{$this->init->nameSuffix}</a>近海で{$this->init->tagDisaster_}津波{$this->init->_tagDisaster}発生！！", $id);
 	}
 	// 津波被害
 	function tsunamiDamage($id, $name, $lName, $point) {

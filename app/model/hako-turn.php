@@ -127,23 +127,24 @@ class Turn {
 			$this->doIslandProcess($hako, $island);
 
 			// 島滅亡判定
+			// （すでに放棄を決定したか、人口か得点がゼロ）
 			if( ($island['isBF']!=1) && ($island['pop']==0 || $island['point']==0) ) {
-			  $island['isDead'] = true;
+				$island['isDead'] = true;
+				// 死滅メッセージ
+				$this->log->dead($tmpid, $island['name']);
 			}
 			if(isset($island['isDead']) && $island['isDead']) {
 				$island['pop']   = 0;
 				$island['point'] = 0;
-				// 死滅メッセージ
-				$this->log->dead($tmpid, $island['name']);
 
-  			$tmpid = $island['id'];
-	  		$remainNumber--;
-		  	if(is_file("{$init->dirName}/island.{$tmpid}")) {
-			  	unlink("{$init->dirName}/island.{$tmpid}");
-			  }
-			  $hako->islands[$order[$i]] = $island;
-		  }
-	  }
+				$tmpid = $island['id'];
+				$remainNumber--;
+				if(is_file("{$init->dirName}/island.{$tmpid}")) {
+					unlink("{$init->dirName}/island.{$tmpid}");
+				}
+				$hako->islands[$order[$i]] = $island;
+			}
+		}
 
 		// 人口順にソート
 		$this->islandSort($hako);
@@ -4696,11 +4697,10 @@ class Turn {
 
 		// 収入ログ
 		if( isset($island['oilincome']) ) {
-		  if($island['oilincome'] > 0) {
+			if($island['oilincome'] > 0) {
 				$this->log->oilMoney($id, $name, "海底油田", "", "総額{$island['oilincome']}{$init->unitMoney}");
 			}
 		}
-		// 収入ログ
 		if( isset($island['bank']) ) {
 			if($island['bank'] > 0) {
 				$value = (int)($island['money'] * 0.005);
@@ -5384,11 +5384,9 @@ class Turn {
 			$island['food'] = $init->maxFood;
 		}
 		// 資金があふれたら切り捨て
-		if($island['money'] > $init->maxMoney) {
-			$island['money'] = $init->maxMoney;
-		}
+		$island['money'] = min($island['money'], $init->maxMoney);
 
-		// 各種の値を計算
+		// 各種値を計算
 		Turn::estimate($hako, $island);
 
 		// 繁栄、災難賞

@@ -371,7 +371,7 @@ class Util {
 	static function rand_string($max = 32) {
 		return substr(md5(uniqid(rand_number(), true)), 0, $max);
 	}
-	
+
 	/**
 	 * 指定座標が島サイズ内か判定する
 	 * @param integer $x
@@ -381,4 +381,5 @@ class Util {
 	static function isInnerLand($x, $y) {
 		global $init;
 		return -1 < $x && $x < $init->islandSize && -1 < $y && $y < $init->islandSize;
+	}
 }
