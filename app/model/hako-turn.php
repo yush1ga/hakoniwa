@@ -20,7 +20,7 @@ class Turn {
 	 * ターン進行モード
 	 *
 	 * 最終更新時刻の更新→ ログファイル更新準備→ 支出計算→
-	 *  コマンド処理→
+	 *   コマンド処理→
 	 *
 	 * @param  [type] &$hako ゲームデータ管理オブジェクト
 	 * @param  [type] $data  [description]
@@ -32,11 +32,7 @@ class Turn {
 		$this->log = new Log();
 
 		// 最終更新時刻を更新
-		if($init->contUpdate == 1) {
-			$uptime = 1;
-		} else {
-			$uptime = (int)(($_SERVER['REQUEST_TIME'] - $hako->islandLastTime) / $init->unitTime);
-		}
+		$uptime = ($init->contUpdate == 1) ? 1 : (int)(($_SERVER['REQUEST_TIME'] - $hako->islandLastTime) / $init->unitTime);
 		$hako->islandLastTime += $init->unitTime * $uptime;
 
 		// ログファイルを後ろにずらす
@@ -52,7 +48,7 @@ class Turn {
 			return;
 		}
 
-		// プレゼントファイルを読み込む(終れば消去)
+		// プレゼントファイルを読み込む
 		$hako->readPresentFile(true);
 
 		// 座標配列を作る
@@ -64,21 +60,21 @@ class Turn {
 		$order = Util::randomArray($hako->islandNumber);
 
 		// 船舶初期化
-		for($i = 0; $i < $hako->islandNumber; $i++) {
-			$this->shipcounter($hako, $hako->islands[$order[$i]]);
+		foreach($order as $i) {
+			$this->shipcounter($hako, $hako->islands[$i]);
 		}
 
 		// ターン差分計算のため、更新前の人口、資金、食料、ポイント情報を取得
-		for($i = 0; $i < $hako->islandNumber; $i++) {
+		foreach($order as $i) {
 			// 島凍結中はスキップ
-			if($hako->islands[$order[$i]]['keep']) {
+			if($hako->islands[$i]['keep']) {
 				continue;
 			}
-			$hako->islands[$order[$i]]['oldMoney'] = $hako->islands[$order[$i]]['money'];
-			$hako->islands[$order[$i]]['oldFood']  = $hako->islands[$order[$i]]['food'];
-			$hako->islands[$order[$i]]['oldPop']   = $hako->islands[$order[$i]]['pop'];
-			$hako->islands[$order[$i]]['oldPoint'] = $hako->islands[$order[$i]]['point'];
-			$this->estimate($hako, $hako->islands[$order[$i]]);
+			$hako->islands[$i]['oldMoney'] = $hako->islands[$i]['money'];
+			$hako->islands[$i]['oldFood']  = $hako->islands[$i]['food'];
+			$hako->islands[$i]['oldPop']   = $hako->islands[$i]['pop'];
+			$hako->islands[$i]['oldPoint'] = $hako->islands[$i]['point'];
+			$this->estimate($hako, $hako->islands[$i]);
 		}
 
 		// 固定費 収入・消費
@@ -198,7 +194,8 @@ class Turn {
 		if($sno > 0) {
 			if($init->logOmit == 1) {
 				$sArray = $island['seichipnt'];
-				for($i = 0; $i < $sno; $i++) {
+				$i = 0;
+				for(; $i < $sno; $i++) {
 					$spnt = $sArray[$i];
 					if($spnt == "") {
 						break;
@@ -398,17 +395,14 @@ class Turn {
 
 				if($kind == $init->comPrepare2) {
 					// 地ならし
+					$island['prepare2'] = $island['prepare2'] ?? 0;
 					$island['prepare2']++;
 					// ターン消費せず
 					$returnMode = 0;
 				} else {
 					// 整地なら、埋蔵金の可能性あり
-					if($island['zin'][0] == 1) {
-						// ノーム所持時埋蔵金確率
-						$r = Util::random(500);
-					} else {
-						$r = Util::random(1000);
-					}
+					// ノーム所持時、確率増
+					$r = ($island['zin'][0] == 1) ? Util::random(500) : Util::random(1000);
 					if($r < $init->disMaizo) {
 						$v = 100 + Util::random(901);
 						$island['money'] += $v;
@@ -4682,9 +4676,12 @@ class Turn {
 		$island['landValue'] = $landValue;
 	}
 
-	//---------------------------------------------------
-	// 島全体
-	//---------------------------------------------------
+	/**
+	 * 島全体処理
+	 * @param  [type] $hako    [description]
+	 * @param  [type] &$island [description]
+	 * @return [type]          [description]
+	 */
 	function doIslandProcess($hako, &$island) {
 		global $init;
 
@@ -4712,16 +4709,12 @@ class Turn {
 		// 1: Sunny, 2: Cloudy, 3: Rainy, 4: Thunder, 5: Snow.
 		// Percent: 70, 15, 7, 5, 3.
 		if( isset($island['tenki']) ) {
-			if($island['tenki'] > 0) {
-				$rnd = Util::random(100);
-				$island['tenki'] = ($rnd < 70) ? 1
-					: ($rnd < 85) ? 2
-					: ($rnd < 92) ? 3
-					: ($rnd < 97) ? 4
-					: 5;
-			} else {
-				$island['tenki'] = 1;
-			}
+			$rnd = Util::random(100);
+			$island['tenki'] = ($rnd > 95) ? 5
+				: ($rnd > 92) ? 4
+				: ($rnd > 85) ? 3
+				: ($rnd > 70) ? 2
+				: 1;
 		}
 
 		// 日照り判定
@@ -5422,9 +5415,14 @@ class Turn {
 		$island['prize'] = "{$flags},{$monsters},{$turns}";
 	}
 
-	//---------------------------------------------------
-	// 周囲の町、農場があるか判定
-	//---------------------------------------------------
+	/**
+	 * 周囲に町、農場があるか判定
+	 * @param  [type] $land      [description]
+	 * @param  [type] $landValue [description]
+	 * @param  [type] $x         [description]
+	 * @param  [type] $y         [description]
+	 * @return boolean            [description]
+	 */
 	function countGrow($land, $landValue, $x, $y) {
 		global $init;
 
@@ -5851,9 +5849,15 @@ class Turn {
 		$island['seichi'] = 0;
 	}
 
-	//---------------------------------------------------
-	// 範囲内の地形を数える
-	//---------------------------------------------------
+	/**
+	 * 範囲内の指定した地形の数を求める
+	 * @param  [type] $land  [description]
+	 * @param  [type] $x     [description]
+	 * @param  [type] $y     [description]
+	 * @param  [type] $range [description]
+	 * @param  [type] $kind  [description]
+	 * @return [type]        [description]
+	 */
 	static function countAround($land, $x, $y, $range, $kind) {
 		global $init;
 

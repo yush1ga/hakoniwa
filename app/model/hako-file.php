@@ -5,9 +5,8 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-
 class File {
-	public $islandTurn;      // ターン数
+	public $islandTurn;      // 現在ターン数
 	public $islandLastTime;  // 最終更新時刻
 	public $islandNumber;    // 島の総数
 	public $islandNextID;    // 次に割り当てる島ID
@@ -22,10 +21,12 @@ class File {
 	public $ally;             // 各同盟の情報を格納
 	public $idToAllyNumber;
 
-	//---------------------------------------------------
-	// 全島データを読み込む
-	// 'mode'が変わる可能性があるので$cgiを参照で受け取る
-	//---------------------------------------------------
+	/**
+	 * 全島データを読み込む
+	 * 'mode'が変わる可能性があるので$cgiを参照で受け取る
+	 * @param  [type] &$cgi [description]
+	 * @return [type]       [description]
+	 */
 	function readIslandsFile(&$cgi) {
 		global $init;
 
@@ -71,9 +72,12 @@ class File {
 		}
 		return true;
 	}
-	//---------------------------------------------------
-	// 島ひとつ読み込む
-	//---------------------------------------------------
+	/**
+	 * datから島ひとつ分読み込む
+	 * @param  [type] $fp  [description]
+	 * @param  [type] $num [description]
+	 * @return [type]      [description]
+	 */
 	function readIsland($fp, $num) {
 		global $init;
 
@@ -214,9 +218,12 @@ class File {
 			'item'         => array(0 => $item0, 1 => $item1, 2 => $item2, 3 => $item3, 4 => $item4, 5 => $item5, 6 => $item6, 7 => $item7, 8 => $item8, 9 => $item9, 10 => $item10, 11 => $item11, 12 => $item12, 13 => $item13, 14 => $item14, 15 => $item15, 16 => $item16, 17 => $item17, 18 => $item18, 19 => $item19, 20 => $item20),
 		);
 	}
-	//---------------------------------------------------
-	// 地形を書き込む
-	//---------------------------------------------------
+	/**
+	 * 地形データの書込
+	 * @param  integer $num    島ID
+	 * @param  [type] $island [description]
+	 * @return [type]         [description]
+	 */
 	function writeLand($num, $island) {
 		global $init;
 		// 地形
@@ -253,9 +260,10 @@ class File {
 			fclose($fp_i);
 		}
 	}
-	//--------------------------------------------------
-	// 同盟データ読みこみ
-	//--------------------------------------------------
+	/**
+	 * 同盟データファイル読込み
+	 * @return [type] [description]
+	 */
 	function readAllyFile() {
 		global $init;
 
@@ -325,9 +333,11 @@ class File {
 			'message'    => $message,
 		);
 	}
-	//---------------------------------------------------
-	// 全島データを書き込む
-	//---------------------------------------------------
+	/**
+	 * 全島dat書込み
+	 * @param  integer $num [description]
+	 * @return [type]       [description]
+	 */
 	function writeIslandsFile($num = 0) {
 		global $init;
 
@@ -337,21 +347,33 @@ class File {
 			touch($fileName);
 		}
 		$fp = fopen($fileName, "w");
+
+		// グローバルデータ
 		fputs($fp, $this->islandTurn . "\n");
 		fputs($fp, $this->islandLastTime . "\n");
 		fputs($fp, $this->islandNumber . "," . $this->islandNumberBF . "," . $this->islandNumberKP . "\n");
 		fputs($fp, $this->islandNextID . "\n");
+
+		// 各島データ
 		for($i = 0; $i < $this->islandNumber; $i++) {
 			$this->writeIsland($fp, $num, $this->islands[$i]);
 		}
+
 		fclose($fp);
 		// chmod($fileName, 0666);
 	}
-	//---------------------------------------------------
-	// 島ひとつ書き込む
-	//---------------------------------------------------
+
+	/**
+	 * 島データひとつ分書込み
+	 * @param  [type] $fp     [description]
+	 * @param  [type] $num    [description]
+	 * @param  [type] $island [description]
+	 * @return [type]         [description]
+	 */
 	function writeIsland($fp, $num, $island) {
 		global $init;
+
+		var_dump($island['tenki']);
 
 		if ( !isset($island['ship']) ) {
 			for ($i=0; $i<=14; $i++) {
@@ -363,7 +385,7 @@ class File {
 		if ( !isset($island['eisei']) ) {
 			for ($i=0; $i<=5; $i++) {
 				if ( !isset($island['eisei'][$i]) ) {
-					$island['eisei'][$i] = "";
+					$island['eisei'][$i] = "0";
 				}
 			}
 		}
@@ -459,9 +481,11 @@ class File {
 			// chmod($fileName, 0666);
 		}
 	}
-	//---------------------------------------------------
-	// データのバックアップ
-	//---------------------------------------------------
+
+	/**
+	 * [deprecated] バックアップ
+	 * @return void
+	 */
 	function backUp() {
 		global $init;
 
@@ -491,73 +515,72 @@ class File {
 			rename("{$init->dirName}.bak0/hakojima.his", "{$init->dirName}/hakojima.his");
 		}
 	}
-	//---------------------------------------------------
-	// セーフモードバックアップ
-	//---------------------------------------------------
+
+	/**
+	 * セーフモードバックアップ（現在は標準でこちら）
+	 * @return void
+	 */
 	function safemode_backup() {
 		global $init;
 
 		try {
-			if ($init->backupTimes <= 0) {
+			// バックアップ未実施設定なら何もせず終了
+			if($init->backupTimes < 1) {
 				return;
 			}
-			for ($i = ($init->backupTimes - 1); $i >= 0; $i--) {
-				$from = $i - 1;
-				$dir;
-				$dir2;
-				if ($from >= 0) {
-					$dir2 = "./{$init->dirName}.bak{$from}";
-				} else {
-					$dir2 = "./{$init->dirName}";
-				}
-				// データディレクトリの中身を空にする
-				$to_del = "{$init->dirName}.bak{$i}";
-				if ( file_exists("{$to_del}/") ) {
-					$dir = opendir("{$to_del}/");
-				} else {
-					$dir = false;
-				}
+			for($i = ($init->backupTimes - 1); $i >= 0; $i--) {
+				$from = $i - 1; // [NOTE] 直近データにサフィックスが付かないことへの対応調整
+				$dirFp;
+				$dir_from = ($from >= 0) ? "./{$init->dirName}.bak{$from}" : "./{$init->dirName}"; // コピー元
+				$dir_to = "./{$init->dirName}.bak{$i}"; // コピー先
 
-				if ( $dir != false ) {
-					while ($fileName = readdir($dir)) {
-						if (!(strcmp($fileName, ".") == 0 || strcmp($fileName, "..") == 0))
-							unlink("{$to_del}/{$fileName}");
+				// コピー先ディレクトリの中身を（あれば）空にする
+				$dirFp = (file_exists("{$dir_to}/")) ? opendir("{$dir_to}/") : false;
+				if ($dirFp !== false) {
+					while (false !== ($fileName = readdir($dirFp))) {
+						if ($fileName != "." && $fileName != "..")
+							unlink("{$dir_to}/{$fileName}");
 					}
-					closedir($dir);
+					closedir($dirFp);
 				}
 
-				// データディレクトリを開く
-				if ( file_exists($dir2) ) {
-					$dir = opendir($dir2);
-				} else {
-					mkdir($dir2);
+				// データディレクトリを開く（なければ作る）：コピー元
+				if(!file_exists($dir_from)) {
+					mkdir($dir_from, $init->dirMode, true);
 				}
-				$dir = opendir($dir2);
+				// ：コピー先
+				if(!file_exists($dir_to)) {
+					mkdir($dir_to, $init->dirMode, true);
+				}
 
-				while ($copyFile = readdir($dir)) {
-					if (is_file("{$dir2}/{$copyFile}")) {
-						// コピー元
-						$from_copy = "{$dir2}/{$copyFile}";
-						// コピー先
-						$to_copy = "{$init->dirName}.bak{$i}/{$copyFile}";
-						// コピー実行
-						copy($from_copy, $to_copy);
+				// コピー実行
+				$dirFp = opendir($dir_from);
+				while(false !== ($copyFile = readdir($dirFp))) {
+					if(is_file("{$dir_from}/{$copyFile}")) {
+						$copy_from = "{$dir_from}/{$copyFile}";
+						$copy_to = "{$dir_to}/{$copyFile}";
+						copy($copy_from, $copy_to);
 					}
 				}
 			}
 		} catch (Exception $ex) {
+			if(DEBUG){
+				print_r($ex);
+			}
 			return;
 		}
 	}
 
-	//---------------------------------------------------
-	// 不要なディレクトリとファイルを削除
-	//---------------------------------------------------
+	/**
+	 * 不要なディレクトリとファイルを削除
+	 * @param  string $dirName Directory that to delete.
+	 * @return void
+	 */
 	function rmTree($dirName) {
 		if(is_dir("{$dirName}")) {
 			$dir = opendir("{$dirName}/");
-			while($fileName = readdir($dir)) {
-				if(!(strcmp($fileName, ".") == 0 || strcmp($fileName, "..") == 0)) {
+			while(false !== ($fileName = readdir($dir))) {
+				if($fileName != "." && $fileName != "..") {
 					unlink("{$dirName}/{$fileName}");
 				}
 			}
@@ -566,6 +589,11 @@ class File {
 		}
 	}
 
+	/**
+	 * プレゼント管理ファイル読込み
+	 * @param  boolean $erase 読込み後にファイルを削除するか
+	 * @return void
+	 */
 	function readPresentFile( $erase = false ) {
 		global $init;
 
@@ -579,12 +607,16 @@ class File {
 				$this->islands[$num]['present']['px'] = $px;
 				$this->islands[$num]['present']['py'] = $py;
 			}
-			if ( $erase ) {
+			if($erase) {
 				unlink($fileName);
 			}
 		}
 	}
 
+	/**
+	 * プレゼント管理ファイル書込み
+	 * @return void
+	 */
 	function writePresentFile() {
 		global $init;
 
@@ -648,11 +680,7 @@ class Hako extends File {
 				$this->defaultTarget = $id;
 			}
 
-			if($id == $select) {
-				$s = "selected";
-			} else {
-				$s = "";
-			}
+			$s = ($id == $select) ? "selected" : "";
 			if($init->allyUse) {
 				$list .= "<option value=\"$id\" $s>{$name}</option>\n"; // 同盟マークを追加
 			} else {
@@ -1689,7 +1717,7 @@ class HakoEdit extends File {
 }
 
 class HakoPresent extends File {
-	public $islandList;  // 島リスト
+	public $islandList; // 島リスト
 
 	function init($cgi) {
 		global $init;

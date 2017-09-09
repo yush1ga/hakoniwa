@@ -154,9 +154,11 @@ class Util {
 
 	/**
 	 * [0, num-1]の乱数生成
+	 * @param  integer $num 正の整数（通例２以上）
+	 * @return float   [0, $num-1]の範囲の実数
 	 */
 	static function random($num = 0) {
-		return ($num <= 1)? 0: mt_rand(0, $num - 1);
+		return ($num > 1)? mt_rand(0, $num - 1) : 0;
 	}
 
 	//---------------------------------------------------
@@ -307,8 +309,7 @@ class Util {
 	 * @param  arr     $ships 島データ内、船舶部分
 	 * @return boolean        災害船舶が1隻でも存在していたらtrue
 	 */
-	static function hasBadShip($ships)
-	{
+	static function hasBadShip($ships) {
 		global $init;
 		$arrSize    = count($ships);
 		$badShipsId = $init->shipKind;
@@ -353,12 +354,12 @@ class Util {
 
 	/**
 	 * アラートタグを出力する
-	 * @param  [type] $message [description]
+	 * @param  string $message [description]
 	 * @param  string $status  [description]
 	 * @return [type]          [description]
 	 */
 	static function makeTagMessage($message, $status = "success"){
-		echo '<div class="alert alert-'. $status .' role="alert">';
+		echo '<div class="alert alert-'. $status .'" role="alert">';
 		echo nl2br($message);
 		echo '</div>';
 	}
