@@ -373,8 +373,6 @@ class File {
 	function writeIsland($fp, $num, $island) {
 		global $init;
 
-		var_dump($island['tenki']);
-
 		if ( !isset($island['ship']) ) {
 			for ($i=0; $i<=14; $i++) {
 				if ( !isset($island['ship'][$i]) ) {

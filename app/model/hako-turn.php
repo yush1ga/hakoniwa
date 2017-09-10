@@ -78,35 +78,35 @@ class Turn {
 		}
 
 		// 固定費 収入・消費
-		for($i = 0; $i < $hako->islandNumber; $i++) {
+		foreach($order as $i) {
 			// 管理人預かり中の場合スキップ
-			if($hako->islands[$order[$i]]['keep']) {
+			if($hako->islands[$i]['keep']) {
 				continue;
 			}
-			$this->income($hako->islands[$order[$i]]);
+			$this->income($hako->islands[$i]);
 		}
 
 		// コマンド処理
-		for($i = 0; $i < $hako->islandNumber; $i++) {
+		foreach($order as $i) {
 			// 管理人預かり中の場合スキップ
-			if($hako->islands[$order[$i]]['keep']) {
+			if($hako->islands[$i]['keep']) {
 				continue;
 			}
 			// 戻り値1になるまで繰り返し
-			while($this->doCommand($hako, $hako->islands[$order[$i]]) == 0);
+			while($this->doCommand($hako, $hako->islands[$i]) == 0){};
 			// 整地ログ（出力をまとめる場合）
 			if($init->logOmit) {
-				$this->logMatome($hako->islands[$order[$i]]);
+				$this->logMatome($hako->islands[$i]);
 			}
 		}
 
 		// ヘックスごとの成長・災害処理
-		for($i = 0; $i < $hako->islandNumber; $i++) {
+		foreach($order as $i) {
 			// 管理人預かり中の場合スキップ
-			if($hako->islands[$order[$i]]['keep']) {
+			if($hako->islands[$i]['keep']) {
 				continue;
 			}
-			$this->doEachHex($hako, $hako->islands[$order[$i]]);
+			$this->doEachHex($hako, $hako->islands[$i]);
 		}
 
 		// 島全体処理
@@ -138,8 +138,8 @@ class Turn {
 				if(is_file("{$init->dirName}/island.{$tmpid}")) {
 					unlink("{$init->dirName}/island.{$tmpid}");
 				}
-				$hako->islands[$order[$i]] = $island;
 			}
+			$hako->islands[$order[$i]] = $island;
 		}
 
 		// 人口順にソート
@@ -4708,14 +4708,12 @@ class Turn {
 		// 天気判定
 		// 1: Sunny, 2: Cloudy, 3: Rainy, 4: Thunder, 5: Snow.
 		// Percent: 70, 15, 7, 5, 3.
-		if( isset($island['tenki']) ) {
-			$rnd = Util::random(100);
-			$island['tenki'] = ($rnd > 95) ? 5
-				: ($rnd > 92) ? 4
-				: ($rnd > 85) ? 3
-				: ($rnd > 70) ? 2
-				: 1;
-		}
+		$rnd = Util::random(100);
+		$island['tenki'] = ($rnd > 97) ? 5
+			: ($rnd > 92) ? 4
+			: ($rnd > 85) ? 3
+			: ($rnd > 70) ? 2
+			: 1;
 
 		// 日照り判定
 		if( isset($island['tenki']) ) {

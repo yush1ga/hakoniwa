@@ -168,7 +168,7 @@ class HtmlTop extends HTML {
 			}
 
 			$name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
-			$name = $island['absent'] == 0 ? "{$init->tagName_}{$name}{$init->_tagName}" : "{$init->tagName2_}{$name}({$island['absent']}){$init->_tagName2}";
+			$name = $island['absent'] == 0 ? $init->tagName_ . $name . $init->_tagName : $init->tagName2_ . $name . '(' .$island['absent'] . ')' .$init->_tagName2;
 
 			$owner = (!empty($island['owner']))? $island['owner']: 'annonymous';
 

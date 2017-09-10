@@ -6,7 +6,7 @@
  * @author sota_n <@sota_n>
  */
 
-require_once './hako-init-default.php';
+require_once './hako-init-default.php'; // InitDefault
 
 class Init extends InitDefault{
 	// 各種設定値
