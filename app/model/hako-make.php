@@ -5,12 +5,14 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-// turn.php
-
 class Make {
-	//---------------------------------------------------
-	// 島の新規作成モード
-	//---------------------------------------------------
+
+	/**
+	 * 島の新規作成モード
+	 * @param  [type] $hako [description]
+	 * @param  [type] $data [description]
+	 * @return [type]       [description]
+	 */
 	function newIsland($hako, $data) {
 		global $init;
 
@@ -23,7 +25,7 @@ class Make {
 			HakoError::newIslandNoName();
 			return;
 		}
-		// 名前が正当化チェック
+		// 島名バリデート
 		if(preg_match("/[,?()<>$]/", $data['ISLANDNAME']) || strcmp($data['ISLANDNAME'], "無人") == 0) {
 			HakoError::newIslandBadName();
 			return;
@@ -59,14 +61,15 @@ class Make {
 		}
 
 		// 各種の値を設定
+		$DAY = 86400; // the seconds of a day.
 		$island['name'] = htmlspecialchars($data['ISLANDNAME']);
 		$island['owner'] = htmlspecialchars($data['OWNERNAME']);
 		$island['id'] = $hako->islandNextID;
 		$hako->islandNextID++;
 		$island['starturn'] = $hako->islandTurn;
 		$island['isBF'] = $island['keep'] = 0;
-		$island['absent'] = $init->giveupTurn - (max(86400 / $init->unitTime, $init->unitTime / 86400));
-		$island['comment'] = '(未登録)';
+		$island['absent'] = $init->giveupTurn - (max($DAY / $init->unitTime, $init->unitTime / $DAY));
+		$island['comment'] = '（未登録）';
 		$island['comment_turn'] = $hako->islandTurn;
 		$island['password'] = Util::encode($data['PASSWORD']);
 		$island['tenki'] = 1;

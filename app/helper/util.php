@@ -5,22 +5,27 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-
 class Util {
-	//---------------------------------------------------
-	// 資金の表示
-	//---------------------------------------------------
+
+	/**
+	 * 資金を丸めて表示する
+	 * @param  integer $money 資金額
+	 * @return string         丸めた文字列
+	 */
 	static function aboutMoney($money = 0) {
 		global $init;
-
-		return    ((int)$init->moneyMode <= 0)? $money .$init->unitMoney
-				: ($money < (int)$init->moneyMode )? "推定{$init->moneyMode}{$init->unitMoney}未満"
-				: '推定'. round($money / (int)$init->moneyMode ) * (int)$init->moneyMode . $init->unitMoney;
+		$digit = (int)$init->moneyMode;
+		return ($digit <= 0)? $money .$init->unitMoney
+				: ($money < $digit )? "推定{$digit}{$init->unitMoney}未満"
+				: '推定'. round($money / $digit ) * $digit . $init->unitMoney;
 	}
 
-	//---------------------------------------------------
-	// 経験地からミサイル基地レベルを算出
-	//---------------------------------------------------
+	/**
+	 * 経験値からミサイル基地レベルを算出
+	 * @param  [type]  $kind ミサイル基地種別
+	 * @param  integer $exp  経験値
+	 * @return integer       対応した基地レベル値
+	 */
 	static function expToLevel($kind, $exp) {
 		global $init;
 
@@ -43,9 +48,11 @@ class Util {
 		}
 	}
 
-	//---------------------------------------------------
-	// 怪獣の種類・名前・体力を算出
-	//---------------------------------------------------
+	/**
+	 * 怪獣の種類・名前・体力を算出
+	 * @param  [type] $lv 地形メタデータ
+	 * @return [type]     [description]
+	 */
 	static function monsterSpec($lv) {
 		global $init;
 
@@ -57,9 +64,13 @@ class Util {
 		$hp = $lv % 100;
 		return array( 'kind' => $kind, 'name' => $name, 'hp' => $hp );
 	}
-	//---------------------------------------------------
-	// 島の名前から番号を算出
-	//---------------------------------------------------
+
+	/**
+	 * 島の名前から番号を算出
+	 * @param  [type] $hako [description]
+	 * @param  [type] $name [description]
+	 * @return [type]       [description]
+	 */
 	static function  nameToNumber($hako, $name) {
 		// 全島から探す
 		for($i = 0; $i < $hako->islandNumber; $i++) {
@@ -104,8 +115,8 @@ class Util {
 		if(empty($p2)) {
 			return false;
 		}
-		if(file_exists("{$init->passwordFile}")) {
-			$fp = fopen("{$init->passwordFile}", "r");
+		if(file_exists($init->passwordFile)) {
+			$fp = fopen($init->passwordFile, "r");
 			$masterPassword = chop(fgets($fp, READ_LINE));
 			fclose($fp);
 		}
@@ -132,8 +143,8 @@ class Util {
 		if(empty($p)) {
 			return false;
 		}
-		if(file_exists("{$init->passwordFile}")) {
-			$fp = fopen("{$init->passwordFile}", "r");
+		if(file_exists($init->passwordFile)) {
+			$fp = fopen($init->passwordFile, "r");
 			$masterPassword = chop(fgets($fp, READ_LINE));
 			$specialPassword = chop(fgets($fp, READ_LINE));
 			fclose($fp);
@@ -169,12 +180,12 @@ class Util {
 
 		$rx = $ry = array();
 		for($i = 0; $i < $init->islandSize; $i++)
-		for($j = 0; $j < $init->islandSize; $j++)
-		$rx[$i * $init->islandSize + $j] = $j;
+			for($j = 0; $j < $init->islandSize; $j++)
+				$rx[$i * $init->islandSize + $j] = $j;
 
 		for($i = 0; $i < $init->islandSize; $i++)
-		for($j = 0; $j < $init->islandSize; $j++)
-		$ry[$j * $init->islandSize + $i] = $j;
+			for($j = 0; $j < $init->islandSize; $j++)
+				$ry[$j * $init->islandSize + $i] = $j;
 
 		for($i = $init->pointNumber; --$i;) {
 			$j = Util::random($i + 1);
@@ -317,7 +328,7 @@ class Util {
 		for ($i=$badShipsId; $i < $arrSize; $i++) {
 			$badShips++;
 		}
-		return ($badShips!==0)? true: false;
+		return ($badShips!=0)? true: false;
 	}
 
 	/**
@@ -326,7 +337,7 @@ class Util {
 	static function lock() {
 		global $init;
 
-		$fp = fopen("{$init->dirName}/lock.dat", "w");
+		$fp = fopen($init->dirName."/lock.dat", "w");
 
 		for($count = 0; $count < LOCK_RETRY_COUNT; $count++) {
 			if(flock($fp, LOCK_EX)) {
@@ -343,9 +354,11 @@ class Util {
 		return FALSE;
 	}
 
-	//---------------------------------------------------
-	// ファイルをアンロックする
-	//---------------------------------------------------
+	/**
+	 * ファイルをアンロックする
+	 * @param  [type] $fp [description]
+	 * @return void
+	 */
 	static function unlock($fp) {
 		fflush($fp);
 		flock($fp, LOCK_UN);

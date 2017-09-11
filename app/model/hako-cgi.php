@@ -5,14 +5,14 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-
 class Cgi {
 	public $mode = "";
 	public $dataSet = array();
 
-	//---------------------------------------------------
-	// POST、GETのデータを取得
-	//---------------------------------------------------
+	/**
+	 * POST、GETのデータを取得
+	 * @return [type] [description]
+	 */
 	function parseInputData() {
 		global $init;
 
@@ -20,7 +20,7 @@ class Cgi {
 
 		if(!empty($_POST)) {
 			while(list($name, $value) = each($_POST)) {
-				$this->dataSet["{$name}"] = str_replace(",", "", $value);
+				$this->dataSet[$name] = str_replace(",", "", $value);
 			}
 		}
 
@@ -101,11 +101,11 @@ class Cgi {
 		}
 	}
 
-	//---------------------------------------------------
-	// COOKIEを生成
-	//---------------------------------------------------
+	/**
+	 * COOKIEを生成
+	 */
 	function setCookies() {
-		$time = $_SERVER['REQUEST_TIME'] + 30 * 86400; // 現在 + 30日有効
+		$time = $_SERVER['REQUEST_TIME'] + 14 * 86400; // 現在から14日間有効
 
 		// Cookieの設定 & POSTで入力されたデータで、Cookieから取得したデータを更新
 		if( isset($this->dataSet['ISLANDID']) && $this->mode == "owner") {

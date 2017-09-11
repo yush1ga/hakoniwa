@@ -1,26 +1,26 @@
 <?php
+require_once 'config.php';
+
+require_once APPPATH.'/model/hako-log.php';
+require_once APPPATH.'/model/hako-make.php';
+
 /**
  * 箱庭諸島 S.E - ターン更新用ファイル -
  * @copyright 箱庭諸島 ver2.30
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-
-require_once 'config.php';
-
-require_once APPPATH.'/model/hako-log.php';
-require_once APPPATH.'/model/hako-make.php';
-
 class Turn {
 	public $log;
 	public $rpx;
 	public $rpy;
 
 	/**
-	 * ターン進行モード
+	 * ターン進行
 	 *
-	 * 最終更新時刻の更新→ ログファイル更新準備→ 支出計算→
-	 *   コマンド処理→
+	 * 最終更新時刻の更新→ ログファイル更新準備→ 収支計算→
+	 *   コマンド処理→ 島処理（座標個別）→ 島処理（全体）→
+	 *
 	 *
 	 * @param  [type] &$hako ゲームデータ管理オブジェクト
 	 * @param  [type] $data  [description]
@@ -51,17 +51,17 @@ class Turn {
 		// プレゼントファイルを読み込む
 		$hako->readPresentFile(true);
 
-		// 座標配列を作る
+		// 座標のランダム配列を作る
 		$randomPoint = Util::makeRandomPointArray();
 		$this->rpx = $randomPoint[0];
 		$this->rpy = $randomPoint[1];
 
-		// 順番決め
+		// 島更新の順番決め
 		$order = Util::randomArray($hako->islandNumber);
 
 		// 船舶初期化
 		foreach($order as $i) {
-			$this->shipcounter($hako, $hako->islands[$i]);
+			$this->shipcounter($hako->islands[$i]);
 		}
 
 		// ターン差分計算のため、更新前の人口、資金、食料、ポイント情報を取得
@@ -109,17 +109,15 @@ class Turn {
 			$this->doEachHex($hako, $hako->islands[$i]);
 		}
 
-		// 島全体処理
-
 		// 残存判定のために現在の島数を一時保存
 		$remainNumber = $hako->islandNumber;
 
-		for($i = 0; $i < $hako->islandNumber; $i++) {
+		foreach($order as $i) {
 			// 管理人預かり中の場合スキップ
-			if($hako->islands[$order[$i]]['keep']) {
-				continue;
-			}
-			$island = $hako->islands[$order[$i]];
+			if($hako->islands[$i]['keep']) continue;
+
+			// 島全体処理
+			$island = $hako->islands[$i];
 			$this->doIslandProcess($hako, $island);
 
 			// 島滅亡判定
@@ -135,11 +133,11 @@ class Turn {
 
 				$tmpid = $island['id'];
 				$remainNumber--;
-				if(is_file("{$init->dirName}/island.{$tmpid}")) {
-					unlink("{$init->dirName}/island.{$tmpid}");
+				if(is_file($init->dirName."/island.{$tmpid}")) {
+					unlink($init->dirName."/island.{$tmpid}");
 				}
 			}
-			$hako->islands[$order[$i]] = $island;
+			$hako->islands[$i] = $island;
 		}
 
 		// 人口順にソート
@@ -148,24 +146,24 @@ class Turn {
 		// ターン杯対象ターンだったら、その処理
 		if(($hako->islandTurn % $init->turnPrizeUnit) == 0) {
 			$island = $hako->islands[0];
-			$this->log->prize($island['id'], $island['name'], "{$hako->islandTurn}{$init->prizeName[0]}");
-			$hako->islands[0]['prize'] .= "{$hako->islandTurn},";
+			$this->log->prize($island['id'], $island['name'], $hako->islandTurn.$init->prizeName[0]);
+			$hako->islands[0]['prize'] .= $hako->islandTurn.",";
 		}
 		// 残存島数更新
 		$hako->islandNumber = $remainNumber;
 
 		// 船舶初期化
-		for($i = 0; $i < $hako->islandNumber; $i++) {
-			$this->shipcounter($hako, $hako->islands[$order[$i]]);
+		foreach($order as $i) {
+			$this->shipcounter($hako->islands[$i]);
 		}
 
 		// 点数・各種人数等計算
-		for($i = 0; $i < $hako->islandNumber; $i++) {
-			$this->estimate($hako, $hako->islands[$order[$i]]);
+		foreach($order as $i) {
+			$this->estimate($hako, $hako->islands[$i]);
 		}
 
 		// バックアップ実行 ターン判定・処理
-		if($hako->islandTurn % $init->backupTurn === 0) {
+		if($hako->islandTurn % $init->backupTurn == 0) {
 			if($init->safemode) {
 				$hako->safemode_backup();
 			} else {
@@ -189,7 +187,7 @@ class Turn {
 	function logMatome($island) {
 		global $init;
 
-		$sno = $island['seichi'];
+		$sno = (int)$island['seichi'];
 		$point = "";
 		if($sno > 0) {
 			if($init->logOmit == 1) {
@@ -248,7 +246,6 @@ class Turn {
 		$prize     = &$island['prize'];
 
 		if($kind == $init->comDoNothing) {
-			//$this->log->doNothing($id, $name, $comName);
 			if($island['isBF'] == 1) {
 				$island['money'] = $init->maxMoney;
 				$island['food'] = $init->maxFood;
@@ -270,12 +267,13 @@ class Turn {
 				return 1;
 			}
 		}
+
 		$island['command'] = $comArray;
 		$island['absent']  = 0;
 
 		// コストチェック
 		if($cost > 0) {
-			// 金の場合
+			// 資金の場合
 			if($island['money'] < $cost) {
 				$this->log->noMoney($id, $name, $comName);
 				return 0;
@@ -509,29 +507,28 @@ class Turn {
 				if(($landKind == $init->landSea) && ($lv == 0)) {
 					// 海なら、油田探し
 					// 投資額決定
-					if($arg == 0) {
-						$arg = 1;
-					}
+					$arg = $arg != 0 ?: 1;
 					$value = min($arg * ($cost), $island['money']);
-					$str = "{$value}{$init->unitMoney}";
+					$str = $value . $init->unitMoney;
 					$p = round($value / $cost);
 					$island['money'] -= $value;
 
 					// 油田見つかるか判定
 					if($p > Util::random(100)) {
-						// 油田見つかる
+						// 見つかる
 						$this->log->oilFound($id, $name, $point, $comName, $str);
 						$island['oil']++;
 						$land[$x][$y] = $init->landOil;
 						$landValue[$x][$y] = 0;
 					} else {
-						// 無駄撃ちに終わる
+						// 見つからない
 						$this->log->oilFail($id, $name, $point, $comName, $str);
 					}
 					$returnMode = 1;
 					break;
 				}
-				// 目的の場所を海にする。山なら荒地に。浅瀬なら海に。
+				// 対象の標高レベルを１下げる
+				// [NOTE] 山 ＞ 各種土地 ＞ 浅瀬 ＞ 海
 				if($landKind == $init->landMountain) {
 					$land[$x][$y] = $init->landWaste;
 					$landValue[$x][$y] = 0;
@@ -583,8 +580,8 @@ class Turn {
 						$this->log->ZinFound($id, $name, $comName, 'ウィスプ');
 					}
 				}
+				// 木材最大値を超えた場合、売却金を得る
 				if($island['item'][20] >= $init->maxWood) {
-					// 木材最大値を超えた場合、売却金を得る
 					$island['money'] += $init->treeValue * $lv;
 				} else {
 					// 木材を得る
@@ -597,8 +594,8 @@ class Turn {
 				$returnMode = 1;
 				break;
 
+			// 砂浜整備
 			case $init->comSeaSide:
-				// 砂浜整備
 				if(($landKind == $init->landSea) && ($lv != 1)) {
 					// 浅瀬以外は整備できない
 					$this->log->landFail($id, $name, $comName, $landName, $point);
@@ -5614,13 +5611,14 @@ class Turn {
 		if($island['food'] < 0) $island['food']  = 0 ;
 	}
 
-	//---------------------------------------------------
-	// 船舶数初期化
-	//---------------------------------------------------
-	function shipcounter($hako, &$island) {
+	/**
+	 * 船舶数初期化
+	 * @param  [type] &$island [description]
+	 * @return void
+	 */
+	function shipcounter(&$island) {
 		global $init;
 
-		// 船舶数初期化
 		for($i = 0, $c=count($init->shipName); $i < $c; $i++) {
 			$island['ship'][$i] = 0;
 		}

@@ -5,6 +5,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 
+
 function _dirName($path, $levels = 1) {
 	if(phpversion()<7){
 		while ($levels--) {
@@ -15,6 +16,7 @@ function _dirName($path, $levels = 1) {
 		return dirname($path,$levels);
 	}
 }
+
 require_once realpath(_dirName(__FILE__,3)).DIRECTORY_SEPARATOR.'config.php';
 
 $init = new Init();
