@@ -2,7 +2,7 @@
 	<h2>島の名前とパスワードの変更</h2>
 
 	<p class="alert alert-info" role="alert">
-		(注意) 名前の変更には<?= $init->costChangeName ?><?= $init->unitMoney ?>かかります。
+		(注意) 名前の変更には<?= $init->costChangeName . $init->unitMoney ?>かかります。
 	</p>
 
 	<form action="<?= $this_file ?>" method="post">

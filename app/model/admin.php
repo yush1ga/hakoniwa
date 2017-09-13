@@ -1,9 +1,8 @@
 <?php
 /**
  * 箱庭諸島 S.E
- * @author hiro <@hiro0218>
+ * @author Sotalbireo
  */
-
 class Admin {
 	public $mode;
 	public $dataSet = array();
@@ -21,12 +20,12 @@ class Admin {
 	function passCheck() {
 		global $init;
 
-		if(file_exists("{$init->passwordFile}")) {
-			$fp = fopen("{$init->passwordFile}", "r");
+		if(file_exists($init->passwordFile)) {
+			$fp = fopen($init->passwordFile, "r");
 			$masterPassword = chop(fgets($fp, READ_LINE));
 			fclose($fp);
 		}
-		if ( !isset($this->dataSet['PASSWORD']) ) {
+		if( !isset($this->dataSet['PASSWORD']) ) {
 			HakoError::wrongPassword();
 			return 0;
 		}

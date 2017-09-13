@@ -1,9 +1,9 @@
 <div id="HistoryLog">
-	<h2>歴史</h2>
+	<h2>History</h2>
 	<ul class="list-unstyled">
-		<?php
-			$log = new Log();
-			$log->historyPrint();
+	<?php
+		$log = new Log();
+		$log->historyPrint();
 	?>
 	</ul>
 </div>
