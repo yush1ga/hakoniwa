@@ -139,9 +139,9 @@ END;
 			return;
 		}
 
-		echo "<h1 class=\"title\">マップ・エディタ</h1>\n";
 		echo <<<END
-<h2 class='Turn'>ターン$hako->islandTurn</h2>
+<h1 class="title">マップ・エディタ</h1>
+<h2 class="Turn">ターン$hako->islandTurn</h2>
 <hr>
 <div ID="IslandView">
 <h2>諸島の状況</h2>
@@ -178,22 +178,14 @@ END;
 			if($island['monster'] > 0) {
 				$monster = "<strong class=\"monster\">[怪獣{$island['monster']}体]</strong>";
 			}
-			$name = "";
-			if($island['absent'] == 0) {
-				$name = "{$init->tagName_}{$island['name']}{$init->nameSuffix}{$init->_tagName}";
-			} else {
-				$name = "{$init->tagName2_}{$island['name']}{$init->nameSuffix}({$island['absent']}){$init->_tagName2}";
-			}
-			if(!empty($island['owner'])) {
-				$owner = $island['owner'];
-			} else {
-				$owner = "コメント";
-			}
+			$name = ($island['absent'] == 0) ? "{$init->tagName_}{$island['name']}{$init->nameSuffix}{$init->_tagName}" : "{$init->tagName2_}{$island['name']}{$init->nameSuffix}({$island['absent']}){$init->_tagName2}";
+			$owner = $island['owner'] ?? "コメント";
+
 			if($hako->islandNumber - $i == $hako->islandNumberBF) {
 				echo "</table>\n</div>\n";
-				echo "<BR>\n";
+				echo "<br>\n";
 				echo "<hr>\n\n";
-				echo "<div ID=\"IslandView\">\n";
+				echo "<div id=\"IslandView\">\n";
 				echo "<h2>Battle Fieldの状況</h2>\n";
 
 				echo <<<END
@@ -235,15 +227,18 @@ END;
 		}
 		echo "</table>\n</div>\n";
 	}
-	//---------------------------------------------------
-	// マップエディタの表示
-	//---------------------------------------------------
+
+	/**
+	 * マップエディタの表示
+	 * @param  [type] $hako [description]
+	 * @param  [type] $data [description]
+	 * @return [type]       [description]
+	 */
 	function editMap($hako, $data) {
 		global $init;
 
 		// パスワード
 		if(!Util::checkPassword("", $data['PASSWORD'])) {
-			// password間違い
 			HakoError::wrongPassword();
 			return;
 		}
@@ -482,11 +477,10 @@ END;
 </div>
 
 <ul>
-	<li>登録するときは十分注意願います。
-	<li>データを破壊する場合があります。
-	<li>バックアップを行ってから<br>行う様にしましょう。
-	<li>地形データを変更するのみで、<br>他のデータは変更されません。<br>
-	ターン更新で他のデータへ反映されます。
+	<li>登録するときは十分注意願います。</li>
+	<li>データを破壊する場合があります。</li>
+	<li>バックアップを行ってから行う様にしましょう。</li>
+	<li>地形データを変更するのみで、他のデータは変更されません。<br>ターン更新で他のデータへ反映されます。</li>
 </ul>
 
 </td>
@@ -496,15 +490,17 @@ END;
 END;
 	}
 
-	//---------------------------------------------------
-	// 地形の登録
-	//---------------------------------------------------
+	/**
+	 * 地形の登録
+	 * @param  [type] $hako [description]
+	 * @param  [type] $data [description]
+	 * @return [type]       [description]
+	 */
 	function register($hako, $data) {
 		global $init;
 
 		// パスワード
 		if(!Util::checkPassword("", $data['PASSWORD'])) {
-			// password間違い
 			HakoError::wrongPassword();
 			return;
 		}
