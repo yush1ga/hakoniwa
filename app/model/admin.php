@@ -3,38 +3,40 @@
  * 箱庭諸島 S.E
  * @author Sotalbireo
  */
-class Admin {
-	public $mode;
-	public $dataSet = array();
+class Admin
+{
+    public $mode;
+    public $dataSet = array();
 
-	function parseInputData() {
-		$this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
+    public function parseInputData()
+    {
+        $this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
 
-		if(!empty($_POST)) {
-			while(list($name, $value) = each($_POST)) {
-				$this->dataSet["{$name}"] = str_replace(",", "", $value);
-			}
-		}
-	}
+        if (!empty($_POST)) {
+            while (list($name, $value) = each($_POST)) {
+                $this->dataSet["{$name}"] = str_replace(",", "", $value);
+            }
+        }
+    }
 
-	function passCheck() {
-		global $init;
+    public function passCheck()
+    {
+        global $init;
 
-		if(file_exists($init->passwordFile)) {
-			$fp = fopen($init->passwordFile, "r");
-			$masterPassword = chop(fgets($fp, READ_LINE));
-			fclose($fp);
-		}
-		if( !isset($this->dataSet['PASSWORD']) ) {
-			HakoError::wrongPassword();
-			return 0;
-		}
-		if(strcmp(crypt($this->dataSet['PASSWORD'], 'ma'), $masterPassword) === 0) {
-			return 1;
-		} else {
-			HakoError::wrongPassword();
-			return 0;
-		}
-
-	}
+        if (file_exists($init->passwordFile)) {
+            $fp = fopen($init->passwordFile, "r");
+            $masterPassword = chop(fgets($fp, READ_LINE));
+            fclose($fp);
+        }
+        if (!isset($this->dataSet['PASSWORD'])) {
+            HakoError::wrongPassword();
+            return 0;
+        }
+        if (strcmp(crypt($this->dataSet['PASSWORD'], 'ma'), $masterPassword) === 0) {
+            return 1;
+        } else {
+            HakoError::wrongPassword();
+            return 0;
+        }
+    }
 }

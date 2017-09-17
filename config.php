@@ -20,12 +20,12 @@ define("READ_LINE", 1024);
 
 
 // 開発用の設定
-if(DEBUG) {
-	ini_set('display_errors', 1);
-	set_time_limit(0);
-	error_reporting(E_ALL);
-	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");   // 過去の日付
+if (DEBUG) {
+    ini_set('display_errors', 1);
+    set_time_limit(0);
+    error_reporting(E_ALL);
+    header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+    header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");   // 過去の日付
 }
 
 
