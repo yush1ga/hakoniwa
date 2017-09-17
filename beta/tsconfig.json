@@ -1,32 +1,34 @@
 {
     "compilerOptions": {
         "allowJs": true,
+        "alwaysStrict": true,
         "experimentalDecorators": true,
         "forceConsistentCasingInFileNames": true,
-        "jsx": "preserve",
         "lib": [
             "dom",
             "es2017"
         ],
-        "listFiles": true,
+        "listEmittedFiles": true,
+        "listFiles": false,
+        "newLine": "lf",
         "noEmitOnError": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": "assets/js/",
         "preserveConstEnums": true,
-        "pretty": true,
+        "pretty": false,
         "removeComments": true,
         "strictNullChecks": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "target": "es6"
     },
     "include": [
-        "/src/**/pages.ts"
+        "src/**/*.ts"
     ],
     "exclude": [
-        "node_modules/"
+        "node_modules/",
+        "**/,*.ts"
     ]
 }

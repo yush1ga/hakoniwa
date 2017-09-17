@@ -4,25 +4,20 @@
 	<meta charset="utf-8">
 	<meta>
 	<title></title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css" integrity="sha256-/Z28yXtfBv/6/alw+yZuODgTbKZm86IKbPE/5kjO/xY=" crossorigin="anonymous" />
+	<script src="../../beta/src/axes.js"></script>
 </head>
 <body>
 
-<section class="container">
-<h1>Access Log Viewer</h1>
-<table id="LogView" class="table table-sm table-hover">
-<thead class="thead-default"><tr><th colspan="6"><button id="ResetFilter" class="btn btn-sm btn-block btn-warning">Reset Filter</button></th></tr>
-<tr><th id="date">日付</th><th>時間</th><th id="islId">島ID</th><th id="islName">島名</th><th id="deptIp">接続元IP</th><th id="deptName">接続元名</th></tr></thead>
-<tbody></tbody>
-</table>
-<script type="text/x-template" id="LogTemplate">
-	<tr><th scope="row" data-name="dateAt" class="logFilter"><%= date %></th><td><%- time %></td><td class="logFilter" data-name="islId"><%- islId %></td><td class="logFilter"><%- islName %></td><td class="logFilter"><%- deptIp %></td><td class="logFilter"><%- deptName %></td></tr>
-</script>
+<section class="ui container">
+	<h1 class="ui dividing huge header">Access Log Viewer</h1>
+	<table id="LogView" class="ui fixed single line compact table">
+		<thead>
+			<tr><th colspan="6"><button id="ResetFilter" class="btn btn-sm btn-block btn-warning">Reset Filter</button></th></tr>
+			<tr><th id="date">日付</th><th>時間</th><th id="islId">島ID</th><th id="islName">島名</th><th id="deptIp">接続元IP</th><th id="deptName">接続元名</th></tr></thead>
+		<tbody></tbody>
+	</table>
 </section>
 
-<script src="../../node_modules/jquery/dist/jquery.min.js"></script>
-<script src="../../node_modules/underscore/underscore-min.js"></script>
-<script src="../../node_modules/backbone/backbone-min.js"></script>
-<script src="page.js"></script>
 </body>
 </html>
