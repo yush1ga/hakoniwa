@@ -6,3 +6,7 @@ sftp-config.json
 node_modules/
 /beta/**/*.js
 *.js.map
+
+Solution1/
+
+\.vs/

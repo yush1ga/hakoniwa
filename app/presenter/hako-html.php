@@ -2025,13 +2025,18 @@ END;
 
 class HtmlAdmin extends HTML
 {
-    public function enter()
+    public function render()
     {
         global $init;
 
-        $urllist  = array( ini_get('safe_mode') ? '/hako-mente-safemode.php' : '/hako-mente.php', '/hako-axes.php', '/hako-keep.php', '/hako-present.php', '/hako-edit.php', '/hako-bf.php');
-        $menulist = array('データ管理','アクセスログ閲覧','島預かり管理','プレゼント','マップエディタ','BattleField管理');
-
+        $menuList  = [
+            'データ管理'       => '/hako-mente.php',
+            'アクセスログ閲覧' => '/hako-axes.php',
+            '島預かり管理'     => '/hako-keep.php',
+            'プレゼント'       => '/hako-present.php',
+            'マップエディタ'   => '/hako-edit.php',
+            'BF管理'           => '/hako-bf.php'
+        ];
         require_once(VIEWS.'/admin/top.php');
     }
 }

@@ -5,6 +5,7 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
+namespace Hakoniwa;
 
 require_once 'config.php';
 require_once MODELPATH.'/hako-cgi.php';
@@ -12,5 +13,4 @@ require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/index.php';
 
 $init  = new Init();
-$start = new Admin();
-$start->execute();
+$exec = new Admin\Main();

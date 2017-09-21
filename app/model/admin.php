@@ -10,7 +10,7 @@ class Admin
 
     public function parseInputData()
     {
-        $this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
+        $this->mode = $_POST['mode'] ?? "";
 
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {
