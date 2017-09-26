@@ -14,7 +14,7 @@ class Admin
 
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {
-                $this->dataSet["{$name}"] = str_replace(",", "", $value);
+                $this->dataSet[$name] = str_replace(",", "", $value);
             }
         }
     }

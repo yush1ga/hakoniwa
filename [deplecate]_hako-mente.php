@@ -2,10 +2,7 @@
 namespace Hakoniwa\Admin;
 
 /**
- * Re:箱庭諸島SE - メンテナンス用ファイル -
- * @copyright 箱庭諸島 ver2.30
- * @since 箱庭諸島 S.E ver23_r09 by SERA
- * @author hiro <@hiro0218>
+ * Re:箱庭諸島SE バックアップモジュール
  */
 
 require_once 'config.php';

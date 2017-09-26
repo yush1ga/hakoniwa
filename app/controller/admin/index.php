@@ -9,8 +9,8 @@ class Main
 {
     public function __construct()
     {
-        $html = new HtmlAdmin();
-        $cgi  = new Cgi();
+        $html = new \HtmlAdmin();
+        $cgi  = new \Cgi();
 
         $cgi->getCookies();
         $html->header();

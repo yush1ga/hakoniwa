@@ -439,7 +439,7 @@ class Util
      * @param  boolean $withGet [description]
      * @return [type]           [description]
      */
-    public static function parsePostData(boolean $withGet=false)
+    public static function parsePostData($withGet=false)
     {
         global $init;
 

@@ -2056,7 +2056,7 @@ class HtmlPresent extends HTML
         require_once(VIEWS.'/admin/present/main.php');
     }
 }
-
+/**
 class HtmlMente extends HTML
 {
     public function enter()
@@ -2177,36 +2177,36 @@ END;
         }
     }
 }
-
-class HtmlMenteSafe extends HTML
+**/
+class HtmlMente extends HTML
 {
     public function enter()
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-mente-safemode.php";
+        $this_file = $init->baseDir.DIRECTORY_SEPARATOR."hako-mente.php";
 
-        echo "<h1 class=\"title\">メンテナンスツール</h1>";
-        if (file_exists("{$init->passwordFile}")) {
+        echo '<h1 class="title">メンテナンスツール</h1>';
+        if (file_exists($init->passwordFile)) {
             echo <<<END
 <form action="{$this_file}" method="post">
-<strong>パスワード：</strong>
-<input type="password" size="32" maxlength="32" name="PASSWORD">
+<label>パスワード：<input type="password" size="64" maxlength="64" name="PASSWORD"></label>
 <input type="hidden" name="mode" value="enter">
-<input type="submit" value="メンテナンス">
+<input type="submit" value="ログイン">
 END;
         } else {
             echo <<<END
 <form action="{$this_file}" method="post">
-<H2>マスタパスワードと特殊パスワードを決めてください。</H2>
-<P>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</P>
-<B>マスタパスワード：</B><BR>
-(1) <INPUT type="password" name="MPASS1" value="$mpass1">&nbsp;&nbsp;(2) <INPUT type="password" name="MPASS2" value="$mpass2"><BR>
-<BR>
-<B>特殊パスワード：</B><BR>
-(1) <INPUT type="password" name="SPASS1" value="$spass1">&nbsp;&nbsp;(2) <INPUT type="password" name="SPASS2" value="$spass2"><BR>
-<BR>
+<h2>マスタパスワードと特殊パスワードを決めてください。</h2>
+<p>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
+
+<h3>マスタパスワード：</h3>
+<label>(1) <input type="password" name="MPASS1" value="$mpass1"></label>&nbsp;&nbsp;<label>(2) <input type="password" name="MPASS2" value="$mpass2"></label>
+
+<h3>特殊パスワード：</h3>
+<label>(1) <input type="password" name="SPASS1" value="$spass1"></label>&nbsp;&nbsp;<label>(2) <input type="password" name="SPASS2" value="$spass2"></label>
+
 <input type="hidden" name="mode" value="setup">
-<INPUT type="submit" value="パスワードを設定する">
+<input type="submit" value="パスワードを設定する">
 END;
         }
         echo "</form>\n";
@@ -2215,22 +2215,22 @@ END;
     public function main($data)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-mente-safemode.php";
+        $this_file = $init->baseDir.DIRECTORY_SEPARATOR."hako-mente.php";
 
-        echo "<h1 class=\"title\">{$init->title}<br>メンテナンスツール</h1>\n";
+        echo '<h1 class="title">'.$init->title.'<small>メンテナンスツール</small></h1>'.PHP_EOL;
         // データ保存用ディレクトリの存在チェック
-        if (!is_dir("{$init->dirName}")) {
+        if (!is_dir($init->dirName)) {
             echo "{$init->tagBig_}データ保存用のディレクトリが存在しません{$init->_tagBig}";
             HTML::footer();
             exit();
         }
         // データ保存用ディレクトリのパーミッションチェック
-        if (!is_writeable("{$init->dirName}") || !is_readable("{$init->dirName}")) {
+        if (!is_writeable($init->dirName) || !is_readable($init->dirName)) {
             echo "{$init->tagBig_}データ保存用のディレクトリのパーミッションが不正です。パーミッションを0777等の値に設定してください。{$init->_tagBig}";
             HTML::footer();
             exit();
         }
-        if (is_file("{$init->dirName}/hakojima.dat")) {
+        if (is_file($init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat')) {
             $this->dataPrint($data);
         } else {
             echo "<hr>\n";
@@ -2241,7 +2241,7 @@ END;
             echo "</form>\n";
         }
         // バックアップデータ
-        $dir = opendir("./");
+        $dir = opendir('.'.DIRECTORY_SEPARATOR);
         while ($dn = readdir($dir)) {
             $_dirName = preg_quote($init->dirName, "/");
             if (preg_match("/{$_dirName}\.bak(.*)$/", $dn, $suf)) {
@@ -2257,11 +2257,11 @@ END;
     public function dataPrint($data, $suf = "")
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-mente-safemode.php";
+        $this_file = $init->baseDir.DIRECTORY_SEPARATOR."hako-mente.php";
 
-        echo "<HR>";
+        echo "<hr>";
         if (strcmp($suf, "") == 0) {
-            $fp = fopen("{$init->dirName}/hakojima.dat", "r");
+            $fp = fopen($init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat', "r");
             echo "<h2>現役データ</h2>\n";
         } else {
             $fp = fopen("{$init->dirName}.bak{$suf}/hakojima.dat", "r");
@@ -2274,8 +2274,8 @@ END;
 
         echo <<<END
 <strong>ターン$lastTurn</strong><br>
-<strong>最終更新時間</strong>:$timeString<br>
-<strong>最終更新時間（秒数表示）</strong>:1970年1月1日から$lastTime 秒<br>
+<strong>最終更新時間</strong>: $timeString<br>
+<!--<strong>最終更新時間（秒数表示）</strong>:1970年1月1日から$lastTime 秒<br>-->
 <form action="{$this_file}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="DELETE">

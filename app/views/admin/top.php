@@ -1,13 +1,5 @@
-<script>
-function go(obj) {
-    if(obj.menulist.value) {
-        obj.action = obj.menulist.value;
-    }
-}
-</script>
-
 <h1>管理画面</h1>
-<form method="post" onSubmit="go(this)">
+<form method="post" onSubmit="return (function(f,v){if(v){f.action=v;return !0;}else{return !1;}})(this,this.menulist.value);">
     <b>パスワード：</b>
     <input type="password" size="32" maxlength="32" name="PASSWORD">
     <input type="hidden" name="mode" value="enter">

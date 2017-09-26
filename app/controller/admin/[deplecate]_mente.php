@@ -23,13 +23,6 @@ class Mente extends Admin
                 $html->main($this->dataSet);
                 break;
 
-            case "CURRENT":
-                if ($this->passCheck()) {
-                    $this->currentMode($this->dataSet['NUMBER']);
-                }
-                $html->main($this->dataSet);
-                break;
-
             case "DELETE":
                 if ($this->passCheck()) {
                     $this->delMode($this->dataSet['NUMBER']);
@@ -61,7 +54,6 @@ class Mente extends Admin
                     $html->main($this->dataSet);
                 }
                 break;
-
             default:
                 $html->enter();
                 break;
@@ -73,12 +65,12 @@ class Mente extends Admin
     {
         global $init;
 
+        mkdir($init->dirName, $init->dirMode);
+
         // 現在の時間を取得
         $now = $_SERVER['REQUEST_TIME'];
-        $now -= $now % $init->unitTime;
-
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
-        touch($fileName);
+        $now = $now - ($now % ($init->unitTime));
+        $fileName = "{$init->dirName}/hakojima.dat";
         $fp = fopen($fileName, "w");
         fputs($fp, "1\n");
         fputs($fp, "{$now}\n");
@@ -87,27 +79,31 @@ class Mente extends Admin
         fclose($fp);
 
         // 同盟ファイル生成
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'ally.dat';
+        $fileName = "{$init->dirName}/ally.dat";
         $fp = fopen($fileName, "w");
         fclose($fp);
 
         // アクセスログ生成
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.$init->logname;
+        $fileName = "{$init->dirName}/{$init->logname}";
         $fp = fopen($fileName, "w");
         fclose($fp);
 
         // .htaccess生成
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'.htaccess';
-        $fp = fopen($fileName, "w");
-        fputs($fp, "Options -Indexes");
-        fclose($fp);
+        // $fileName = "{$init->dirName}/.htaccess";
+        // $fp = fopen($fileName, "w");
+        // fputs($fp, "Options -Indexes");
+        // fclose($fp);
     }
 
     public function delMode($id)
     {
         global $init;
 
-        $dirName = (strcmp($id, "") == 0)? $init->dirName : $init->dirName.DIRECTORY_SEPARATOR.".bak{$id}";
+        if (strcmp($id, "") == 0) {
+            $dirName = "{$init->dirName}";
+        } else {
+            $dirName = "{$init->dirName}.bak{$id}";
+        }
         $this->rmTree($dirName);
     }
 
@@ -127,13 +123,13 @@ class Mente extends Admin
     {
         global $init;
 
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
+        $fileName = "{$init->dirName}/hakojima.dat";
         $fp = fopen($fileName, "r+");
-        $buffer = [];
+        $buffer = array();
         while ($line = fgets($fp, READ_LINE)) {
             array_push($buffer, $line);
         }
-        $buffer[1] = "$sec\n";
+        $buffer[1] = "{$sec}\n";
         fseek($fp, 0);
         while ($line = array_shift($buffer)) {
             fputs($fp, $line);
@@ -141,30 +137,17 @@ class Mente extends Admin
         fclose($fp);
     }
 
-    public function currentMode($id)
-    {
-        global $init;
-
-        $this->rmTree($init->dirName);
-        $dir = opendir($init->dirName.DIRECTORY_SEPARATOR.'bak'.$id.DIRECTORY_SEPARATOR);
-        while (false !== ($fileName = readdir($dir))) {
-            if ($fileName != "." && $fileName != "..") {
-                copy("{$init->dirName}.bak{$id}".DIRECTORY_SEPARATOR.$fileName, $init->dirName.DIRECTORY_SEPARATOR.$fileName);
-            }
-        }
-        closedir($dir);
-    }
-
     public function rmTree($dirName)
     {
-        if (is_dir($dirName)) {
-            $dir = opendir($dirName.DIRECTORY_SEPARATOR);
-            while (false !== ($fileName = readdir($dir))) {
-                if ($fileName != "." && $fileName != "..") {
-                    unlink($dirName.DIRECTORY_SEPARATOR.$fileName);
+        if (is_dir("{$dirName}")) {
+            $dir = opendir("{$dirName}/");
+            while ($fileName = readdir($dir)) {
+                if (!(strcmp($fileName, ".") == 0 || strcmp($fileName, "..") == 0)) {
+                    unlink("{$dirName}/{$fileName}");
                 }
             }
             closedir($dir);
+            rmdir($dirName);
         }
     }
 
@@ -181,7 +164,7 @@ class Mente extends Admin
         }
         $masterPassword  = crypt($this->dataSet['MPASS1'], 'ma');
         $specialPassword = crypt($this->dataSet['SPASS1'], 'sp');
-        $fp = fopen($init->passwordFile, "w");
+        $fp = fopen("{$init->passwordFile}", "w");
         fputs($fp, "$masterPassword\n");
         fputs($fp, "$specialPassword\n");
         fclose($fp);

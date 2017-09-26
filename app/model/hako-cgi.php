@@ -8,7 +8,7 @@
 class Cgi
 {
     public $mode = "";
-    public $dataSet = array();
+    public $dataSet = [];
 
     /**
      * POST、GETのデータを取得
@@ -51,9 +51,8 @@ class Cgi
             }
         }
         // この段階でmodeにturnがセットされるのは不正アクセスの場合のみなのでクリアする
-        if ($this->mode === "turn") {
-            $this->mode = '';
-        }
+        $this->mode = ($this->mode != "turn") ?: '';
+
         $this->dataSet['islandListStart'] = (!empty($_GET['islandListStart']))? $_GET['islandListStart'] : 1;
         $this->dataSet["ISLANDNAME"] = (isset($this->dataSet['ISLANDNAME']))? mb_substr($this->dataSet["ISLANDNAME"], 0, 16) : "";
         $this->dataSet["MESSAGE"] = (isset($this->dataSet['MESSAGE']))? mb_substr($this->dataSet["MESSAGE"], 0, 60) : "";
