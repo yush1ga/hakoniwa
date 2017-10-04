@@ -44,7 +44,7 @@ class InitDefault
     // ゲーム全般に関する設定
     //---------------------------------------------------
     // ゲームタイトル
-    public $title      = "Re:箱庭諸島 S.E.";
+    public $title      = "Re:箱庭諸島SE";
     public $adminName  = "管理人";
     public $urlTopPage = "http://www.example.com/";
     public $twitterID  = "TwitterJP";

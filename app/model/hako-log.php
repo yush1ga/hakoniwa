@@ -280,11 +280,11 @@ class Log extends LogIO {
 	}
 	// 対象地形の種類による失敗
 	function landFail($id, $name, $comName, $kind, $point) {
-		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、予定地の{$this->init->tagName_}{$point}{$this->init->_tagName}が<strong>{$kind}</strong>だったため中止されました。",$id);
+		$this->out('<a href="'."{$this->this_file}?Sight={$id}".'">'.$this->init->tagName_.$name.$this->init->nameSuffix.'</a>'.$this->init->_tagName.'で予定されていた'.$this->init->tagComName_.$comName.$this->init->_tagComName.'は、予定地の'.$this->init->tagName_.$point.$this->init->_tagName."が<strong>{$kind}</strong>だったため中止されました。",$id);
 	}
 	// 対象地形の条件による失敗
 	function JoFail($id, $name, $comName, $kind, $point) {
-		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、予定地の{$this->init->tagName_}{$point}{$this->init->_tagName}が条件を満たしていない<strong>{$kind}</strong>だったため中止されました。",$id);
+		$this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</a>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、予定地の{$this->init->tagName_}{$point}{$this->init->_tagName}が条件を満たしていない<strong>{$kind}</strong>だったため中止されました。",$id);
 	}
 	// 都市の種類による失敗
 	function BokuFail($id, $name, $comName, $kind, $point) {

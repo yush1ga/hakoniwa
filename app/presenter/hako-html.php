@@ -267,23 +267,23 @@ class HtmlTop extends HTML
             }
 
             // 電力消費量
-            $enesyouhi = round($island['pop'] / 100 + $island['factory'] * 2/3 + $island['commerce'] * 1/3 + $island['mountain'] * 1/4);
+            $enesyouhi = round(($island['pop'] / 100) + ($island['factory'] * 2/3) + ($island['commerce'] /3) + ($island['mountain'] /4) );
             if ($enesyouhi == 0) {
                 $ene = "電力消費なし";
             } elseif ($island['hatuden'] == 0) {
-                $ene =  "<font color=\"#C7243A\">0%</font>";
+                $ene =  '<span style="color:#c7243a;">0%</span>';
             } else {
                 // 電力供給率
                 $ene = round($island['hatuden'] / $enesyouhi * 100);
                 if ($ene < 100) {
                     // 供給電力不足
-                    $ene = "<font color=\"#C7243A\">{$ene}%</font>";
+                    $ene = '<span style="color:#c7243a;">'.$ene.'%</span>';
                 } else {
                     // 供給電力充分
                     $ene = "{$ene}%";
                 }
             }
-            $keep = isset($keep) ? $keep : "";
+            $keep = $keep ?? "";
             echo <<<END
 	<thead>
 		<tr>
@@ -341,8 +341,7 @@ class HtmlTop extends HTML
 	</tr>
 END;
         }
-        echo "</table>";
-        echo "</div>";
+        echo "</table></div>";
     }
 
     /**
@@ -412,9 +411,12 @@ END;
 
 class HtmlMap extends HTML
 {
-    //---------------------------------------------------
-    // 開発画面
-    //---------------------------------------------------
+    /**
+     * 開発画面
+     * @param  [type] $hako [description]
+     * @param  [type] $data [description]
+     * @return [type]       [description]
+     */
     public function owner($hako, $data)
     {
         global $init;
@@ -434,16 +436,16 @@ class HtmlMap extends HTML
         $this->tempOwer($hako, $data, $number);
 
         // IP情報取得
-        $logfile = "{$init->dirName}/{$init->logname}";
+        $logfile = $init->dirName.DIRECTORY_SEPARATOR.$init->logname;
         $ax = $init->axesmax - 1;
         $log = file($logfile);
         $fp = fopen($logfile, "w");
         $timedata = date("Y年m月d日(D) H時i分s秒");
-        $islandID = "{$data['ISLANDID']}";
-        $name = "{$island['name']}{$init->nameSuffix}";
+        $islandID = $data['ISLANDID'];
+        $name = $island['name'].$init->nameSuffix;
         $ip = getenv("REMOTE_ADDR");
         $host = gethostbyaddr(getenv("REMOTE_ADDR"));
-        fputs($fp, $timedata.",".$islandID.",".$name.",".$ip.",".$host."\n");
+        fputs($fp, $timedata.",".$islandID.",".$name.",".$ip.",".$host.PHP_EOL);
         for ($i=0; $i<$ax; $i++) {
             if (isset($log[$i])) {
                 fputs($fp, $log[$i]);
@@ -463,11 +465,11 @@ class HtmlMap extends HTML
     public function visitor($hako, $data)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-main.php";
+        $this_file = $init->baseDir.DIRECTORY_SEPARATOR.'hako-main.php';
 
         // idから島番号を取得
         $id = $data['ISLANDID'];
-        $number = isset($hako->idToNumber[$id]) ? $hako->idToNumber[$id] : -1;
+        $number = $hako->idToNumber[$id] ?? -1;
 
         // なぜかその島がない場合
         if ($number < 0 || $number > $hako->islandNumber) {
@@ -491,14 +493,14 @@ class HtmlMap extends HTML
         $island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
 
         $rank       = ($island['isBF']) ? '★' : $number + 1;
-        $pop        = $island['pop'] . $init->unitPop;
-        $area       = $island['area'] . $init->unitArea;
-        $eisei      = isset($island['eisei']) ? $island['eisei'] : "";
-        $zin        = isset($island['zin'])   ? $island['zin']   : "";
-        $item       = isset($island['item'])  ? $island['item']  : "";
-        $money      = ($mode == 0) ? Util::aboutMoney($island['money']) : "{$island['money']}{$init->unitMoney}";
-        $lot        = isset($island['lot'])  ? $island['lot']  : "";
-        $food       = $island['food'] . $init->unitFood;
+        $pop        = $island['pop'].$init->unitPop;
+        $area       = $island['area'].$init->unitArea;
+        $eisei      = $island['eisei'] ?? "";
+        $zin        = $island['zin'] ?? "";
+        $item       = $island['item'] ?? "";
+        $money      = ($mode == 0) ? Util::aboutMoney($island['money']) : $island['money'].$init->unitMoney;
+        $lot        = $island['lot'] ?? "";
+        $food       = $island['food'].$init->unitFood;
         $unemployed = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
         $unemployed = '<font color="' . ($unemployed < 0 ? 'black' : '#C7243A') . '">' . sprintf("%-3d%%", $unemployed) . '</font>';
         $farm       = ($island['farm'] <= 0) ? $init->notHave : $island['farm'] * 10 . $init->unitPop;
@@ -506,7 +508,7 @@ class HtmlMap extends HTML
         $commerce   = ($island['commerce'] <= 0) ? $init->notHave : $island['commerce'] * 10 . $init->unitPop;
         $mountain   = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
         $hatuden    = ($island['hatuden'] <= 0) ? $init->notHave : $island['hatuden'] * 10 . $init->unitPop;
-        $taiji      = ($island['taiji'] <= 0) ? "0" .$init->unitMonster : $island['taiji'] * 1 . $init->unitMonster;
+        $taiji      = (($island['taiji'] <= 0)? "0" : $island['taiji'] * 1 ).$init->unitMonster;
         $tenki      = $island['tenki'];
         $team       = $island['team'];
         $shiai      = $island['shiai'];
@@ -581,14 +583,10 @@ class HtmlMap extends HTML
         }
         $lots = "";
         if ($lot > 0) {
-            $lots .= " <IMG SRC=\"{$init->imgDir}/lot.gif\" ALT=\"{$lot}枚\" title=\"{$lot}枚\">";
+            $lots .= " <img src=\"{$init->imgDir}/lot.gif\" alt=\"{$lot}枚\" title=\"{$lot}枚\">";
         }
 
-        if ($mode == 1) {
-            $arm = "Lv.{$island['rena']}";
-        } else {
-            $arm = "機密事項";
-        }
+        $arm = ($mode == 1) ? 'Lv.'.$island['rena'] : "機密事項";
 
         // 電力消費量
         $enesyouhi = round($island['pop'] / 100 + $island['factory'] * 2/3 + $island['commerce'] * 1/3 + $island['mountain'] * 1/4);
@@ -701,15 +699,15 @@ END;
     {
         global $init;
 
-        echo "<hr>\n";
+        echo '<hr>'.PHP_EOL;
+        echo '<div id="RecentlyLog">'.PHP_EOL;
+        echo '<h2>'.$island['name'].$init->nameSuffix.'の近況</h2>'.PHP_EOL;
 
-        echo "<div id=\"RecentlyLog\">\n";
-        echo "<h2>{$island['name']}{$init->nameSuffix}の近況</h2>\n";
         $log = new Log();
         for ($i = 0; $i < $init->logMax; $i++) {
             $log->logFilePrint($i, $island['id'], $mode);
         }
-        echo "</div>\n";
+        echo '</div>'.PHP_EOL;
     }
 
     //---------------------------------------------------
@@ -2226,7 +2224,7 @@ END;
         }
         // データ保存用ディレクトリのパーミッションチェック
         if (!is_writeable($init->dirName) || !is_readable($init->dirName)) {
-            echo "{$init->tagBig_}データ保存用のディレクトリのパーミッションが不正です。パーミッションを0777等の値に設定してください。{$init->_tagBig}";
+            echo "{$init->tagBig_}データ保存用のディレクトリのパーミッションが不正です。{$init->_tagBig}";
             HTML::footer();
             exit();
         }

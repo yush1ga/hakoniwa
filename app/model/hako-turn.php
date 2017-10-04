@@ -924,7 +924,7 @@ class Turn {
                 // 種類で分岐
                 switch($kind) {
                     case $init->comPlant:
-                        // 目的の場所を森にする。
+                        // 目的の場所を森にする
                         $land[$x][$y] = $init->landForest;
                         // 木は最低単位
                         $landValue[$x][$y] = 1;
@@ -952,7 +952,7 @@ class Turn {
                         break;
 
                     case $init->comBase:
-                        // 目的の場所をミサイル基地にする。
+                        // 目的の場所をミサイル基地にする
                         $land[$x][$y] = $init->landBase;
                         // 経験値0
                         $landValue[$x][$y] = 0;
