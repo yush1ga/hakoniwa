@@ -4686,7 +4686,7 @@ class Turn {
         $id   = $island['id'];
         $land = $island['land'];
         $landValue = $island['landValue'];
-        $presentItem = isset($island['present']['item']) ? $island['present']['item'] : 0;
+        $presentItem = $island['present']['item'] ?? 0;
 
         // 収入ログ
         if( isset($island['oilincome']) ) {
@@ -4712,41 +4712,37 @@ class Turn {
             : 1;
 
         // 日照り判定
-        if( isset($island['tenki']) ) {
-            if((Util::random(1000) < $init->disTenki) && ($island['tenki'] == 1)) {
-                // 日照り発生
-                $this->log->Hideri($id, $name);
-                for($i = 0; $i < $init->pointNumber; $i++) {
-                    $x = $this->rpx[$i];
-                    $y = $this->rpy[$i];
-                    $landKind = $land[$x][$y];
-                    $lv = $landValue[$x][$y];
-                    if(($landKind == $init->landTown) && ($landValue[$x][$y] > 100)) {
-                        // 人口が減る
-                        $people = (Util::random(2) + 1);
-                        $landValue[$x][$y] -= $people;
-                    }
+        if((Util::random(1000) < $init->disTenki) && ($island['tenki'] == 1)) {
+            // 日照り発生
+            $this->log->Hideri($id, $name);
+            for($i = 0; $i < $init->pointNumber; $i++) {
+                $x = $this->rpx[$i];
+                $y = $this->rpy[$i];
+                $landKind = $land[$x][$y];
+                $lv = $landValue[$x][$y];
+                if(($landKind == $init->landTown) && ($landValue[$x][$y] > 100)) {
+                    // 人口が減る
+                    $people = (Util::random(2) + 1);
+                    $landValue[$x][$y] -= $people;
                 }
             }
         }
 
         // にわか雨判定
-        if( isset($island['tenki']) ) {
-            if((Util::random(1000) < $init->disTenki) && ($island['tenki'] == 3)) {
-                // にわか雨発生
-                $this->log->Niwakaame($id, $name);
-                for($i = 0; $i < $init->pointNumber; $i++) {
-                    $x = $this->rpx[$i];
-                    $y = $this->rpy[$i];
-                    $landKind = $land[$x][$y];
-                    $lv = $landValue[$x][$y];
-                    if($landKind == $init->landForest) {
-                        // 木が増える
-                        $tree = (Util::random(5) + 1);
-                        $landValue[$x][$y] += $tree;
-                        if($landValue[$x][$y] > 200) {
-                            $landValue[$x][$y] = 200;
-                        }
+        if((Util::random(1000) < $init->disTenki) && ($island['tenki'] == 3)) {
+            // にわか雨発生
+            $this->log->Niwakaame($id, $name);
+            for($i = 0; $i < $init->pointNumber; $i++) {
+                $x = $this->rpx[$i];
+                $y = $this->rpy[$i];
+                $landKind = $land[$x][$y];
+                $lv = $landValue[$x][$y];
+                if($landKind == $init->landForest) {
+                    // 木が増える
+                    $tree = (Util::random(5) + 1);
+                    $landValue[$x][$y] += $tree;
+                    if($landValue[$x][$y] > 200) {
+                        $landValue[$x][$y] = 200;
                     }
                 }
             }
@@ -4813,7 +4809,7 @@ class Turn {
         }
 
         // 地震判定
-        $prepare2 = isset($island['prepare2']) ? (int)$island['prepare2'] : 0;
+        $prepare2 = (int)$island['prepare2'] ?? 0;
         if ((Util::random(1000) < (($prepare2 + 1) * $init->disEarthquake) - (int)($island['eisei'][1] / 15))
             || ($presentItem == 1) )
         {
