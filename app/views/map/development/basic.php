@@ -1,28 +1,24 @@
-<h1 class="text-center">
-    <?= $init->tagName_ ?><?= $name ?><?= $init->_tagName ?>開発計画
-</h1>
+<h1 class="text-center"><?= $init->tagName_.$name.$init->_tagName ?> <small>開発計画</small></h1>
+
 <?php $this->islandInfo($island, $number, 1); ?>
 
 <table class="table table-bordered">
     <tr>
-        <td <?= $init->bgInputCell ?>>
+        <td <?=$init->bgInputCell?>>
             <div class="text-center">
-                <form action="<?= $this_file ?>" method="post" name="InputPlan">
+                <form action="<?=$this_file?>" method="post" name="InputPlan">
                     <input type="hidden" name="mode" value="command">
-                    <input type="hidden" name="ISLANDID" value="<?= $island['id'] ?>">
-                    <input type="hidden" name="PASSWORD" value="<?= $data['defaultPassword'] ?>">
+                    <input type="hidden" name="ISLANDID" value="<?=$island['id']?>">
+                    <input type="hidden" name="PASSWORD" value="<?=$data['defaultPassword']?>">
                     <input type="submit" class="btn btn-primary" value="計画送信">
 
                     <hr>
 
                     <b>計画番号</b>
                     <select name="NUMBER">
-                    <?php
-                    for($i = 0; $i < $init->commandMax; $i++) {
-                        $j = $i + 1;
-                        echo "<option value=\"{$i}\">{$j}</option>";
-                    }
-                    ?>
+                    <?php for($i = 0; $i < $init->commandMax; $i++):?>
+                        <option value="<?=$i?>"><?=$i+1?></option>";
+                    <?php endfor;?>
                     </select>
 
                     <hr>
@@ -31,8 +27,7 @@
                     <select name="COMMAND">
                     <?php
                     // コマンド
-                    $comCnt = count($init->comList);
-                    for($i = 0;  $i < $comCnt; $i++) {
+                    for($i = 0, $l = count($init->comList);  $i < $l; $i++) {
                         $kind = $init->comList[$i];
                         $cost = $init->comCost[$kind];
                         $s = '';
@@ -49,13 +44,14 @@
                         } else {
                             $cost .= $init->unitMoney;
                         }
-                        if ( isset($data['defaultKind']) ) {
+
+                        if (isset($data['defaultKind'])) {
                             if($kind == $data['defaultKind']) {
                                 $s = 'selected';
                             }
                         }
 
-                        echo "<option value=\"{$kind}\" {$s}>{$init->comName[$kind]} ({$cost})</option>\n";
+                        println('<option value="',$kind,'" ',$s,'>',$init->comName[$kind],' (',$cost,')</option>');
                     }
                     ?>
                     </select>
@@ -139,15 +135,15 @@
 
                 </form>
 
-                <p>ミサイル発射上限数[<b> <?= $island['fire'] ?> </b>]発</p>
+                <p>ミサイル発射上限数[<b> <?=$island['fire']?> </b>]発</p>
             </div>
         </td>
 
-        <td <?= $init->bgMapCell ?>>
+        <td <?=$init->bgMapCell?>>
             <?php $this->islandMap($hako, $island, 1); // 島の地図、所有者モード ?>
         </td>
-        
-        <td <?= $init->bgCommandCell ?>>
+
+        <td <?=$init->bgCommandCell?>>
         <?php
             $command = $island['command'];
             $commandMax = $init->commandMax;
@@ -161,16 +157,16 @@
 
 <hr>
 
-<div id='CommentBox'>
+<div id="CommentBox">
     <h2>コメント更新</h2>
-    <form action="<?= $this_file ?>" method="post">
+    <form action="<?=$this_file?>" method="post">
         <div class="row">
             <div class="col-xs-12">
                 <div class="input-group">
-                    <input type="text" name="MESSAGE" class="form-control" size="80" value="<?= $island['comment'] ?>" placeholder="コメントする">
-                    <input type="hidden" name="PASSWORD" value="<?= $data['defaultPassword'] ?>">
+                    <input type="text" name="MESSAGE" class="form-control" size="80" value="<?=$island['comment']?>" placeholder="コメントする">
+                    <input type="hidden" name="PASSWORD" value="<?=$data['defaultPassword']?>">
                     <input type="hidden" name="mode" value="comment">
-                    <input type="hidden" name="ISLANDID" value="<?= $island['id'] ?>">
+                    <input type="hidden" name="ISLANDID" value="<?=$island['id']?>">
                     <input type="hidden" name="DEVELOPEMODE" value="cgi">
                     <span class="input-group-btn">
                         <input type="submit" class="btn btn-primary" value="コメント更新">
@@ -183,7 +179,7 @@
 
 <script>
 var w;
-var p = <?= $defaultTarget ?>;
+var p = <?=$defaultTarget?>;
 
 function ps(x, y) {
     document.InputPlan.POINTX.options[x].selected = true;
@@ -200,6 +196,6 @@ function settarget(part){
     p = part.options[part.selectedIndex].value;
 }
 function targetopen() {
-    w = window.open("<?= $this_file ?>?target=" + p, "","width=<?= $width ?>,height=<?= $height ?>,scrollbars=1,resizable=1,toolbar=1,menubar=1,location=1,directories=0,status=1");
+    w = window.open("<?=$this_file?>?target="+p, "","width=<?=$width?>,height=<?=$height?>,scrollbars=1,resizable=1");
 }
 </script>

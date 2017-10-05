@@ -7,8 +7,8 @@
 class Main {
 
 	function execute() {
-		$hako = new Hako();
-		$cgi  = new Cgi();
+		$hako = new \Hako();
+		$cgi  = new \Cgi();
 
 		$cgi->parseInputData();
 		$cgi->getCookies();
@@ -21,14 +21,12 @@ class Main {
 			Util::unlock($lock);
 			exit();
 		}
-		$lock = Util::lock($fp);
-		if(FALSE == $lock) {
+		if(FALSE == ($lock = Util::lock($fp))) {
 			exit();
 		}
 		$cgi->setCookies();
 
-		$_developmode = $cgi->dataSet['DEVELOPEMODE'] ?? "";
-		if( mb_strtolower($_developmode) == "javascript") {
+		if(strtolower($cgi->dataSet['DEVELOPEMODE'] ?? "") == "javascript") {
 			$html = new HtmlMapJS();
 			$com  = new MakeJS();
 		} else {
@@ -36,6 +34,13 @@ class Main {
 			$com  = new Make();
 		}
 		switch($cgi->mode) {
+            case "log":
+                $html = new HtmlTop();
+                $html->header();
+                $html->log();
+                $html->footer();
+                break;
+
 			case "turn":
 				$turn = new Turn();
 				$html = new HtmlTop();
@@ -97,13 +102,6 @@ class Main {
 				$html = new HtmlTop();
 				$html->header();
 				$html->register($hako, $cgi->dataSet);
-				$html->footer();
-				break;
-
-			case "log":
-				$html = new HtmlTop();
-				$html->header();
-				$html->log();
 				$html->footer();
 				break;
 

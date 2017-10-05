@@ -18,7 +18,7 @@ $THIS_FILE = $init->baseDir . "/hako-edit.php";
 class CgiImitation
 {
     public $mode = "";
-    public $dataSet = array();
+    public $dataSet = [];
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
@@ -26,7 +26,7 @@ class CgiImitation
     {
         global $init;
 
-        $this->mode = isset($_POST['mode']) ? $_POST['mode'] : "";
+        $this->mode = $_POST['mode'] ?? "";
 
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {
@@ -122,7 +122,7 @@ class Edit
         global $init;
 
         echo <<<END
-<h1 class="title">{$init->title}<br>マップ・エディタ</h1>
+<h1 class="title">{$init->title} <small>マップ・エディタ</small></h1>
 <form action="{$GLOBALS['THIS_FILE']}" method="post">
 	<strong>パスワード：</strong>
 	<input type="password" size="32" maxlength="32" name="PASSWORD">
@@ -150,7 +150,7 @@ END;
 <h1 class="title">マップ・エディタ</h1>
 <h2 class="Turn">ターン$hako->islandTurn</h2>
 <hr>
-<div ID="IslandView">
+<div id="IslandView">
 <h2>諸島の状況</h2>
 <p>島の名前をクリックすると、<strong>マップ</strong>が表示されます。</p>
 
@@ -181,11 +181,8 @@ END;
             $mountain = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
             $comment = $island['comment'];
             $comment_turn = $island['comment_turn'];
-            $monster = '';
-            if ($island['monster'] > 0) {
-                $monster = "<strong class=\"monster\">[怪獣{$island['monster']}体]</strong>";
-            }
-            $name = ($island['absent'] == 0) ? "{$init->tagName_}{$island['name']}{$init->nameSuffix}{$init->_tagName}" : "{$init->tagName2_}{$island['name']}{$init->nameSuffix}({$island['absent']}){$init->_tagName2}";
+            $monster = ($island['monster'] > 0) ? '<strong class="monster">[怪獣'.$island['monster'].'体]</strong>' : '';
+            $name = ($island['absent'] == 0) ? $init->tagName_.$island['name'].$init->nameSuffix.$init->_tagName : $init->tagName2_.$island['name'].$init->nameSuffix.'('.$island['absent'].')'.$init->_tagName2;
             $owner = $island['owner'] ?? "コメント";
 
             if ($hako->islandNumber - $i == $hako->islandNumberBF) {
@@ -389,11 +386,11 @@ END;
 <td {$init->bgCommandCell}>
 	<b>レベルについて</b>
 	<ul>
-		<li><b>海、浅瀬</b><br>レベル 0 のとき海<br>1 のとき浅瀬<br>それ以外 のとき財宝
-		<li><b>荒地</b><br>レベル 1 のとき着弾点
-		<li><b>村、町、都市</b><br>レベル 30 未満が村<br>レベル 100 未満が町<br>レベル 200 未満が都市
+		<li><b>海、浅瀬</b><br>レベル0のとき海<br>1のとき浅瀬<br>それ以外のとき財宝
+		<li><b>荒地</b><br>レベル1のとき着弾点
+		<li><b>村、町、都市</b><br>レベル30未満が村<br>レベル100未満が町<br>レベル200未満が都市
 		<li><b>ミサイル基地</b><br>経験値
-		<li><b>山、採掘場</b><br>レベル 1 以上のとき採掘場
+		<li><b>山、採掘場</b><br>レベル1以上のとき採掘場
 		<li><b>怪獣</b><br>各怪獣の最大レベルを超える<br>設定はできません
 		<li><b>海底基地</b><br>経験値
 	</ul>
@@ -478,7 +475,7 @@ END;
 		</select>
 		<hr>
 		<strong>レベル</strong>
-		<input type="number" min="0" max="1048575" size="8" maxlength="7" name="LEVEL" value="{$data['defaultLEVEL']}">
+		<input type="number" min="0" max="512" size="4" maxlength="4" name="LEVEL" value="{$data['defaultLEVEL']}">
 		<hr>
 		<input type="submit" value="登録">
 	</form>
@@ -529,11 +526,8 @@ END;
         if ($ld == $init->landMonster || $ld == $init->landSleeper) {
             // 怪獣のレベル設定
             $BHP = $init->monsterBHP[$mons];
-            if ($init->monsterDHP[$mons] > 0) {
-                $DHP = Util::random($init->monsterDHP[$mons] - 1);
-            } else {
-                $DHP = Util::random($init->monsterDHP[$mons]);
-            }
+
+            $DHP = ($init->monsterDHP[$mons] > 0) ? Util::random($init->monsterDHP[$mons] - 1) : Util::random($init->monsterDHP[$mons]);
             $level = $BHP + $DHP;
             $level = $mons * 100 + $level;
         } elseif ($ld == $init->landShip) {

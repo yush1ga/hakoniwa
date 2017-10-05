@@ -29,7 +29,7 @@ class InitDefault
 
     // データディレクトリの名前（必ず変更してください）
     public $dirName = "logs/data";
-    // ディレクトリ作成時のパーミション
+    // ディレクトリ作成時のパーミション（8進数4桁）
     public $dirMode = 0775;
 
     // パスワード・ファイル
@@ -160,7 +160,7 @@ class InitDefault
     // 食料の単位
     public $unitFood    = "00トン";
     // 広さの単位
-    public $unitArea    = "mi<sup>2</sup>"; // 平方マイル
+    public $unitArea    = "mi<sup>2</sup>"; //平方マイル
     // 木材の数の単位
     public $unitTree    = "00石";
     // お金の単位
@@ -259,8 +259,8 @@ class InitDefault
     public $maxSBaseLevel = 3; // 海底基地
 
     // 経験値がいくつでレベルアップか
-    public $baseLevelUp   = array(20, 60, 120, 200); // ミサイル基地
-    public $sBaseLevelUp  = array(50, 200); // 海底基地
+    public $baseLevelUp   = [20, 60, 120, 200]; // ミサイル基地
+    public $sBaseLevelUp  = [50, 200]; // 海底基地
 
     // 防衛施設の最大耐久力
     public $dBaseHP       = 5;
@@ -283,7 +283,7 @@ class InitDefault
     public $shipKind = 4; // 最大7
 
     // 船舶の名前（5,6のみ災害船舶と定義）
-    public $shipName = array(
+    public $shipName = [
         '輸送船',    // 0
         '漁船',      // 1
         '海底探索船', // 2
@@ -291,13 +291,13 @@ class InitDefault
         '',         // 4
         '',         // 5
         '海賊船'     // 6
-        );
+        ];
 
     // 船舶維持費
-    public $shipCost = array(100, 200, 300, 500, 0, 0, 0);
+    public $shipCost = [100, 200, 300, 500, 0, 0, 0];
 
     // 船舶体力（最大15）
-    public $shipHP   = array(1, 2, 3, 10, 0, 0, 10);
+    public $shipHP   = [1, 2, 3, 10, 0, 0, 10];
 
     // 船舶経験値の最大値（最大でも15まで）
     public $shipEX   = 15;
@@ -306,7 +306,7 @@ class InitDefault
     public $shipLv   = 3;
 
     // 経験値がいくつでレベルアップか
-    public $shipLevelUp   = array(4, 14);
+    public $shipLevelUp   = [4, 14];
 
     // 船舶設定値（確率：設定値 x 0.1%）
     public $shipIncom          =  200; // 輸送船収入
@@ -422,9 +422,9 @@ class InitDefault
     // ターン杯を何ターン毎に出すか
     public $turnPrizeUnit = 100;
     // 賞の名前
-    public $prizeName = array(
+    public $prizeName = [
         'ターン杯', '繁栄賞', '超繁栄賞', '究極繁栄賞', '平和賞', '超平和賞', '究極平和賞', '災難賞', '超災難賞', '究極災難賞', '素人怪獣討伐賞', '怪獣討伐賞', '超怪獣討伐賞', '究極怪獣討伐賞', '怪獣討伐王賞',
-    );
+    ];
 
     //---------------------------------------------------
     // 記念碑に関する設定
@@ -432,9 +432,9 @@ class InitDefault
     // 何種類あるか
     public $monumentNumber = 54;
     // 名前
-    public $monumentName = array(
+    public $monumentName = [
         '戦の碑', '農の碑', '鉱の碑', '匠の碑', '平和の碑', 'キャッスル城', 'モノリス', '聖樹', '戦いの碑', 'ラスカル', '棺桶', 'ヨーゼフ', 'くま', 'くま', 'くま', '貯金箱', 'モアイ', '地球儀', 'バッグ', 'ごみ箱', 'ダークいのら像', 'テトラ像', 'はねはむ像', 'ロケット', 'ピラミッド', 'アサガオ', 'チューリップ', 'チューリップ', '水仙', 'サボテン', '仙人掌', '魔方陣', '神殿', '神社', '闇石', '地石', '氷石', '風石', '炎石', '光石', '卵', '卵', '卵', '卵', '古代遺跡', 'サンタクロース', '壊れた侵略者', '憩いの公園', '桜', '向日葵', '銀杏', 'クリスマスツリー2001', '雪うさぎ', '幸福の女神像'
-    );
+    ];
 
     //---------------------------------------------------
     // 人工衛星に関する設定
@@ -442,9 +442,9 @@ class InitDefault
     // 何種類あるか
     public $EiseiNumber = 6;
     // 名前
-    public $EiseiName = array(
+    public $EiseiName = [
         '気象衛星', '観測衛星', '迎撃衛星', '軍事衛星', '防衛衛星', 'イレギュラー'
-    );
+    ];
 
     //---------------------------------------------------
     // ジンに関する設定
@@ -452,9 +452,9 @@ class InitDefault
     // 何種類あるか
     public $ZinNumber = 7;
     // 名前
-    public $ZinName = array(
+    public $ZinName = [
         'ノーム', 'ウィスプ', 'シェイド', 'ドリアード', 'ルナ', 'ジン', 'サラマンダー'
-    );
+    ];
 
     //---------------------------------------------------
     // アイテムに関する設定
@@ -462,9 +462,9 @@ class InitDefault
     // 何種類あるか
     public $ItemNumber = 21;
     // 名前
-    public $ItemName = array(
+    public $ItemName = [
         '地図１', 'ノコギリ', '禁断の書', 'マスク', 'ポチョムキン', '地図２', '科学書', '物理書', '第三の脳', 'マスターソード', '植物図鑑', 'ルーペ', '苗木', '数学書', '技術書', 'マナ・クリスタル', '農作物図鑑', '経済書', 'リング', 'レッドダイヤ', '木材'
-    );
+    ];
 
     /********************
         外見関係
@@ -663,9 +663,9 @@ class InitDefault
     // 島の座標数
     public $pointNumber;
 
-    // 周囲2ヘックスの座標
-    public $ax = array(0,  1, 1, 1, 0,-1, 0,  1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0);
-    public $ay = array(0, -1, 0, 1, 1, 0,-1, -2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2);
+    // 周囲2hexの座標
+    public $ax = [0,  1, 1, 1, 0,-1, 0,  1, 2, 2, 2, 1, 0,-1,-1,-2,-1,-1, 0];
+    public $ay = [0, -1, 0, 1, 1, 0,-1, -2,-1, 0, 1, 2, 2, 2, 1, 0,-1,-2,-2];
 
 
     //////////////////////////////////////////////////
@@ -673,7 +673,7 @@ class InitDefault
     private function setpubliciable()
     {
         $this->pointNumber = $this->islandSize * $this->islandSize;
-        $this->comList = array(
+        $this->comList = [
             $this->comPrepare,
             $this->comPrepare2,
             $this->comReclaim,
@@ -746,7 +746,7 @@ class InitDefault
             $this->comAutoPrepare2,
             $this->comAutoReclaim,
             $this->comAutoDelete,
-        );
+        ];
 
         // 計画の名前と値段
         $this->comName[$this->comPrepare]      = '整地';

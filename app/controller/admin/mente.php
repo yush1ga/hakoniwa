@@ -1,15 +1,16 @@
 <?php
+namespace Hakoniwa\Admin\Maintenance;
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
 
-class Mente extends Admin
+class Mente extends \Admin
 {
-    public function execute()
+    function __construct()
     {
-        $html = new HtmlMente();
-        $cgi = new Cgi();
+        $html = new \HtmlMente();
+        $cgi = new \Cgi();
         $this->parseInputData();
         $cgi->getCookies();
 

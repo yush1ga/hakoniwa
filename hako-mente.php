@@ -15,5 +15,4 @@ require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/mente.php';
 
 $init  = new \Init();
-$start = new \Mente();
-$start->execute();
+$start = new Maintenance\Mente();

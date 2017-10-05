@@ -407,7 +407,7 @@ class Util
      */
     public static function makeTagMessage($message, $status = "success")
     {
-        echo '<div class="alert alert-'. $status .'" role="alert">';
+        echo '<div class="alert alert-'.$status.'" role="alert">';
         echo nl2br($message);
         echo '</div>';
     }
@@ -445,4 +445,11 @@ class Util
 
         $mode = $_POST['mode'] ?? '';
     }
+}
+
+function println(...$strs) {
+    foreach($strs as $str) {
+        echo $str;
+    }
+    echo PHP_EOL;
 }

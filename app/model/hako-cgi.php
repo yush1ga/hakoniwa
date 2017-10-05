@@ -51,7 +51,7 @@ class Cgi
             }
         }
         // この段階でmodeにturnがセットされるのは不正アクセスの場合のみなのでクリアする
-        $this->mode = ($this->mode != "turn") ?: '';
+        $this->mode = ($this->mode != "turn") ? $this->mode : '';
 
         $this->dataSet['islandListStart'] = (!empty($_GET['islandListStart']))? $_GET['islandListStart'] : 1;
         $this->dataSet["ISLANDNAME"] = (isset($this->dataSet['ISLANDNAME']))? mb_substr($this->dataSet["ISLANDNAME"], 0, 16) : "";
