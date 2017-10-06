@@ -670,7 +670,7 @@ class Hako extends File
         global $init;
 
         $m = $this->readIslandsFile($cgi);
-        $this->islandList = $this->getIslandList((isset($cgi->dataSet['defaultID'])) ? $cgi->dataSet['defaultID'] : "");
+        $this->islandList = $this->getIslandList(($cgi->dataSet['defaultID'] ?? ""));
         if ($init->targetIsland == 1) {
             // 目標の島 所有の島が選択されたリスト
             $this->targetList = $this->islandList;

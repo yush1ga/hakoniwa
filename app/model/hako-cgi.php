@@ -62,7 +62,7 @@ class Cgi
 
     /**
      * COOKIEを取得
-     * @return [type] [description]
+     * @return void
      */
     public function getCookies()
     {
