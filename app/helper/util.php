@@ -101,7 +101,7 @@ class Util
             $i = $idToAllyNumber[$id];
             $mark  = $ally[$i]['mark'];
             $color = $ally[$i]['color'];
-            $name .= '<span style="color:'.$color.';font-weight:bold;>' . $mark . '</span> ';
+            $name .= '<span style="color:'.$color.'";font-weight:bold;>' . $mark . '</span> ';
         }
         $name .= $island['name'] . "島";
 
