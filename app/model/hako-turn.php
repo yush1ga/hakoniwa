@@ -205,7 +205,7 @@ class Turn {
                     }
                 }
             }
-            if($i > 1 || ($init->logOmit != 1)) {
+            if(($init->logOmit != 1) || $i > 1) {
                 $point .= "の<strong>{$sno}箇所</strong>";
             }
         }
@@ -902,7 +902,7 @@ class Turn {
                     (($landKind == $init->landSoukoM || $landKind == $init->landSoukoF) && ($kind == $init->comHikidasi)) ||
                     (($landKind == $init->landMonument) && ($kind == $init->comMonument)) ||
                     (($landKind == $init->landFarm) && ($kind == $init->comFarm)) ||
-                    (($landKind == $init->landlandSea) && ($lv == 1) && ($kind == $init->comNursery)) ||
+                    (($landKind == $init->landSea) && ($lv == 1) && ($kind == $init->comNursery)) ||
                     (($landKind == $init->landNursery) && ($kind == $init->comNursery)) ||
                     (($landKind == $init->landFactory) && ($kind == $init->comFactory)) ||
                     (($landKind == $init->landHatuden) && ($kind == $init->comHatuden)) ||
@@ -4809,7 +4809,7 @@ class Turn {
         }
 
         // 地震判定
-        $prepare2 = (int)$island['prepare2'] ?? 0;
+        $prepare2 = (int)($island['prepare2'] ?? 0);
         if ((Util::random(1000) < (($prepare2 + 1) * $init->disEarthquake) - (int)($island['eisei'][1] / 15))
             || ($presentItem == 1) )
         {
