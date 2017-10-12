@@ -490,16 +490,6 @@ class InitDefault
     // 災害
     public $tagDisaster_  = '<span class="disaster">';
     public $_tagDisaster  = '</span>';
-    // 順位表、セルの属性
-    public $bgTitleCell   = 'class="TitleCell"';   // 順位表見出し
-    public $bgNumberCell  = 'class="NumberCell"';  // 順位表順位
-    public $bgNameCell    = 'class="NameCell"';    // 順位表島の名前
-    public $bgInfoCell    = 'class="InfoCell"';    // 順位表島の情報
-    public $bgMarkCell    = 'class="MarkCell"';    // 同盟のマーク
-    public $bgCommentCell = 'class="CommentCell"'; // 順位表コメント欄
-    public $bgInputCell   = 'class="InputCell"';   // 開発計画フォーム
-    public $bgMapCell     = 'class="MapCell"';     // 開発計画地図
-    public $bgCommandCell = 'class="CommandCell"'; // 開発計画入力済み計画
 
     /********************
         地形番号
@@ -559,7 +549,7 @@ class InitDefault
             '開発,0,10',      // 計画番号00～10
             '建設,11,25',     // 計画番号11～20
             '建設2,26,50',    // 計画番号21～30
-            'サッカー,51,60', // 計画番号51～60
+            'サッカー,51,60',   // 計画番号51～60
             '攻撃1,61,70',    // 計画番号61～80
             '攻撃2,71,80',    // 計画番号61～80
             '運営,81,90'      // 計画番号81～90

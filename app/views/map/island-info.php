@@ -17,50 +17,28 @@
             </tr>
         </thead>
         <tr>
-            <th <?= $init->bgNumberCell ?> rowspan="4">
-                <?= $init->tagNumber_ ?><?= $rank ?><?= $init->_tagNumber ?>
+            <th class="NumberCell" rowspan="4">
+                <?= $init->tagNumber.$rank.$init->_tagNumber ?>
             </th>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $pop ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $area ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $money ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $food ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $unemployed ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $farm ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $factory ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $commerce ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $mountain ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $hatuden ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $ene ?>
-            </td>
+            <td class="InfoCell"><?= $pop ?></td>
+            <td class="InfoCell"><?= $area ?></td>
+            <td class="InfoCell"><?= $money ?></td>
+            <td class="InfoCell"><?= $food ?></td>
+            <td class="InfoCell"><?= $unemployed ?></td>
+            <td class="InfoCell"><?= $farm ?></td>
+            <td class="InfoCell"><?= $factory ?></td>
+            <td class="InfoCell"><?= $commerce ?></td>
+            <td class="InfoCell"><?= $mountain ?></td>
+            <td class="InfoCell"><?= $hatuden ?></td>
+            <td class="InfoCell"><?= $ene ?></td>
         </tr>
         <tr>
             <th><?= $init->nameWeather ?></th>
             <td class="TenkiCell"><?= $sora ?></td>
             <th><?= $init->nameMilitaryTechnology ?></th>
-            <td <?= $init->bgInfoCell ?>><?= $arm ?></td>
+            <td class="InfoCell"><?= $arm ?></td>
             <th><?= $init->nameMonsterExterminationNumber ?></th>
-            <td <?= $init->bgInfoCell ?>><?= $taiji ?></td>
+            <td class="InfoCell"><?= $taiji ?></td>
             <th><?= $init->nameSatellite ?></th>
             <td class="ItemCell" colspan="4"><?= $eiseis ?></td>
         </tr>
@@ -71,7 +49,7 @@
             <td class="ItemCell" colspan="4"><?= $items ?></td>
         </tr>
         <tr>
-            <td colspan="11" <?= $init->bgCommentCell ?>><?= $comment ?></td>
+            <td colspan="11" class="CommentCell"><?= $comment ?></td>
         </tr>
     </table>
 </div>

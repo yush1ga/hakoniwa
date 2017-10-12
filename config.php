@@ -9,6 +9,12 @@
 // set default charset / TimeZone settings
 ini_set('default_charset', 'UTF-8');
 date_default_timezone_set('Asia/Tokyo');
+if(!extension_loaded('mbstring')){
+    echo 'ご利用のPHPサーバー内にて、モジュール"mbstring"が読み込まれていないため、本プログラムは動作を停止しました。<br>大変お手数ですが、サーバー管理者にお問合せください。';
+    //-> php.iniから'mbstring.so'/'php_mbstring.dll'を有効にする
+    die;
+}
+
 
 
 // 箱庭の設定

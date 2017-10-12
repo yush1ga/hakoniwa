@@ -6,7 +6,7 @@
 class Admin
 {
     public $mode;
-    public $dataSet = array();
+    public $dataSet = [];
 
     public function parseInputData()
     {
@@ -19,7 +19,7 @@ class Admin
         }
     }
 
-    public function passCheck()
+    public function passCheck():bool
     {
         global $init;
 
@@ -30,13 +30,13 @@ class Admin
         }
         if (!isset($this->dataSet['PASSWORD'])) {
             HakoError::wrongPassword();
-            return 0;
+            return false;
         }
         if (strcmp(crypt($this->dataSet['PASSWORD'], 'ma'), $masterPassword) === 0) {
-            return 1;
+            return true;
         } else {
             HakoError::wrongPassword();
-            return 0;
+            return false;
         }
     }
 }

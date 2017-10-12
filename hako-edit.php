@@ -156,15 +156,15 @@ END;
 
 <table class="table table-bordered table-condensed">
 <tr>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameSuffix}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameSuffix}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
 </tr>
 END;
         // 表示内容は、管理者用の内容
@@ -195,21 +195,21 @@ END;
                 echo <<<END
 <table class="table table-bordered">
 <tr>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameSuffix}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameSuffix}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
 </tr>
 END;
             }
             echo "<tr>\n";
-            echo "<th {$init->bgNumberCell} rowspan=\"2\">{$init->tagNumber_}$j{$init->_tagNumber}</th>\n";
-            echo "<td {$init->bgNameCell} rowspan=\"2\"><a href=\"JavaScript:void(0);\" onClick=\"document.MAP{$id}.submit();return false;\">{$name}</a> {$monster}<br>\n{$prize}</td>\n";
+            echo "<th class="NumberCell" rowspan=\"2\">{$init->tagNumber_}$j{$init->_tagNumber}</th>\n";
+            echo "<td class="NameCell" rowspan=\"2\"><a href=\"JavaScript:void(0);\" onClick=\"document.MAP{$id}.submit();return false;\">{$name}</a> {$monster}<br>\n{$prize}</td>\n";
             echo <<<END
 <form name="MAP{$id}" action="{$GLOBALS['THIS_FILE']}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
@@ -217,16 +217,16 @@ END;
 	<input type="hidden" name="Sight" value="{$id}">
 </form>
 END;
-            echo "<td {$init->bgInfoCell}>$pop</td>\n";
-            echo "<td {$init->bgInfoCell}>$area</td>\n";
-            echo "<td {$init->bgInfoCell}>$money</td>\n";
-            echo "<td {$init->bgInfoCell}>$food</td>\n";
-            echo "<td {$init->bgInfoCell}>$farm</td>\n";
-            echo "<td {$init->bgInfoCell}>$factory</td>\n";
-            echo "<td {$init->bgInfoCell}>$mountain</td>\n";
+            echo "<td class="InfoCell">$pop</td>\n";
+            echo "<td class="InfoCell">$area</td>\n";
+            echo "<td class="InfoCell">$money</td>\n";
+            echo "<td class="InfoCell">$food</td>\n";
+            echo "<td class="InfoCell">$farm</td>\n";
+            echo "<td class="InfoCell">$factory</td>\n";
+            echo "<td class="InfoCell">$mountain</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-            echo "<td {$init->bgCommentCell} colspan=\"7\">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>\n";
+            echo "<td class="CommentCell" colspan=\"7\">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>\n";
             echo "</tr>\n";
         }
         echo "</table>\n</div>\n";
@@ -383,7 +383,7 @@ END;
 <div class="text-center">
 <table class="table table-bordered">
 <tr valign="top">
-<td {$init->bgCommandCell}>
+<td class="CommandCell">
 	<b>レベルについて</b>
 	<ul>
 		<li><b>海、浅瀬</b><br>レベル0のとき海<br>1のとき浅瀬<br>それ以外のとき財宝
@@ -395,7 +395,7 @@ END;
 		<li><b>海底基地</b><br>経験値
 	</ul>
 </td>
-<td {$init->bgMapCell}>
+<td class="MapCell">
 END;
         // 地形出力
         $html->islandMap($hako, $island, 1);
@@ -403,7 +403,7 @@ END;
         // エディタ領域の表示
         echo <<<END
 </td>
-<td {$init->bgInputCell}>
+<td class="InputCell">
 <div class="text-center">
 	<form action="{$GLOBALS['THIS_FILE']}" method="post" name="InputPlan">
 		<input type="hidden" name="mode" value="regist">

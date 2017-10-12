@@ -88,14 +88,10 @@ class Mente extends \Admin
         fclose($fp);
 
         // 同盟ファイル生成
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'ally.dat';
-        $fp = fopen($fileName, "w");
-        fclose($fp);
+        touch($init->dirName.DIRECTORY_SEPARATOR.'ally.dat');
 
         // アクセスログ生成
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.$init->logname;
-        $fp = fopen($fileName, "w");
-        fclose($fp);
+        touch($init->dirName.DIRECTORY_SEPARATOR.$init->logname);
 
         // .htaccess生成
         $fileName = $init->dirName.DIRECTORY_SEPARATOR.'.htaccess';
@@ -147,7 +143,7 @@ class Mente extends \Admin
         global $init;
 
         $this->rmTree($init->dirName);
-        $dir = opendir($init->dirName.DIRECTORY_SEPARATOR.'bak'.$id.DIRECTORY_SEPARATOR);
+        $dir = opendir($init->dirName.'bak'.$id.DIRECTORY_SEPARATOR);
         while (false !== ($fileName = readdir($dir))) {
             if ($fileName != "." && $fileName != "..") {
                 copy("{$init->dirName}.bak{$id}".DIRECTORY_SEPARATOR.$fileName, $init->dirName.DIRECTORY_SEPARATOR.$fileName);
@@ -156,6 +152,11 @@ class Mente extends \Admin
         closedir($dir);
     }
 
+    /**
+     * 引数にとったディレクトリの中身をすべて削除する
+     * @param  string $dirName 子ファイルを削除したいディレクトリ
+     * @return void
+     */
     public function rmTree($dirName)
     {
         if (is_dir($dirName)) {
@@ -173,10 +174,14 @@ class Mente extends \Admin
     {
         global $init;
 
-        if (empty($this->dataSet['MPASS1']) || empty($this->dataSet['MPASS2']) || strcmp($this->dataSet['MPASS1'], $this->dataSet['MPASS2'])) {
+        function isValidPasswd($passwd1='', $passwd2=''){
+            return !($passwd1=='' || $passwd2=='' || strcmp($passwd1,$passwd2));
+        }
+
+        if (!isValidPasswd($this->dataSet['MPASS1'],$this->dataSet['MPASS2'])) {
             HakoError::wrongMasterPassword();
             return 0;
-        } elseif (empty($this->dataSet['SPASS1']) || empty($this->dataSet['SPASS2']) || strcmp($this->dataSet['SPASS1'], $this->dataSet['SPASS2'])) {
+        }elseif(!isValidPasswd($this->dataSet['SPASS1'],$this->dataSet['SPASS2'])) {
             HakoError::wrongSpecialPassword();
             return 0;
         }

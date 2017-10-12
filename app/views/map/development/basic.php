@@ -4,7 +4,7 @@
 
 <table class="table table-bordered">
     <tr>
-        <td <?=$init->bgInputCell?>>
+        <td class="InputCell">
             <div class="text-center">
                 <form action="<?=$this_file?>" method="post" name="InputPlan">
                     <input type="hidden" name="mode" value="command">
@@ -139,11 +139,11 @@
             </div>
         </td>
 
-        <td <?=$init->bgMapCell?>>
+        <td class="MapCell">
             <?php $this->islandMap($hako, $island, 1); // 島の地図、所有者モード ?>
         </td>
 
-        <td <?=$init->bgCommandCell?>>
+        <td class="CommandCell">
         <?php
             $command = $island['command'];
             $commandMax = $init->commandMax;
