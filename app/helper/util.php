@@ -401,14 +401,14 @@ class Util
 
     /**
      * アラートタグを出力する
-     * @param  string $message [description]
-     * @param  string $status  [description]
-     * @return [type]          [description]
+     * @param  string $message 本文
+     * @param  string $status  アラート種類："success","info","warning","danger".
+     * @return void
      */
     public static function makeTagMessage($message, $status = "success")
     {
         echo '<div class="alert alert-'.$status.'" role="alert">';
-        echo nl2br($message);
+        echo nl2br($message, false);
         echo '</div>';
     }
 

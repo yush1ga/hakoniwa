@@ -2083,24 +2083,25 @@ END;
     {
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";
+        $dirName = $init->dirName;
 
-        echo '<h1 class="title">'.$init->title.'<small>メンテナンスツール</small></h1>'.PHP_EOL;
+        println('<h1 class="title">'.$init->title.'<small>メンテナンスツール</small></h1>');
         // データ保存用ディレクトリの存在チェック
-        if (!is_dir($init->dirName)) {
-            if(!@mkdir($init->dirName, $init->dirMode, true)){
-                Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\n設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
+        if (!is_dir($dirName)) {
+            if(!@mkdir($dirName, $init->dirMode, true)){
+                Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\nゲーム設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
                 HTML::footer();
                 exit();
             }
         }
         // データ保存用ディレクトリのパーミッションチェック
-        if (!is_writeable($init->dirName) || !is_readable($init->dirName)) {
+        if (!is_writeable($dirName) || !is_readable($dirName)) {
             Util::makeTagMessage("データ保存用ディレクトリに対する適切な操作権限を所持していません。\nサーバー管理者にお問合せください。", 'danger');
             HTML::footer();
             exit();
         }
 
-        if (is_file($init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat')) {
+        if (is_file($dirName.DIRECTORY_SEPARATOR.'hakojima.dat')) {
             $this->dataPrint($data);
         } else {
             echo <<<EOT
@@ -2112,13 +2113,15 @@ END;
 </form>
 EOT;
         }
-        // バックアップデータ
-        $dir = opendir('.'.DIRECTORY_SEPARATOR);
-        while ($dn = readdir($dir)) {
-            $_dirName = preg_quote($init->dirName, "/");
-            if(preg_match("/{$_dirName}\.bak(.*)$/", $dn, $suf)) {
-                if (is_file("{$init->dirName}.bak{$suf[1]}/hakojima.dat")) {
-                    $this->dataPrint($data, $suf[1]);
+        // バックアップデータがあれば表示
+        $dir = opendir(dirname($dirName));
+        $dirCld = substr(strrchr($dirName, "/"), 1);
+        while (false !== ($dn = readdir($dir))) {
+            $_dirName = preg_quote($dirCld);
+            if(preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
+                ChromePhp::log($dn,$matches);
+                if (is_file("{$dirName}.bak{$matches[1]}/hakojima.dat")) {
+                    $this->dataPrint($data, $matches[1]);
                 }
             }
         }
@@ -2131,13 +2134,13 @@ EOT;
         global $init;
         $this_file = $init->baseDir.DIRECTORY_SEPARATOR."hako-mente.php";
 
-        echo "<hr>";
+        println('<hr>',PHP_EOL,'<section>');
         if (strcmp($suf, "") == 0) {
             $fp = fopen($init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat', "r");
-            echo "<h2>現役データ</h2>\n";
+            println('<h2>現役データ</h2>');
         } else {
             $fp = fopen("{$init->dirName}.bak{$suf}/hakojima.dat", "r");
-            echo "<h2>バックアップ{$suf}</h2>\n";
+            println('<h2>バックアップ（',$suf,'期前）</h2>');
         }
         $lastTurn = chop(fgets($fp, READ_LINE));
         $lastTime = chop(fgets($fp, READ_LINE));
@@ -2145,13 +2148,13 @@ EOT;
         $timeString = self::timeToString($lastTime);
 
         echo <<<END
-<strong>ターン$lastTurn</strong><br>
-<strong>最終更新時間</strong>: $timeString<br>
+<h3>ターン：$lastTurn</h3>
+<p><strong>最終更新時間</strong>：$timeString</p>
 <form action="$this_file" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="DELETE">
 	<input type="hidden" name="NUMBER" value="$suf">
-	<input type="submit" value="このデータを削除">
+	<input type="submit" class="btn btn-danger btn-sm" value="このデータを削除">
 </form>
 END;
         if (strcmp($suf, "") == 0) {
@@ -2159,7 +2162,7 @@ END;
             $time['tm_year'] += 1900;
             $time['tm_mon']++;
             echo <<<END
-<h2>最終更新時間の変更</h2>
+<h4>最終更新時間の変更</h4>
 <form action="{$this_file}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
@@ -2170,7 +2173,7 @@ END;
 	<input type="text" size="2" name="HOUR" value="{$time['tm_hour']}">時
 	<input type="text" size="2" name="MIN" value="{$time['tm_min']}">分
 	<input type="text" size="2" name="NSEC" value="{$time['tm_sec']}">秒
-	<input type="submit" value="変更">
+	<input type="submit" class="btn btn-warning btn-sm" value="変更">
 </form>
 END;
         } else {
@@ -2179,10 +2182,11 @@ END;
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="NUMBER" value="{$suf}">
 	<input type="hidden" name="mode" value="CURRENT">
-	<input type="submit" value="このデータを現役に">
+	<input type="submit" class="btn btn-warning" value="このデータを現役に">
 </form>
 END;
         }
+    println('</section>');
     }
 }
 
@@ -2196,7 +2200,7 @@ class HtmlAxes extends HTML
     public function passwdChk()
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-axes.php";
+        $this_file = $init->baseDir.'/hako-axes.php';
         $this->pageHeader($init->title);
         echo <<<END
 <form action="{$this_file}" method="post">
@@ -2238,7 +2242,7 @@ END;
 <tbody>
 END;
         // ファイルを読み込み専用でオープンする
-        $fp = fopen("{$init->dirName}/{$init->logname}", 'r');
+        $fp = fopen($init->dirName.'/'.$init->logname, 'r');
 
         // 終端に達するまでループ
         while (!feof($fp)) {
@@ -2259,7 +2263,7 @@ class HtmlBF extends HTML
     public function main($data, $hako)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-bf.php";
+        $this_file = $init->baseDir.'/hako-bf.php';
         require_once(VIEWS.'/admin/bf.php');
     }
 }
@@ -2269,7 +2273,7 @@ class HTMLKeep extends HTML
     public function main($data, $hako)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-keep.php";
+        $this_file = $init->baseDir.'/hako-keep.php';
         require_once(VIEWS.'/admin/keep.php');
     }
 }
