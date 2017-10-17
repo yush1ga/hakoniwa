@@ -208,8 +208,8 @@ END;
 END;
             }
             echo "<tr>\n";
-            echo "<th class="NumberCell" rowspan=\"2\">{$init->tagNumber_}$j{$init->_tagNumber}</th>\n";
-            echo "<td class="NameCell" rowspan=\"2\"><a href=\"JavaScript:void(0);\" onClick=\"document.MAP{$id}.submit();return false;\">{$name}</a> {$monster}<br>\n{$prize}</td>\n";
+            echo "<th class=\"NumberCell\" rowspan=\"2\">{$init->tagNumber_}$j{$init->_tagNumber}</th>\n";
+            echo "<td class=\"NameCell\" rowspan=\"2\"><a href=\"JavaScript:void(0);\" onClick=\"document.MAP{$id}.submit();return false;\">{$name}</a> {$monster}<br>\n{$prize}</td>\n";
             echo <<<END
 <form name="MAP{$id}" action="{$GLOBALS['THIS_FILE']}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
@@ -217,16 +217,16 @@ END;
 	<input type="hidden" name="Sight" value="{$id}">
 </form>
 END;
-            echo "<td class="InfoCell">$pop</td>\n";
-            echo "<td class="InfoCell">$area</td>\n";
-            echo "<td class="InfoCell">$money</td>\n";
-            echo "<td class="InfoCell">$food</td>\n";
-            echo "<td class="InfoCell">$farm</td>\n";
-            echo "<td class="InfoCell">$factory</td>\n";
-            echo "<td class="InfoCell">$mountain</td>\n";
+            echo "<td class=\"InfoCell\">$pop</td>\n";
+            echo "<td class=\"InfoCell\">$area</td>\n";
+            echo "<td class=\"InfoCell\">$money</td>\n";
+            echo "<td class=\"InfoCell\">$food</td>\n";
+            echo "<td class=\"InfoCell\">$farm</td>\n";
+            echo "<td class=\"InfoCell\">$factory</td>\n";
+            echo "<td class=\"InfoCell\">$mountain</td>\n";
             echo "</tr>\n";
             echo "<tr>\n";
-            echo "<td class="CommentCell" colspan=\"7\">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>\n";
+            echo "<td class=\"CommentCell\" colspan=\"7\">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>\n";
             echo "</tr>\n";
         }
         echo "</table>\n</div>\n";
