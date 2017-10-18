@@ -33,10 +33,10 @@
 
  	// 盟主コメント変更完了
  	static function allyPactOK($name) {
- 		Util::makeTagMessage("{$name}のコメントを変更しました。", "success");
+ 		Util::makeTagMessage("{$name}のコメントを変更しました", "success");
  	}
  	// 同盟データの再構成
  	static function allyDataUp() {
- 		Util::makeTagMessage("同盟データを再構成しました。(ターン更新後に再構成されます)", "info");
+ 		Util::makeTagMessage("同盟データを再構成しました（ターン更新後に反映されます）", "info");
  	}
  }
