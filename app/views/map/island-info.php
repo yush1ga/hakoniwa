@@ -18,7 +18,7 @@
         </thead>
         <tr>
             <th class="NumberCell" rowspan="4">
-                <?= $init->tagNumber.$rank.$init->_tagNumber ?>
+                <?= $init->tagNumber_.$rank.$init->_tagNumber ?>
             </th>
             <td class="InfoCell"><?= $pop ?></td>
             <td class="InfoCell"><?= $area ?></td>

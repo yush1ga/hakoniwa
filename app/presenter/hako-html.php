@@ -52,13 +52,23 @@ class HTML
      * @param  Integer $t Unixタイムスタンプ
      * @return String     "Y年M月D日 H時m分S秒"形式の文字列
      */
-    public function timeToString($t)
+    public function timeToString(int $t)
     {
         $time = localtime($t, true);
         $time['tm_year'] += 1900;
         $time['tm_mon']++;
         return "{$time['tm_year']}年{$time['tm_mon']}月{$time['tm_mday']}日 {$time['tm_hour']}時{$time['tm_min']}分{$time['tm_sec']}秒";
     }
+
+    public function pageTitle(string $title, string $subtitle = '')
+    {
+        if($subtitle=='') {
+            println('<h1 class="title">',$title,'</h1>');
+        } else {
+            println('<h1 class="title">',$title,' <small>',$subtitle,'</small></h1>');
+        }
+    }
+
 }
 
 
@@ -122,7 +132,7 @@ class HtmlTop extends HTML
     public function islandTable(&$hako, $start, $sentinel)
     {
         global $init;
-        $this_file = $init->baseDir.DIRECTORY_SEPARATOR."hako-main.php";
+        $this_file = $init->baseDir.'/hako-main.php';
 
         if ($sentinel == 0) {
             return;
@@ -170,11 +180,13 @@ class HtmlTop extends HTML
             $comment       = $island['comment'];
             $comment_turn  = $island['comment_turn'];
             //$starturn     = $island['starturn'];
+            $keep = '';
 
             $monster       = ($island['monster'] > 0)? '<strong class="monster">[怪獣'.$island['monster'].'体出現中]</strong>' :'';
 
             if ($island['keep'] == 1) {
-                $comment = '<span class="attention">この島は管理人預かり中です。</span>';
+                $comment = '<span class="attention">この島は管理人預かり中です</span>';
+                $keep = '<span style="font-size:1.4em;color:#4f4dff;font-weight:700;" title="管理人預かり中">❄</span>';
             }
 
             $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
@@ -265,7 +277,6 @@ class HtmlTop extends HTML
                     $ene = "{$ene}%";
                 }
             }
-            $keep = $keep ?? "";
             echo <<<END
 	<thead>
 		<tr>
@@ -283,7 +294,7 @@ class HtmlTop extends HTML
 	<tr>
 		<th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
 		<td class="NameCell" rowspan="5" valign="top">
-			<h3><a href="{$this_file}?Sight={$id}">{$name}</a> <small>{$start}{$monster}{$soccer}</small></h3>
+			<h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
 			{$prize}{$viking}<br>
 			{$zins}<br>
 			<small>({$peop} {$okane} {$gohan} {$poin})</small>
@@ -310,7 +321,7 @@ class HtmlTop extends HTML
 		<td class="InfoCell">$factory</td>
 		<td class="InfoCell">$commerce</td>
 		<td class="InfoCell">$mountain</td>
-		<td class="InfoCell">{$hatuden}</td>
+		<td class="InfoCell">$hatuden</td>
 		<td class="InfoCell">$ene</td>
 		<td class="ItemCell">$eiseis</td>
 	</tr>
@@ -414,27 +425,29 @@ class HtmlMap extends HTML
             return;
         }
 
-        // 開発画面
-        $this->tempOwer($hako, $data, $number);
-
         // IP情報取得
-        $logfile = $init->dirName.DIRECTORY_SEPARATOR.$init->logname;
-        $ax = $init->axesmax - 1;
+        $logfile = $init->dirName.'/'.$init->logname;
         $log = file($logfile);
         $fp = fopen($logfile, "w");
         $timedata = date("Y年m月d日(D) H時i分s秒");
         $islandID = $data['ISLANDID'];
         $name = $island['name'].$init->nameSuffix;
-        $ip = getenv("REMOTE_ADDR");
-        $host = gethostbyaddr(getenv("REMOTE_ADDR"));
-        fputs($fp, $timedata.",".$islandID.",".$name.",".$ip.",".$host.PHP_EOL);
-        for ($i=0; $i<$ax; $i++) {
+        $ip = (getenv('REMOTE_ADDR',true)?:getenv('REMOTE_ADDR'))?:'192.0.2.0';
+        $host = gethostbyaddr($ip);
+
+        // ファイル頭に追記して最大容量超過分を切り捨て
+        fputs($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
+        for ($i=0,$ax=$init->axesmax-1; $i<$ax; $i++) {
             if (isset($log[$i])) {
                 fputs($fp, $log[$i]);
             }
         }
         fclose($fp);
 
+        // 開発画面
+        $this->tempOwer($hako, $data, $number);
+
+        // 島の近況
         $this->islandRecent($island, 1);
     }
 
@@ -504,25 +517,25 @@ class HtmlMap extends HTML
         $comment    = $island['comment'];
 
         if ($island['keep'] == 1) {
-            $comment = "<span class=\"attention\">この島は管理人預かり中です。</span>";
+            $comment = '<span class="attention">この島は管理人預かり中です。</span>';
         }
 
         $sora = "";
         switch ($tenki) {
             case 1:
-                $sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
+                $sora = '<img src="'.$init->imgDir.'/tenki1.gif" alt="晴れ" title="晴れ" width="19" height="19">';//"☀";
                 break;
             case 2:
-                $sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
+                $sora = '<img src="'.$init->imgDir.'/tenki2.gif" alt="曇り" title="曇り" width="19" height="19">';//"☁";
                 break;
             case 3:
-                $sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
+                $sora = '<img src="'.$init->imgDir.'/tenki3.gif" alt="雨" title="雨" width="19" height="19">';//"☂";
                 break;
             case 4:
-                $sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
+                $sora = '<img src="'.$init->imgDir.'/tenki4.gif" alt="雷" title="雷" width="19" height="19">';//"⛈";
                 break;
             default:
-                $sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
+                $sora = '<img src="'.$init->imgDir.'/tenki5.gif" alt="雪" title="雪" width="19" height="19">';//"☃";
         }
 
         $eiseis = "";
@@ -640,9 +653,8 @@ class HtmlMap extends HTML
 
         echo "<p class='text-center'>開始ターン：{$island['starturn']}</p>\n";
 
-        if (isset($island['soccer'])) {
-            if ($island['soccer'] > 0) {
-                echo <<<END
+        if (isset($island['soccer']) && $island['soccer'] > 0) {
+            echo <<<END
 <table class="table table-bordered">
 	<thead>
 		<tr>
@@ -666,7 +678,6 @@ class HtmlMap extends HTML
 	</tbody>
 </table>
 END;
-            }
         }
     }
 
@@ -681,15 +692,17 @@ END;
     {
         global $init;
 
-        echo '<hr>'.PHP_EOL;
-        echo '<div id="RecentlyLog">'.PHP_EOL;
-        echo '<h2>'.$island['name'].$init->nameSuffix.'の近況</h2>'.PHP_EOL;
+        echo <<<END
+<hr>
+<div id="RecentlyLog">
+<h2>{$island['name']}{$init->nameSuffix}の近況</h2>
+END;
 
         $log = new Log();
         for ($i = 0; $i < $init->logMax; $i++) {
             $log->logFilePrint($i, $island['id'], $mode);
         }
-        echo '</div>'.PHP_EOL;
+        println('</div>');
     }
 
     //---------------------------------------------------
@@ -698,7 +711,7 @@ END;
     public function tempOwer($hako, $data, $number = 0)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-main.php";
+        $this_file = $init->baseDir.'/hako-main.php';
 
         $island = $hako->islands[$number];
         $name   = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
@@ -2044,9 +2057,9 @@ class HtmlMente extends HTML
     public function enter()
     {
         global $init;
-        $this_file = $init->baseDir."/hako-mente.php";
+        $this_file = $init->baseDir.'/hako-mente.php';
 
-        echo '<h1 class="title">メンテナンスツール</h1>';
+        parent::pageTitle($init->title, 'メンテナンスツール');
 
         if (file_exists($init->passwordFile)) {
             echo <<<END
@@ -2070,7 +2083,7 @@ END;
 <label>(1) <input type="password" name="SPASS1" value="" size=32></label>
 <label>(2) <input type="password" name="SPASS2" value="" size=32></label>
 
-<hr style="margin:16px;border:none;padding:0;">
+<hr style="margin:16px;border:0;padding:0;">
 
 <input type="hidden" name="mode" value="setup">
 <input type="submit" value="パスワードを設定する" class="btn btn-primary">
@@ -2084,8 +2097,8 @@ END;
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";
         $dirName = $init->dirName;
+        parent::pageTitle($init->title, 'メンテナンスツール');
 
-        println('<h1 class="title">'.$init->title.'<small>メンテナンスツール</small></h1>');
         // データ保存用ディレクトリの存在チェック
         if (!is_dir($dirName)) {
             if(!@mkdir($dirName, $init->dirMode, true)){
@@ -2101,7 +2114,7 @@ END;
             exit();
         }
 
-        if (is_file($dirName.DIRECTORY_SEPARATOR.'hakojima.dat')) {
+        if (is_file($dirName.'/hakojima.dat')) {
             $this->dataPrint($data);
         } else {
             echo <<<EOT
@@ -2119,7 +2132,6 @@ EOT;
         while (false !== ($dn = readdir($dir))) {
             $_dirName = preg_quote($dirCld);
             if(preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
-                ChromePhp::log($dn,$matches);
                 if (is_file("{$dirName}.bak{$matches[1]}/hakojima.dat")) {
                     $this->dataPrint($data, $matches[1]);
                 }
@@ -2140,7 +2152,7 @@ EOT;
             println('<h2>現役データ</h2>');
         } else {
             $fp = fopen("{$init->dirName}.bak{$suf}/hakojima.dat", "r");
-            println('<h2>バックアップ（',$suf,'期前）</h2>');
+            println('<h2>バックアップ <small>（bak',$suf,'）</small></h2>');
         }
         $lastTurn = chop(fgets($fp, READ_LINE));
         $lastTime = chop(fgets($fp, READ_LINE));
@@ -2192,16 +2204,12 @@ END;
 
 class HtmlAxes extends HTML
 {
-    public function pageHeader($title)
-    {
-        echo '<h1 class="title">', $title, ' <small class="text-muted">アクセスログ閲覧</small></h1>', "\n";
-    }
 
     public function passwdChk()
     {
         global $init;
         $this_file = $init->baseDir.'/hako-axes.php';
-        $this->pageHeader($init->title);
+        parent::pageTitle($init->title, 'アクセスログ');
         echo <<<END
 <form action="{$this_file}" method="post">
 	<label>パスワード確認：<input type="password" size="32" maxlength="32" name="PASSWORD"></label>
@@ -2214,49 +2222,41 @@ END;
     public function main($data)
     {
         global $init;
-        $this->pageHeader($init->title);
+        parent::pageTitle($init->title, 'アクセスログ');
         $this->dataPrint($data);
     }
 
     // 表示モード
-    public function dataPrint($data, $suf = "")
+    public function dataPrint($data)
     {
         global $init;
 
         echo <<<END
 <hr>
-
-<h2>アクセスログ</h2>
 <form class="container">
-<button class="btn btn-default" onclick="Button_DispFilter(this, 'DATA-TABLE')" onkeypress="Button_DispFilter(this, 'DATA-TABLE')">オートフィルタ表示</button>
-<table id="DATA-TABLE" class="table">
+<button class="btn btn-default" onclick="Button_DispFilter(this, 'DATA-TABLE');return false;">オートフィルタ表示</button>
+<table id="DATA-TABLE" class="table table-condensed">
 <thead>
 <tr class="NumberCell">
-	<th scope="col" colspan=2><button class="btn btn-default" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])">ログインした時間</button></th>
-	<th scope="col"><button class="btn btn-default" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])">島ID</button></th>
-	<th scope="col"><button class="btn btn-default" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])">島の名前</button></th>
-	<th scope="col"><button class="btn btn-default" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])">ＩＰ情報</button></th>
-	<th scope="col"><button class="btn btn-default" tabindex="5" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])">ホスト情報</button></th>
+	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[0]);return false;">ログインした時間</button></th>
+	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[1,0]);return false;">島ID</button></th>
+	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[2,0]);return false;">島の名前</button></th>
+	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[3,0]);return false;">ＩＰ情報</button></th>
+	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[4,0]);return false;">ホスト情報</button></th>
 </tr>
 </thead>
 <tbody>
 END;
-        // ファイルを読み込み専用でオープンする
         $fp = fopen($init->dirName.'/'.$init->logname, 'r');
-
-        // 終端に達するまでループ
-        while (!feof($fp)) {
-            // ファイルから一行読み込む
-            $line = fgets($fp);
-            if ($line !== false) {
-                $num = str_replace([' ', ','], "</td><td>", $line);
-                echo '<tr><td scope="row">',$num,'</td></tr>',"\n";
-            }
+        while (false !== ($line = fgets($fp))) {
+            println('<tr><td scope="row">',str_replace(',', "</td><td>", $line),'</td></tr>');
         }
         fclose($fp);
-        echo "</tbody>\n</table>\n</form>";
+        println("</tbody>\n</table>\n</form>");
     }
 }
+
+
 
 class HtmlBF extends HTML
 {
@@ -2268,6 +2268,8 @@ class HtmlBF extends HTML
     }
 }
 
+
+
 class HTMLKeep extends HTML
 {
     public function main($data, $hako)
@@ -2278,7 +2280,6 @@ class HTMLKeep extends HTML
     }
 }
 
-///
 
 
 class HtmlAlly extends HTML
@@ -2303,8 +2304,7 @@ END;
         }
         $this->allyInfo($hako);
 
-        echo "</div>";
-        echo "</div>";
+        echo "</div>",PHP_EOL,"</div>";
     }
 
     //--------------------------------------------------
@@ -2323,7 +2323,7 @@ END;
         }
 
         echo <<<END
-占有率は、同盟加盟の<strong>総人口</strong>により算出されたものです。
+占有率は、同盟に加盟している{$init->nameSuffix}の<strong>総人口</strong>により算出されたものです。
 <div id="IslandView" class="table-responsive">
 <table class="table table-bordered">
 <thead>

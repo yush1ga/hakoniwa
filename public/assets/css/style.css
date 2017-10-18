@@ -26,7 +26,7 @@ th, td {
 
 /* タイトル */
 h1 {
-    color: #ccc;
+    color: #666;
 }
 .title::first-letter {
     color: #4169E1;
@@ -319,14 +319,6 @@ h2 {
 }
 
 
-/**
- * アクセスログ
- */
-
-/* アクセスログテーブル */
-#DATA-TABLE {
-    background-color: #fff;
-}
 
 /**
  * 追加した項目

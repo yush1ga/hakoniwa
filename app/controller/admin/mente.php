@@ -104,7 +104,7 @@ class Mente extends \Admin
     {
         global $init;
 
-        $dirName = (strcmp($id, "") == 0)? $init->dirName : $init->dirName.DIRECTORY_SEPARATOR.".bak{$id}";
+        $dirName = (strcmp($id, "") == 0)? $init->dirName : $init->dirName.".bak{$id}";
         $this->rmTree($dirName);
     }
 
@@ -143,10 +143,10 @@ class Mente extends \Admin
         global $init;
 
         $this->rmTree($init->dirName);
-        $dir = opendir($init->dirName.'bak'.$id.DIRECTORY_SEPARATOR);
+        $dir = opendir($init->dirName.".bak{$id}/");
         while (false !== ($fileName = readdir($dir))) {
             if ($fileName != "." && $fileName != "..") {
-                copy("{$init->dirName}.bak{$id}".DIRECTORY_SEPARATOR.$fileName, $init->dirName.DIRECTORY_SEPARATOR.$fileName);
+                copy("{$init->dirName}.bak{$id}/".$fileName, $init->dirName.'/'.$fileName);
             }
         }
         closedir($dir);
