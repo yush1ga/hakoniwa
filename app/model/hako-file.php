@@ -48,10 +48,8 @@ class File
         $GLOBALS['ISLAND_TURN'] = $this->islandTurn;
 
         // ターン処理判定
-        $now = $_SERVER['REQUEST_TIME'];
-        $_mode = isset($cgi->dataSet['mode']) ? $cgi->dataSet['mode'] : "";
-        if ((DEBUG && (strcmp($_mode, 'debugTurn') == 0)) ||
-             (($now - $this->islandLastTime) >= $init->unitTime)) {
+        if ((DEBUG && (strcmp(($cgi->dataSet['mode'] ?? ""), 'debugTurn') == 0)) ||
+             (($_SERVER['REQUEST_TIME'] - $this->islandLastTime) >= $init->unitTime)) {
             $cgi->mode = $data['mode'] = 'turn';
             $num = -1;
         }
@@ -129,15 +127,9 @@ class File
         $this->idToName[$id] = $name;
 
         if (($num == -1) || ($num == $id)) {
-            $fp_i;
 
             // データファイルの存在チェック
-            if (file_exists("{$init->dirName}/island.{$id}")) {
-                $fp_i = fopen("{$init->dirName}/island.{$id}", "r");
-            } else {
-                $fp_i = false;
-            }
-
+            $fp_i = (file_exists("{$init->dirName}/island.{$id}")) ? fopen("{$init->dirName}/island.{$id}", "r") : false;
             if ($fp_i === false) {
                 HTML::header();
                 HakoError::problem();
@@ -214,10 +206,10 @@ class File
             'bougyo'       => $bougyo,
             'tokuten'      => $tokuten,
             'shitten'      => $shitten,
-            'land'         => isset($land)      ? $land      : "",
-            'landValue'    => isset($landValue) ? $landValue : "",
-            'command'      => isset($command)   ? $command   : "",
-            'lbbs'         => isset($lbbs)      ? $lbbs      : "",
+            'land'         => $land ?? "",
+            'landValue'    => $landValue ?? "",
+            'command'      => $command ?? "",
+            'lbbs'         => $lbbs ?? "",
             'port'         => $port,
             'ship'         => array(0 => $ship0, 1 => $ship1, 2 => $ship2, 3 => $ship3, 4 => $ship4, 5 => $ship5, 6 => $ship6, 7 => $ship7, 8 => $ship8, 9 => $ship9, 10 => $ship10, 11 => $ship11, 12 => $ship12, 13 => $ship13, 14 => $ship14),
             'eisei'        => array(0 => $eisei0, 1 => $eisei1, 2 => $eisei2, 3 => $eisei3, 4 => $eisei4, 5 => $eisei5),
@@ -231,7 +223,7 @@ class File
      * @param  [type] $island [description]
      * @return [type]         [description]
      */
-    public function writeLand($num, $island)
+    public function writeLand(int $num, $island)
     {
         global $init;
         // 地形
@@ -428,19 +420,19 @@ class File
         fputs($fp, $island['password'] . "\n");
 
         if (!isset($island['pots'])) {
-            $island['pots'] = "0";
+            $island['pots'] = 0;
         }
         if (!isset($island['lot'])) {
-            $island['lot'] = "0";
+            $island['lot'] = 0;
         }
         if (!isset($island['gold'])) {
-            $island['gold'] = "0";
+            $island['gold'] = 0;
         }
         if (!isset($island['rice'])) {
-            $island['rice'] = "0";
+            $island['rice'] = 0;
         }
         if (!isset($island['peop'])) {
-            $island['peop'] = "0";
+            $island['peop'] = 0;
         }
 
         fputs($fp, $island['point'] . "," . $island['pots'] . "\n");
@@ -494,43 +486,10 @@ class File
         }
     }
 
-    /**
-     * [deprecated] バックアップ
-     * @return void
-     */
-    public function backUp()
-    {
-        global $init;
 
-        if ($init->backupTimes <= 0) {
-            return;
-        }
-        $tmp = $init->backupTimes - 1;
-        $this->rmTree("{$init->dirName}.bak{$tmp}");
-        for ($i = ($init->backupTimes - 1); $i > 0; $i--) {
-            $j = $i - 1;
-            if (is_dir("{$init->dirName}.bak{$j}")) {
-                rename("{$init->dirName}.bak{$j}", "{$init->dirName}.bak{$i}");
-            }
-        }
-        if (is_dir("{$init->dirName}")) {
-            rename("{$init->dirName}", "{$init->dirName}.bak0");
-        }
-        mkdir("{$init->dirName}", $init->dirMode);
-
-        // ログファイルだけ戻す
-        for ($i = 0; $i <= $init->logMax; $i++) {
-            if (is_file("{$init->dirName}.bak0/hakojima.log{$i}")) {
-                rename("{$init->dirName}.bak0/hakojima.log{$i}", "{$init->dirName}/hakojima.log{$i}");
-            }
-        }
-        if (is_file("{$init->dirName}.bak0/hakojima.his")) {
-            rename("{$init->dirName}.bak0/hakojima.his", "{$init->dirName}/hakojima.his");
-        }
-    }
 
     /**
-     * セーフモードバックアップ（現在は標準でこちら）
+     * バックアップ
      * @return void
      */
     public function safemode_backup()
@@ -591,7 +550,7 @@ class File
      * @param  string $dirName Directory that to delete.
      * @return void
      */
-    public function rmTree($dirName)
+    public function rmTree(string $dirName)
     {
         if (is_dir("{$dirName}")) {
             $dir = opendir("{$dirName}/");
@@ -610,7 +569,7 @@ class File
      * @param  boolean $erase 読込み後にファイルを削除するか
      * @return void
      */
-    public function readPresentFile($erase = false)
+    public function readPresentFile(bool $erase = false)
     {
         global $init;
 
@@ -655,6 +614,18 @@ class File
             }
         }
         fclose($fp);
+    }
+
+
+
+    /**
+     * 指定したフォルダをzipにまとめる
+     * @param  $path  対象フォルダの絶対パス
+     * @return [type] [description]
+     */
+    public function zip(string $path)
+    {
+        //wip
     }
 }
 
@@ -759,7 +730,7 @@ class Hako extends File
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr)
+    public function landString($l, $lv, $x, $y, $mode, $comStr = '')
     {
         global $init;
 
@@ -768,10 +739,6 @@ class Hako extends File
         $image = '';
         $naviTitle = '';
         $naviText = "";
-
-        if (empty($comStr)) {
-            $comStr = "";
-        }
 
         if ($x < $init->islandSize / 2) {
             $naviPos = 0;
@@ -1248,7 +1215,7 @@ class HakoBF extends File
         global $init;
 
         $this->readIslandsFile($cgi);
-        $this->islandListNoBF = "<option value=\"0\"></option>\n";
+        $this->islandListNoBF = '<option value="0"></option>'.PHP_EOL;
         for ($i = 0; $i < ($this->islandNumberNoBF); $i++) {
             $name = $this->islands[$i]['name'];
             $id = $this->islands[$i]['id'];
@@ -1268,9 +1235,7 @@ class HakoEdit extends File
     public function readIslands(&$cgi)
     {
         global $init;
-
-        $m = $this->readIslandsFile($cgi);
-        return $m;
+        return $this->readIslandsFile($cgi);
     }
 
     //---------------------------------------------------
@@ -1283,11 +1248,7 @@ class HakoEdit extends File
         $naviExp = "''";
         $comStr = implode(",", $comStr);
 
-        if ($x < $init->islandSize / 2) {
-            $naviPos = 0;
-        } else {
-            $naviPos = 1;
-        }
+        $naviPos = ($x < $init->islandSize / 2) ? 0 : 1;
         switch ($l) {
             case $init->landSea:
                 if ($lv == 0) {
@@ -1754,7 +1715,7 @@ class HakoPresent extends File
         $this->readIslandsFile($cgi);
         $this->readPresentFile();
 
-        $this->islandList = "<option value=\"0\"></option>\n";
+        $this->islandList = '<option value="0"></option>'.PHP_EOL;
         for ($i = 0; $i < ($this->islandNumber); $i++) {
             $name = $this->islands[$i]['name'];
             $id = $this->islands[$i]['id'];
@@ -1765,15 +1726,15 @@ class HakoPresent extends File
 
 class HakoKP extends File
 {
-    public $islandListNoKP;    // 普通の島リスト
-    public $islandListKP;    // 管理人預かり島リスト
+    public $islandListNoKP; // 普通の島リスト
+    public $islandListKP;   // 管理人預かり島リスト
 
     public function init($cgi)
     {
         global $init;
         $this->readIslandsFile($cgi);
-        $this->islandListNoKP = "<option value=\"0\"></option>\n";
-        $this->islandListKP = "<option value=\"0\"></option>\n";
+        $this->islandListNoKP = '<option value="0"></option>'.PHP_EOL;
+        $this->islandListKP = '<option value="0"></option>'.PHP_EOL;
 
         for ($i = 0; $i < $this->islandNumber; $i++) {
             $name = $this->islands[$i]['name'];

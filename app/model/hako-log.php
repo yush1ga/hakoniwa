@@ -15,9 +15,9 @@ class LogIO {
 	public $this_file = '';
 	public $init;
 
-	private $logPool       = array();
-	private $secretLogPool = array();
-	private $lateLogPool   = array();
+	private $logPool       = [];
+	private $secretLogPool = [];
+	private $lateLogPool   = [];
 
 
 	public function __construct() {
@@ -79,9 +79,7 @@ class LogIO {
 				echo "<h3>{$init->tagNumber_}ターン{$turn}の出来事{$init->_tagNumber}</h3>\n";
 				$row++;
 			}
-			echo "<ul class='list-unstyled'>";
-			echo "<li>{$message}</li>\n";
-			echo "</ul>";
+			echo "<ul class='list-unstyled'><li>{$message}</li></ul>";
 		}
 		echo "</div>";
 
@@ -209,15 +207,15 @@ class LogIO {
 			return;
 		}
 
-		$fileName = "{$this->init->noticeFile}";
+		$fileName = $this->init->noticeFile;
 		if(!is_file($fileName)) {
 			return;
 		}
 
 		$fp = fopen($fileName, "r");
-		while($line = fgets($fp, READ_LINE)) {
+		while(false !== ($line = fgets($fp, READ_LINE))) {
 			$line = chop($line);
-			echo "{$line}<br>\n";
+			echo $line}.'<br>'.PHP_EOL;
 		}
 		fclose($fp);
 
@@ -230,10 +228,9 @@ class LogIO {
 class Log extends LogIO {
 
 	function discover($id, $name) {
-		$this->history("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}{$this->init->_tagName}</A>が発見される。");
+		$this->history("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}{$this->init->_tagName}</a>が発見される。");
 	}
 	function changeName($name1, $name2) {
-		//$this->history("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name1}島</A>{$this->init->_tagName}、名称を<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name2}島</A>{$this->init->_tagName}に変更する。");
 		$this->history("{$this->init->tagName_}{$name1}島{$this->init->_tagName}、名称を{$this->init->tagName_}{$name2}島{$this->init->_tagName}に変更する。");
 	}
 	// 資金をプレゼント
@@ -259,8 +256,7 @@ class Log extends LogIO {
 		$this->history("{$this->init->tagName_}{$name}{$this->init->nameSuffix}{$this->init->_tagName}に、箱庭大明神の<strong>天罰が降り</strong><span class=attention>海の中に没し</span>ました。");
 	}
 	function doNothing($id, $name, $comName) {
-		//global $this->init;
-		//$this->out("{$this->init->tagName_}{$name}{$this->init->nameSuffix}{$this->init->_tagName}で{$this->init->tagComName_}${comName}{$this->init->_tagComName}が行われました。",$id);
+        // do not out anything
 	}
 	// 資金足りない
 	function noMoney($id, $name, $comName) {

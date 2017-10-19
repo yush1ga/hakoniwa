@@ -460,7 +460,7 @@ class HtmlMap extends HTML
     public function visitor($hako, $data)
     {
         global $init;
-        $this_file = $init->baseDir.DIRECTORY_SEPARATOR.'hako-main.php';
+        $this_file = $init->baseDir.'/hako-main.php';
 
         // idから島番号を取得
         $id = $data['ISLANDID'];
@@ -503,7 +503,7 @@ class HtmlMap extends HTML
         $commerce   = ($island['commerce'] <= 0) ? $init->notHave : $island['commerce'] * 10 . $init->unitPop;
         $mountain   = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
         $hatuden    = ($island['hatuden'] <= 0) ? $init->notHave : $island['hatuden'] * 10 . $init->unitPop;
-        $taiji      = (($island['taiji'] <= 0)? "0" : $island['taiji'] * 1 ).$init->unitMonster;
+        $taiji      = (($island['taiji'] <= 0)? 0 : $island['taiji']).$init->unitMonster;
         $tenki      = $island['tenki'];
         $team       = $island['team'];
         $shiai      = $island['shiai'];
@@ -605,10 +605,13 @@ class HtmlMap extends HTML
         require_once(VIEWS.'/map/island-info.php');
     }
 
-    //---------------------------------------------------
-    // 地形出力
-    // $mode = 1 -- ミサイル基地なども表示
-    //---------------------------------------------------
+    /**
+     * 地形出力
+     * @param  [type]  $hako   [description]
+     * @param  [type]  $island [description]
+     * @param  integer $mode   ミサイル基地等の機密情報表示有無(1/0) // [TODO]: boolにする
+     * @return [type]          [description]
+     */
     public function islandMap($hako, $island, $mode = 0)
     {
         global $init;
@@ -616,7 +619,7 @@ class HtmlMap extends HTML
         $land = $island['land'];
         $landValue = $island['landValue'];
         $command = $island['command'];
-        $comStr = array();
+        $comStr = [];
 
         // 増減情報
         $peop  = "";
@@ -625,16 +628,16 @@ class HtmlMap extends HTML
         $poin  = "";
 
         if (isset($island['peop'])) {
-            $peop = ($island['peop'] < 0) ? "{$island['peop']}{$init->unitPop}" : "+{$island['peop']}{$init->unitPop}";
+            $peop = ($island['peop'] < 0) ? $island['peop'].$init->unitPop : '+'.$island['peop'].$init->unitPop;
         }
         if (isset($island['gold'])) {
-            $okane = ($island['gold'] < 0) ? "{$island['gold']}{$init->unitMoney}" : "+{$island['gold']}{$init->unitMoney}";
+            $okane = ($island['gold'] < 0) ? $island['gold'].$init->unitMoney : '+'.$island['gold'].$init->unitMoney;
         }
         if (isset($island['rice'])) {
-            $gohan = ($island['rice'] < 0) ? "{$island['rice']}{$init->unitFood}" : "+{$island['rice']}{$init->unitFood}";
+            $gohan = ($island['rice'] < 0) ? $island['rice'].$init->unitFood : '+'.$island['rice'].$init->unitFood;
         }
         if (isset($island['pots'])) {
-            $poin = ($island['pots'] < 0) ? "{$island['pots']}pts" : "+{$island['pots']}pts";
+            $poin = ($island['pots'] < 0) ? $island['pots'].'pts' : '+'.$island['pots'].'pts';
         }
 
         if ($mode == 1) {
@@ -651,7 +654,7 @@ class HtmlMap extends HTML
 
         require_once(VIEWS.'/map/development/map.php');
 
-        echo "<p class='text-center'>開始ターン：{$island['starturn']}</p>\n";
+        println('<p class="text-center">開始ターン：',$island['starturn'],'</p>');
 
         if (isset($island['soccer']) && $island['soccer'] > 0) {
             echo <<<END
@@ -916,11 +919,8 @@ END;
             case $init->comHatuden:
             case $init->comBoku:
                 // 回数付き
-                if ($arg == 0) {
-                    $str = "{$point}で{$comName}";
-                } else {
-                    $str = "{$point}で{$comName}（{$arg}回）";
-                }
+                $str = "{$point}で{$comName}";
+                $str .= ($arg != 0) ?: "（{$arg}回）";
                 break;
 
             case $init->comPropaganda:
