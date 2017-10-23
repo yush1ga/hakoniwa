@@ -2144,14 +2144,14 @@ EOT;
     public function dataPrint($data, $suf = "")
     {
         global $init;
-        $this_file = $init->baseDir.DIRECTORY_SEPARATOR."hako-mente.php";
+        $this_file = $init->baseDir."/hako-mente.php";
 
         println('<hr>',PHP_EOL,'<section>');
         if (strcmp($suf, "") == 0) {
-            $fp = fopen($init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat', "r");
+            $fp = fopen($init->dirName.'/hakojima.dat', "r");
             println('<h2>現役データ</h2>');
         } else {
-            $fp = fopen("{$init->dirName}.bak{$suf}/hakojima.dat", "r");
+            $fp = fopen($init->dirName.".bak{$suf}/hakojima.dat", "r");
             println('<h2>バックアップ <small>（bak',$suf,'）</small></h2>');
         }
         $lastTurn = chop(fgets($fp, READ_LINE));

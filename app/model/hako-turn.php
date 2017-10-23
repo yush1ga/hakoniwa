@@ -164,11 +164,7 @@ class Turn {
 
         // バックアップ実行 ターン判定・処理
         if($hako->islandTurn % $init->backupTurn == 0) {
-            if($init->safemode) {
-                $hako->safemode_backup();
-            } else {
-                $hako->backUp();
-            }
+            $hako->backUp();
         }
 
         // ファイル・ログ書出し
@@ -5441,9 +5437,16 @@ class Turn {
         return false;
     }
 
-    //---------------------------------------------------
-    // 広域被害ルーチン
-    //---------------------------------------------------
+    /**
+     * 広域災害ルーチン
+     * @param  [type] $id         [description]
+     * @param  [type] $name       [description]
+     * @param  [type] &$land      [description]
+     * @param  [type] &$landValue [description]
+     * @param  [type] $x          [description]
+     * @param  [type] $y          [description]
+     * @return [type]             [description]
+     */
     function wideDamage($id, $name, &$land, &$landValue, $x, $y) {
         global $init;
 
@@ -5489,13 +5492,8 @@ class Turn {
                         $this->log->wideDamageSea($id, $name, $landName, $point);
                     }
                     $land[$sx][$sy] = $init->landSea;
-                    if($i == 0) {
-                        // 海
-                        $landValue[$sx][$sy] = 0;
-                    } else {
-                        // 浅瀬
-                        $landValue[$sx][$sy] = 1;
-                    }
+                    // 海・浅瀬
+                    $landValue[$sx][$sy] = ($i == 0) ? 0 : 1;
                 }
             } else {
                 // 2ヘックス
@@ -5603,7 +5601,7 @@ class Turn {
             $island['food']  += $init->shipFood  * $island['ship'][1];
         }
         if($island['money'] < 0) $island['money'] = 0;
-        if($island['food'] < 0) $island['food']  = 0 ;
+        if($island['food'] < 0) $island['food'] = 0 ;
     }
 
     /**
@@ -5613,7 +5611,6 @@ class Turn {
      */
     function shipcounter(&$island) {
         global $init;
-
         for($i = 0, $c=count($init->shipName); $i < $c; $i++) {
             $island['ship'][$i] = 0;
         }
@@ -5639,6 +5636,7 @@ class Turn {
             for($x = 0; $x < $init->islandSize; $x++) {
                 $kind = $land[$x][$y];
                 $value = $landValue[$x][$y];
+
                 if($kind == $init->landShip){
                     $ship = Util::navyUnpack($value);
                     if($ship[0] != 0) {
@@ -5649,56 +5647,44 @@ class Turn {
                         $island['ship'][$ship[1]]++;
                     }
                 }
-                if($kind == $init->landOil) {
-                    $oil++;
-                }
-                if($kind == $init->landSbase) {
-                    $base += 3;
-                    $fire += Util::expToLevel($kind, $value);
-                }
-                if($kind == $init->landSdefence) {
-                    $base += $value;
-                }
                 if(($kind != $init->landSea) &&
                     ($kind != $init->landShip) &&
-                    ($kind != $init->landSbase) &&
-                    ($kind != $init->landSdefence) &&
-                    ($kind != $init->landSsyoubou) &&
-                    ($kind != $init->landOil)) {
-                    if(($kind != $init->landNursery) && ($kind != $init->landSeaCity) && ($kind != $init->landFroCity) &&
-                        ($kind != $init->landSfarm) && ($kind != $init->landZorasu)) {
-                        $area++;
-                    }
+                    ($kind != $init->landSsyoubou)) {
                     switch($kind) {
                         // 町
                         case $init->landTown:
+                        case $init->landProcity:
+                            $area++;
+                            // no break.
                         case $init->landSeaCity:
                         case $init->landFroCity:
-                        case $init->landProcity:
                             $base++;
                             $pop += $value;
                             break;
 
                         // ニュータウン
                         case $init->landNewtown:
+                            $area++;
                             $pop += $value;
-                            $nwork =  (int)($value/15);
+                            $nwork = intdiv($value, 15);
                             $commerce += $nwork;
                             break;
 
                         // 現代都市
                         case $init->landBigtown:
+                            $area++;
                             $pop += $value;
-                            $mwork =  (int)($value/20);
-                            $lwork =  (int)($value/30);
+                            $mwork = intdiv($value, 20);
+                            $lwork = intdiv($value, 30);
                             $farm += $mwork;
                             $commerce += $lwork;
                             break;
 
                         // 農場
                         case $init->landFarm:
-                            // 周囲2へクスに風車があれば2倍の規模に
-                            $farm += (Turn::countAround($land, $x, $y, 19, array($init->landFusya)))? $value * 2 : $value;
+                            $area++;
+                            // 周囲2へクスに風車があれば規模を2倍
+                            $farm += (Turn::countAround($land, $x, $y, 19, [$init->landFusya]))? $value * 2 : $value;
                             break;
 
                         // 海底農場
@@ -5713,34 +5699,47 @@ class Turn {
 
                         // 工場
                         case $init->landFactory:
+                            $area++;
                             $factory += $value;
                             break;
 
                         // 商業
                         case $init->landCommerce:
+                            $area++;
                             $commerce += $value;
                             break;
 
                         // 山
                         case $init->landMountain:
+                            $area++;
                             $mountain += $value;
                             break;
 
                         // 発電所
                         case $init->landHatuden:
+                            $area++;
                             // ルナ所持でボーナス
-                            $hatuden += $island['zin'][4] == 1 ? $value *2 : $value;
+                            $hatuden += $island['zin'][4] == 1 ? $value*2 : $value;
                             break;
 
-                        // ミサイル
+                        // ミサイル基地・海底基地・海上防衛基地
                         case $init->landBase:
+                            $area++;
                             $base += 2;
                             $fire += Util::expToLevel($kind, $value);
+                            break;
+                        case $init->landSbase:
+                            $base += 3;
+                            $fire += Util::expToLevel($kind, $value);
+                            break;
+                        case $init->landSdefence:
+                            $base += $value;
                             break;
 
                         // 怪獣
                         case $init->landMonster:
                         case $init->landSleeper:
+                            $area++;
                             $monster++;
                             break;
 
@@ -5751,42 +5750,55 @@ class Turn {
 
                         // 港
                         case $init->landPort:
+                            $area++;
                             $port++;
                             break;
 
                         // 駅
                         case $init->landStat:
+                            $area++;
                             $stat++;
                             break;
 
                         // 電車
                         case $init->landTrain:
+                            $area++;
                             $train++;
                             break;
 
                         // スタジアム
                         case $init->landSoccer:
+                            $area++;
                             $soccer++;
                             break;
 
                         // 遊園地
                         case $init->landPark:
+                            $area++;
                             $park++;
                             break;
 
                         // 銀行
                         case $init->landBank:
+                            $area++;
                             $bank++;
                             break;
 
                         // 記念碑
                         case $init->landMonument:
+                            $area++;
                             if($value == 23) $m23++;
                             break;
 
                         // マイホーム
                         case $init->landMyhome:
+                            $area++;
                             $home++;
+                            break;
+
+                        // 海底油田
+                        case $init->landOil:
+                            $oil++;
                             break;
                     }
                 }
@@ -5828,6 +5840,7 @@ class Turn {
 
         // サッカーポイント計算
         // 2*勝数 - 2*敗数 + 引分け + 攻撃力 + 防御力 + 得点数 - 失点数
+        // [NOTE] サッカー場が存在しない場合は全部ゼロを代入させる
         if($island['soccer'] == 0) {
             $island['kachi'] = $island['make'] = $island['hikiwake'] = $island['kougeki'] = $island['bougyo'] = $island['tokuten'] = $island['shitten'] = 0;
         }
@@ -5843,21 +5856,18 @@ class Turn {
     /**
      * 範囲内の指定した地形の数を求める
      * @param  [type] $land  [description]
-     * @param  [type] $x     [description]
-     * @param  [type] $y     [description]
-     * @param  [type] $range [description]
-     * @param  [type] $kind  [description]
+     * @param  int   $x     中心にするx座標
+     * @param  int   $y     中心にするy座標
+     * @param  int   $range 範囲の大きさ [TODO]座標取得の自動化
+     * @param  array $kind  数えたい地形
      * @return [type]        [description]
      */
-    static function countAround($land, $x, $y, $range, $kind) {
+    static function countAround($land, int $x, int $y, int $range, array $kind) {
         global $init;
 
         // 範囲内の地形を数える
-        $count = 0;
-        $sea = 0;
-        $list = array();
-        $sx = 0;
-        $sy = 0;
+        $count = $sea = $sx = $sy = 0;
+        $list = [];
         reset($kind);
 
         while (list(, $value) = each($kind)) {
@@ -5870,13 +5880,11 @@ class Turn {
             if((($sy % 2) == 0) && (($y % 2) == 1)) {
                 $sx--;
             }
+            // 範囲外の場合は海として計算
             if(($sx < 0) || ($sx >= $init->islandSize) ||
                 ($sy < 0) || ($sy >= $init->islandSize)) {
-                // 範囲外の場合
-                // 海に加算
                 $sea++;
             } elseif( isset($list[$land[$sx][$sy]]) ) {
-                // 範囲内の場合
                 $count++;
             }
         }
@@ -5924,7 +5932,7 @@ class Turn {
      * @param  Integar $lv   メタデータ
      * @return String        対応した名称
      */
-    function landName($land, $lv) {
+    function landName(int $land, int $lv = 0) {
         global $init;
 
         switch($land) {
@@ -6019,10 +6027,10 @@ class Turn {
             case $init->landMountain:
                 return '山';
 
+            // 怪獣・寝てる怪獣
             case $init->landMonster:
             case $init->landSleeper:
-                $monsSpec = Util::monsterSpec($lv);
-                return $monsSpec['name'];
+                return Util::monsterSpec($lv)['name'];
 
             case $init->landSbase:
                 return '海底基地';
@@ -6045,6 +6053,7 @@ class Turn {
             case $init->landSoukoF:
                 return '食料庫';
 
+            // モニュメント
             case $init->landMonument:
                 return $init->monumentName[$lv];
 
@@ -6078,19 +6087,12 @@ class Turn {
  */
 function popComp($x, $y) {
     if ($x['isBF'] && !$y['isBF']) {
-            return 1;
-    }
-    if ($y['isBF'] && !$x['isBF']) {
-            return -1;
-    }
-    if($x['point'] == $y['point']) {
+        return 1;
+    } elseif ($y['isBF'] && !$x['isBF']) {
+        return -1;
+    } elseif ($x['isBF'] && $y['isBF']) {
         return 0;
     }
-    if ($x['point'] == 0) {
-        return 1;
-    }
-    if ($y['point'] == 0) {
-        return -1;
-    }
-    return ($x['point'] > $y['point']) ? -1 : 1;
+    // mean ($x['point'] > $y['point']) ? -1 : 1;
+    return $y['point'] <=> $x['point'];
 }

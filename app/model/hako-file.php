@@ -492,7 +492,7 @@ class File
      * バックアップ
      * @return void
      */
-    public function safemode_backup()
+    public function backup()
     {
         global $init;
 
@@ -621,7 +621,7 @@ class File
     /**
      * 指定したフォルダをzipにまとめる
      * @param  $path  対象フォルダの絶対パス
-     * @return [type] [description]
+     * @return int    エラーコード
      */
     public function zip(string $path)
     {

@@ -180,10 +180,10 @@ class Mente extends \Admin
 
         if (!isValidPasswd($this->dataSet['MPASS1'],$this->dataSet['MPASS2'])) {
             HakoError::wrongMasterPassword();
-            return 0;
+            return;
         }elseif(!isValidPasswd($this->dataSet['SPASS1'],$this->dataSet['SPASS2'])) {
             HakoError::wrongSpecialPassword();
-            return 0;
+            return;
         }
         $masterPassword  = crypt($this->dataSet['MPASS1'], 'ma');
         $specialPassword = crypt($this->dataSet['SPASS1'], 'sp');

@@ -1,15 +1,16 @@
 <?php
+namespace Hakoniwa\Admin
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
 
- class BF extends Admin {
+ class BF extends \Admin {
 
  	function execute() {
- 		$html = new HtmlBF();
- 		$hako = new HakoBF();
- 		$cgi = new Cgi();
+ 		$html = new \HtmlBF();
+ 		$hako = new \HakoBF();
+ 		$cgi = new \Cgi();
  		$this->parseInputData();
  		$hako->init($this);
  		$cgi->getCookies();
