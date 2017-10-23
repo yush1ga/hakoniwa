@@ -2128,7 +2128,7 @@ EOT;
         }
         // バックアップデータがあれば表示
         $dir = opendir(dirname($dirName));
-        $dirCld = substr(strrchr($dirName, "/"), 1);
+        $dirCld = false !== strpos($dirName, "/") ? substr(strrchr($dirName, "/"), 1) : $dirName;
         while (false !== ($dn = readdir($dir))) {
             $_dirName = preg_quote($dirCld);
             if(preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
