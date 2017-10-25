@@ -175,7 +175,7 @@ class Mente extends \Admin
         global $init;
 
         function isValidPasswd($passwd1='', $passwd2=''){
-            return !($passwd1=='' || $passwd2=='' || strcmp($passwd1,$passwd2));
+            return !($passwd1=='' || $passwd2=='' || (0 != strcmp($passwd1,$passwd2)));
         }
 
         if (!isValidPasswd($this->dataSet['MPASS1'],$this->dataSet['MPASS2'])) {
@@ -185,11 +185,11 @@ class Mente extends \Admin
             HakoError::wrongSpecialPassword();
             return;
         }
-        $masterPassword  = crypt($this->dataSet['MPASS1'], 'ma');
-        $specialPassword = crypt($this->dataSet['SPASS1'], 'sp');
+        $masterPasswd  = password_hash($this->dataSet['MPASS1'], PASSWORD_DEFAULT, ['cost'=>10]);
+        $specialPasswd = password_hash($this->dataSet['SPASS1'], PASSWORD_DEFAULT, ['cost'=>10]);
         $fp = fopen($init->passwordFile, "w");
-        fputs($fp, "$masterPassword\n");
-        fputs($fp, "$specialPassword\n");
+        fputs($fp, "$masterPasswd\n");
+        fputs($fp, "$specialPasswd\n");
         fclose($fp);
     }
 }

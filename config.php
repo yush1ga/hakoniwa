@@ -24,13 +24,7 @@ if (DEBUG) {
     error_reporting(E_ALL);
     header("Cache-Control: no-cache, no-store, must-revalidate");
     header("Expires: Sat, 01 Apr 2017 09:00:00 GMT");
-    require_once __DIR__.DIRECTORY_SEPARATOR.'ChromePhp.php'; // ChromeLogger
-    // ChromePhp::log($hoge);
-    if(!extension_loaded('mbstring')){
-        echo 'ご利用のPHPサーバー内にて、モジュール"mbstring"が読み込まれていないため、本プログラムは動作を停止しました。<br>大変お手数ですが、サーバー管理者にお問合せください。';
-        //-> php.iniから'mbstring.so'/'php_mbstring.dll'を有効にする
-        die;
-    }
+    require_once __DIR__.'/launchTest.php';
 }
 
 // 各種ディレクトリ

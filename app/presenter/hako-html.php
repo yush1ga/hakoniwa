@@ -94,7 +94,7 @@ class HtmlTop extends HTML
         $defaultPassword = $data['defaultPassword'] ?? "";
 
         // set parent directory
-        $views = VIEWS.DIRECTORY_SEPARATOR.'top'.DIRECTORY_SEPARATOR;
+        $views = VIEWS.'/top/';
 
         // 読み込み
         require_once($views.'main.php');
@@ -520,23 +520,8 @@ class HtmlMap extends HTML
             $comment = '<span class="attention">この島は管理人預かり中です。</span>';
         }
 
-        $sora = "";
-        switch ($tenki) {
-            case 1:
-                $sora = '<img src="'.$init->imgDir.'/tenki1.gif" alt="晴れ" title="晴れ" width="19" height="19">';//"☀";
-                break;
-            case 2:
-                $sora = '<img src="'.$init->imgDir.'/tenki2.gif" alt="曇り" title="曇り" width="19" height="19">';//"☁";
-                break;
-            case 3:
-                $sora = '<img src="'.$init->imgDir.'/tenki3.gif" alt="雨" title="雨" width="19" height="19">';//"☂";
-                break;
-            case 4:
-                $sora = '<img src="'.$init->imgDir.'/tenki4.gif" alt="雷" title="雷" width="19" height="19">';//"⛈";
-                break;
-            default:
-                $sora = '<img src="'.$init->imgDir.'/tenki5.gif" alt="雪" title="雪" width="19" height="19">';//"☃";
-        }
+        $_sora = ['','晴れ','曇り','雨','雷','雪'];
+        $sora = '<img src="'.$init->imgDir.'/tenki'.$tenki.'.gif" alt="'.$_sora[$tenki].'" title="'.$_sora[$tenki].'" width="19" height="19">';
 
         $eiseis = "";
         for ($e = 0; $e < $init->EiseiNumber; $e++) {
@@ -556,8 +541,6 @@ class HtmlMap extends HTML
             if (isset($zin[$z])) {
                 if ($zin[$z] > 0) {
                     $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
-                } else {
-                    $zins .= "";
                 }
             }
         }
@@ -571,8 +554,6 @@ class HtmlMap extends HTML
                     } else {
                         $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
                     }
-                } else {
-                    $items .= "";
                 }
             }
         }
@@ -2071,7 +2052,8 @@ class HtmlMente extends HTML
 END;
         } else {
             echo <<<END
-<p><strong>マスタパスワードと特殊パスワードを決めてください。</strong><br>マスタパスワードは、管理者権限でログインするために必要になります。特殊パスワードは、<br>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
+<p><strong>マスタパスワードと特殊パスワードを決めてください。</strong></p>
+<p>マスタパスワードは、管理者権限でログインするために必要になります。<br>特殊パスワードは、マップエディットの際に資源を増加させる際などに用います。<br>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
 
 <form action="$this_file" method="post">
 

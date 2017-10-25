@@ -32,7 +32,7 @@ class Admin
             HakoError::wrongPassword();
             return false;
         }
-        if (strcmp(crypt($this->dataSet['PASSWORD'], 'ma'), $masterPassword) === 0) {
+        if (password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
             return true;
         } else {
             HakoError::wrongPassword();

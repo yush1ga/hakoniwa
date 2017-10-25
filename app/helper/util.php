@@ -13,7 +13,7 @@ class Util
      * @param  integer $money 資金額
      * @return string         丸めた文字列
      */
-    public static function aboutMoney($money = 0)
+    public static function aboutMoney(int $money = 0):string
     {
         global $init;
         $digit = (int)$init->moneyMode;
@@ -28,7 +28,7 @@ class Util
      * @param  integer $exp  経験値
      * @return integer       対応した基地レベル値
      */
-    public static function expToLevel($kind, $exp)
+    public static function expToLevel(int $kind, int $exp):int
     {
         global $init;
 
@@ -61,7 +61,7 @@ class Util
         global $init;
 
         // 種類
-        $kind = (int)($lv / 100);
+        $kind = intdiv($lv, 100);
         // 名前
         $name = $init->monsterName[$kind];
         // 体力
@@ -124,13 +124,14 @@ class Util
         }
         if (file_exists($init->passwordFile)) {
             $fp = fopen($init->passwordFile, "r");
-            $masterPassword = chop(fgets($fp, READ_LINE));
+            $masterPasswd = chop(fgets($fp, READ_LINE));
             fclose($fp);
         }
         // マスターパスワードチェック
-        if (strcmp($masterPassword, crypt($p2, 'ma')) == 0) {
+        if (password_verify($p2, $masterPasswd)) {
             return true;
         }
+        // 通常のパスワードチェック
         if (strcmp($p1, Util::encode($p2)) == 0) {
             return true;
         }
@@ -143,7 +144,7 @@ class Util
      * @param  string $p [description]
      * @return [type]    [description]
      */
-    public static function checkSpecialPassword($p = "")
+    public static function checkSpecialPassword(string $p = ""):bool
     {
         global $init;
 
@@ -153,23 +154,20 @@ class Util
         }
         if (file_exists($init->passwordFile)) {
             $fp = fopen($init->passwordFile, "r");
-            $masterPassword = chop(fgets($fp, READ_LINE));
-            $specialPassword = chop(fgets($fp, READ_LINE));
+            $specialPasswd = chop(fgets($fp, READ_LINE));//1行目を破棄
+            $specialPasswd = chop(fgets($fp, READ_LINE));
             fclose($fp);
         }
         // 特殊パスワードチェック
-        if (strcmp($specialPassword, crypt($p, 'sp')) == 0) {
-            return true;
-        }
-        return false;
+        return password_verify($p, $specialPasswd);
     }
 
     /**
      * パスワードのエンコード
      */
-    public static function encode($s)
+    public static function encode(string $s):string
     {
-        return crypt($s, 'h2');
+        return password_hash($s, PASSWORD_DEFAULT, ['cost'=>10]);
     }
 
     /**
@@ -189,7 +187,7 @@ class Util
     {
         global $init;
 
-        $rx = $ry = array();
+        $rx = $ry = [];
         for ($i = 0; $i < $init->islandSize; $i++) {
             for ($j = 0; $j < $init->islandSize; $j++) {
                 $rx[$i * $init->islandSize + $j] = $j;
@@ -268,7 +266,7 @@ class Util
         if ($number == count($command) - 1) {
             return;
         }
-        for ($i = (int)$init->commandMax - 1; $i > $number; $i--) {
+        for ($i = $init->commandMax - 1; $i > $number; $i--) {
             $command[$i] = $command[$i - 1];
         }
         $command[$i] = array(
@@ -306,7 +304,7 @@ class Util
         $lv >>= 3;
         $id   = $lv & 0x1f;
 
-        return array($id, $kind, $hp, $exp, $flag);
+        return [$id, $kind, $hp, $exp, $flag];
     }
 
     //---------------------------------------------------
@@ -360,7 +358,7 @@ class Util
         for ($i=$badShipsId; $i < $arrSize; $i++) {
             $badShips++;
         }
-        return ($badShips!=0)? true: false;
+        return ($badShips!=0);
     }
 
     /**

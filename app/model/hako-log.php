@@ -215,7 +215,7 @@ class LogIO {
 		$fp = fopen($fileName, "r");
 		while(false !== ($line = fgets($fp, READ_LINE))) {
 			$line = chop($line);
-			echo $line}.'<br>'.PHP_EOL;
+			echo $line.'<br>'.PHP_EOL;
 		}
 		fclose($fp);
 

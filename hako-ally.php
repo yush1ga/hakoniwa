@@ -25,15 +25,15 @@ class MakeAlly
         global $init;
 
         $currentID = $data['ISLANDID'];
-        $allyID = isset($data['ALLYID']) ? $data['ALLYID'] : "";
-        $currentAnumber = isset($data['ALLYNUMBER']) ? $data['ALLYNUMBER'] : "";
+        $allyID = $data['ALLYID'] ?? "";
+        $currentAnumber = $data['ALLYNUMBER'] ?? "";
         $allyName = htmlspecialchars($data['ALLYNAME']);
         $allyMark = $data['MARK'];
-        $allyColor = "{$data['COLOR1']}{$data['COLOR2']}{$data['COLOR3']}{$data['COLOR4']}{$data['COLOR5']}{$data['COLOR6']}";
+        $allyColor = $data['COLOR1'].$data['COLOR2'].$data['COLOR3'].$data['COLOR4'].$data['COLOR5'].$data['COLOR6'];
         $adminMode = 0;
 
         // パスワードチェック
-        $data['OLDPASS'] = isset($data['OLDPASS']) ? $data['OLDPASS'] : "";
+        $data['OLDPASS'] = $data['OLDPASS'] ?? "";
         if (AllyUtil::checkPassword("", $data['OLDPASS'])) {
             $adminMode = 1;
             if ($allyID > 200) {
@@ -856,7 +856,7 @@ class AllyUtil
     {
         // 全島から探す
         for ($i = 0; $i < $hako->islandNumber; $i++) {
-            if (strcmp($name, "{$hako->islands[$i]['name']}") == 0) {
+            if (strcmp($name, $hako->islands[$i]['name']) == 0) {
                 return $i;
             }
         }
@@ -922,7 +922,7 @@ class AllyUtil
             $i = $idToAllyNumber[$id];
             $mark  = $ally[$i]['mark'];
             $color = $ally[$i]['color'];
-            $name .= '<FONT COLOR="' . $color . '"><B>' . $mark . '</B></FONT> ';
+            $name .= '<span style="font-weight:bold;color:'.$color.'">'.$mark.'</span> ';
         }
         $name .= $island['name'] . "島";
         return ($name);
@@ -931,7 +931,7 @@ class AllyUtil
     //---------------------------------------------------
     // パスワードチェック
     //---------------------------------------------------
-    public static function checkPassword($p1 = "", $p2 = "")
+    public static function checkPassword(string $p1 = "", string $p2 = ""):bool
     {
         global $init;
 
@@ -1002,7 +1002,7 @@ class AllyUtil
 class Main
 {
     public $mode;
-    public $dataSet = array();
+    public $dataSet = [];
     //--------------------------------------------------
     // モード分岐
     //--------------------------------------------------
