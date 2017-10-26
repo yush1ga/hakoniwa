@@ -1987,7 +1987,7 @@ END;
 <input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
 <input type="hidden" name="mode" value="comment">
 <input type="hidden" name="ISLANDID" value="{$island['id']}">
-<input type="hidden" name="DEVELOPEMODE" value="cgi">
+<input type="hidden" name="DEVELOPEMODE" value="javascript">
 <span class="input-group-btn"><input type="submit" class="btn btn-primary" value="コメント更新"></span>
 </div>
 </form>
