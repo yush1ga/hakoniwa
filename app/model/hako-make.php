@@ -55,9 +55,9 @@ class Make {
 		$safety = 0;
 		while(isset($hako->idToNumber[$hako->islandNextID])) {
 			$hako->islandNextID++;
-			if($hako->islandNextID > 250) $hako->islandNextID = 1;
+			if($hako->islandNextID > $init->maxIsland) $hako->islandNextID = 1;
 			$safety++;
-			if($safety == 250) break;
+			if($safety == $init->maxIsland) break;
 		}
 
 		// 各種の値を設定
@@ -98,20 +98,20 @@ class Make {
 	function makeNewIsland() {
 		global $init;
 
-		$command = array();
+		$command = [];
 		// 初期コマンド生成
 		for($i = 0; $i < $init->commandMax; $i++) {
-			$command[$i] = array (
+			$command[$i] = [
 				'kind'   => $init->comDoNothing,
 				'target' => 0,
 				'x'      => 0,
 				'y'      => 0,
 				'arg'    => 0,
-			);
+			];
 		}
 
-		$land = array();
-		$landValue = array();
+		$land = [];
+		$landValue = [];
 
 		if ($init->initialLand) {
 			// 初期島データファイル使用モード
@@ -256,7 +256,7 @@ class Make {
 			for($i = 0; $i < 120; $i++) {
 				$x = Util::random(8) + $center - 3;
 				$y = Util::random(8) + $center - 3;
-				if(Turn::countAround($land, $x, $y, 7, array($init->landSea)) != 7) {
+				if(Turn::countAround($land, $x, $y, 7, [$init->landSea]) != 7) {
 					// 周りに陸地がある場合、浅瀬にする
 					// 浅瀬は荒地にする
 					// 荒地は平地にする
@@ -371,6 +371,7 @@ class Make {
 		Success::Comment();
 
 		// owner modeへ
+        ChromePhp::log($data);
 		if($data['DEVELOPEMODE'] == "cgi") {
 			$html = new HtmlMap();
 		} else {
@@ -544,13 +545,13 @@ class Make {
 				$y = $rpy[$j];
 				if($land[$x][$y] == $init->landWaste) {
 					Util::slideBack($command, $i);
-					$command[$i] = array (
+					$command[$i] = [
 						'kind'   => $kind,
 						'target' => 0,
 						'x'      => $x,
 						'y'      => $y,
 						'arg'    => 0,
-					);
+					];
 					$i++;
 				}
 				$j++;
@@ -693,13 +694,13 @@ class Make {
 			}
 			Success::commandAdd();
 			// コマンドを登録
-			$command[$data['NUMBER']] = array (
+			$command[$data['NUMBER']] = [
 				'kind'   => $data['COMMAND'],
 				'target' => $data['TARGETID'],
 				'x'      => $data['POINTX'],
 				'y'      => $data['POINTY'],
 				'arg'    => $data['AMOUNT'],
-			);
+			];
 		}
 
 		// データの書き出し
@@ -778,13 +779,13 @@ class MakeJS extends Make {
 			if($kind == 0) {
 				$kind = $init->comDoNothing;
 			}
-			$command[$i] = array (
+			$command[$i] = [
 				'kind'   => $kind,
 				'x'      => $x,
 				'y'      => $y,
 				'arg'    => $arg,
 				'target' => $target
-			);
+			];
 		}
 		Success::commandAdd();
 

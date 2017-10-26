@@ -445,9 +445,14 @@ class Util
     }
 }
 
-function println(...$strs) {
+function println(...$strs)
+{
     foreach($strs as $str) {
         echo $str;
     }
     echo PHP_EOL;
+}
+function h(string $str):string
+{
+    return preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($str, ENT_QUOTES, 'UTF-8'));
 }
