@@ -92,7 +92,7 @@ class MakeAlly
             HakoError::noMoney();
             return;
         }
-        $n = $hako->idToAllyNumber[$currentID];
+        $n = $hako->idToAllyNumber[$currentID] ?? '';
         if ($n != '') {
             if ($adminMode && ($allyID != '') && ($allyID < 200)) {
                 $allyMember = $hako->ally[$n]['memberId'];
@@ -673,9 +673,13 @@ class AllyIO
         fputs($fp, $ext . "\n");
         if (isset($ally['comment'])) {
             fputs($fp, $ally['comment'] . "\n");
+        }else {
+            fputs($fp, "\n");
         }
         if (isset($ally['title']) && isset($ally['message'])) {
             fputs($fp, $ally['title'] . '<>' . $ally['message'] . "\n");
+        }else {
+            fputs($fp, '<>'. "\n");
         }
     }
 
@@ -1121,11 +1125,11 @@ $start->execute();
 // 人口を比較、同盟一覧用
 function scoreComp($x, $y)
 {
-    if ($x['dead'] == 1) {
+    if (isset($x['dead']) && $x['dead'] == 1) {
         // 死滅フラグが立っていれば後ろへ
         return +1;
     }
-    if ($y['dead'] == 1) {
+    if (isset($y['dead']) && $y['dead'] == 1) {
         return -1;
     }
     if ($x['score'] == $y['score']) {
