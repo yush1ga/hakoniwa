@@ -71,7 +71,7 @@ class Make {
 		$island['absent'] = $init->giveupTurn - (max($DAY / $init->unitTime, $init->unitTime / $DAY));
 		$island['comment'] = '（未登録）';
 		$island['comment_turn'] = $hako->islandTurn;
-		$island['password'] = Util::encode($data['PASSWORD']);
+		$island['password'] = Util::encode($data['PASSWORD'], true);
 		$island['tenki'] = 1;
 		$island['team'] = $island['shiai'] = $island['kachi'] = $island['make'] = $island['hikiwake'] = $island['kougeki'] = $island['bougyo'] = $island['tokuten'] = $island['shitten'] = 0;
 
@@ -446,7 +446,7 @@ class Make {
 		// password変更の場合
 		if(!empty($data['PASSWORD'])) {
 			// パスワードを変更
-			$island['password'] = Util::encode($data['PASSWORD']);
+			$island['password'] = Util::encode($data['PASSWORD'], true);
 			$flag = 1;
 		}
 		//if(($flag == 0) && (strcmp($data['PASSWORD'], $data['PASSWORD2']) != 0)) {

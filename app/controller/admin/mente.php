@@ -78,7 +78,7 @@ class Mente extends \Admin
         $now = $_SERVER['REQUEST_TIME'];
         $now -= $now % $init->unitTime;
 
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
+        $fileName = $init->dirName.'/hakojima.dat';
         touch($fileName);
         $fp = fopen($fileName, "w");
         fputs($fp, "1\n");
@@ -88,13 +88,13 @@ class Mente extends \Admin
         fclose($fp);
 
         // 同盟ファイル生成
-        touch($init->dirName.DIRECTORY_SEPARATOR.'ally.dat');
+        touch($init->dirName.'/ally.dat');
 
         // アクセスログ生成
         touch($init->dirName.DIRECTORY_SEPARATOR.$init->logname);
 
         // .htaccess生成
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'.htaccess';
+        $fileName = $init->dirName.'/.htaccess';
         $fp = fopen($fileName, "w");
         fputs($fp, "Options -Indexes");
         fclose($fp);
@@ -124,7 +124,7 @@ class Mente extends \Admin
     {
         global $init;
 
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
+        $fileName = $init->dirName.'/hakojima.dat';
         $fp = fopen($fileName, "r+");
         $buffer = [];
         while ($line = fgets($fp, READ_LINE)) {
@@ -160,10 +160,10 @@ class Mente extends \Admin
     public function rmTree($dirName)
     {
         if (is_dir($dirName)) {
-            $dir = opendir($dirName.DIRECTORY_SEPARATOR);
+            $dir = opendir($dirName.'/');
             while (false !== ($fileName = readdir($dir))) {
                 if ($fileName != "." && $fileName != "..") {
-                    unlink($dirName.DIRECTORY_SEPARATOR.$fileName);
+                    unlink($dirName.'/'.$fileName);
                 }
             }
             closedir($dir);

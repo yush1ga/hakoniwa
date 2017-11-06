@@ -805,26 +805,8 @@ class AllyIO
     }
 }
 
-class AllyUtil
+class AllyUtil extends Util
 {
-    //---------------------------------------------------
-    // 資金の表示
-    //---------------------------------------------------
-    public static function aboutMoney($money = 0)
-    {
-        global $init;
-
-        if ($init->moneyMode) {
-            if ($money < 500) {
-                return "推定500{$init->unitMoney}未満";
-            } else {
-                return "推定" . round($money / 1000) . "000" . $init->unitMoney;
-            }
-        } else {
-            return $money . $init->unitMoney;
-        }
-    }
-
     //---------------------------------------------------
     // 同盟の占有率の計算
     //---------------------------------------------------
@@ -903,68 +885,18 @@ class AllyUtil
     //---------------------------------------------------
     public static function htmlEscape($s, $mode = 0)
     {
-        $s = htmlspecialchars($s);
-        $s = str_replace('"', '&quot;', $s);
-        $s = str_replace("'", "&#039;", $s);
+        $s = h($s);
 
         if ($mode) {
             $s = str_replace("\r\n", "<br>", $s);
             $s = str_replace("\r", "<br>", $s);
             $s = str_replace("\n", "<br>", $s);
-            $s = preg_replace("/(<br>){5,}/", "<br>", $s); // 大量改行対策
+            $s = preg_replace('/(<br>){3,}/', '<br><br>', $s); // 大量改行対策
         }
         return $s;
     }
 
-    //---------------------------------------------------
-    // 島名を返す
-    //---------------------------------------------------
-    public static function islandName($island, $ally, $idToAllyNumber)
-    {
-        $name = '';
-        foreach ($island['allyId'] as $id) {
-            $i = $idToAllyNumber[$id];
-            $mark  = $ally[$i]['mark'];
-            $color = $ally[$i]['color'];
-            $name .= '<span style="font-weight:bold;color:'.$color.'">'.$mark.'</span> ';
-        }
-        $name .= $island['name'] . "島";
-        return ($name);
-    }
 
-    //---------------------------------------------------
-    // パスワードチェック
-    //---------------------------------------------------
-    public static function checkPassword(string $p1 = "", string $p2 = ""):bool
-    {
-        global $init;
-
-        // nullチェック
-        if (empty($p2)) {
-            return false;
-        }
-        if (file_exists("{$init->passwordFile}")) {
-            $fp = fopen("{$init->passwordFile}", "r");
-            $masterPassword = chop(fgets($fp, READ_LINE));
-            fclose($fp);
-        }
-        // マスターパスワードチェック
-        if (strcmp($masterPassword, crypt($p2, 'ma')) == 0) {
-            return true;
-        }
-        if (strcmp($p1, AllyUtil::encode($p2)) == 0) {
-            return true;
-        }
-        return false;
-    }
-
-    //---------------------------------------------------
-    // パスワードのエンコード
-    //---------------------------------------------------
-    public static function encode($s)
-    {
-        return crypt($s, 'h2');
-    }
 
     //---------------------------------------------------
     // ファイルをロックする(書き込み時)
@@ -988,14 +920,6 @@ class AllyUtil
             HakoError::lockFail();
         }
         rewind($fp);
-    }
-
-    //---------------------------------------------------
-    // ファイルをアンロックする
-    //---------------------------------------------------
-    public static function unlock($fp)
-    {
-        flock($fp, LOCK_UN);
     }
 }
 
@@ -1084,9 +1008,8 @@ class Main
     {
         global $init;
 
-        if (isset($_POST['mode'])) {
-            $this->mode = $_POST['mode'];
-        }
+        $this->mode = $_POST['mode'] ?? '';
+
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {
                 $this->dataSet["{$name}"] = str_replace(",", "", $value);

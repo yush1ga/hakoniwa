@@ -105,7 +105,7 @@ class Util
         }
         $name .= $island['name'] . "島";
 
-        return ($name);
+        return $name;
     }
 
     /**
@@ -114,7 +114,7 @@ class Util
      * @param  string $p2 [description]
      * @return [type]     [description]
      */
-    public static function checkPassword($p1 = "", $p2 = "")
+    public static function checkPassword(string $p1 = "", string $p2 = ""):bool
     {
         global $init;
 
@@ -131,8 +131,10 @@ class Util
         if (password_verify($p2, $masterPasswd)) {
             return true;
         }
+
         // 通常のパスワードチェック
-        if (strcmp($p1, Util::encode($p2)) == 0) {
+        $isLegacyHash = '$2y$10$' !== substr($p1, 0,7);
+        if (strcmp($p1, Util::encode($p2, $isLegacyHash)) == 0) {
             return true;
         }
 
@@ -165,9 +167,9 @@ class Util
     /**
      * パスワードのエンコード
      */
-    public static function encode(string $s):string
+    public static function encode(string $s, bool $isLegacy = false):string
     {
-        return password_hash($s, PASSWORD_DEFAULT, ['cost'=>10]);
+        return ($isLegacy)? crypt($s, 'h2') : password_hash($s, PASSWORD_DEFAULT, ['cost'=>10]);
     }
 
     /**
@@ -193,7 +195,6 @@ class Util
                 $rx[$i * $init->islandSize + $j] = $j;
             }
         }
-
         for ($i = 0; $i < $init->islandSize; $i++) {
             for ($j = 0; $j < $init->islandSize; $j++) {
                 $ry[$j * $init->islandSize + $i] = $j;
@@ -211,7 +212,7 @@ class Util
                 $ry[$j] = $tmp;
             }
         }
-        return array($rx, $ry);
+        return [$rx, $ry];
     }
 
     //---------------------------------------------------
@@ -246,13 +247,13 @@ class Util
         array_splice($command, $number, 1);
 
         // 最後に資金繰り
-        $command[$init->commandMax - 1] = array(
+        $command[$init->commandMax - 1] = [
             'kind'   => $init->comDoNothing,
             'target' => 0,
             'x'      => 0,
             'y'      => 0,
             'arg'    => 0
-        );
+        ];
     }
 
     //---------------------------------------------------
