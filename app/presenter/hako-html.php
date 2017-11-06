@@ -2292,7 +2292,7 @@ END;
     //--------------------------------------------------
     // 同盟の状況
     //--------------------------------------------------
-    public function allyInfo($hako, $num = 0)
+    public function allyInfo($hako, $view_ally_num = 0)
     {
         global $init;
         $this_file  = $init->baseDir . "/hako-ally.php";
@@ -2326,7 +2326,7 @@ END;
 END;
 
         for ($i=0; $i<$allyNumber; $i++) {
-            if ($num && ($i != $hako->idToAllyNumber[$num])) {
+            if ($view_ally_num && ($i != $hako->idToAllyNumber[$view_ally_num])) {
                 continue;
             }
             $ally = $hako->ally[$i];

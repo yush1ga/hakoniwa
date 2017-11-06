@@ -773,7 +773,7 @@ class Log extends LogIO {
 	}
 	// 船失敗
 	function shipFail($id, $name, $comName, $kind) {
-		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、<strong>{$kind}</strong>だったため中止されました。",$id, $tId);
+		$this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、<strong>{$kind}</strong>だったため中止されました。",$id);
 	}
 	// ぞらす現る
 	function ZorasuCome($id, $name, $point) {
