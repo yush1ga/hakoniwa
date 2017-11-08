@@ -576,7 +576,6 @@ class AllyIO
             }
         }
         AllyUtil::unlock($fp);
-        fclose($fp);
         return true;
     }
     //--------------------------------------------------
@@ -637,7 +636,6 @@ class AllyIO
             $this->writeAlly($fp, $this->ally[$i]);
         }
         AllyUtil::unlock($fp);
-        fclose($fp);
         return true;
     }
 
@@ -695,7 +693,6 @@ class AllyIO
             $this->islands[$i]['allyId'] = array();
         }
         AllyUtil::unlock($fp);
-        fclose($fp);
 
         if ($init->allyUse) {
             $this->readAllyFile();
