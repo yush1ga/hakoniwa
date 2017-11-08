@@ -13,7 +13,6 @@ class Main
 
         $cgi->parseInputData();
         $cgi->getCookies();
-        $fp = "";
 
         // [CHK] データファイルがない
         if (!$hako->readIslands($cgi)) {
@@ -23,7 +22,7 @@ class Main
             exit();
         }
         // [CHK] ファイルロック失敗
-        if (false == ($lock = Util::lock($fp))) {
+        if (false == ($lock = Util::lock())) {
             exit();
         }
         $cgi->setCookies();

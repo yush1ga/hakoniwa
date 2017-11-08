@@ -285,7 +285,6 @@ class File
         // 加盟している同盟のIDを格納
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $member = $this->ally[$i]['memberId'];
-            $j = 0;
             foreach ($member as $id) {
                 $n = $this->idToNumber[$id];
                 if (!($n > -1)) {
@@ -803,7 +802,7 @@ class Hako extends File
                     $naviText = "{$owner}島所属<br>破損率：{$hp}%";
                 } else {
                     // 海賊船
-                    $treasure = $ship[3] * 1000 + $ship[4] * 100;
+                    // $treasure = $ship[3] * 1000 + $ship[4] * 100; //memo: 未使用コード おそらくコピペミス
                     $naviText = "破損率：{$hp}%";
                 }
                 $image = "ship{$ship[1]}.gif"; // 船舶画像
@@ -965,7 +964,7 @@ class Hako extends File
 
             case $init->landNewtown:
                 // ニュータウン
-                $level = Util::expToLevel($l, $lv);
+                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
                 $nwork = (int)($lv/15);
                 $image = 'new.gif';
                 $naviTitle = 'ニュータウン';
@@ -974,7 +973,7 @@ class Hako extends File
 
             case $init->landBigtown:
                 // 現代都市
-                $level = Util::expToLevel($l, $lv);
+                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
                 $mwork = (int)($lv/20);
                 $lwork = (int)($lv/30);
                 $image = 'big.gif';
@@ -1469,7 +1468,7 @@ class HakoEdit extends File
 
             case $init->landNewtown:
                 // ニュータウン
-                $level = Util::expToLevel($l, $lv);
+                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
                 $nwork = (int)($lv/15);
                 $image = 'new.gif';
                 $naviTitle = 'ニュータウン';
@@ -1478,7 +1477,7 @@ class HakoEdit extends File
 
             case $init->landBigtown:
                 // 現代都市
-                $level = Util::expToLevel($l, $lv);
+                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
                 $mwork = (int)($lv/20);
                 $lwork = (int)($lv/30);
                 $image = 'big.gif';

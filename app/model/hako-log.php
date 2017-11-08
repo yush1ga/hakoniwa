@@ -247,12 +247,12 @@ class Log extends LogIO {
 		$this->history("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}、<strong>$pName</strong>を受賞");
 	}
 	// 死滅
-	function dead($id, $name) {
-		$this->out("{$this->init->tagName_}${name}{$this->init->nameSuffix}{$this->init->_tagName}から人がいなくなり、<strong>滅亡</strong>しました。", $id);
+	function dead($name) {
+		$this->out("{$this->init->tagName_}${name}{$this->init->nameSuffix}{$this->init->_tagName}から人がいなくなり、<strong>滅亡</strong>しました。");
 		$this->history("{$this->init->tagName_}${name}{$this->init->nameSuffix}{$this->init->_tagName}、人がいなくなり<strong>滅亡</strong>する。");
 	}
 	// 島の強制削除
-	function deleteIsland($id, $name) {
+	function deleteIsland($name) {
 		$this->history("{$this->init->tagName_}{$name}{$this->init->nameSuffix}{$this->init->_tagName}に、箱庭大明神の<strong>天罰が降り</strong><span class=attention>海の中に没し</span>ました。");
 	}
 	function doNothing($id, $name, $comName) {
