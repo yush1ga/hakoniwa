@@ -133,7 +133,7 @@ class Util
         }
 
         // 通常のパスワードチェック
-        $isLegacyHash = '$2y$10$' !== substr($p1, 0,7);
+        $isLegacyHash = '$2y$10$' !== substr($p1, 0, 7);
         if (strcmp($p1, Util::encode($p2, $isLegacyHash)) == 0) {
             return true;
         }
@@ -416,7 +416,7 @@ class Util
      * @param  integer $max [description]
      * @return [type]       [description]
      */
-    public static function rand_string($max = 32)
+    public static function rand_string(int $max = 32):string
     {
         return substr(md5(uniqid(rand_number(), true)), 0, $max);
     }
@@ -448,7 +448,7 @@ class Util
 
 function println(...$strs)
 {
-    foreach($strs as $str) {
+    foreach ($strs as $str) {
         echo $str;
     }
     echo PHP_EOL;

@@ -113,8 +113,8 @@ class MakeAlly
                     echo "変更できません。\n";
                     return;
                 }
-                $hako->ally[$n]['id']       = $allyID;
-                $hako->ally[$n]['oName']    = $aIsland['name'];
+                $hako->ally[$n]['id']    = $allyID;
+                $hako->ally[$n]['oName'] = $aIsland['name'];
                 if ($flag == 2) {
                     $hako->ally[$n]['password'] = $aIsland['password'];
                     $hako->ally[$n]['score']    = $aIsland['pop'];
@@ -151,9 +151,9 @@ class MakeAlly
             // 新規
             $n = $hako->allyNumber;
             $hako->ally[$n]['id'] = $currentID;
-            $memberId = array();
+            $memberId = [];
             if ($allyID < 200) {
-                $hako->ally[$n]['oName']    = $island['name'] . "島";
+                $hako->ally[$n]['oName']    = $island['name']."島";
                 $hako->ally[$n]['password'] = $island['password'];
                 $hako->ally[$n]['number']   = 1;
                 $memberId[0]                = $currentID;
@@ -174,14 +174,13 @@ class MakeAlly
         }
 
         // 同盟の各種の値を設定
-        $hako->ally[$n]['name']     = $allyName;
-        $hako->ally[$n]['mark']     = $allyMark;
-        $hako->ally[$n]['color']    = "$allyColor";
+        $hako->ally[$n]['name']  = $allyName;
+        $hako->ally[$n]['mark']  = $allyMark;
+        $hako->ally[$n]['color'] = $allyColor;
 
         // 費用をいただく
-        if (!$adminMode) {
-            $island['money'] -= $init->costMakeAlly;
-        }
+        $island['money'] -= (!$adminMode) ? $init->costMakeAlly : 0;
+
         // データ格納先へ
         $hako->islands[$currentNumber] = $island;
 
@@ -241,7 +240,7 @@ class MakeAlly
         }
         foreach ($allyMember as $id) {
             $island = $hako->islands[$hako->idToNumber[$id]];
-            $newId = array();
+            $newId = [];
             foreach ($island['allyId'] as $aId) {
                 if ($aId != $currentID) {
                     array_push($newId, $aId);
@@ -251,7 +250,7 @@ class MakeAlly
         }
         $hako->ally[$n]['dead'] = 1;
         $hako->idToAllyNumber[$currentID] = '';
-        $hako->allyNumber --;
+        $hako->allyNumber--;
 
         // データ格納先へ
         $hako->islands[$currentNumber] = $island;
@@ -298,7 +297,7 @@ class MakeAlly
         }
 
         $allyMember = $ally['memberId'];
-        $newAllyMember = array();
+        $newAllyMember = [];
         $flag = 0;
 
         foreach ($allyMember as $id) {
@@ -312,7 +311,7 @@ class MakeAlly
 
         if ($flag) {
             // 脱退
-            $newAlly = array();
+            $newAlly = [];
             foreach ($island['allyId'] as $id) {
                 if ($id != $ally['id']) {
                     array_push($newAlly, $id);
@@ -320,13 +319,13 @@ class MakeAlly
             }
             $island['allyId'] = $newAlly;
             $ally['score'] -= $island['pop'];
-            $ally['number'] --;
+            $ally['number']--;
         } else {
             // 加盟
             array_push($newAllyMember, $currentID);
             array_push($island['allyId'], $ally['id']);
             $ally['score'] += $island['pop'];
-            $ally['number'] ++;
+            $ally['number']++;
         }
         $island['money'] -= $init->comCost[$init->comAlly];
         $ally['memberId'] = $newAllyMember;
@@ -404,7 +403,7 @@ class MakeAlly
                 // 配列から削除
                 $hako->ally[$i]['dead'] = 1;
                 $hako->idToAllyNumber[$id] = '';
-                $count ++;
+                $count++;
             }
         }
 
@@ -429,11 +428,11 @@ class MakeAlly
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $count = 0;
             $allyMember = $hako->ally[$i]['memberId'];
-            $newAllyMember = array();
+            $newAllyMember = [];
             foreach ($allyMember as $id) {
                 if ($hako->idToNumber[$id] > -1) {
                     array_push($newAllyMember, $id);
-                    $count ++;
+                    $count++;
                 }
             }
             if ($count != $hako->ally[$i]['number']) {
@@ -513,27 +512,16 @@ class Ally extends AllyIO
 
         $list = "";
         for ($i = 0; $i < $this->islandNumber; $i++) {
-            if ($init->allyUse) {
-                $name = AllyUtil::islandName($this->islands[$i], $this->ally, $this->idToAllyNumber); // 同盟マークを追加
-            } else {
-                $name = $this->islands[$i]['name'];
-            }
+            // 同盟マークを追加
+            $name = ($init->allyUse) ? AllyUtil::islandName($this->islands[$i], $this->ally, $this->idToAllyNumber) : $this->islands[$i]['name'];
             $id   = $this->islands[$i]['id'];
-
             // 攻撃目標をあらかじめ自分の島にする
             if (empty($this->defaultTarget)) {
                 $this->defaultTarget = $id;
             }
-            if ($id == $select) {
-                $s = "selected";
-            } else {
-                $s = "";
-            }
-            if ($init->allyUse) {
-                $list .= "<option value=\"$id\" $s>{$name}</option>\n"; // 同盟マークを追加
-            } else {
-                $list .= "<option value=\"$id\" $s>{$name}{$init->nameSuffix}</option>\n";
-            }
+            $s = ($id == $select) ? "selected" : "";
+            // 同盟マークを追加
+            $list .= ($init->allyUse) ? "<option value=\"$id\" $s>{$name}</option>\n" : "<option value=\"$id\" $s>{$name}{$init->nameSuffix}</option>\n";
         }
         return $list;
     }
