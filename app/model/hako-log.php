@@ -66,9 +66,9 @@ class LogIO {
 				if(($mode == 0) || ($id1 != $id)) {
 					continue;
 				}
-				$m = "<strong>(機密)</strong>";
+				$message_prefix = "<strong>(機密)</strong>";
 			} else {
-				$m = "";
+                $message_prefix = "";
 			}
 			if($id != 0) {
 				if(($id != $id1) && ($id != $id2)) {
@@ -79,7 +79,7 @@ class LogIO {
 				echo "<h3>{$init->tagNumber_}ターン{$turn}の出来事{$init->_tagNumber}</h3>\n";
 				$row++;
 			}
-			echo "<ul class='list-unstyled'><li>{$message}</li></ul>";
+			echo "<ul class='list-unstyled'><li>{$message_prefix}{$message}</li></ul>";
 		}
 		echo "</div>";
 
