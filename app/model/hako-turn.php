@@ -3260,7 +3260,7 @@ class Turn {
                     break;
                 }
                 // 援助量決定
-                $arg = ($arg != 0) ?: 1;
+                $arg = ($arg != 0) ? $arg: 1;
 
                 if($cost < 0) {
                     $value = min($arg * (-$cost), $island['food']);
