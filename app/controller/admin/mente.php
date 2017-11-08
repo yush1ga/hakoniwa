@@ -91,12 +91,12 @@ class Mente extends \Admin
         touch($init->dirName.'/ally.dat');
 
         // アクセスログ生成
-        touch($init->dirName.DIRECTORY_SEPARATOR.$init->logname);
+        touch($init->dirName.'/'.$init->logname);
 
         // .htaccess生成
         $fileName = $init->dirName.'/.htaccess';
         $fp = fopen($fileName, "w");
-        fputs($fp, "Options -Indexes");
+        fputs($fp, "Options -Indexes\n");
         fclose($fp);
     }
 
@@ -127,12 +127,12 @@ class Mente extends \Admin
         $fileName = $init->dirName.'/hakojima.dat';
         $fp = fopen($fileName, "r+");
         $buffer = [];
-        while ($line = fgets($fp, READ_LINE)) {
+        while (false !== ($line = fgets($fp, READ_LINE))) {
             array_push($buffer, $line);
         }
         $buffer[1] = "$sec\n";
         fseek($fp, 0);
-        while ($line = array_shift($buffer)) {
+        while (NULL !== ($line = array_shift($buffer))) {
             fputs($fp, $line);
         }
         fclose($fp);
@@ -146,7 +146,7 @@ class Mente extends \Admin
         $dir = opendir($init->dirName.".bak{$id}/");
         while (false !== ($fileName = readdir($dir))) {
             if ($fileName != "." && $fileName != "..") {
-                copy("{$init->dirName}.bak{$id}/".$fileName, $init->dirName.'/'.$fileName);
+                copy($init->dirName.".bak{$id}/".$fileName, $init->dirName.'/'.$fileName);
             }
         }
         closedir($dir);
@@ -185,8 +185,8 @@ class Mente extends \Admin
             HakoError::wrongSpecialPassword();
             return;
         }
-        $masterPasswd  = password_hash($this->dataSet['MPASS1'], PASSWORD_DEFAULT, ['cost'=>10]);
-        $specialPasswd = password_hash($this->dataSet['SPASS1'], PASSWORD_DEFAULT, ['cost'=>10]);
+        $masterPasswd  = Util::encode($this->dataSet['MPASS1'], false);
+        $specialPasswd = Util::encode($this->dataSet['SPASS1'], false);
         $fp = fopen($init->passwordFile, "w");
         fputs($fp, "$masterPasswd\n");
         fputs($fp, "$specialPasswd\n");

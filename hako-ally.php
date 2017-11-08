@@ -167,7 +167,7 @@ class MakeAlly
             $hako->ally[$n]['occupation']   = 0;
             $hako->ally[$n]['memberId']     = $memberId;
             $island['allyId']               = $memberId;
-            $ext = array(0,);
+            $ext = [0];
             $hako->ally[$n]['ext']          = $ext;
             $hako->idToAllyNumber[$currentID] = $n;
             $hako->allyNumber++;
@@ -549,13 +549,13 @@ class AllyIO
     {
         global $init;
 
-        $fileName = "{$init->dirName}/{$init->allyData}";
+        $fileName = $init->dirName.'/'.$init->allyData;
         if (!is_file($fileName)) {
             return false;
         }
         $fp = fopen($fileName, "r");
         AllyUtil::lockr($fp);
-        $this->allyNumber   = chop(fgets($fp, READ_LINE));
+        $this->allyNumber = chop(fgets($fp, READ_LINE));
         if ($this->allyNumber == '') {
             $this->allyNumber = 0;
         }
@@ -596,12 +596,12 @@ class AllyIO
         $tmp        = chop(fgets($fp, READ_LINE));
         $allymember = explode(",", $tmp);
         $tmp        = chop(fgets($fp, READ_LINE));
-        $ext        = explode(",", $tmp);                // 拡張領域
+        $ext        = explode(",", $tmp); // 拡張領域
         $comment    = chop(fgets($fp, READ_LINE));
         $title      = chop(fgets($fp, READ_LINE));
         list($title, $message) = array_pad(explode("<>", $title), 2, null);
 
-        return array(
+        return [
             'name'       => $name,
             'mark'       => $mark,
             'color'      => $color,
@@ -616,7 +616,7 @@ class AllyIO
             'comment'    => $comment,
             'title'      => $title,
             'message'    => $message,
-        );
+        ];
     }
     //--------------------------------------------------
     // 同盟データ書き込み
@@ -1000,7 +1000,7 @@ class Main
 
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {
-                $this->dataSet["{$name}"] = str_replace(",", "", $value);
+                $this->dataSet[$name] = str_replace(",", "", $value);
             }
             if (isset($this->dataSet['Allypact'])) {
                 $this->mode = "AllypactUp";
@@ -1043,8 +1043,6 @@ function scoreComp($x, $y)
     if (isset($y['dead']) && $y['dead'] == 1) {
         return -1;
     }
-    if ($x['score'] == $y['score']) {
-        return 0;
-    }
-    return ($x['score'] > $y['score']) ? -1 : +1;
+    // mean ($x['score'] > $y['score']) ? -1 : 1;
+    return $y['score'] <=> $x['score'];
 }

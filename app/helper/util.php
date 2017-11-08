@@ -134,7 +134,10 @@ class Util
 
         // 通常のパスワードチェック
         $isLegacyHash = '$2y$10$' !== substr($p1, 0, 7);
-        if (strcmp($p1, Util::encode($p2, $isLegacyHash)) == 0) {
+        if (!$isLegacyHash) {
+            return password_verify($p2, $p1);
+        }
+        if (strcmp($p1, Util::encode($p2)) == 0) {
             return true;
         }
 
@@ -167,7 +170,7 @@ class Util
     /**
      * パスワードのエンコード
      */
-    public static function encode(string $s, bool $isLegacy = false):string
+    public static function encode(string $s, bool $isLegacy = true):string
     {
         return ($isLegacy)? crypt($s, 'h2') : password_hash($s, PASSWORD_DEFAULT, ['cost'=>10]);
     }
