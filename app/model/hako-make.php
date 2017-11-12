@@ -89,7 +89,7 @@ class Make {
 		$htmlMap = new HtmlMap();
 		$htmlMap->newIslandHead($island['name']);
 		$htmlMap->islandInfo($island, $newNumber);
-		$htmlMap->islandMap($hako, $island, 1, $data);
+        $htmlMap->islandMap($hako, $island, 1); //$htmlMap->islandMap($hako, $island, 1, $data);
 
 	}
 	//---------------------------------------------------
@@ -368,7 +368,7 @@ class Make {
 		$hako->writeIslandsFile();
 
 		// コメント更新メッセージ
-		Success::Comment();
+		Success::comment();
 
 		// owner modeへ
         ChromePhp::log($data);
@@ -400,7 +400,7 @@ class Make {
 			if(preg_match("/^無人$/", $data['ISLANDNAME'])) {
 				// 島の強制削除
 				$this->deleteIsland($hako, $data);
-				Success::deleteIsland($name);
+				Success::deleteIsland($name, $init);
 				return;
 			} else {
 				$island['money'] = $init->maxMoney;
@@ -729,7 +729,7 @@ class Make {
 		$island['pop'] = 0;
 		$island['isDead'] = true;
 		$tmpid = $island['id'];
-		$log->deleteIsland($tmpid, $island['name']);
+		$log->deleteIsland($island['name']);
 		if(is_file("{$init->dirName}/island.{$tmpid}")) {
 			unlink("{$init->dirName}/island.{$tmpid}");
 		}

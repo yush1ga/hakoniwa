@@ -27,7 +27,7 @@
  	}
 
  	// 島の強制削除
- 	static function deleteIsland($name) {
+ 	static function deleteIsland($name, $init) {
  		Util::makeTagMessage("{$name}{$init->nameSuffix}を強制削除しました", "success");
  	}
 

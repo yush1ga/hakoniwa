@@ -566,7 +566,6 @@ class AllyIO
         // 加盟している同盟のIDを格納
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $member = $this->ally[$i]['memberId'];
-            $j = 0;
             foreach ($member as $id) {
                 $n = $this->idToNumber[$id];
                 if (!($n > -1)) {

@@ -125,7 +125,7 @@ class Turn {
             if( ($island['isBF']!=1) && ($island['pop']==0 || $island['point']==0) ) {
                 $island['isDead'] = true;
                 // 死滅メッセージ
-                $this->log->dead($tmpid, $island['name']);
+                $this->log->dead($island['name']);
             }
             if(isset($island['isDead']) && $island['isDead']) {
                 $island['pop']   = 0;
@@ -3260,7 +3260,7 @@ class Turn {
                     break;
                 }
                 // 援助量決定
-                $arg = ($arg != 0) ?: 1;
+                $arg = ($arg != 0) ? $arg: 1;
 
                 if($cost < 0) {
                     $value = min($arg * (-$cost), $island['food']);
@@ -3677,7 +3677,7 @@ class Turn {
                     $lName = $this->landName($landKind, $lv);
 
                     if(($lv == 5) || ($lv == 6) || ($lv == 21) || ($lv == 24) || ($lv == 32)) {
-                        if(util::random(100) < 5) {
+                        if(Util::random(100) < 5) {
                             // お土産
                             $value = 1+ Util::random(49);
                             if ($value > 0) {
@@ -3688,7 +3688,7 @@ class Turn {
                             }
                         }
                     } elseif(($lv == 1) || ($lv == 7) || ($lv == 33)) {
-                        if(util::random(100) < 5) {
+                        if(Util::random(100) < 5) {
                             // 収穫
                             $value = round($island['pop'] / 100) * 10 + Util::random(11);
                             // 人口１万人ごとに1000トンの収穫
@@ -3700,7 +3700,7 @@ class Turn {
                             }
                         }
                     } elseif($lv == 15) {
-                        if(util::random(100) < 5) {
+                        if(Util::random(100) < 5) {
                             // 銀行化
                             $land[$x][$y] = $init->landBank;
                             $landValue[$x][$y] = 1;
@@ -3709,7 +3709,7 @@ class Turn {
                             break;
                         }
                     } elseif(($lv == 40) || ($lv == 41) || ($lv == 42) || ($lv == 43)) {
-                        if(util::random(100) < 1) {
+                        if(Util::random(100) < 1) {
                             // 卵孵化
                             $kind = Util::random($init->monsterLevel1) + 1;
                             $lv = $kind * 100
