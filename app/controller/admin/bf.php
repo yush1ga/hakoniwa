@@ -1,5 +1,5 @@
 <?php
-namespace Hakoniwa\Admin
+namespace Hakoniwa\Admin;
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>

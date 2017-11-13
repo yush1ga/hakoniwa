@@ -83,9 +83,10 @@ class HtmlTop extends HTML
         $this_file = $init->baseDir . "/hako-main.php";
         $allyfile  = $init->baseDir . "/hako-ally.php";
 
+        // 開発モードのラジオボタンのチェックフラグ
         $radio  = "";
         $radio2 = "checked";
-        if (!empty($data['defaultDevelopeMode']) && $data['defaultDevelopeMode'] != "javascript") {
+        if (strtolower($data['defaultDevelopeMode'] ?? "") != "javascript") {
             $radio  = "checked";
             $radio2 = "";
         }
@@ -114,7 +115,7 @@ class HtmlTop extends HTML
         require_once($views.'bf-list.php');
 
         // 歴史
-        require_once(VIEWS.DIRECTORY_SEPARATOR.'log'.DIRECTORY_SEPARATOR.'history.php');
+        require_once(VIEWS.'/log/history.php');
 
         // 管理者登録モード
         if ($init->registerMode) {
@@ -144,10 +145,10 @@ class HtmlTop extends HTML
         for ($i = $start; $i < $sentinel ; $i++) {
             $island        = $hako->islands[$i];
             $island['pop'] = ($island['pop'] > 1) ? $island['pop'] : 1;
-            $j             = ($island['isBF'])? '★': $i + 1;
+            $j             = ($island['isBF']) ? '★' : $i + 1;
             $id            = $island['id'];
-            $pop           = $island['pop'] . $init->unitPop;
-            $area          = $island['area'] . $init->unitArea;
+            $pop           = $island['pop'].$init->unitPop;
+            $area          = $island['area'].$init->unitArea;
             $point         = $island['point'];
             $eisei         = $island['eisei'];
             $zin           = $island['zin'];
