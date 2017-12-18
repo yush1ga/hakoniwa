@@ -32,8 +32,8 @@ class File
     {
         global $init;
 
-        $num = (isset($cgi->dataSet['ISLANDID'])) ? $cgi->dataSet['ISLANDID'] : "";
-        $fileName = "{$init->dirName}/hakojima.dat";
+        $num = $cgi->dataSet['ISLANDID'] ?? "";
+        $fileName = $init->dirName.'/hakojima.dat';
         if (!is_file($fileName)) {
             return false;
         }
@@ -63,7 +63,7 @@ class File
                 $islandNumberKP++;
             }
             $this->idToNumber[$this->islands[$i]['id']] = $i;
-            $this->islands[$i]['allyId'] = array();
+            $this->islands[$i]['allyId'] = [];
         }
         $this->islandNumberBF = $islandNumberBF;
         $this->islandNumberKP = $islandNumberKP;
@@ -164,7 +164,7 @@ class File
             fclose($fp_i);
         }
 
-        return array(
+        return [
             'name'         => $name,
             'owner'        => $owner,
             'id'           => $id,
@@ -211,11 +211,11 @@ class File
             'command'      => $command ?? "",
             'lbbs'         => $lbbs ?? "",
             'port'         => $port,
-            'ship'         => array(0 => $ship0, 1 => $ship1, 2 => $ship2, 3 => $ship3, 4 => $ship4, 5 => $ship5, 6 => $ship6, 7 => $ship7, 8 => $ship8, 9 => $ship9, 10 => $ship10, 11 => $ship11, 12 => $ship12, 13 => $ship13, 14 => $ship14),
-            'eisei'        => array(0 => $eisei0, 1 => $eisei1, 2 => $eisei2, 3 => $eisei3, 4 => $eisei4, 5 => $eisei5),
-            'zin'          => array(0 => $zin0, 1 => $zin1, 2 => $zin2, 3 => $zin3, 4 => $zin4, 5 => $zin5, 6 => $zin6),
-            'item'         => array(0 => $item0, 1 => $item1, 2 => $item2, 3 => $item3, 4 => $item4, 5 => $item5, 6 => $item6, 7 => $item7, 8 => $item8, 9 => $item9, 10 => $item10, 11 => $item11, 12 => $item12, 13 => $item13, 14 => $item14, 15 => $item15, 16 => $item16, 17 => $item17, 18 => $item18, 19 => $item19, 20 => $item20),
-        );
+            'ship'         => [$ship0, $ship1, $ship2, $ship3, $ship4, $ship5, $ship6, $ship7, $ship8, $ship9, $ship10, $ship11, $ship12, $ship13, $ship14],
+            'eisei'        => [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5],
+            'zin'          => [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6],
+            'item'         => [$item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19, $item20],
+        ];
     }
     /**
      * 地形データの書込
@@ -226,17 +226,17 @@ class File
     public function writeLand(int $num, $island)
     {
         global $init;
-        // 地形
         if (($num <= -1) || ($num == $island['id'])) {
-            $fileName = "{$init->dirName}/island.{$island['id']}";
+            $fileName = $init->dirName."/island.{$island['id']}";
 
             if (!is_file($fileName)) {
                 touch($fileName);
             }
             $fp_i = fopen($fileName, "w");
+
+            // 地形
             $land = $island['land'];
             $landValue = $island['landValue'];
-
             for ($y = 0; $y < $init->islandSize; $y++) {
                 for ($x = 0; $x < $init->islandSize; $x++) {
                     $l = sprintf("%02x%05x", $land[$x][$y], $landValue[$x][$y]);
@@ -248,7 +248,7 @@ class File
             $command = $island['command'];
             for ($i = 0; $i < $init->commandMax; $i++) {
                 $com = sprintf(
-                        "%d,%d,%d,%d,%d\n",
+                    "%d,%d,%d,%d,%d\n",
                     $command[$i]['kind'],
                     $command[$i]['target'],
                     $command[$i]['x'],
@@ -496,7 +496,7 @@ class File
         global $init;
 
         try {
-            // バックアップ未実施設定なら何もせず終了
+            // 未実施設定なら何もせず終了
             if ($init->backupTimes < 1) {
                 return;
             }
