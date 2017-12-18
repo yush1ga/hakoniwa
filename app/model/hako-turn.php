@@ -5294,9 +5294,9 @@ class Turn {
                 if((($sy % 2) == 0) && (($y % 2) == 1)) {
                     $sx--;
                 }
-                $landKind = $land[$sx][$sy];
-                $lv = $landValue[$sx][$sy];
-                $point = "({$sx}, {$sy})";
+                //$landKind = $land[$sx][$sy];
+                //$lv = $landValue[$sx][$sy];
+                //$point = "({$sx}, {$sy})";
 
                 if(($sx < 0) || ($sx >= $init->islandSize) ||
                     ($sy < 0) || ($sy >= $init->islandSize)) {

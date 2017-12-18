@@ -360,7 +360,7 @@ class Util
         $badShipsId = $init->shipKind;
         $badShips   = 0;
         for ($i=$badShipsId; $i < $arrSize; $i++) {
-            $badShips++;
+            if (is_numeric($ships[$i]) && $ships[$i] > 0) $badShips++;
         }
         return ($badShips!=0);
     }

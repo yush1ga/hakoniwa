@@ -185,8 +185,8 @@ class Mente extends \Admin
             HakoError::wrongSpecialPassword();
             return;
         }
-        $masterPasswd  = Util::encode($this->dataSet['MPASS1'], false);
-        $specialPasswd = Util::encode($this->dataSet['SPASS1'], false);
+        $masterPasswd  = \Util::encode($this->dataSet['MPASS1'], false);
+        $specialPasswd = \Util::encode($this->dataSet['SPASS1'], false);
         $fp = fopen($init->passwordFile, "w");
         fputs($fp, "$masterPasswd\n");
         fputs($fp, "$specialPasswd\n");
