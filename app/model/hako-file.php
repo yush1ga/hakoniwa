@@ -572,7 +572,7 @@ class File
     {
         global $init;
 
-        $fileName = "{$init->dirName}/present.dat";
+        $fileName = $init->dirName.'/present.dat';
         if (is_file($fileName)) {
             $presents = file($fileName);
             foreach ($presents as $present) {
@@ -596,8 +596,8 @@ class File
     {
         global $init;
 
-        $presents = array();
-        $fileName = "{$init->dirName}/present.dat";
+        $presents = [];
+        $fileName = $init->dirName.'/present.dat';
         for ($i = 0; $i < $this->islandNumber; $i++) {
             $present =& $this->islands[$i]['present'];
             if ((($present['item'] == 0) && (($present['px'] != 0) || ($present['py'] != 0))) ||
@@ -733,17 +733,10 @@ class Hako extends File
     {
         global $init;
 
-        $point = "({$x},{$y})";
-        $naviExp = "''";
-        $image = '';
-        $naviTitle = '';
-        $naviText = "";
+        $point = "($x,$y)";
+        $naviExp = $image = $naviTitle = $naviText = '';
+        $naviPos = ($x < $init->islandSize / 2) ? 0 : 1;
 
-        if ($x < $init->islandSize / 2) {
-            $naviPos = 0;
-        } else {
-            $naviPos = 1;
-        }
         switch ($l) {
             case $init->landSea:
                 if ($lv == 0) {
@@ -784,19 +777,19 @@ class Hako extends File
             case $init->landShip:
                 // 船舶
                 $ship = Util::navyUnpack($lv);
-                $owner = isset($this->idToName[$ship[0]]) ? $this->idToName[$ship[0]] : ""; // 所属
-                $naviTitle = "{$init->shipName[$ship[1]]}"; // 船舶の種類
+                $owner = $this->idToName[$ship[0]] ?? ''; // 所属
+                $naviTitle = $init->shipName[$ship[1]]; // 船舶の種類
                 $hp = round(100 - $ship[2] / $init->shipHP[$ship[1]] * 100); // 破損率
                 if ($ship[1] <= 1) {
                     // 輸送船、漁船
-                    $naviText = "{$owner}島所属";
+                    $naviText = $owner.'島所属';
                 } elseif ($ship[1] == 2) {
                     // 海底探索船
                     $treasure = $ship[3] * 1000 + $ship[4] * 100;
                     if ($treasure > 0) {
                         $naviText = "{$owner}島所属<br>破損率：{$hp}%<br>{$treasure}億円相当の財宝積載";
                     } else {
-                        $naviText = "{$owner}島所属";
+                        $naviText = $owner.'島所属';
                     }
                 } elseif ($ship[1] < $init->shipKind) {
                     $naviText = "{$owner}島所属<br>破損率：{$hp}%";
@@ -850,7 +843,7 @@ class Hako extends File
                     $image = 'umi3.gif';
                     $naviTitle = 'リゾートホテル';
                 }
-                $naviText = "収入:{$lv}{$init->unitPop} <br>";
+                $naviText = "収入:{$lv}{$init->unitPop}<br>";
                 break;
 
             case $init->landSoccer:
@@ -891,12 +884,8 @@ class Hako extends File
                 break;
 
             case $init->landWaste:
-                // 荒地
-                if ($lv == 1) {
-                    $image = 'land13.gif'; // 着弾点
-                } else {
-                    $image = 'land1.gif';
-                }
+                // 荒地・着弾点
+                $image = ($lv == 1) ? 'land13.gif' : 'land1.gif';
                 $naviTitle = '荒地';
                 break;
 
@@ -915,14 +904,12 @@ class Hako extends File
 
             case $init->landForest:
                 // 森
-                if ($mode == 1) {
-                    $image = 'land6.gif';
-                    $naviText= "${lv}{$init->unitTree}";
-                } else {
-                    // 観光者の場合は木の本数隠す
-                    $image = 'land6.gif';
-                }
+                $image = 'land6.gif';
                 $naviTitle = '森';
+                // 観光者に対しては本数を隠す
+                if ($mode == 1) {
+                    $naviText= $lv.$init->unitTree;
+                }
                 break;
 
             case $init->landTown:
@@ -1043,16 +1030,16 @@ class Hako extends File
                     break;
 
             case $init->landBase:
+                // ミサイル基地
                 if ($mode == 0 || $mode == 2) {
-                    // 観光者の場合は森のふり
+                    // 観光者に対しては森のふり
                     $image = 'land6.gif';
                     $naviTitle = '森';
                 } else {
-                    // ミサイル基地
                     $level = Util::expToLevel($l, $lv);
                     $image = 'land9.gif';
                     $naviTitle = 'ミサイル基地';
-                    $naviText = "レベル ${level} / 経験値 {$lv}";
+                    $naviText = "Lv:${level} / EXP:{$lv}";
                 }
                 break;
 
@@ -1095,12 +1082,10 @@ class Hako extends File
 
             case $init->landSdefence:
                 // 海底防衛施設
+                $image = 'land102.gif';
+                $naviTitle = '海底防衛施設';
                 if ($mode == 0 || $mode == 2) {
-                    $image = 'land102.gif';
-                    $naviTitle = '海底防衛施設';
                 } else {
-                    $image = 'land102.gif';
-                    $naviTitle = '海底防衛施設';
                     $naviText = "耐久力 {$lv}";
                 }
                 break;
@@ -1206,8 +1191,8 @@ class Hako extends File
  */
 class HakoBF extends File
 {
-    public $islandListNoBF;    // 普通の島リスト
-    public $islandListBF;    // BFな島リスト
+    public $islandListNoBF; // 普通の島リスト
+    public $islandListBF;   // BFな島リスト
 
     public function init($cgi)
     {
@@ -1218,13 +1203,13 @@ class HakoBF extends File
         for ($i = 0; $i < ($this->islandNumberNoBF); $i++) {
             $name = $this->islands[$i]['name'];
             $id = $this->islands[$i]['id'];
-            $this->islandListNoBF .= "<option value=\"$id\">${name}{$init->nameSuffix}</option>\n";
+            $this->islandListNoBF .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
         }
-        $this->islandListBF = "<option value=\"0\"></option>\n";
+        $this->islandListBF = '<option value="0"></option>'.PHP_EOL;
         for ($i = $this->islandNumberNoBF; $i < $this->islandNumber; $i++) {
             $name = $this->islands[$i]['name'];
             $id = $this->islands[$i]['id'];
-            $this->islandListBF .= "<option value=\"$id\">${name}{$init->nameSuffix}</option>\n";
+            $this->islandListBF .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
         }
     }
 }
@@ -1243,11 +1228,11 @@ class HakoEdit extends File
     public function landString($l, $lv, $x, $y, $mode, $comStr)
     {
         global $init;
-        $point = "({$x},{$y})";
-        $naviExp = "''";
+        $point = "($x,$y)";
+        $naviExp = '';
         $comStr = implode(",", $comStr);
-
         $naviPos = ($x < $init->islandSize / 2) ? 0 : 1;
+
         switch ($l) {
             case $init->landSea:
                 if ($lv == 0) {
@@ -1262,7 +1247,7 @@ class HakoEdit extends File
                     // 財宝？
                     $image = 'land17.gif';
                     $naviTitle = '海';
-                    $naviText = "{$lv}";
+                    $naviText = $lv;
                 }
                 break;
 
@@ -1270,14 +1255,14 @@ class HakoEdit extends File
                 // 海底都市
                 $image = 'SeaCity.gif';
                 $naviTitle = '海底都市';
-                $naviText = "{$lv}{$init->unitPop}";
+                $naviText = $lv.$init->unitPop;
                 break;
 
             case $init->landFroCity:
                 // 海上都市
                 $image = 'FroCity.gif';
                 $naviTitle = '海上都市';
-                $naviText = "{$lv}{$init->unitPop}";
+                $naviText = $lv.$init->unitPop;
                 break;
 
             case $init->landPort:
@@ -1290,18 +1275,18 @@ class HakoEdit extends File
                 // 船舶
                 $ship = Util::navyUnpack($lv);
                 $owner = $this->idToName[$ship[0]]; // 所属
-                $naviTitle = "{$init->shipName[$ship[1]]}"; // 船舶の種類
+                $naviTitle = $init->shipName[$ship[1]]; // 船舶の種類
                 $hp = round(100 - $ship[2] / $init->shipHP[$ship[1]] * 100); // 破損率
                 if ($ship[1] <= 1) {
                     // 輸送船、漁船
-                    $naviText = "{$owner}島所属";
+                    $naviText = $owner.'島所属';
                 } elseif ($ship[1] == 2) {
                     // 海底探索船
                     $treasure = $ship[3] * 1000 + $ship[4] * 100;
                     if ($treasure > 0) {
                         $naviText = "{$owner}島所属<br>破損率：{$hp}%<br>{$treasure}億円相当の財宝積載";
                     } else {
-                        $naviText = "{$owner}島所属";
+                        $naviText = $owner.'島所属';
                     }
                 } elseif ($ship[1] < $init->shipKind) {
                     $naviText = "{$owner}島所属<br>破損率：{$hp}%";
@@ -1354,7 +1339,7 @@ class HakoEdit extends File
                     $image = 'umi3.gif';
                     $naviTitle = 'リゾートホテル';
                 }
-                $naviText = "収入:{$lv}{$init->unitPop} <br>";
+                $naviText = "収入:{$lv}{$init->unitPop}<br>";
                 break;
 
             case $init->landSoccer:
@@ -1717,8 +1702,8 @@ class HakoPresent extends File
         $this->islandList = '<option value="0"></option>'.PHP_EOL;
         for ($i = 0; $i < ($this->islandNumber); $i++) {
             $name = $this->islands[$i]['name'];
-            $id = $this->islands[$i]['id'];
-            $this->islandList .= "<option value=\"$id\">${name}{$init->nameSuffix}</option>\n";
+            $id   = $this->islands[$i]['id'];
+            $this->islandList .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
         }
     }
 }
@@ -1740,9 +1725,9 @@ class HakoKP extends File
             $id = $this->islands[$i]['id'];
             $keep = $this->islands[$i]['keep'];
             if ($keep == 1) {
-                $this->islandListKP .= "<option value=\"$id\">${name}{$init->nameSuffix}</option>\n";
+                $this->islandListKP .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
             } else {
-                $this->islandListNoKP .= "<option value=\"$id\">${name}{$init->nameSuffix}</option>\n";
+                $this->islandListNoKP .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
             }
         }
     }
