@@ -80,19 +80,19 @@ class HtmlTop extends HTML
     public function main($hako, $data)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-main.php";
-        $allyfile  = $init->baseDir . "/hako-ally.php";
+        $this_file = $init->baseDir.'/hako-main.php';
+        $allyfile  = $init->baseDir.'/hako-ally.php';
 
         // 開発モードのラジオボタンのチェックフラグ
-        $radio  = "";
-        $radio2 = "checked";
-        if (strtolower($data['defaultDevelopeMode'] ?? "") != "javascript") {
-            $radio  = "checked";
-            $radio2 = "";
+        $radio  = '';
+        $radio2 = 'checked';
+        if (strtolower($data['defaultDevelopeMode'] ?? "") != 'javascript') {
+            $radio  = 'checked';
+            $radio2 = '';
         }
 
         // セットするパスワードのチェック
-        $defaultPassword = $data['defaultPassword'] ?? "";
+        $defaultPassword = $data['defaultPassword'] ?? '';
 
         // set parent directory
         $views = VIEWS.'/top/';

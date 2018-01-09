@@ -437,6 +437,24 @@ class Util
     }
 
     /**
+     * $catに対応した計算式で数値を返す
+     * [TODO] 関数を他所に切り出す
+     * @param  string $cat [description]
+     * @param  array  $isl [description]
+     * @return float       [description]
+     */
+    public static function calcIslandData(string $cat, array $isl): float {
+        switch($cat) {
+            case 'unemployed':
+                return ($isl['pop'] - ($isl['farm'] + $isl['factory'] + $isl['commerce'] + $isl['mountain'] + $isl['hatuden']) * 10) / $isl['pop'] * 100;
+            case 'enesyouhi':
+                return round(($isl['pop']/100) + ($isl['factory']*2/3) + ($isl['commerce']/3) + ($isl['mountain']/4));
+            case 'ene':
+                return round($isl['hatuden'] / Util::calcIslandData('enesyouhi',$isl) * 100);
+        }
+    }
+
+    /**
      * WIP
      * @param  boolean $withGet [description]
      * @return [type]           [description]
