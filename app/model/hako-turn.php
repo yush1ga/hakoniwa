@@ -5409,7 +5409,7 @@ class Turn {
      * @param  [type] $y         [description]
      * @return boolean            [description]
      */
-    function countGrow($land, $landValue, $x, $y) {
+    function countGrow($land, $landValue, int $x, int $y): bool {
         global $init;
 
         for($i = 1; $i < 7; $i++) {
@@ -5932,7 +5932,7 @@ class Turn {
      * @param  Integar $lv   メタデータ
      * @return String        対応した名称
      */
-    function landName(int $land, int $lv = 0) {
+    function landName(int $land, int $lv = 0): string {
         global $init;
 
         switch($land) {
