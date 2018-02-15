@@ -18,7 +18,7 @@ echo <<<END
 </tr>
 END;
 
-for($i=0; $i<$hako->allyNumber; $i++) {
+for ($i=0; $i<$hako->allyNumber; $i++) {
     //if($num && ($i != $hako->idToAllyNumber[$num])) {
     //	continue;
     //}
@@ -26,7 +26,7 @@ for($i=0; $i<$hako->allyNumber; $i++) {
     $j = $i + 1;
 
     $pop = $farm = $factory = $commerce = $mountain = $hatuden = $missiles = 0;
-    for($k=0; $k<$ally['number']; $k++) {
+    for ($k=0; $k<$ally['number']; $k++) {
         $id = $ally['memberId'][$k];
         $island = $hako->islands[$hako->idToNumber[$id]];
         $pop += $island['pop'];

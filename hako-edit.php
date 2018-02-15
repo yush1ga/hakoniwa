@@ -15,15 +15,13 @@ $init = new Init();
 
 $THIS_FILE = $init->baseDir . "/hako-edit.php";
 
-class CgiImitation
-{
+class CgiImitation {
     public $mode = "";
     public $dataSet = [];
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
-    public function parseInputData()
-    {
+    public function parseInputData() {
         global $init;
 
         $this->mode = $_POST['mode'] ?? "";
@@ -41,31 +39,37 @@ class CgiImitation
     //---------------------------------------------------
     // COOKIEを取得
     //---------------------------------------------------
-    public function getCookies()
-    {
+    public function getCookies() {
         if (!empty($_COOKIE)) {
             while (list($name, $value) = each($_COOKIE)) {
                 switch ($name) {
                     case "POINTX":
                         $this->dataSet['defaultX'] = $value;
+
                         break;
                     case "POINTY":
                         $this->dataSet['defaultY'] = $value;
+
                         break;
                     case "LAND":
                         $this->dataSet['defaultLAND'] = $value;
+
                         break;
                     case "MONSTER":
                         $this->dataSet['defaultMONSTER'] = $value;
+
                         break;
                     case "SHIP":
                         $this->dataSet['defaultSHIP'] = $value;
+
                         break;
                     case "LEVEL":
                         $this->dataSet['defaultLEVEL'] = $value;
+
                         break;
                     case "IMG":
                         $this->dataSet['defaultImg'] = $value;
+
                         break;
                 }
             }
@@ -75,8 +79,7 @@ class CgiImitation
     //---------------------------------------------------
     // COOKIEを生成
     //---------------------------------------------------
-    public function setCookies()
-    {
+    public function setCookies() {
         $time = $_SERVER['REQUEST_TIME'] + 30; // 現在 + 30秒有効
 
         // Cookieの設定 & POSTで入力されたデータで、Cookieから取得したデータを更新
@@ -112,13 +115,11 @@ class CgiImitation
 }
 
 //----------------------------------------------------------------------
-class Edit
-{
+class Edit {
     //---------------------------------------------------
     // TOP 表示（パスワード入力）
     //---------------------------------------------------
-    public function enter()
-    {
+    public function enter() {
         global $init;
 
         echo <<<END
@@ -135,14 +136,14 @@ END;
     //---------------------------------------------------
     // 島の一覧を表示
     //---------------------------------------------------
-    public function main($hako, $data)
-    {
+    public function main($hako, $data) {
         global $init;
 
         // パスワード
         if (!Util::checkPassword("", $data['PASSWORD'])) {
             // password間違い
             HakoError::wrongPassword();
+
             return;
         }
 
@@ -238,13 +239,13 @@ END;
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function editMap($hako, $data)
-    {
+    public function editMap($hako, $data) {
         global $init;
 
         // パスワード
         if (!Util::checkPassword("", $data['PASSWORD'])) {
             HakoError::wrongPassword();
+
             return;
         }
         $html = new HtmlMap();
@@ -253,7 +254,7 @@ END;
         $island = $hako->islands[$number];
 
         // 地形リストを生成
-        $landList = array(
+        $landList = [
             "$init->landSea",
             "$init->landSeaSide",
             "$init->landWaste",
@@ -298,10 +299,10 @@ END;
             "$init->landMonster",
             "$init->landSleeper",
             "$init->landZorasu"
-        );
+        ];
 
         // 地形リスト名称を生成
-        $landName = array(
+        $landName = [
             "海、浅瀬",
             "砂浜",
             "荒地",
@@ -346,7 +347,7 @@ END;
             "怪獣",
             "怪獣（睡眠中）",
             "ぞらす"
-        );
+        ];
         echo <<<END
 <script type="text/javascript">
 function ps(x, y, ld, lv) {
@@ -501,13 +502,13 @@ END;
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function register($hako, $data)
-    {
+    public function register($hako, $data) {
         global $init;
 
         // パスワード
         if (!Util::checkPassword("", $data['PASSWORD'])) {
             HakoError::wrongPassword();
+
             return;
         }
 
@@ -552,10 +553,8 @@ END;
     }
 }
 
-class EditMain
-{
-    public function execute()
-    {
+class EditMain {
+    public function execute() {
         $hako = new HakoEdit();
         $cgi = new CgiImitation();
         $cgi->parseInputData();
@@ -575,6 +574,7 @@ class EditMain
                 $html->header();
                 $edit->main($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "list":
@@ -582,6 +582,7 @@ class EditMain
                 $html->header();
                 $edit->main($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "map":
@@ -589,6 +590,7 @@ class EditMain
                 $html->header();
                 $edit->editMap($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "regist":
@@ -596,6 +598,7 @@ class EditMain
                 $html->header();
                 $edit->register($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             default:

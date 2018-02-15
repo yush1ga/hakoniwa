@@ -2,11 +2,11 @@
     <?=$init->tagName_?>「<?=$name?>」<?=$init->_tagName?>へようこそ！
 </h1>
 <?php
-	// 情報
-	$this->islandInfo($island, $number, 0);
-	// マップ
-	$this->islandMap($hako, $island, 0);
-	// 他の島へ
+    // 情報
+    $this->islandInfo($island, $number, 0);
+    // マップ
+    $this->islandMap($hako, $island, 0);
+    // 他の島へ
 ?>
 <form action="<?=$this_file?>" method="get" class="text-center">
 <select name="Sight">
@@ -16,5 +16,5 @@
 </form>
 
 <?php
-	// 近況
+    // 近況
     $this->islandRecent($island, 0);

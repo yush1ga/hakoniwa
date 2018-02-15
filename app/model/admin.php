@@ -3,13 +3,11 @@
  * 箱庭諸島 S.E
  * @author Sotalbireo
  */
-class Admin
-{
+class Admin {
     public $mode;
     public $dataSet = [];
 
-    public function parseInputData()
-    {
+    public function parseInputData() {
         $this->mode = $_POST['mode'] ?? "";
 
         if (!empty($_POST)) {
@@ -19,8 +17,7 @@ class Admin
         }
     }
 
-    public function passCheck():bool
-    {
+    public function passCheck():bool {
         global $init;
 
         if (file_exists($init->passwordFile)) {
@@ -30,12 +27,14 @@ class Admin
         }
         if (!isset($this->dataSet['PASSWORD'])) {
             HakoError::wrongPassword();
+
             return false;
         }
         if (password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
             return true;
         } else {
             HakoError::wrongPassword();
+
             return false;
         }
     }

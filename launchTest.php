@@ -6,20 +6,18 @@ require_once 'ChromePhp.php';// ChromeLogger
 require_once 'hako-init.php';
 
 use \ChromePhp as Console;
+
 /**
 *
 */
-class LaunchTest extends \Init
-{
+class LaunchTest extends \Init {
     private $needExts = [
         'mbstring'
     ];
-    private function HasExtension(string $extName):bool
-    {
+    private function HasExtension(string $extName):bool {
         return extension_loaded($extName);
     }
-    private function chkExtensionLoaded()
-    {
+    private function chkExtensionLoaded() {
         foreach ($this->needExts as $ext) {
             if (!$this->HasExtension($ext)) {
                 echo 'ご利用のPHPサーバー内にて、本プログラムの動作に必要なモジュール"',$ext,'"が読み込まれていないため、動作を停止しました。<br>大変お手数ですが、サーバー管理者にお問合せください。';
@@ -28,13 +26,11 @@ class LaunchTest extends \Init
             }
         }
     }
-    function __construct()
-    {
+    public function __construct() {
         $this->chkExtensionLoaded();
     }
 
-    private function view_head()
-    {
+    private function view_head() {
         echo <<<END
 <!doctype html>
 <html lang="ja">
@@ -49,8 +45,7 @@ class LaunchTest extends \Init
   <body>
 END;
     }
-    private function view_foot()
-    {
+    private function view_foot() {
         echo <<<END
   </body>
 </html>

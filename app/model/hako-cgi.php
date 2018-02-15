@@ -5,8 +5,7 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class Cgi
-{
+class Cgi {
     public $mode = "";
     public $dataSet = [];
 
@@ -14,8 +13,7 @@ class Cgi
      * POST、GETのデータを取得
      * @return void
      */
-    public function parseInputData()
-    {
+    public function parseInputData() {
         global $init;
 
         $this->mode = $_POST['mode'] ?? "";
@@ -64,41 +62,48 @@ class Cgi
      * COOKIEを取得
      * @return void
      */
-    public function getCookies()
-    {
+    public function getCookies() {
         if (!empty($_COOKIE)) {
             while (list($name, $value) = each($_COOKIE)) {
                 switch ($name) {
                     case "OWNISLANDID":
                         $this->dataSet['defaultID'] = $value;
+
                         break;
 
                     case "OWNISLANDPASSWORD":
                         $this->dataSet['defaultPassword'] = $value;
+
                         break;
 
                     case "TARGETISLANDID":
                         $this->dataSet['defaultTarget'] = $value;
+
                         break;
 
                     case "POINTX":
                         $this->dataSet['defaultX'] = $value;
+
                         break;
 
                     case "POINTY":
                         $this->dataSet['defaultY'] = $value;
+
                         break;
 
                     case "COMMAND":
                         $this->dataSet['defaultKind'] = $value;
+
                         break;
 
                     case "DEVELOPEMODE":
                         $this->dataSet['defaultDevelopeMode'] = $value;
+
                         break;
 
                     case "IMG":
                         $this->dataSet['defaultImg'] = $value;
+
                         break;
                 }
             }
@@ -108,8 +113,7 @@ class Cgi
     /**
      * COOKIEを生成
      */
-    public function setCookies()
-    {
+    public function setCookies() {
         $time = $_SERVER['REQUEST_TIME'] + 14 * 86400; // 現在から14日間有効
 
         // Cookieの設定 & POSTで入力されたデータで、Cookieから取得したデータを更新

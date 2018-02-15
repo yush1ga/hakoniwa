@@ -5,8 +5,7 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class File
-{
+class File {
     public $islandTurn;      // 現在ターン数
     public $islandLastTime;  // 最終更新時刻
     public $islandNumber;    // 島の総数
@@ -28,8 +27,7 @@ class File
      * @param  [type] &$cgi [description]
      * @return [type]       [description]
      */
-    public function readIslandsFile(&$cgi)
-    {
+    public function readIslandsFile(&$cgi) {
         global $init;
 
         $num = $cgi->dataSet['ISLANDID'] ?? "";
@@ -74,6 +72,7 @@ class File
         if ($init->allyUse) {
             $this->readAllyFile();
         }
+
         return true;
     }
     /**
@@ -82,8 +81,7 @@ class File
      * @param  [type] $num [description]
      * @return [type]      [description]
      */
-    public function readIsland($fp, $num)
-    {
+    public function readIsland($fp, $num) {
         global $init;
 
         $name = chop(fgets($fp, READ_LINE));
@@ -152,13 +150,13 @@ class File
             for ($i = 0; $i < $init->commandMax; $i++) {
                 $line = chop(fgets($fp_i, READ_LINE));
                 list($kind, $target, $x, $y, $arg) = explode(",", $line);
-                $command[$i] = array(
+                $command[$i] = [
                     'kind' => $kind,
                     'target' => $target,
                     'x' => $x,
                     'y' => $y,
                     'arg' => $arg,
-                );
+                ];
             }
 
             fclose($fp_i);
@@ -223,8 +221,7 @@ class File
      * @param  [type] $island [description]
      * @return [type]         [description]
      */
-    public function writeLand(int $num, $island)
-    {
+    public function writeLand(int $num, $island) {
         global $init;
         if (($num <= -1) || ($num == $island['id'])) {
             $fileName = $init->dirName."/island.{$island['id']}";
@@ -265,8 +262,7 @@ class File
      * 同盟データファイル読込み
      * @return [type] [description]
      */
-    public function readAllyFile()
-    {
+    public function readAllyFile() {
         global $init;
 
         $fileName = "{$init->dirName}/{$init->allyData}";
@@ -294,13 +290,13 @@ class File
             }
         }
         fclose($fp);
+
         return true;
     }
     //--------------------------------------------------
     // 同盟ひとつ読みこみ
     //--------------------------------------------------
-    public function readAlly($fp)
-    {
+    public function readAlly($fp) {
         $name = chop(fgets($fp, READ_LINE));
         $mark = chop(fgets($fp, READ_LINE));
         $color = chop(fgets($fp, READ_LINE));
@@ -318,7 +314,7 @@ class File
         $title = chop(fgets($fp, READ_LINE));
         list($title, $message) = array_pad(explode("<>", $title), 2, 0);
 
-        return array(
+        return [
             'name'       => $name,
             'mark'       => $mark,
             'color'      => $color,
@@ -333,15 +329,14 @@ class File
             'comment'    => $comment,
             'title'      => $title,
             'message'    => $message,
-        );
+        ];
     }
     /**
      * 全島dat書込み
      * @param  integer $num [description]
      * @return [type]       [description]
      */
-    public function writeIslandsFile($num = 0)
-    {
+    public function writeIslandsFile($num = 0) {
         global $init;
 
         $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
@@ -373,8 +368,7 @@ class File
      * @param  [type] $island [description]
      * @return [type]         [description]
      */
-    public function writeIsland($fp, $num, $island)
-    {
+    public function writeIsland($fp, $num, $island) {
         global $init;
 
         if (!isset($island['ship'])) {
@@ -491,8 +485,7 @@ class File
      * バックアップ
      * @return void
      */
-    public function backup()
-    {
+    public function backup() {
         global $init;
 
         try {
@@ -540,6 +533,7 @@ class File
             if (DEBUG) {
                 print_r($ex);
             }
+
             return;
         }
     }
@@ -549,8 +543,7 @@ class File
      * @param  string $dirName Directory that to delete.
      * @return void
      */
-    public function rmTree(string $dirName)
-    {
+    public function rmTree(string $dirName) {
         if (is_dir("{$dirName}")) {
             $dir = opendir("{$dirName}/");
             while (false !== ($fileName = readdir($dir))) {
@@ -568,8 +561,7 @@ class File
      * @param  boolean $erase 読込み後にファイルを削除するか
      * @return void
      */
-    public function readPresentFile(bool $erase = false)
-    {
+    public function readPresentFile(bool $erase = false) {
         global $init;
 
         $fileName = $init->dirName.'/present.dat';
@@ -592,8 +584,7 @@ class File
      * プレゼント管理ファイル書込み
      * @return void
      */
-    public function writePresentFile()
-    {
+    public function writePresentFile() {
         global $init;
 
         $presents = [];
@@ -622,21 +613,18 @@ class File
      * @param  $path  対象フォルダの絶対パス
      * @return int    エラーコード
      */
-    public function zip(string $path)
-    {
+    public function zip(string $path) {
         //wip
     }
 }
 
 
-class Hako extends File
-{
+class Hako extends File {
     public $islandList;    // 島リスト
     public $targetList;    // ターゲットの島リスト
     public $defaultTarget; // 目標補足用ターゲット
 
-    public function readIslands(&$cgi)
-    {
+    public function readIslands(&$cgi) {
         global $init;
 
         $m = $this->readIslandsFile($cgi);
@@ -648,13 +636,13 @@ class Hako extends File
             // 順位がTOPの島が選択された状態のリスト
             $this->targetList = $this->getIslandList($cgi->dataSet['defaultTarget']);
         }
+
         return $m;
     }
     //---------------------------------------------------
     // 島リスト生成
     //---------------------------------------------------
-    public function getIslandList($select = 0)
-    {
+    public function getIslandList($select = 0) {
         global $init;
 
         $list = "";
@@ -678,13 +666,13 @@ class Hako extends File
                 $list .= "<option value=\"$id\" $s>{$name}{$init->nameSuffix}</option>\n";
             }
         }
+
         return $list;
     }
     //---------------------------------------------------
     // 賞に関するリストを生成
     //---------------------------------------------------
-    public function getPrizeList($prize)
-    {
+    public function getPrizeList($prize) {
         global $init;
         list($flags, $monsters, $turns) = explode(",", $prize, 3);
 
@@ -724,13 +712,13 @@ class Hako extends File
         if ($max != -1) {
             $prizeList .= "<img src=\"{$init->imgDir}/monster{$max}.gif\" alt=\"{$nameList}\" title=\"{$nameList}\" width=\"16\" height=\"16\"> ";
         }
+
         return $prizeList;
     }
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr = '')
-    {
+    public function landString($l, $lv, $x, $y, $mode, $comStr = '') {
         global $init;
 
         $point = "($x,$y)";
@@ -752,6 +740,7 @@ class Hako extends File
                     $image = 'land17.gif';
                     $naviTitle = '海';
                 }
+
                 break;
 
             case $init->landSeaCity:
@@ -759,6 +748,7 @@ class Hako extends File
                 $image = 'SeaCity.gif';
                 $naviTitle = '海底都市';
                 $naviText = "{$lv}{$init->unitPop}";
+
                 break;
 
             case $init->landFroCity:
@@ -766,12 +756,14 @@ class Hako extends File
                 $image = 'FroCity.gif';
                 $naviTitle = '海上都市';
                 $naviText = "{$lv}{$init->unitPop}";
+
                 break;
 
             case $init->landPort:
                 // 港
                 $image = 'port.gif';
                 $naviTitle = '港';
+
                 break;
 
             case $init->landShip:
@@ -805,30 +797,35 @@ class Hako extends File
                 // 線路
                 $image = "rail{$lv}.gif";
                 $naviTitle = '線路';
+
                 break;
 
             case $init->landStat:
                 // 駅
                 $image = 'stat.gif';
                 $naviTitle = '駅';
+
                 break;
 
             case $init->landTrain:
                 // 電車
                 $image = "train{$lv}.gif";
                 $naviTitle = '電車';
+
                 break;
 
             case $init->landZorasu:
                 // 海怪獣
                 $image = 'zorasu.gif';
                 $naviTitle = 'ぞらす';
+
                 break;
 
             case $init->landSeaSide:
                 // 海岸
                 $image = 'sunahama.gif';
                 $naviTitle = '砂浜';
+
                 break;
 
             case $init->landSeaResort:
@@ -844,36 +841,42 @@ class Hako extends File
                     $naviTitle = 'リゾートホテル';
                 }
                 $naviText = "収入:{$lv}{$init->unitPop}<br>";
+
                 break;
 
             case $init->landSoccer:
                 // スタジアム
                 $image = 'stadium.gif';
                 $naviTitle = 'スタジアム';
+
                 break;
 
             case $init->landPark:
                 // 遊園地
                 $image = "park{$lv}.gif";
                 $naviTitle = '遊園地';
+
                 break;
 
             case $init->landFusya:
                 // 風車
                 $image = 'fusya.gif';
                 $naviTitle = '風車';
+
                 break;
 
             case $init->landSyoubou:
                 // 消防署
                 $image = 'syoubou.gif';
                 $naviTitle = '消防署';
+
                 break;
 
             case $init->landSsyoubou:
                 // 海底消防署
                 $image = 'syoubou2.gif';
                 $naviTitle = '海底消防署';
+
                 break;
 
             case $init->landNursery:
@@ -881,18 +884,21 @@ class Hako extends File
                 $image = 'Nursery.gif';
                 $naviTitle = '養殖場';
                 $naviText = "{$lv}0{$init->unitPop}規模";
+
                 break;
 
             case $init->landWaste:
                 // 荒地・着弾点
                 $image = ($lv == 1) ? 'land13.gif' : 'land1.gif';
                 $naviTitle = '荒地';
+
                 break;
 
             case $init->landPlains:
                 // 平地
                 $image = 'land2.gif';
                 $naviTitle = '平地';
+
                 break;
 
             case $init->landPoll:
@@ -900,6 +906,7 @@ class Hako extends File
                 $image = 'poll.gif';
                 $naviTitle = '汚染土壌';
                 $naviText = "汚染レベル{$lv}";
+
                 break;
 
             case $init->landForest:
@@ -910,6 +917,7 @@ class Hako extends File
                 if ($mode == 1) {
                     $naviText= $lv.$init->unitTree;
                 }
+
                 break;
 
             case $init->landTown:
@@ -930,6 +938,7 @@ class Hako extends File
                 }
                 $image = "land{$p}.gif";
                 $naviText = "{$lv}{$init->unitPop}";
+
                 break;
 
             case $init->landProcity:
@@ -947,6 +956,7 @@ class Hako extends File
                 }
                 $image = "bousai.gif";
                 $naviText = "{$lv}{$init->unitPop}";
+
                 break;
 
             case $init->landNewtown:
@@ -956,6 +966,7 @@ class Hako extends File
                 $image = 'new.gif';
                 $naviTitle = 'ニュータウン';
                 $naviText = "{$lv}{$init->unitPop}/職場{$nwork}0{$init->unitPop}";
+
                 break;
 
             case $init->landBigtown:
@@ -966,6 +977,7 @@ class Hako extends File
                 $image = 'big.gif';
                 $naviTitle = '現代都市';
                 $naviText = "{$lv}{$init->unitPop}/職場{$lwork}0{$init->unitPop}/農場{$mwork}0{$init->unitPop}";
+
                 break;
 
             case $init->landFarm:
@@ -978,6 +990,7 @@ class Hako extends File
                     $image = 'land71.gif';
                     $naviTitle = 'ドーム型農場';
                 }
+
                 break;
 
             case $init->landSfarm:
@@ -985,6 +998,7 @@ class Hako extends File
                 $image = 'land72.gif';
                 $naviTitle = '海底農場';
                 $naviText = "{$lv}0{$init->unitPop}規模";
+
                 break;
 
             case $init->landFactory:
@@ -997,6 +1011,7 @@ class Hako extends File
                     $image = 'land82.gif';
                     $naviTitle = '大工場';
                 }
+
                 break;
 
             case $init->landCommerce:
@@ -1009,6 +1024,7 @@ class Hako extends File
                     $image = 'commerce2.gif';
                     $naviTitle = '本社ビル';
                 }
+
                 break;
 
             case $init->landHatuden:
@@ -1021,12 +1037,14 @@ class Hako extends File
                     $image = 'hatuden2.gif';
                     $naviTitle = '大型発電所';
                 }
+
                 break;
 
             case $init->landBank:
                 // 銀行
                 $image = 'bank.gif';
                 $naviTitle = '銀行';
+
                     break;
 
             case $init->landBase:
@@ -1041,6 +1059,7 @@ class Hako extends File
                     $naviTitle = 'ミサイル基地';
                     $naviText = "Lv:${level} / EXP:{$lv}";
                 }
+
                 break;
 
             case $init->landSbase:
@@ -1055,6 +1074,7 @@ class Hako extends File
                     $naviTitle = '海底基地';
                     $naviText = "レベル ${level} / 経験値 {$lv}";
                 }
+
                 break;
 
             case $init->landDefence:
@@ -1067,6 +1087,7 @@ class Hako extends File
                     $naviTitle = '防衛施設';
                     $naviText = "耐久力 {$lv}";
                 }
+
                 break;
 
             case $init->landHaribote:
@@ -1078,6 +1099,7 @@ class Hako extends File
                 } else {
                     $naviTitle = 'ハリボテ';
                 }
+
                 break;
 
             case $init->landSdefence:
@@ -1088,12 +1110,14 @@ class Hako extends File
                 } else {
                     $naviText = "耐久力 {$lv}";
                 }
+
                 break;
 
             case $init->landOil:
                 // 海底油田
                 $image = 'land16.gif';
                 $naviTitle = '海底油田';
+
                 break;
 
             case $init->landMountain:
@@ -1106,6 +1130,7 @@ class Hako extends File
                     $image = 'land11.gif';
                     $naviTitle = '山';
                 }
+
                 break;
 
             case $init->landMyhome:
@@ -1113,6 +1138,7 @@ class Hako extends File
                 $image = "home{$lv}.gif";
                 $naviTitle = 'マイホーム';
                 $naviText = "{$lv}人家族";
+
                 break;
 
             case $init->landSoukoM:
@@ -1141,6 +1167,7 @@ class Hako extends File
                         $naviText = "セキュリティ：{$sec}、貯食：{$tyo}000{$init->unitFood}";
                     }
                 }
+
                 break;
 
             case $init->landMonument:
@@ -1148,6 +1175,7 @@ class Hako extends File
                 $image = "monument{$lv}.gif";
                 $naviTitle = '記念碑';
                 $naviText = $init->monumentName[$lv];
+
                 break;
 
             case $init->landMonster:
@@ -1189,13 +1217,11 @@ class Hako extends File
 /**
  * バトルフィールド
  */
-class HakoBF extends File
-{
+class HakoBF extends File {
     public $islandListNoBF; // 普通の島リスト
     public $islandListBF;   // BFな島リスト
 
-    public function init($cgi)
-    {
+    public function init($cgi) {
         global $init;
 
         $this->readIslandsFile($cgi);
@@ -1214,19 +1240,17 @@ class HakoBF extends File
     }
 }
 
-class HakoEdit extends File
-{
-    public function readIslands(&$cgi)
-    {
+class HakoEdit extends File {
+    public function readIslands(&$cgi) {
         global $init;
+
         return $this->readIslandsFile($cgi);
     }
 
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr)
-    {
+    public function landString($l, $lv, $x, $y, $mode, $comStr) {
         global $init;
         $point = "($x,$y)";
         $naviExp = '';
@@ -1249,6 +1273,7 @@ class HakoEdit extends File
                     $naviTitle = '海';
                     $naviText = $lv;
                 }
+
                 break;
 
             case $init->landSeaCity:
@@ -1256,6 +1281,7 @@ class HakoEdit extends File
                 $image = 'SeaCity.gif';
                 $naviTitle = '海底都市';
                 $naviText = $lv.$init->unitPop;
+
                 break;
 
             case $init->landFroCity:
@@ -1263,12 +1289,14 @@ class HakoEdit extends File
                 $image = 'FroCity.gif';
                 $naviTitle = '海上都市';
                 $naviText = $lv.$init->unitPop;
+
                 break;
 
             case $init->landPort:
                 // 港
                 $image = 'port.gif';
                 $naviTitle = '港';
+
                 break;
 
             case $init->landShip:
@@ -1301,30 +1329,35 @@ class HakoEdit extends File
                 // 線路
                 $image = "rail{$lv}.gif";
                 $naviTitle = '線路';
+
                 break;
 
             case $init->landStat:
                 // 駅
                 $image = 'stat.gif';
                 $naviTitle = '駅';
+
                 break;
 
             case $init->landTrain:
                 // 電車
                 $image = "train{$lv}.gif";
                 $naviTitle = '電車';
+
                 break;
 
             case $init->landZorasu:
                 // 海怪獣
                 $image = 'zorasu.gif';
                 $naviTitle = 'ぞらす';
+
                 break;
 
             case $init->landSeaSide:
                 // 海岸
                 $image = 'sunahama.gif';
                 $naviTitle = '砂浜';
+
                 break;
 
             case $init->landSeaResort:
@@ -1340,36 +1373,42 @@ class HakoEdit extends File
                     $naviTitle = 'リゾートホテル';
                 }
                 $naviText = "収入:{$lv}{$init->unitPop}<br>";
+
                 break;
 
             case $init->landSoccer:
                 // スタジアム
                 $image = 'stadium.gif';
                 $naviTitle = 'スタジアム';
+
                 break;
 
             case $init->landPark:
                 // 遊園地
                 $image = "park{$lv}.gif";
                 $naviTitle = '遊園地';
+
                 break;
 
             case $init->landFusya:
                 // 風車
                 $image = 'fusya.gif';
                 $naviTitle = '風車';
+
                 break;
 
             case $init->landSyoubou:
                 // 消防署
                 $image = 'syoubou.gif';
                 $naviTitle = '消防署';
+
                 break;
 
             case $init->landSsyoubou:
                 // 海底消防署
                 $image = 'syoubou2.gif';
                 $naviTitle = '海底消防署';
+
                 break;
 
             case $init->landNursery:
@@ -1377,6 +1416,7 @@ class HakoEdit extends File
                 $image = 'Nursery.gif';
                 $naviTitle = '養殖場';
                 $naviText = "{$lv}0{$init->unitPop}規模";
+
                 break;
 
             case $init->landWaste:
@@ -1387,12 +1427,14 @@ class HakoEdit extends File
                     $image = 'land1.gif';
                 }
                 $naviTitle = '荒地';
+
                 break;
 
             case $init->landPlains:
                 // 平地
                 $image = 'land2.gif';
                 $naviTitle = '平地';
+
                 break;
 
             case $init->landPoll:
@@ -1400,6 +1442,7 @@ class HakoEdit extends File
                 $image = 'poll.gif';
                 $naviTitle = '汚染土壌';
                 $naviText = "汚染レベル{$lv}";
+
                 break;
 
             case $init->landForest:
@@ -1412,6 +1455,7 @@ class HakoEdit extends File
                     $image = 'land6.gif';
                 }
                 $naviTitle = '森';
+
                 break;
 
             case $init->landTown:
@@ -1432,6 +1476,7 @@ class HakoEdit extends File
                 }
                 $image = "land{$p}.gif";
                 $naviText = "{$lv}{$init->unitPop}";
+
                 break;
 
             case $init->landProcity:
@@ -1449,6 +1494,7 @@ class HakoEdit extends File
                 }
                 $image = "bousai.gif";
                 $naviText = "{$lv}{$init->unitPop}";
+
                 break;
 
             case $init->landNewtown:
@@ -1458,6 +1504,7 @@ class HakoEdit extends File
                 $image = 'new.gif';
                 $naviTitle = 'ニュータウン';
                 $naviText = "{$lv}{$init->unitPop}/職場{$nwork}0{$init->unitPop}";
+
                 break;
 
             case $init->landBigtown:
@@ -1468,6 +1515,7 @@ class HakoEdit extends File
                 $image = 'big.gif';
                 $naviTitle = '現代都市';
                 $naviText = "{$lv}{$init->unitPop}/職場{$mwork}0{$init->unitPop}/農場{$lwork}0{$init->unitPop}";
+
                 break;
 
             case $init->landFarm:
@@ -1480,6 +1528,7 @@ class HakoEdit extends File
                     $image = 'land71.gif';
                     $naviTitle = 'ドーム型農場';
                 }
+
                 break;
 
             case $init->landSfarm:
@@ -1487,6 +1536,7 @@ class HakoEdit extends File
                 $image = 'land72.gif';
                 $naviTitle = '海底農場';
                 $naviText = "{$lv}0{$init->unitPop}規模";
+
                 break;
 
             case $init->landFactory:
@@ -1499,6 +1549,7 @@ class HakoEdit extends File
                     $image = 'land82.gif';
                     $naviTitle = '大工場';
                 }
+
                 break;
 
             case $init->landCommerce:
@@ -1511,6 +1562,7 @@ class HakoEdit extends File
                     $image = 'commerce2.gif';
                     $naviTitle = '本社ビル';
                 }
+
                 break;
 
             case $init->landHatuden:
@@ -1523,12 +1575,14 @@ class HakoEdit extends File
                     $image = 'hatuden2.gif';
                     $naviTitle = '大型発電所';
                 }
+
                 break;
 
             case $init->landBank:
                 // 銀行
                 $image = 'bank.gif';
                 $naviTitle = '銀行';
+
                 break;
 
             case $init->landBase:
@@ -1543,6 +1597,7 @@ class HakoEdit extends File
                     $naviTitle = 'ミサイル基地';
                     $naviText = "レベル ${level} / 経験値 {$lv}";
                 }
+
                 break;
             case $init->landSbase:
                 // 海底基地
@@ -1556,6 +1611,7 @@ class HakoEdit extends File
                     $naviTitle = '海底基地';
                     $naviText = "レベル ${level} / 経験値 {$lv}";
                 }
+
                 break;
 
             case $init->landDefence:
@@ -1568,6 +1624,7 @@ class HakoEdit extends File
                     $naviTitle = '防衛施設';
                     $naviText = "耐久力 {$lv}";
                 }
+
                 break;
 
             case $init->landHaribote:
@@ -1579,6 +1636,7 @@ class HakoEdit extends File
                 } else {
                     $naviTitle = 'ハリボテ';
                 }
+
                 break;
 
             case $init->landSdefence:
@@ -1591,12 +1649,14 @@ class HakoEdit extends File
                     $naviTitle = '海底防衛施設';
                     $naviText = "耐久力 {$lv}";
                 }
+
                 break;
 
             case $init->landOil:
                 // 海底油田
                 $image = 'land16.gif';
                 $naviTitle = '海底油田';
+
                 break;
 
             case $init->landMountain:
@@ -1609,6 +1669,7 @@ class HakoEdit extends File
                     $image = 'land11.gif';
                     $naviTitle = '山';
                 }
+
                 break;
 
             case $init->landMyhome:
@@ -1616,6 +1677,7 @@ class HakoEdit extends File
                 $image = "home{$lv}.gif";
                 $naviTitle = 'マイホーム';
                 $naviText = "{$lv}人家族";
+
                 break;
 
             case $init->landSoukoM:
@@ -1644,6 +1706,7 @@ class HakoEdit extends File
                         $naviText = "セキュリティ：{$sec}、貯食：{$tyo}000{$init->unitFood}";
                     }
                 }
+
                 break;
 
             case $init->landMonument:
@@ -1651,6 +1714,7 @@ class HakoEdit extends File
                 $image = "monument{$lv}.gif";
                 $naviTitle = '記念碑';
                 $naviText = $init->monumentName[$lv];
+
                 break;
 
             case $init->landMonster:
@@ -1689,12 +1753,10 @@ class HakoEdit extends File
     }
 }
 
-class HakoPresent extends File
-{
+class HakoPresent extends File {
     public $islandList; // 島リスト
 
-    public function init($cgi)
-    {
+    public function init($cgi) {
         global $init;
         $this->readIslandsFile($cgi);
         $this->readPresentFile();
@@ -1708,13 +1770,11 @@ class HakoPresent extends File
     }
 }
 
-class HakoKP extends File
-{
+class HakoKP extends File {
     public $islandListNoKP; // 普通の島リスト
     public $islandListKP;   // 管理人預かり島リスト
 
-    public function init($cgi)
-    {
+    public function init($cgi) {
         global $init;
         $this->readIslandsFile($cgi);
         $this->islandListNoKP = '<option value="0"></option>'.PHP_EOL;

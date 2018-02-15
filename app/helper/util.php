@@ -5,18 +5,17 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class Util
-{
+class Util {
 
     /**
      * 資金を丸めて表示する
      * @param  integer $money 資金額
      * @return string         丸めた文字列
      */
-    public static function aboutMoney(int $money = 0):string
-    {
+    public static function aboutMoney(int $money = 0):string {
         global $init;
         $digit = (int)$init->moneyMode;
+
         return ($digit <= 0)? $money .$init->unitMoney
                 : ($money < $digit)? "推定{$digit}{$init->unitMoney}未満"
                 : '推定'. round($money / $digit) * $digit . $init->unitMoney;
@@ -28,8 +27,7 @@ class Util
      * @param  integer $exp  経験値
      * @return integer       対応した基地レベル値
      */
-    public static function expToLevel(int $kind, int $exp):int
-    {
+    public static function expToLevel(int $kind, int $exp):int {
         global $init;
 
         // ミサイル基地
@@ -39,14 +37,16 @@ class Util
                     return $i;
                 }
             }
+
             return 1;
-            // 海底基地
+        // 海底基地
         } else {
             for ($i = $init->maxSBaseLevel; $i > 1; $i--) {
                 if ($exp >= $init->sBaseLevelUp[$i - 2]) {
                     return $i;
                 }
             }
+
             return 1;
         }
     }
@@ -56,8 +56,7 @@ class Util
      * @param  [type] $lv 地形メタデータ
      * @return [type]     [description]
      */
-    public static function monsterSpec($lv)
-    {
+    public static function monsterSpec($lv) {
         global $init;
 
         // 種類
@@ -66,6 +65,7 @@ class Util
         $name = $init->monsterName[$kind];
         // 体力
         $hp = $lv % 100;
+
         return ['kind' => $kind, 'name' => $name, 'hp' => $hp];
     }
 
@@ -75,8 +75,7 @@ class Util
      * @param  [type] $name [description]
      * @return [type]       [description]
      */
-    public static function nameToNumber($hako, $name)
-    {
+    public static function nameToNumber($hako, $name) {
         // 全島から探す
         for ($i = 0; $i < $hako->islandNumber; $i++) {
             if (strcmp($name, $hako->islands[$i]['name']) == 0) {
@@ -94,8 +93,7 @@ class Util
      * @param  [type] $idToAllyNumber [description]
      * @return [type]                 [description]
      */
-    public static function islandName($island, $ally, $idToAllyNumber)
-    {
+    public static function islandName($island, $ally, $idToAllyNumber) {
         $name = '';
         foreach ($island['allyId'] as $id) {
             $i = $idToAllyNumber[$id];
@@ -114,8 +112,7 @@ class Util
      * @param  string $p2 [description]
      * @return [type]     [description]
      */
-    public static function checkPassword(string $p1 = "", string $p2 = ""):bool
-    {
+    public static function checkPassword(string $p1 = "", string $p2 = ""):bool {
         global $init;
 
         // nullチェック
@@ -149,8 +146,7 @@ class Util
      * @param  string $p [description]
      * @return [type]    [description]
      */
-    public static function checkSpecialPassword(string $p = ""):bool
-    {
+    public static function checkSpecialPassword(string $p = ""):bool {
         global $init;
 
         // nullチェック
@@ -170,8 +166,7 @@ class Util
     /**
      * パスワードのエンコード
      */
-    public static function encode(string $s, bool $isLegacy = true):string
-    {
+    public static function encode(string $s, bool $isLegacy = true):string {
         return ($isLegacy)? crypt($s, 'h2') : password_hash($s, PASSWORD_DEFAULT, ['cost'=>10]);
     }
 
@@ -180,16 +175,14 @@ class Util
      * @param  integer $num 正の整数（通例２以上）
      * @return float   [0, $num-1]の範囲の実数
      */
-    public static function random($num = 0)
-    {
+    public static function random($num = 0) {
         return ($num > 1)? mt_rand(0, $num - 1) : 0;
     }
 
     //---------------------------------------------------
     // ランダムな座標を生成
     //---------------------------------------------------
-    public static function makeRandomPointArray()
-    {
+    public static function makeRandomPointArray() {
         global $init;
 
         $rx = $ry = [];
@@ -215,14 +208,14 @@ class Util
                 $ry[$j] = $tmp;
             }
         }
+
         return [$rx, $ry];
     }
 
     //---------------------------------------------------
     // ランダムな島の順序を生成
     //---------------------------------------------------
-    public static function randomArray($n = 1)
-    {
+    public static function randomArray($n = 1) {
         // 初期値
         for ($i = 0; $i < $n; $i++) {
             $list[$i] = $i;
@@ -236,14 +229,14 @@ class Util
                 $list[$j] = $tmp;
             }
         }
+
         return $list;
     }
 
     //---------------------------------------------------
     // コマンドを前にずらす
     //---------------------------------------------------
-    public static function slideFront(&$command, $number = 0)
-    {
+    public static function slideFront(&$command, $number = 0) {
         global $init;
 
         // それぞれずらす
@@ -262,8 +255,7 @@ class Util
     //---------------------------------------------------
     // コマンドを後にずらす
     //---------------------------------------------------
-    public static function slideBack(&$command, $number = 0)
-    {
+    public static function slideBack(&$command, $number = 0) {
         global $init;
 
         // それぞれずらす
@@ -273,20 +265,19 @@ class Util
         for ($i = $init->commandMax - 1; $i > $number; $i--) {
             $command[$i] = $command[$i - 1];
         }
-        $command[$i] = array(
+        $command[$i] = [
             'kind'   => $init->comDoNothing,
             'target' => 0,
             'x'      => 0,
             'y'      => 0,
             'arg'    => 0
-        );
+        ];
     }
 
     //---------------------------------------------------
     // 船情報のUnpack
     //---------------------------------------------------
-    public static function navyUnpack($lv)
-    {
+    public static function navyUnpack($lv) {
         global $init;
 
         // bit 意味
@@ -314,8 +305,7 @@ class Util
     //---------------------------------------------------
     // 船情報のPack
     //---------------------------------------------------
-    public static function navyPack($id, $kind, $hp, $exp, $flag)
-    {
+    public static function navyPack($id, $kind, $hp, $exp, $flag) {
         global $init;
 
         // bit 意味
@@ -353,23 +343,24 @@ class Util
      * @param  arr     $ships 島データ内、船舶部分
      * @return boolean        災害船舶が1隻でも存在していたらtrue
      */
-    public static function hasBadShip($ships)
-    {
+    public static function hasBadShip($ships) {
         global $init;
         $arrSize    = count($ships);
         $badShipsId = $init->shipKind;
         $badShips   = 0;
         for ($i=$badShipsId; $i < $arrSize; $i++) {
-            if (is_numeric($ships[$i]) && $ships[$i] > 0) $badShips++;
+            if (is_numeric($ships[$i]) && $ships[$i] > 0) {
+                $badShips++;
+            }
         }
+
         return ($badShips!=0);
     }
 
     /**
      * ファイルをロックする
      */
-    public static function lock()
-    {
+    public static function lock() {
         global $init;
 
         $fp = fopen($init->dirName."/lock.dat", "w");
@@ -386,6 +377,7 @@ class Util
         // ロック失敗
         fclose($fp);
         HakoError::lockFail();
+
         return false;
     }
 
@@ -394,8 +386,7 @@ class Util
      * @param  [type] $fp [description]
      * @return void
      */
-    public static function unlock($fp)
-    {
+    public static function unlock($fp) {
         fflush($fp);
         flock($fp, LOCK_UN);
         fclose($fp);
@@ -407,8 +398,7 @@ class Util
      * @param  string $status  アラート種類："success","info","warning","danger".
      * @return void
      */
-    public static function makeTagMessage($message, $status = "success")
-    {
+    public static function makeTagMessage($message, $status = "success") {
         echo '<div class="alert alert-'.$status.'" role="alert">';
         echo nl2br($message, false);
         echo '</div>';
@@ -419,8 +409,7 @@ class Util
      * @param  integer $max [description]
      * @return [type]       [description]
      */
-    public static function rand_string(int $max = 32):string
-    {
+    public static function rand_string(int $max = 32):string {
         return substr(md5(uniqid(rand_number(), true)), 0, $max);
     }
 
@@ -430,9 +419,9 @@ class Util
      * @param integer $y
      * @return boolean
      */
-    public static function isInnerLand($x, $y)
-    {
+    public static function isInnerLand($x, $y) {
         global $init;
+
         return -1 < $x && $x < $init->islandSize && -1 < $y && $y < $init->islandSize;
     }
 
@@ -444,13 +433,13 @@ class Util
      * @return float       [description]
      */
     public static function calcIslandData(string $cat, array $isl): float {
-        switch($cat) {
+        switch ($cat) {
             case 'unemployed':
                 return ($isl['pop'] - ($isl['farm'] + $isl['factory'] + $isl['commerce'] + $isl['mountain'] + $isl['hatuden']) * 10) / $isl['pop'] * 100;
             case 'enesyouhi':
                 return round(($isl['pop']/100) + ($isl['factory']*2/3) + ($isl['commerce']/3) + ($isl['mountain']/4));
             case 'ene':
-                return round($isl['hatuden'] / Util::calcIslandData('enesyouhi',$isl) * 100);
+                return round($isl['hatuden'] / Util::calcIslandData('enesyouhi', $isl) * 100);
         }
     }
 
@@ -459,22 +448,19 @@ class Util
      * @param  boolean $withGet [description]
      * @return [type]           [description]
      */
-    public static function parsePostData($withGet=false)
-    {
+    public static function parsePostData($withGet=false) {
         global $init;
 
         $mode = $_POST['mode'] ?? '';
     }
 }
 
-function println(...$strs)
-{
+function println(...$strs) {
     foreach ($strs as $str) {
         echo $str;
     }
     echo PHP_EOL;
 }
-function h(string $str):string
-{
+function h(string $str):string {
     return preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($str, ENT_QUOTES, 'UTF-8'));
 }

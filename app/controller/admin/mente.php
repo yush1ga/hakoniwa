@@ -1,14 +1,13 @@
 <?php
 namespace Hakoniwa\Admin\Maintenance;
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
 
-class Mente extends \Admin
-{
-    function __construct()
-    {
+class Mente extends \Admin {
+    public function __construct() {
         $html = new \HtmlMente();
         $cgi = new \Cgi();
         $this->parseInputData();
@@ -22,6 +21,7 @@ class Mente extends \Admin
                     $this->newMode();
                 }
                 $html->main($this->dataSet);
+
                 break;
 
             case "CURRENT":
@@ -29,6 +29,7 @@ class Mente extends \Admin
                     $this->currentMode($this->dataSet['NUMBER']);
                 }
                 $html->main($this->dataSet);
+
                 break;
 
             case "DELETE":
@@ -36,6 +37,7 @@ class Mente extends \Admin
                     $this->delMode($this->dataSet['NUMBER']);
                 }
                 $html->main($this->dataSet);
+
                 break;
 
             case "NTIME":
@@ -43,6 +45,7 @@ class Mente extends \Admin
                     $this->timeMode();
                 }
                 $html->main($this->dataSet);
+
                 break;
 
             case "STIME":
@@ -50,28 +53,31 @@ class Mente extends \Admin
                     $this->stimeMode($this->dataSet['SSEC']);
                 }
                 $html->main($this->dataSet);
+
                 break;
 
             case "setup":
                 $this->setupMode();
                 $html->enter();
+
                 break;
 
             case "enter":
                 if ($this->passCheck()) {
                     $html->main($this->dataSet);
                 }
+
                 break;
 
             default:
                 $html->enter();
+
                 break;
         }
         $html->footer();
     }
 
-    public function newMode()
-    {
+    public function newMode() {
         global $init;
 
         // 現在の時間を取得
@@ -100,16 +106,14 @@ class Mente extends \Admin
         fclose($fp);
     }
 
-    public function delMode($id)
-    {
+    public function delMode($id) {
         global $init;
 
         $dirName = (strcmp($id, "") == 0)? $init->dirName : $init->dirName.".bak{$id}";
         $this->rmTree($dirName);
     }
 
-    public function timeMode()
-    {
+    public function timeMode() {
         $year = $this->dataSet['YEAR'];
         $day = $this->dataSet['DATE'];
         $mon = $this->dataSet['MON'];
@@ -120,8 +124,7 @@ class Mente extends \Admin
         $this->stimeMode($ctSec);
     }
 
-    public function stimeMode($sec)
-    {
+    public function stimeMode($sec) {
         global $init;
 
         $fileName = $init->dirName.'/hakojima.dat';
@@ -132,14 +135,13 @@ class Mente extends \Admin
         }
         $buffer[1] = "$sec\n";
         fseek($fp, 0);
-        while (NULL !== ($line = array_shift($buffer))) {
+        while (null !== ($line = array_shift($buffer))) {
             fputs($fp, $line);
         }
         fclose($fp);
     }
 
-    public function currentMode($id)
-    {
+    public function currentMode($id) {
         global $init;
 
         $this->rmTree($init->dirName);
@@ -157,8 +159,7 @@ class Mente extends \Admin
      * @param  string $dirName 子ファイルを削除したいディレクトリ
      * @return void
      */
-    public function rmTree($dirName)
-    {
+    public function rmTree($dirName) {
         if (is_dir($dirName)) {
             $dir = opendir($dirName.'/');
             while (false !== ($fileName = readdir($dir))) {
@@ -170,19 +171,20 @@ class Mente extends \Admin
         }
     }
 
-    public function setupMode()
-    {
+    public function setupMode() {
         global $init;
 
-        function isValidPasswd($passwd1='', $passwd2=''){
-            return !($passwd1=='' || $passwd2=='' || (0 != strcmp($passwd1,$passwd2)));
+        function isValidPasswd($passwd1='', $passwd2='') {
+            return !($passwd1=='' || $passwd2=='' || (0 != strcmp($passwd1, $passwd2)));
         }
 
-        if (!isValidPasswd($this->dataSet['MPASS1'],$this->dataSet['MPASS2'])) {
+        if (!isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['MPASS2'])) {
             HakoError::wrongMasterPassword();
+
             return;
-        }elseif(!isValidPasswd($this->dataSet['SPASS1'],$this->dataSet['SPASS2'])) {
+        } elseif (!isValidPasswd($this->dataSet['SPASS1'], $this->dataSet['SPASS2'])) {
             HakoError::wrongSpecialPassword();
+
             return;
         }
         $masterPasswd  = \Util::encode($this->dataSet['MPASS1'], false);

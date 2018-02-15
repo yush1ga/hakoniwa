@@ -3,42 +3,42 @@
 	<p>島の名前を選択すると、<strong>観光</strong>することができます。</p>
 <?php
 
-	/**
-	 * 島一覧pagenation
-	 * @var integer
-	 */
-	$islandListStart = 0;
-	$islandListSentinel = 0;
+    /**
+     * 島一覧pagenation
+     * @var integer
+     */
+    $islandListStart = 0;
+    $islandListSentinel = 0;
 
-	if ($hako->islandNumber != 0) {
-		$islandListStart = $data['islandListStart'];
-		if ($init->islandListRange == 0) {
-			$islandListSentinel = $hako->islandNumberNoBF;
-		} else {
-			$islandListSentinel = $islandListStart + $init->islandListRange - 1;
-			if ( $islandListSentinel > $hako->islandNumberNoBF ) {
-				$islandListSentinel = $hako->islandNumberNoBF;
-			}
-		}
-	}
+    if ($hako->islandNumber != 0) {
+        $islandListStart = $data['islandListStart'];
+        if ($init->islandListRange == 0) {
+            $islandListSentinel = $hako->islandNumberNoBF;
+        } else {
+            $islandListSentinel = $islandListStart + $init->islandListRange - 1;
+            if ($islandListSentinel > $hako->islandNumberNoBF) {
+                $islandListSentinel = $hako->islandNumberNoBF;
+            }
+        }
+    }
 
-	if (($islandListStart  != 1) || ($islandListSentinel != $hako->islandNumberNoBF)) {
-		for ($i = 1; $i <= $hako->islandNumberNoBF ; $i += $init->islandListRange) {
-			$j = min( $i + $init->islandListRange - 1, $hako->islandNumberNoBF );
-			echo " ";
+    if (($islandListStart  != 1) || ($islandListSentinel != $hako->islandNumberNoBF)) {
+        for ($i = 1; $i <= $hako->islandNumberNoBF ; $i += $init->islandListRange) {
+            $j = min($i + $init->islandListRange - 1, $hako->islandNumberNoBF);
+            echo " ";
 
-			if ( $i != $islandListStart ) {
-				echo '<a href="', $this_file, "?islandListStart=", $i, '">';
-			}
-			echo " [ ". $i . " - " . $j . " ]";
+            if ($i != $islandListStart) {
+                echo '<a href="', $this_file, "?islandListStart=", $i, '">';
+            }
+            echo " [ ". $i . " - " . $j . " ]";
 
-			if ($i != $islandListStart) {
-				echo "</a>";
-			}
-		}
-	}
-	$islandListStart--;
-	$this->islandTable($hako, $islandListStart, $islandListSentinel);
+            if ($i != $islandListStart) {
+                echo "</a>";
+            }
+        }
+    }
+    $islandListStart--;
+    $this->islandTable($hako, $islandListStart, $islandListSentinel);
 ?>
 </div>
 <hr>

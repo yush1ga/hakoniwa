@@ -4,10 +4,8 @@
  * @author hiro <@hiro0218>
  */
 
-class Main
-{
-    public function execute()
-    {
+class Main {
+    public function execute() {
         $hako = new \Hako();
         $cgi  = new \Cgi();
 
@@ -40,6 +38,7 @@ class Main
                 $html->header();
                 $html->log();
                 $html->footer();
+
                 break;
 
             case "turn":
@@ -50,36 +49,42 @@ class Main
                 // ターン処理後、通常トップページ描画
                 $html->main($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "owner":
                 $html->header();
                 $html->owner($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "command":
                 $html->header();
                 $com->commandMain($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "new":
                 $html->header();
                 $com->newIsland($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "comment":
                 $html->header();
                 $com->commentMain($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "print":
                 $html->header();
                 $html->visitor($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "targetView":
@@ -92,12 +97,14 @@ class Main
                 $html->header();
                 $com->changeMain($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "ChangeOwnerName":
                 $html->header();
                 $com->changeOwnerName($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             case "conf":
@@ -105,6 +112,7 @@ class Main
                 $html->header();
                 $html->register($hako, $cgi->dataSet);
                 $html->footer();
+
                 break;
 
             default:

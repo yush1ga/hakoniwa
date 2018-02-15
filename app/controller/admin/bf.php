@@ -1,76 +1,78 @@
 <?php
 namespace Hakoniwa\Admin;
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
 
  class BF extends \Admin {
+     public function execute() {
+         $html = new \HtmlBF();
+         $hako = new \HakoBF();
+         $cgi = new \Cgi();
+         $this->parseInputData();
+         $hako->init($this);
+         $cgi->getCookies();
+         $html->header();
 
- 	function execute() {
- 		$html = new \HtmlBF();
- 		$hako = new \HakoBF();
- 		$cgi = new \Cgi();
- 		$this->parseInputData();
- 		$hako->init($this);
- 		$cgi->getCookies();
- 		$html->header();
+         switch ($this->mode) {
+            case "TOBF":
+                if ($this->passCheck()) {
+                    $this->toMode($this->dataSet['ISLANDID'], $hako);
+                    $hako->init($this);
+                }
+                $html->main($this->dataSet, $hako);
 
- 		switch($this->mode) {
- 			case "TOBF":
- 				if($this->passCheck()) {
- 					$this->toMode($this->dataSet['ISLANDID'], $hako);
- 					$hako->init($this);
- 				}
- 				$html->main($this->dataSet, $hako);
- 				break;
+                break;
 
- 			case "FROMBF":
- 				if($this->passCheck()) {
- 					$this->fromMode($this->dataSet['ISLANDID'], $hako);
- 					$hako->init($this);
- 				}
- 				$html->main($this->dataSet, $hako);
- 				break;
+            case "FROMBF":
+                if ($this->passCheck()) {
+                    $this->fromMode($this->dataSet['ISLANDID'], $hako);
+                    $hako->init($this);
+                }
+                $html->main($this->dataSet, $hako);
 
- 			case "enter":
- 			default:
- 				if($this->passCheck()) {
- 					$html->main($this->dataSet, $hako);
- 				}
- 				break;
- 		}
- 		$html->footer();
- 	}
+                break;
 
- 	function toMode($id, &$hako) {
- 		global $init;
+            case "enter":
+            default:
+                if ($this->passCheck()) {
+                    $html->main($this->dataSet, $hako);
+                }
 
- 		if ($id) {
- 			$num = $hako->idToNumber[$id];
- 			if (!$hako->islands[$num]['isBF']) {
- 				$hako->islands[$num]['isBF'] = 1;
- 				$hako->islandNumberBF++;
- 				require_once APPPATH.'/model/hako-turn.php';
- 				Turn::islandSort($hako);
- 				$hako->writeIslandsFile();
- 			}
- 		}
- 	}
+                break;
+        }
+         $html->footer();
+     }
 
- 	function fromMode($id, &$hako) {
- 		global $init;
+     public function toMode($id, &$hako) {
+         global $init;
 
- 		if ($id) {
- 			$num = $hako->idToNumber[$id];
- 			if ($hako->islands[$num]['isBF']) {
- 				$hako->islands[$num]['isBF'] = 0;
- 				$hako->islandNumberBF--;
- 				require_once APPPATH.'/model/hako-turn.php';
- 				Turn::islandSort($hako);
- 				$hako->writeIslandsFile();
- 			}
- 		}
- 	}
+         if ($id) {
+             $num = $hako->idToNumber[$id];
+             if (!$hako->islands[$num]['isBF']) {
+                 $hako->islands[$num]['isBF'] = 1;
+                 $hako->islandNumberBF++;
+                 require_once APPPATH.'/model/hako-turn.php';
+                 Turn::islandSort($hako);
+                 $hako->writeIslandsFile();
+             }
+         }
+     }
 
+     public function fromMode($id, &$hako) {
+         global $init;
+
+         if ($id) {
+             $num = $hako->idToNumber[$id];
+             if ($hako->islands[$num]['isBF']) {
+                 $hako->islands[$num]['isBF'] = 0;
+                 $hako->islandNumberBF--;
+                 require_once APPPATH.'/model/hako-turn.php';
+                 Turn::islandSort($hako);
+                 $hako->writeIslandsFile();
+             }
+         }
+     }
  }

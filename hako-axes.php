@@ -1,5 +1,6 @@
 <?php
 namespace Hakoniwa\Admin;
+
 /**
  * 箱庭諸島 S.E - アクセス解析用ファイル -
  * @copyright 箱庭諸島 ver2.30

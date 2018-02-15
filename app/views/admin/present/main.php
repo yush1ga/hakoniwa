@@ -1,6 +1,6 @@
 <h1>管理ツール： <small>プレゼント</small></h1>
 
-<?php if($this->mode=='enter' && $this->passCheck()): ?>
+<?php if ($this->mode=='enter' && $this->passCheck()): ?>
 <h2>援助</h2>
 <form action="<?=$this_file?>" method="post">
     <select name="ISLANDID"><?= $hako->islandList ?></select>に、
@@ -16,13 +16,13 @@
     <select name="ISLANDID" onchange="settarget(this);"><?=$hako->islandList?></select>の、（
     <select name="POINTX">
     <option value="0" selected>0</option>
-    <?php for($i = 1; $i < $init->islandSize; $i++):?>
+    <?php for ($i = 1; $i < $init->islandSize; $i++):?>
         <option value="<?=$i?>"><?=$i?></option>
     <?php endfor;?>
     </select>,
     <select name="POINTY">
         <option value="0" selected>0</option>
-    <?php for($i = 1; $i < $init->islandSize; $i++):?>
+    <?php for ($i = 1; $i < $init->islandSize; $i++):?>
         <option value="<?=$i?>"><?=$i?></option>
     <?php endfor;?>
     </select>）に、
@@ -53,21 +53,21 @@ $hasPresent = false;
 for ($i=0; $i < $hako->islandNumber; $i++) {
     $present =&$hako->islands[$i]['present'];
     $name =&$hako->islands[$i]['name'];
-    if ( $present['item'] == 0 ) {
-        if ( $present['px'] != 0 ) {
-            println('<li>',$init->tagName_$name.$init->nameSuffix.$init->_tagName,'に、資金<strong>',$present['px'].$init->unitMoney,'</strong></li>');
+    if ($present['item'] == 0) {
+        if ($present['px'] != 0) {
+            println('<li>', $init->tagName_.$name.$init->nameSuffix.$init->_tagName, 'に、資金<strong>', $present['px'].$init->unitMoney, '</strong></li>');
             $hasPresent = true;
         }
-        if ( $present['py'] != 0 ) {
-            println('<li>',$init->tagName_.$name.$init->nameSuffix.$init->_tagName,'に、食料<strong>',$present['py'].$init->unitFood,'</strong></li>');
+        if ($present['py'] != 0) {
+            println('<li>', $init->tagName_.$name.$init->nameSuffix.$init->_tagName, 'に、食料<strong>', $present['py'].$init->unitFood, '</strong></li>');
             $hasPresent = true;
         }
-    } elseif ( $present['item'] > 0 ) {
+    } elseif ($present['item'] > 0) {
         $items = ['地震','津波','怪獣','地盤沈下','台風','巨大隕石','隕石','噴火'];
         $item = $items[$present['item'] - 1];
-        if ( $present['item'] < 9 ) {
+        if ($present['item'] < 9) {
             $point = ($present['item'] < 6)? '' : "（{$present['px']},{$present['py']}）";
-            println('<li>',$init->tagName_.$name.$init->nameSuffix.$point.$init->_tagName,'に、',$init->tagDisaster_.$item.$init->_tagDisaster.'</li>');
+            println('<li>', $init->tagName_.$name.$init->nameSuffix.$point.$init->_tagName, 'に、', $init->tagDisaster_.$item.$init->_tagDisaster.'</li>');
             $hasPresent = true;
         }
     }

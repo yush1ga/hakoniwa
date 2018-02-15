@@ -5,7 +5,7 @@
     <input type="hidden" name="mode" value="enter">
 
     <select name="menulist">
-    <?php foreach($menuList as $label => $url):?>
+    <?php foreach ($menuList as $label => $url):?>
          <option value="<?=$init->baseDir,$url?>"><?=$label?></option>
     <?php endforeach;?>
     </select>

@@ -16,7 +16,7 @@
 
                     <b>計画番号</b>
                     <select name="NUMBER">
-                    <?php for($i = 0; $i < $init->commandMax; $i++):?>
+                    <?php for ($i = 0; $i < $init->commandMax; $i++):?>
                         <option value="<?=$i?>"><?=$i+1?></option>";
                     <?php endfor;?>
                     </select>
@@ -27,16 +27,16 @@
                     <select name="COMMAND">
                     <?php
                     // コマンド
-                    for($i = 0, $l = count($init->comList);  $i < $l; $i++) {
+                    for ($i = 0, $l = count($init->comList);  $i < $l; $i++) {
                         $kind = $init->comList[$i];
                         $cost = $init->comCost[$kind];
                         $s = '';
 
-                        if($cost == 0) {
+                        if ($cost == 0) {
                             $cost = '無料';
-                        } elseif($cost < 0) {
+                        } elseif ($cost < 0) {
                             $cost = - $cost;
-                            if($kind == $init->comSellTree) {
+                            if ($kind == $init->comSellTree) {
                                 $cost .= $init->unitTree;
                             } else {
                                 $cost .= $init->unitFood;
@@ -46,12 +46,12 @@
                         }
 
                         if (isset($data['defaultKind'])) {
-                            if($kind == $data['defaultKind']) {
+                            if ($kind == $data['defaultKind']) {
                                 $s = 'selected';
                             }
                         }
 
-                        println('<option value="',$kind,'" ',$s,'>',$init->comName[$kind],' (',$cost,')</option>');
+                        println('<option value="', $kind, '" ', $s, '>', $init->comName[$kind], ' (', $cost, ')</option>');
                     }
                     ?>
                     </select>
@@ -61,10 +61,9 @@
                     <b>座標</b>(
                     <select name="POINTX">
                     <?php
-                    for($i = 0; $i < $init->islandSize; $i++) {
-
-                        if ( isset($data['defaultX']) ) {
-                            if($i == $data['defaultX']) {
+                    for ($i = 0; $i < $init->islandSize; $i++) {
+                        if (isset($data['defaultX'])) {
+                            if ($i == $data['defaultX']) {
                                 echo "<option value=\"{$i}\" selected>{$i}</option>\n";
                             } else {
                                 echo "<option value=\"{$i}\">{$i}</option>\n";
@@ -77,9 +76,9 @@
                     </select>,
                     <select name="POINTY">
                     <?php
-                    for($i = 0; $i < $init->islandSize; $i++) {
-                        if ( isset($data['defaultY']) ) {
-                            if($i == $data['defaultY']) {
+                    for ($i = 0; $i < $init->islandSize; $i++) {
+                        if (isset($data['defaultY'])) {
+                            if ($i == $data['defaultY']) {
                                 echo "<option value=\"{$i}\" selected>{$i}</option>\n";
                             } else {
                                 echo "<option value=\"{$i}\">{$i}</option>\n";
@@ -87,7 +86,6 @@
                         } else {
                             echo "<option value=\"{$i}\">{$i}</option>\n";
                         }
-
                     }
                     ?>
                     </select>)
@@ -97,7 +95,7 @@
                     <b>数量</b>
                     <select name="AMOUNT">
                     <?php
-                    for($i = 0; $i < 100; $i++) {
+                    for ($i = 0; $i < 100; $i++) {
                         echo "<option value=\"{$i}\">{$i}</option>\n";
                     }
                     ?>
@@ -140,14 +138,14 @@
         </td>
 
         <td class="MapCell">
-            <?php $this->islandMap($hako, $island, 1); // 島の地図、所有者モード ?>
+            <?php $this->islandMap($hako, $island, 1); // 島の地図、所有者モード?>
         </td>
 
         <td class="CommandCell">
         <?php
             $command = $island['command'];
             $commandMax = $init->commandMax;
-            for($i = 0; $i < $commandMax; $i++) {
+            for ($i = 0; $i < $commandMax; $i++) {
                 $this->tempCommand($i, $command[$i], $hako);
             }
         ?>
