@@ -53,9 +53,7 @@ class Turn {
         $hako->readPresentFile(true);
 
         // 座標のランダム配列を作る
-        $randomPoint = Util::makeRandomPointArray();
-        $this->rpx = $randomPoint[0];
-        $this->rpy = $randomPoint[1];
+        list($this->rpx, $this->rpy) = Util::makeRandomPointArray();
 
         // 島更新の順番決め
         $order = Util::randomArray($hako->islandNumber);
@@ -199,8 +197,8 @@ class Turn {
                         break;
                     }
                     $point .= "({$spnt['x']}, {$spnt['y']}) ";
-                    // 座標の数が16で改行
-                    if (!(($i+1)%16)) {
+                    // 座標の数が8で改行
+                    if (!(($i+1)%8)) {
                         $point .= "<br>　　　"; // 全角空白３つ
                     }
                 }

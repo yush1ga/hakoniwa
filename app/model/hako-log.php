@@ -170,11 +170,8 @@ class LogIO {
     // ログ書き出し
     //---------------------------------------------------
     public function flush() {
-        $fileName = "{$this->init->dirName}/hakojima.log0";
+        $fileName = $this->init->dirName."/hakojima.log0";
 
-        if (!is_file($fileName)) {
-            touch($fileName);
-        }
         $fp = fopen($fileName, "w");
 
         // 全部逆順にして書き出す
@@ -194,7 +191,6 @@ class LogIO {
             }
         }
         fclose($fp);
-        // chmod($fileName, 0666);
     }
 
     /**
@@ -590,9 +586,9 @@ class Log extends LogIO {
     public function SenkanMissile($id, $tId, $name, $tName, $lName, $point, $tPoint, $tmonsName) {
         $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<A href=\"{$this->this_file}?Sight={$tId}\">{$this->init->tagName_}{$tName}島</A>籍{$this->init->_tagName}<strong>{$lName}</strong>が多弾頭ミサイルを発射し、{$tPoint}の<strong>{$tmonsName}</strong>に命中しました。", $id, $tId);
     }
-    // 怪獣あうち
+    // 怪獣あうち（同士討ち）
     public function BariaAttack($id, $name, $lName, $point, $mName) {
-        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<strong>怪獣{$mName}</strong>が強力な力場に押し潰されました。", $id);
+        $this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_.$name.$this->init->nameSuffix.$this->init->_tagName}</a>{$point}の<strong>怪獣{$mName}</strong>が周囲の怪獣との争いにより力尽きました。", $id);
     }
     // 怪獣輸送に失敗
     public function MonsNoSleeper($id, $name, $comName) {
@@ -745,7 +741,6 @@ class Log extends LogIO {
     }
     // 津波発生
     public function tsunami($id, $name) {
-        // $this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</a>{$this->init->_tagName}近海で{$this->init->tagDisaster_}津波{$this->init->_tagDisaster}発生！！",$id);
         $this->out("<a href=\"{$this->this_file}?Sight={$id}\" class=\"islName\">{$name}{$this->init->nameSuffix}</a>近海で{$this->init->tagDisaster_}津波{$this->init->_tagDisaster}発生！！", $id);
     }
     // 津波被害
@@ -794,7 +789,7 @@ class Log extends LogIO {
     }
     // 怪獣による資金減少
     public function MonsMoney2($id, $name, $mName, $point, $str) {
-        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<strong>怪獣{$mName}</strong>によって、島の資金<strong>{$str}</strong>が強奪されました。", $id);
+        $this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_.$name.$this->init->nameSuffix.$this->init->_tagName}</a>{$point}の<strong>怪獣{$mName}</strong>の影響で、島の資金<strong>{$str}</strong>が喪失しました。", $id);
     }
     // 怪獣による食料減少
     public function MonsFood2($id, $name, $mName, $point, $str) {
@@ -890,7 +885,7 @@ class Log extends LogIO {
     }
     // 港がないので、造船失敗
     public function NoPort($id, $name, $comName, $point) {
-        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、周辺に<b>港</b>がなかったため中止されました。", $id);
+        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、周辺に<strong>港</strong>がなかったため中止されました。", $id);
     }
     // 船破棄
     public function ComeBack($id, $name, $comName, $lName, $point) {
@@ -902,7 +897,7 @@ class Log extends LogIO {
     }
     // 港閉鎖
     public function ClosedPort($id, $name, $lName, $point) {
-        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$point}{$this->init->_tagName}の<B>{$lName}</B>は閉鎖したようです。", $id);
+        $this->out("<a href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_.$name.$this->init->nameSuffix.$this->init->_tagName}</a>{$point}の<strong>{$lName}</strong>は閉鎖したようです。", $id);
     }
     // 資金不足のため船舶放棄
     public function shipRelease($id, $tId, $name, $tName, $point, $tshipName) {
