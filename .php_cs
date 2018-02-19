@@ -11,7 +11,7 @@ return PhpCsFixer\Config::create()
 		'@PSR2' => true,
 		'array_syntax' => ['syntax' => 'short'],
 		'blank_line_before_statement' => true,
-		'braces' => ['position_after_functions_and_oop_constructs' => 'same'],
+		'braces' => ['position_after_functions_and_oop_constructs' => 'next'],
 		'trailing_comma_in_multiline_array' => false
 	])
 	->setFinder($finder)

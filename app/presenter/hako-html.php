@@ -33,7 +33,7 @@ class HTML {
     }
 
     /**
-     * 最終更新時刻 ＋ 次ターン更新時刻出力
+     * 最終更新時刻 ＋ 次ターン更新予定時刻出力
      * @param  [type] $hako [description]
      * @return void
      */
@@ -45,14 +45,11 @@ class HTML {
     /**
      * [timeToString description]
      * @param  Integer $t Unixタイムスタンプ
-     * @return String     "Y年M月D日 H時m分S秒"形式の文字列
+     * @return String     "Y年n月j日 G時i分s秒"形式の文字列
      */
-    public function timeToString(int $t) {
-        $time = localtime($t, true);
-        $time['tm_year'] += 1900;
-        $time['tm_mon']++;
-
-        return "{$time['tm_year']}年{$time['tm_mon']}月{$time['tm_mday']}日 {$time['tm_hour']}時{$time['tm_min']}分{$time['tm_sec']}秒";
+    public function timeToString(int $t): string
+    {
+        return date("Y年n月j日 G時i分s秒", $t);
     }
 
     public function pageTitle(string $title, string $subtitle = '') {
@@ -61,6 +58,184 @@ class HTML {
         } else {
             println('<h1 class="title">', $title, ' <small>', $subtitle, '</small></h1>');
         }
+    }
+
+    public function print_islandInfoTable($info, int $rank)
+    {
+        global $init;
+
+        $rank       = ($info['isBF']) ? '★' : $rank;
+        $population = ($info['pop'] > 1) ? $info['pop'] : 1;
+        $id         = $info['id'];
+        $area       = $info['area'];
+        $point      = $info['point'];
+        $satelites  = $info['eisei'];
+        $zins       = $info['zin'];
+        $items      = $info['item'];
+        $money      = Util::aboutMoney($info['money']);
+        $lottery    = $info['lot'];
+        $food       = $info['food'] . $init->unitFood;
+        $unemployed = ($population - ($info['farm'] + $info['factory'] + $info['commerce'] + $info['mountain'] + $info['hatuden']) * 10) / $population * 100;
+        $unemployed = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
+        $farm       = min($info['farm'] * 10, 0);
+        $factory    = min($info['factory'] * 10, 0);
+        $commerce   = min($info['commerce'] * 10, 0);
+        $mountain   = min($info['mountain'] * 10, 0);
+            $hatuden       = ($info['hatuden']  <= 0)? $init->notHave: $info['hatuden'] *10 . 'kW';
+            $taiji         = ($info['taiji']    <= 0)? "0".$init->unitMonster: $info['taiji'].$init->unitMonster;
+            $peop          = ($info['peop'] < 0) ? $info['peop'].$init->unitPop : '+'.$info['peop'].$init->unitPop;
+            $okane         = ($info['gold'] < 0) ? $info['gold'].$init->unitMoney : '+'.$info['gold'].$init->unitMoney;
+            $gohan         = ($info['rice'] < 0) ? $info['rice'].$init->unitFood : '+'.$info['rice'].$init->unitFood;
+            $poin          = ($info['pots'] < 0) ? $info['pots'].'pts' : '+'.$info['pots'].'pts';
+            $tenki         = $info['tenki'];
+            $team          = $info['team'];
+            $shiai         = $info['shiai'];
+            $kachi         = $info['kachi'];
+            $make          = $info['make'];
+            $hikiwake      = $info['hikiwake'];
+            $kougeki       = $info['kougeki'];
+            $bougyo        = $info['bougyo'];
+            $tokuten       = $info['tokuten'];
+            $shitten       = $info['shitten'];
+            $comment       = $info['comment'];
+            $comment_turn  = $info['comment_turn'];
+            //$starturn     = $info['starturn'];
+            $keep = '';
+
+            $monster       = ($info['monster'] > 0)? '<strong class="monster">[怪獣'.$info['monster'].'体出現中]</strong>' :'';
+
+            if ($info['keep'] == 1) {
+                $comment = '<span class="attention">この島は管理人預かり中です</span>';
+                $keep = '<span style="font-size:1.4em;color:#4f4dff;font-weight:700;" title="管理人預かり中">❄</span>';
+            }
+
+            $name = Util::infoName($info, $hako->ally, $hako->idToAllyNumber);
+            $name = $info['absent'] == 0 ? $init->tagName_.$name.$init->_tagName : $init->tagName2_.$name.'('.$info['absent'].')'.$init->_tagName2;
+
+            $owner = (!empty($info['owner']))? $info['owner']: 'annonymous';
+
+            $prize = $hako->getPrizeList($info['prize']);
+
+            $point = $info['point'];
+
+            $sora = "";
+            switch ($tenki) {
+                case 1:
+                    $sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
+                    break;
+                case 2:
+                    $sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
+                    break;
+                case 3:
+                    $sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
+                    break;
+                case 4:
+                    $sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
+                    break;
+                default:
+                    $sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
+            }
+
+            $eiseis = "";
+            for ($e = 0; $e < $init->EiseiNumber; $e++) {
+                if (isset($eisei[$e])) {
+                    if ($eisei[$e] > 0) {
+                        $eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eisei[$e]}%\" title=\"{$init->EiseiName[$e]} {$eisei[$e]}%\"> ";
+                    }
+                }
+            }
+
+            $zins = "";
+            for ($z = 0; $z < $init->ZinNumber; $z++) {
+                if (isset($zin[$z])) {
+                    if ($zin[$z] > 0) {
+                        $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
+                    }
+                }
+            }
+
+            $items = "";
+            for ($t = 0; $t < $init->ItemNumber; $t++) {
+                if (isset($item[$t])) {
+                    if ($item[$t] > 0) {
+                        if ($t == 20) {
+                            $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"  title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
+                        } else {
+                            $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
+                        }
+                    }
+                }
+            }
+
+            $lots = ($lot > 0)? ' <img src="'.$init->imgDir.'/lot.gif" alt="くじ：'.$lot.'枚" title="'.$lot.'枚">':'';
+
+            $viking = "";
+            for ($v = $init->shipKind, $c=count($init->shipName); $v < $c; $v++) {
+                if ($island['ship'][$v] > 0) {
+                    $viking .= " <img src=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" alt=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
+                }
+            }
+
+            $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist)? " 🔰":"";
+
+            $soccer = ($island['soccer'] > 0)?" <span title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">⚽</span>":"";
+
+            // 電力消費量
+            $enesyouhi = round(($island['pop'] / 100) + ($island['factory'] * 2/3) + ($island['commerce'] /3) + ($island['mountain'] /4));
+            if ($enesyouhi == 0) {
+                $ene = "電力消費なし";
+            } elseif ($island['hatuden'] == 0) {
+                $ene =  '<span style="color:#c7243a;">0%</span>';
+            } else {
+                // 電力供給率
+                $ene = round($island['hatuden'] / $enesyouhi * 100);
+                $ene = ($ene < 100) ? '<span style="color:#c7243a;">'.$ene.'%</span>' : $ene.'%';
+            }
+            echo <<<END
+    <tr>
+        <th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
+        <td class="NameCell" rowspan="5" valign="top">
+            <h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
+            {$prize}{$viking}<br>
+            {$zins}<br>
+            <small>({$peop} {$okane} {$gohan} {$poin})</small>
+        </td>
+        <td class="InfoCell">$point</td>
+        <td class="InfoCell">$pop</td>
+        <td class="InfoCell">$area</td>
+        <td class="TenkiCell">$sora</td>
+        <td class="InfoCell">$money</td>
+        <td class="InfoCell">$food</td>
+        <td class="InfoCell">$unemployed</td>
+    </tr>
+    <tr>
+        <th class="TitleCell head">{$init->nameFarmSize}</th>
+        <th class="TitleCell head">{$init->nameFactoryScale}</th>
+        <th class="TitleCell head">{$init->nameCommercialScale}</th>
+        <th class="TitleCell head">{$init->nameMineScale}</th>
+        <th class="TitleCell head">{$init->namePowerPlantScale}</th>
+        <th class="TitleCell head">{$init->namePowerSupplyRate}</th>
+        <th class="TitleCell head">{$init->nameSatellite}</th>
+    </tr>
+    <tr>
+        <td class="InfoCell">$farm</td>
+        <td class="InfoCell">$factory</td>
+        <td class="InfoCell">$commerce</td>
+        <td class="InfoCell">$mountain</td>
+        <td class="InfoCell">$hatuden</td>
+        <td class="InfoCell">$ene</td>
+        <td class="ItemCell">$eiseis</td>
+    </tr>
+    <tr>
+        <th class="TitleCell head">取得アイテム</th>
+        <td class="ItemCell" colspan="6">$items</td>
+    </tr>
+    <tr>
+        <td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
+    </tr>
+END;
+        }
+
     }
 }
 
@@ -260,26 +435,20 @@ class HtmlTop extends HTML {
             } else {
                 // 電力供給率
                 $ene = round($island['hatuden'] / $enesyouhi * 100);
-                if ($ene < 100) {
-                    // 供給電力不足
-                    $ene = '<span style="color:#c7243a;">'.$ene.'%</span>';
-                } else {
-                    // 供給電力充分
-                    $ene = "{$ene}%";
-                }
+                $ene = ($ene < 100) ? '<span style="color:#c7243a;">'.$ene.'%</span>' : $ene.'%';
             }
             echo <<<END
 	<thead>
 		<tr>
-			<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}島{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}得点{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}{$init->nameWeather}{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}{$lots}</th>
-			<th class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}{$init->nameUnemploymentRate}{$init->_tagTH}</th>
+			<th class="TitleCell head">{$init->nameRank}</th>
+			<th class="TitleCell head">島</th>
+			<th class="TitleCell head">得点</th>
+			<th class="TitleCell head">{$init->namePopulation}</th>
+			<th class="TitleCell head">{$init->nameArea}</th>
+			<th class="TitleCell head">{$init->nameWeather}</th>
+			<th class="TitleCell head">{$init->nameFunds} {$lots}</th>
+			<th class="TitleCell head">{$init->nameFood}</th>
+			<th class="TitleCell head">{$init->nameUnemploymentRate}</th>
 		</tr>
 	</thead>
 	<tr>
@@ -299,13 +468,13 @@ class HtmlTop extends HTML {
 		<td class="InfoCell">$unemployed</td>
 	</tr>
 	<tr>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->namePowerSupplyRate}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameSatellite}{$init->_tagTH}</th>
+		<th class="TitleCell head">{$init->nameFarmSize}</th>
+		<th class="TitleCell head">{$init->nameFactoryScale}</th>
+		<th class="TitleCell head">{$init->nameCommercialScale}</th>
+		<th class="TitleCell head">{$init->nameMineScale}</th>
+		<th class="TitleCell head">{$init->namePowerPlantScale}</th>
+		<th class="TitleCell head">{$init->namePowerSupplyRate}</th>
+		<th class="TitleCell head">{$init->nameSatellite}</th>
 	</tr>
 	<tr>
 		<td class="InfoCell">$farm</td>
@@ -317,11 +486,11 @@ class HtmlTop extends HTML {
 		<td class="ItemCell">$eiseis</td>
 	</tr>
 	<tr>
-		<th class="TitleCell">{$init->tagTH_}取得アイテム{$init->_tagTH}</th>
+		<th class="TitleCell head">取得アイテム</th>
 		<td class="ItemCell" colspan="6">$items</td>
 	</tr>
 	<tr>
-		<td class="CommentCell" colspan="7">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>
+		<td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
 	</tr>
 END;
         }
@@ -2678,7 +2847,7 @@ END;
 <BR>
 {$str7}
 同盟の名前（変更）<small>(全角{$init->lengthAllyName}字まで）</small><BR>
-<INPUT TYPE="text" NAME="ALLYNAME" VALUE="$allyname" SIZE=32 MAXLENGTH=32 class="form-control"><BR>
+<INPUT TYPE="text" NAME="ALLYNAME" VALUE="$allyname" SIZE={(int)$init->lengthAllyName + 1} MAXLENGTH={$init->lengthAllyName} class="form-control"><BR>
 マーク（変更）<BR>
 <SELECT NAME="MARK" onChange="colorPack()" onClick="colorPack()">{$markList}</SELECT>
 <br>

@@ -1,9 +1,13 @@
 <?php
+
+require_once '../../config.php';
+require_once MODELPATH.'hako-file.php';
+require_once MODELPATH.'hako-cgi.php';
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
-
 class Main {
     public function execute() {
         $hako = new \Hako();
@@ -34,7 +38,7 @@ class Main {
         }
         switch ($cgi->mode) {
             case "log":
-                $html = new HtmlTop();
+                // $html = new HtmlTop(); [NOTE]いらない気配
                 $html->header();
                 $html->log();
                 $html->footer();

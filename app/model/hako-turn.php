@@ -32,7 +32,7 @@ class Turn {
         $this->log = new Log();
 
         // 最終更新時刻を更新
-        $uptime = ($init->contUpdate == 1) ? 1 : (int)(($_SERVER['REQUEST_TIME'] - $hako->islandLastTime) / $init->unitTime);
+        $uptime = ($init->contUpdate == 1) ? 1 : intdiv($_SERVER['REQUEST_TIME'] - $hako->islandLastTime, $init->unitTime);
         $hako->islandLastTime += $init->unitTime * $uptime;
 
         // ログファイルを後ろにずらす
