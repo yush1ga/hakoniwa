@@ -3,8 +3,10 @@
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
-class Keep extends Admin {
-    public function execute() {
+class Keep extends Admin
+{
+    public function execute()
+    {
         $html = new HTMLKeep();
         $cgi = new Cgi();
         $hako = new HakoKP();
@@ -43,7 +45,8 @@ class Keep extends Admin {
         $html->footer();
     }
 
-    public function toMode($id, &$hako) {
+    public function toMode($id, &$hako)
+    {
         global $init;
 
         if ($id) {
@@ -58,7 +61,8 @@ class Keep extends Admin {
         }
     }
 
-    public function fromMode($id, &$hako) {
+    public function fromMode($id, &$hako)
+    {
         global $init;
 
         if ($id) {

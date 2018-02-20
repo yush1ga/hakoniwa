@@ -6,8 +6,10 @@ namespace Hakoniwa\Admin\Maintenance;
  * @author hiro <@hiro0218>
  */
 
-class Mente extends \Admin {
-    public function __construct() {
+class Mente extends \Admin
+{
+    public function __construct()
+    {
         $html = new \HtmlMente();
         $cgi = new \Cgi();
         $this->parseInputData();
@@ -77,7 +79,8 @@ class Mente extends \Admin {
         $html->footer();
     }
 
-    public function newMode() {
+    public function newMode()
+    {
         global $init;
 
         // 現在の時間を取得
@@ -104,16 +107,19 @@ class Mente extends \Admin {
         $fp = fopen($fileName, "w");
         fputs($fp, "Options -Indexes\n");
         fclose($fp);
+        chmod($fileName, 0644);
     }
 
-    public function delMode($id) {
+    public function delMode($id)
+    {
         global $init;
 
         $dirName = (strcmp($id, "") == 0)? $init->dirName : $init->dirName.".bak{$id}";
         $this->rmTree($dirName);
     }
 
-    public function timeMode() {
+    public function timeMode()
+    {
         $year = $this->dataSet['YEAR'];
         $day = $this->dataSet['DATE'];
         $mon = $this->dataSet['MON'];
@@ -124,7 +130,8 @@ class Mente extends \Admin {
         $this->stimeMode($ctSec);
     }
 
-    public function stimeMode($sec) {
+    public function stimeMode($sec)
+    {
         global $init;
 
         $fileName = $init->dirName.'/hakojima.dat';
@@ -141,7 +148,8 @@ class Mente extends \Admin {
         fclose($fp);
     }
 
-    public function currentMode($id) {
+    public function currentMode($id)
+    {
         global $init;
 
         $this->rmTree($init->dirName);
@@ -159,7 +167,8 @@ class Mente extends \Admin {
      * @param  string $dirName 子ファイルを削除したいディレクトリ
      * @return void
      */
-    public function rmTree($dirName) {
+    public function rmTree($dirName)
+    {
         if (is_dir($dirName)) {
             $dir = opendir($dirName.'/');
             while (false !== ($fileName = readdir($dir))) {
@@ -171,10 +180,12 @@ class Mente extends \Admin {
         }
     }
 
-    public function setupMode() {
+    public function setupMode()
+    {
         global $init;
 
-        function isValidPasswd($passwd1='', $passwd2='') {
+        function isValidPasswd($passwd1='', $passwd2='')
+        {
             return !($passwd1=='' || $passwd2=='' || (0 != strcmp($passwd1, $passwd2)));
         }
 

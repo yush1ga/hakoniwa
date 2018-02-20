@@ -10,7 +10,8 @@ require_once APPPATH.'/model/hako-make.php';
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class Turn {
+class Turn
+{
     public $log;
     public $rpx;
     public $rpy;
@@ -26,7 +27,8 @@ class Turn {
      * @param  [type] $data  [description]
      * @return [type]        [description]
      */
-    public function turnMain(&$hako, $data) {
+    public function turnMain(&$hako, $data)
+    {
         global $init;
 
         $this->log = new Log();
@@ -182,7 +184,8 @@ class Turn {
      * @param  [type] $island [description]
      * @return void
      */
-    public function logMatome($island) {
+    public function logMatome($island)
+    {
         global $init;
 
         $sno = (int)$island['seichi'];
@@ -219,7 +222,8 @@ class Turn {
     //---------------------------------------------------
     // コマンドフェイズ
     //---------------------------------------------------
-    public function doCommand(&$hako, &$island) {
+    public function doCommand(&$hako, &$island)
+    {
         global $init;
 
         $comArray  = &$island['command'];
@@ -3565,7 +3569,8 @@ class Turn {
      * @param  [type] &$island 島データ
      * @return [type]          [description]
      */
-    public function doEachHex(&$hako, &$island) {
+    public function doEachHex(&$hako, &$island)
+    {
         global $init;
 
         // 導出値
@@ -4933,7 +4938,8 @@ class Turn {
      * @param  [type] &$island [description]
      * @return [type]          [description]
      */
-    public function doIslandProcess($hako, &$island) {
+    public function doIslandProcess($hako, &$island)
+    {
         global $init;
 
         // 導出値
@@ -5674,7 +5680,8 @@ class Turn {
      * @param  [type] $y         [description]
      * @return boolean            [description]
      */
-    public function countGrow($land, $landValue, int $x, int $y): bool {
+    public function countGrow($land, $landValue, int $x, int $y): bool
+    {
         global $init;
 
         for ($i = 1; $i < 7; $i++) {
@@ -5713,7 +5720,8 @@ class Turn {
      * @param  [type] $y          [description]
      * @return [type]             [description]
      */
-    public function wideDamage($id, $name, &$land, &$landValue, $x, $y) {
+    public function wideDamage($id, $name, &$land, &$landValue, $x, $y)
+    {
         global $init;
 
         for ($i = 0; $i < 19; $i++) {
@@ -5795,7 +5803,8 @@ class Turn {
      * @param  [type] &$hako [description]
      * @return void
      */
-    public static function islandSort(&$hako) {
+    public static function islandSort(&$hako)
+    {
         global $init;
         usort($hako->islands, 'popComp');
     }
@@ -5805,7 +5814,8 @@ class Turn {
      * @param  [type] &$island 島データ
      * @return void
      */
-    public function income(&$island) {
+    public function income(&$island)
+    {
         global $init;
 
         $pop      = $island['pop'];
@@ -5880,7 +5890,8 @@ class Turn {
      * @param  [type] &$island [description]
      * @return void
      */
-    public function shipcounter(&$island) {
+    public function shipcounter(&$island)
+    {
         global $init;
         for ($i = 0, $c=count($init->shipName); $i < $c; $i++) {
             $island['ship'][$i] = 0;
@@ -5893,7 +5904,8 @@ class Turn {
      * @param  [type] &$island [description]
      * @return [type]          [description]
      */
-    public static function estimate($hako, &$island) {
+    public static function estimate($hako, &$island)
+    {
         global $init;
 
         $land      = $island['land'];
@@ -6159,7 +6171,8 @@ class Turn {
      * @param  array $kind  数えたい地形
      * @return [type]        [description]
      */
-    public static function countAround($land, int $x, int $y, int $range, array $kind) {
+    public static function countAround($land, int $x, int $y, int $range, array $kind)
+    {
         global $init;
 
         // 範囲内の地形を数える
@@ -6197,7 +6210,8 @@ class Turn {
     //---------------------------------------------------
     // 範囲内の地形＋値でカウント
     //---------------------------------------------------
-    public function countAroundValue($island, $x, $y, $kind, $lv, $range) {
+    public function countAroundValue($island, $x, $y, $kind, $lv, $range)
+    {
         global $init;
 
         $land = $island['land'];
@@ -6231,7 +6245,8 @@ class Turn {
      * @param  Integar $lv   メタデータ
      * @return String        対応した名称
      */
-    public function landName(int $land, int $lv = 0): string {
+    public function landName(int $land, int $lv = 0): string
+    {
         global $init;
 
         switch ($land) {
@@ -6385,7 +6400,8 @@ class Turn {
  * @param  [type] $y [description]
  * @return [type]    [description]
  */
-function popComp($x, $y) {
+function popComp($x, $y)
+{
     if ($x['isBF'] && !$y['isBF']) {
         return 1;
     } elseif ($y['isBF'] && !$x['isBF']) {

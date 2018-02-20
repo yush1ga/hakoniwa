@@ -8,8 +8,10 @@ require_once MODELPATH.'hako-cgi.php';
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
-class Main {
-    public function execute() {
+class Main
+{
+    public function execute()
+    {
         $hako = new \Hako();
         $cgi  = new \Cgi();
 
@@ -20,6 +22,7 @@ class Main {
         if (!$hako->readIslands($cgi)) {
             HTML::header();
             HakoError::noDataFile();
+            println('<p><a href="./hako-mente.php">→初期設定</a></p>');
             HTML::footer();
             exit();
         }

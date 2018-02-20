@@ -6,8 +6,10 @@ namespace Hakoniwa\Admin;
  * @author hiro <@hiro0218>
  */
 
- class BF extends \Admin {
-     public function execute() {
+ class BF extends \Admin
+ {
+     public function execute()
+     {
          $html = new \HtmlBF();
          $hako = new \HakoBF();
          $cgi = new \Cgi();
@@ -46,7 +48,8 @@ namespace Hakoniwa\Admin;
          $html->footer();
      }
 
-     public function toMode($id, &$hako) {
+     public function toMode($id, &$hako)
+     {
          global $init;
 
          if ($id) {
@@ -61,7 +64,8 @@ namespace Hakoniwa\Admin;
          }
      }
 
-     public function fromMode($id, &$hako) {
+     public function fromMode($id, &$hako)
+     {
          global $init;
 
          if ($id) {

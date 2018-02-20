@@ -5,7 +5,8 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class File {
+class File
+{
     public $islandTurn;      // 現在ターン数
     public $islandLastTime;  // 最終更新時刻
     public $islandNumber;    // 島の総数
@@ -27,7 +28,8 @@ class File {
      * @param  [type] &$cgi [description]
      * @return [type]       [description]
      */
-    public function readIslandsFile(&$cgi) {
+    public function readIslandsFile(&$cgi)
+    {
         global $init;
 
         $num = $cgi->dataSet['ISLANDID'] ?? "";
@@ -81,7 +83,8 @@ class File {
      * @param  [type] $num [description]
      * @return [type]      [description]
      */
-    public function readIsland($fp, $num) {
+    public function readIsland($fp, $num)
+    {
         global $init;
 
         $name = chop(fgets($fp, READ_LINE));
@@ -221,7 +224,8 @@ class File {
      * @param  [type] $island [description]
      * @return [type]         [description]
      */
-    public function writeLand(int $num, $island) {
+    public function writeLand(int $num, $island)
+    {
         global $init;
         if (($num <= -1) || ($num == $island['id'])) {
             $fileName = $init->dirName."/island.{$island['id']}";
@@ -262,7 +266,8 @@ class File {
      * 同盟データファイル読込み
      * @return [type] [description]
      */
-    public function readAllyFile() {
+    public function readAllyFile()
+    {
         global $init;
 
         $fileName = "{$init->dirName}/{$init->allyData}";
@@ -296,7 +301,8 @@ class File {
     //--------------------------------------------------
     // 同盟ひとつ読みこみ
     //--------------------------------------------------
-    public function readAlly($fp) {
+    public function readAlly($fp)
+    {
         $name = chop(fgets($fp, READ_LINE));
         $mark = chop(fgets($fp, READ_LINE));
         $color = chop(fgets($fp, READ_LINE));
@@ -336,7 +342,8 @@ class File {
      * @param  integer $num [description]
      * @return [type]       [description]
      */
-    public function writeIslandsFile($num = 0) {
+    public function writeIslandsFile($num = 0)
+    {
         global $init;
 
         $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
@@ -368,7 +375,8 @@ class File {
      * @param  [type] $island [description]
      * @return [type]         [description]
      */
-    public function writeIsland($fp, $num, $island) {
+    public function writeIsland($fp, $num, $island)
+    {
         global $init;
 
         if (!isset($island['ship'])) {
@@ -485,7 +493,8 @@ class File {
      * バックアップ
      * @return void
      */
-    public function backup() {
+    public function backup()
+    {
         global $init;
 
         try {
@@ -543,7 +552,8 @@ class File {
      * @param  string $dirName Directory that to delete.
      * @return void
      */
-    public function rmTree(string $dirName) {
+    public function rmTree(string $dirName)
+    {
         if (is_dir("{$dirName}")) {
             $dir = opendir("{$dirName}/");
             while (false !== ($fileName = readdir($dir))) {
@@ -561,7 +571,8 @@ class File {
      * @param  boolean $erase 読込み後にファイルを削除するか
      * @return void
      */
-    public function readPresentFile(bool $erase = false) {
+    public function readPresentFile(bool $erase = false)
+    {
         global $init;
 
         $fileName = $init->dirName.'/present.dat';
@@ -584,7 +595,8 @@ class File {
      * プレゼント管理ファイル書込み
      * @return void
      */
-    public function writePresentFile() {
+    public function writePresentFile()
+    {
         global $init;
 
         $presents = [];
@@ -613,18 +625,21 @@ class File {
      * @param  $path  対象フォルダの絶対パス
      * @return int    エラーコード
      */
-    public function zip(string $path) {
+    public function zip(string $path)
+    {
         //wip
     }
 }
 
 
-class Hako extends File {
+class Hako extends File
+{
     public $islandList;    // 島リスト
     public $targetList;    // ターゲットの島リスト
     public $defaultTarget; // 目標補足用ターゲット
 
-    public function readIslands(&$cgi) {
+    public function readIslands(&$cgi)
+    {
         global $init;
 
         $m = $this->readIslandsFile($cgi);
@@ -642,7 +657,8 @@ class Hako extends File {
     //---------------------------------------------------
     // 島リスト生成
     //---------------------------------------------------
-    public function getIslandList($select = 0) {
+    public function getIslandList($select = 0)
+    {
         global $init;
 
         $list = "";
@@ -672,7 +688,8 @@ class Hako extends File {
     //---------------------------------------------------
     // 賞に関するリストを生成
     //---------------------------------------------------
-    public function getPrizeList($prize) {
+    public function getPrizeList($prize)
+    {
         global $init;
         list($flags, $monsters, $turns) = explode(",", $prize, 3);
 
@@ -718,7 +735,8 @@ class Hako extends File {
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr = '') {
+    public function landString($l, $lv, $x, $y, $mode, $comStr = '')
+    {
         global $init;
 
         $point = "($x,$y)";
@@ -1217,11 +1235,13 @@ class Hako extends File {
 /**
  * バトルフィールド
  */
-class HakoBF extends File {
+class HakoBF extends File
+{
     public $islandListNoBF; // 普通の島リスト
     public $islandListBF;   // BFな島リスト
 
-    public function init($cgi) {
+    public function init($cgi)
+    {
         global $init;
 
         $this->readIslandsFile($cgi);
@@ -1240,8 +1260,10 @@ class HakoBF extends File {
     }
 }
 
-class HakoEdit extends File {
-    public function readIslands(&$cgi) {
+class HakoEdit extends File
+{
+    public function readIslands(&$cgi)
+    {
         global $init;
 
         return $this->readIslandsFile($cgi);
@@ -1250,7 +1272,8 @@ class HakoEdit extends File {
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr) {
+    public function landString($l, $lv, $x, $y, $mode, $comStr)
+    {
         global $init;
         $point = "($x,$y)";
         $naviExp = '';
@@ -1753,10 +1776,12 @@ class HakoEdit extends File {
     }
 }
 
-class HakoPresent extends File {
+class HakoPresent extends File
+{
     public $islandList; // 島リスト
 
-    public function init($cgi) {
+    public function init($cgi)
+    {
         global $init;
         $this->readIslandsFile($cgi);
         $this->readPresentFile();
@@ -1770,11 +1795,13 @@ class HakoPresent extends File {
     }
 }
 
-class HakoKP extends File {
+class HakoKP extends File
+{
     public $islandListNoKP; // 普通の島リスト
     public $islandListKP;   // 管理人預かり島リスト
 
-    public function init($cgi) {
+    public function init($cgi)
+    {
         global $init;
         $this->readIslandsFile($cgi);
         $this->islandListNoKP = '<option value="0"></option>'.PHP_EOL;

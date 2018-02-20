@@ -7,7 +7,8 @@
 <?php
     /* （次のターンまで、残りおよそx日とy時間z分） */
     /* ページを更新してください */
-    function remainTime($nextTime) {
+    function remainTime($nextTime)
+    {
         $remainSec = $nextTime - $_SERVER['REQUEST_TIME'];
         $echoVal = '';
 

@@ -6,7 +6,8 @@
  * @author hiro <@hiro0218>
  */
 
-class InitDefault {
+class InitDefault
+{
     /**
      * プログラムファイルに関する設定
      */
@@ -650,7 +651,8 @@ class InitDefault {
 
     //////////////////////////////////////////////////
 
-    private function setpubliciable() {
+    private function setpubliciable()
+    {
         $this->pointNumber = $this->islandSize * $this->islandSize;
         $this->comList = [
             $this->comPrepare,
@@ -874,7 +876,8 @@ class InitDefault {
         $this->comCost[$this->comAutoDelete]   = 0;
     }
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->CPU_start = microtime();
         $this->setpubliciable();
         mt_srand($_SERVER['REQUEST_TIME']);

@@ -5,7 +5,8 @@
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class Make {
+class Make
+{
 
     /**
      * 島の新規作成モード
@@ -13,7 +14,8 @@ class Make {
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function newIsland($hako, $data) {
+    public function newIsland($hako, $data)
+    {
         global $init;
 
         $log = new Log();
@@ -104,7 +106,8 @@ class Make {
     //---------------------------------------------------
     // 新しい島を作成する
     //---------------------------------------------------
-    public function makeNewIsland() {
+    public function makeNewIsland()
+    {
         global $init;
 
         $command = [];
@@ -357,7 +360,8 @@ class Make {
     //---------------------------------------------------
     // コメント更新
     //---------------------------------------------------
-    public function commentMain($hako, $data) {
+    public function commentMain($hako, $data)
+    {
         $id = $data['ISLANDID'];
         $num = $hako->idToNumber[$id];
         $island = $hako->islands[$num];
@@ -395,7 +399,8 @@ class Make {
     //---------------------------------------------------
     // 情報変更モード
     //---------------------------------------------------
-    public function changeMain($hako, $data) {
+    public function changeMain($hako, $data)
+    {
         global $init;
         $log = new Log();
 
@@ -484,7 +489,8 @@ class Make {
     //---------------------------------------------------
     // オーナ名変更モード
     //---------------------------------------------------
-    public function changeOwnerName($hako, $data) {
+    public function changeOwnerName($hako, $data)
+    {
         global $init;
 
         $id = $data['ISLANDID'];
@@ -514,7 +520,8 @@ class Make {
     //---------------------------------------------------
     // コマンドモード
     //---------------------------------------------------
-    public function commandMain($hako, $data) {
+    public function commandMain($hako, $data)
+    {
         global $init;
 
         $id = $data['ISLANDID'];
@@ -736,7 +743,8 @@ class Make {
     //---------------------------------------------------
     // 島の強制削除
     //---------------------------------------------------
-    public function deleteIsland($hako, $data) {
+    public function deleteIsland($hako, $data)
+    {
         global $init;
 
         $log = new Log();
@@ -764,12 +772,14 @@ class Make {
 }
 
 //--------------------------------------------------------------------
-class MakeJS extends Make {
+class MakeJS extends Make
+{
 
     //---------------------------------------------------
     // コマンドモード
     //---------------------------------------------------
-    public function commandMain($hako, $data) {
+    public function commandMain($hako, $data)
+    {
         global $init;
 
         $id = $data['ISLANDID'];

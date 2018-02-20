@@ -12,14 +12,16 @@ require_once PRESENTER.'/hako-html.php';
 
 $init = new Init();
 
-class MakeAlly {
+class MakeAlly
+{
     /**
      * 結成・変更メイン
      * @param  [type] $hako [description]
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function makeAllyMain($hako, $data) {
+    public function makeAllyMain($hako, $data)
+    {
         global $init;
 
         $currentID = $data['ISLANDID'];
@@ -207,7 +209,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 解散
     //--------------------------------------------------
-    public function deleteAllyMain($hako, $data) {
+    public function deleteAllyMain($hako, $data)
+    {
         global $init;
 
         $currentID = $data['ISLANDID'];
@@ -281,7 +284,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 加盟・脱退
     //--------------------------------------------------
-    public function joinAllyMain($hako, $data) {
+    public function joinAllyMain($hako, $data)
+    {
         global $init;
 
         $currentID = $data['ISLANDID'];
@@ -362,7 +366,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 盟主コメントモード
     //--------------------------------------------------
-    public function allyPactMain($hako, $data) {
+    public function allyPactMain($hako, $data)
+    {
         $ally = $hako->ally[$hako->idToAllyNumber[$data['ALLYID']]];
 
         if (AllyUtil::checkPassword($ally['password'], $data['Allypact'])) {
@@ -387,7 +392,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 箱庭データとのデータ統合処理
     //--------------------------------------------------
-    public function allyReComp(&$hako) {
+    public function allyReComp(&$hako)
+    {
         $rt1 = $this->allyDelete($hako);    // 盟主不在により同盟データから削除
         $rt2 = $this->allyMemberDel($hako);    // 放棄、無人島を同盟データから削除
         $rt3 = $this->allyPopComp($hako);    // 人口の再集計（ターン処理に組み込んでいないため）
@@ -410,7 +416,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 盟主不在により同盟データから削除
     //--------------------------------------------------
-    public function allyDelete(&$hako) {
+    public function allyDelete(&$hako)
+    {
         $count = 0;
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $id = $hako->ally[$i]['id'];
@@ -439,7 +446,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 放棄、無人島を同盟データから削除
     //--------------------------------------------------
-    public function allyMemberDel(&$hako) {
+    public function allyMemberDel(&$hako)
+    {
         $flg = 0;
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $count = 0;
@@ -467,7 +475,8 @@ class MakeAlly {
     //--------------------------------------------------
     // 人口の再集計（ターンに組み込めば処理不要）
     //--------------------------------------------------
-    public function allyPopComp(&$hako) {
+    public function allyPopComp(&$hako)
+    {
         $flg = 0;
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $score = 0;
@@ -492,7 +501,8 @@ class MakeAlly {
 //------------------------------------------------------------
 // Ally
 //------------------------------------------------------------
-class Ally extends AllyIO {
+class Ally extends AllyIO
+{
     public $islandList;    // 島リスト
     public $targetList;    // ターゲットの島リスト
     public $defaultTarget;    // 目標補足用ターゲット
@@ -502,7 +512,8 @@ class Ally extends AllyIO {
      * @param  [type] $cgi [description]
      * @return [type]      [description]
      */
-    public function readIslands(&$cgi) {
+    public function readIslands(&$cgi)
+    {
         global $init;
 
         $m = $this->readIslandsFile();
@@ -522,7 +533,8 @@ class Ally extends AllyIO {
     //--------------------------------------------------
     // 島リスト生成
     //--------------------------------------------------
-    public function getIslandList($select = 0) {
+    public function getIslandList($select = 0)
+    {
         global $init;
 
         $list = "";
@@ -546,7 +558,8 @@ class Ally extends AllyIO {
 //------------------------------------------------------------
 // AllyIO
 //------------------------------------------------------------
-class AllyIO {
+class AllyIO
+{
     public $islandTurn;     // ターン数
     public $islandLastTime; // 最終更新時刻
     public $islandNumber;   // 島の総数
@@ -560,7 +573,8 @@ class AllyIO {
     //--------------------------------------------------
     // 同盟データ読みこみ
     //--------------------------------------------------
-    public function readAllyFile() {
+    public function readAllyFile()
+    {
         global $init;
 
         $fileName = $init->dirName.'/'.$init->allyData;
@@ -595,7 +609,8 @@ class AllyIO {
     //--------------------------------------------------
     // 同盟ひとつ読みこみ
     //--------------------------------------------------
-    public function readAlly($fp) {
+    public function readAlly($fp)
+    {
         $name       = chop(fgets($fp, READ_LINE));
         $mark       = chop(fgets($fp, READ_LINE));
         $color      = chop(fgets($fp, READ_LINE));
@@ -633,7 +648,8 @@ class AllyIO {
     //--------------------------------------------------
     // 同盟データ書き込み
     //--------------------------------------------------
-    public function writeAllyFile() {
+    public function writeAllyFile()
+    {
         global $init;
 
         $fileName = "{$init->dirName}/{$init->allyData}";
@@ -655,7 +671,8 @@ class AllyIO {
     //--------------------------------------------------
     // 同盟ひとつ書き込み
     //--------------------------------------------------
-    public function writeAlly($fp, $ally) {
+    public function writeAlly($fp, $ally)
+    {
         fputs($fp, $ally['name'] . "\n");
         fputs($fp, $ally['mark'] . "\n");
         fputs($fp, $ally['color'] . "\n");
@@ -684,7 +701,8 @@ class AllyIO {
     //---------------------------------------------------
     // 全島データを読み込む
     //---------------------------------------------------
-    public function readIslandsFile() {
+    public function readIslandsFile()
+    {
         global $init;
 
         $fileName = "{$init->dirName}/hakojima.dat";
@@ -715,7 +733,8 @@ class AllyIO {
     //---------------------------------------------------
     // 島ひとつ読み込む
     //---------------------------------------------------
-    public function readIsland($fp) {
+    public function readIsland($fp)
+    {
         $name     = chop(fgets($fp, READ_LINE));
 
         list($name, $owner, $monster, $port, $passenger, $fishingboat, $tansaku, $senkan, $viking) = array_pad(explode(",", $name), 10, null);
@@ -801,11 +820,13 @@ class AllyIO {
     }
 }
 
-class AllyUtil extends Util {
+class AllyUtil extends Util
+{
     //---------------------------------------------------
     // 同盟の占有率の計算
     //---------------------------------------------------
-    public static function allyOccupy(&$hako) {
+    public static function allyOccupy(&$hako)
+    {
         $totalScore = 0;
 
         for ($i=0; $i<$hako->allyNumber; $i++) {
@@ -825,14 +846,16 @@ class AllyUtil extends Util {
     //---------------------------------------------------
     // 人口順にソート(同盟バージョン)
     //---------------------------------------------------
-    public static function allySort(&$hako) {
+    public static function allySort(&$hako)
+    {
         usort($hako->ally, 'scoreComp');
     }
 
     //---------------------------------------------------
     // 島の名前から番号を算出
     //---------------------------------------------------
-    public static function nameToNumber($hako, $name) {
+    public static function nameToNumber($hako, $name)
+    {
         // 全島から探す
         for ($i = 0; $i < $hako->islandNumber; $i++) {
             if (strcmp($name, $hako->islands[$i]['name']) == 0) {
@@ -846,7 +869,8 @@ class AllyUtil extends Util {
     //---------------------------------------------------
     // 同盟の名前からIDを得る
     //---------------------------------------------------
-    public static function aNameToId($hako, $name) {
+    public static function aNameToId($hako, $name)
+    {
         // 全島から探す
         for ($i = 0; $i < $hako->allyNumber; $i++) {
             if ($hako->ally[$i]['name'] == $name) {
@@ -860,7 +884,8 @@ class AllyUtil extends Util {
     //---------------------------------------------------
     // 同盟のマークからIDを得る
     //---------------------------------------------------
-    public static function aMarkToId($hako, $mark) {
+    public static function aMarkToId($hako, $mark)
+    {
         // 全島から探す
         for ($i = 0; $i < $hako->allyNumber; $i++) {
             if ($hako->ally[$i]['mark'] == $mark) {
@@ -874,7 +899,8 @@ class AllyUtil extends Util {
     //---------------------------------------------------
     // エスケープ文字の処理
     //---------------------------------------------------
-    public static function htmlEscape($s, $mode = 0) {
+    public static function htmlEscape($s, $mode = 0)
+    {
         $s = h($s);
 
         if ($mode) {
@@ -892,7 +918,8 @@ class AllyUtil extends Util {
     //---------------------------------------------------
     // ファイルをロックする(書き込み時)
     //---------------------------------------------------
-    public static function lockw($fp) {
+    public static function lockw($fp)
+    {
         set_file_buffer($fp, 0);
         if (!flock($fp, LOCK_EX)) {
             HakoError::lockFail();
@@ -903,7 +930,8 @@ class AllyUtil extends Util {
     //---------------------------------------------------
     // ファイルをロックする(読み込み時)
     //---------------------------------------------------
-    public static function lockr($fp) {
+    public static function lockr($fp)
+    {
         set_file_buffer($fp, 0);
         if (!flock($fp, LOCK_SH)) {
             HakoError::lockFail();
@@ -916,13 +944,15 @@ class AllyUtil extends Util {
 //------------------------------------------------------------
 // メイン処理
 //------------------------------------------------------------
-class Main {
+class Main
+{
     public $mode;
     public $dataSet = [];
     //--------------------------------------------------
     // モード分岐
     //--------------------------------------------------
-    public function execute() {
+    public function execute()
+    {
         global $init;
 
         $ally = new Ally();
@@ -999,7 +1029,8 @@ class Main {
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
-    public function parseInputData() {
+    public function parseInputData()
+    {
         global $init;
 
         $this->mode = $_POST['mode'] ?? '';
@@ -1040,7 +1071,8 @@ $start = new Main();
 $start->execute();
 
 // 人口を比較、同盟一覧用
-function scoreComp($x, $y) {
+function scoreComp($x, $y)
+{
     if (isset($x['dead']) && $x['dead'] == 1) {
         // 死滅フラグが立っていれば後ろへ
         return +1;

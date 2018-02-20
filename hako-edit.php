@@ -15,13 +15,15 @@ $init = new Init();
 
 $THIS_FILE = $init->baseDir . "/hako-edit.php";
 
-class CgiImitation {
+class CgiImitation
+{
     public $mode = "";
     public $dataSet = [];
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
-    public function parseInputData() {
+    public function parseInputData()
+    {
         global $init;
 
         $this->mode = $_POST['mode'] ?? "";
@@ -39,7 +41,8 @@ class CgiImitation {
     //---------------------------------------------------
     // COOKIEを取得
     //---------------------------------------------------
-    public function getCookies() {
+    public function getCookies()
+    {
         if (!empty($_COOKIE)) {
             while (list($name, $value) = each($_COOKIE)) {
                 switch ($name) {
@@ -79,7 +82,8 @@ class CgiImitation {
     //---------------------------------------------------
     // COOKIEを生成
     //---------------------------------------------------
-    public function setCookies() {
+    public function setCookies()
+    {
         $time = $_SERVER['REQUEST_TIME'] + 30; // 現在 + 30秒有効
 
         // Cookieの設定 & POSTで入力されたデータで、Cookieから取得したデータを更新
@@ -115,11 +119,13 @@ class CgiImitation {
 }
 
 //----------------------------------------------------------------------
-class Edit {
+class Edit
+{
     //---------------------------------------------------
     // TOP 表示（パスワード入力）
     //---------------------------------------------------
-    public function enter() {
+    public function enter()
+    {
         global $init;
 
         echo <<<END
@@ -136,7 +142,8 @@ END;
     //---------------------------------------------------
     // 島の一覧を表示
     //---------------------------------------------------
-    public function main($hako, $data) {
+    public function main($hako, $data)
+    {
         global $init;
 
         // パスワード
@@ -239,7 +246,8 @@ END;
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function editMap($hako, $data) {
+    public function editMap($hako, $data)
+    {
         global $init;
 
         // パスワード
@@ -502,7 +510,8 @@ END;
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function register($hako, $data) {
+    public function register($hako, $data)
+    {
         global $init;
 
         // パスワード
@@ -553,8 +562,10 @@ END;
     }
 }
 
-class EditMain {
-    public function execute() {
+class EditMain
+{
+    public function execute()
+    {
         $hako = new HakoEdit();
         $cgi = new CgiImitation();
         $cgi->parseInputData();

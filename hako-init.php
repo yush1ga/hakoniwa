@@ -8,6 +8,7 @@
 
 require_once 'hako-init-default.php'; // InitDefault
 
-class Init extends InitDefault {
+class Init extends InitDefault
+{
     // 各種設定値
 }

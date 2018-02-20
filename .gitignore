@@ -11,3 +11,7 @@ node_modules/
 
 composer.lock
 vendor/
+
+*.cache
+
+\.DS_Store

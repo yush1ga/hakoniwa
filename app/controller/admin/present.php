@@ -4,8 +4,10 @@
  * @author hiro <@hiro0218>
  */
 
- class Present extends Admin {
-     public function execute() {
+ class Present extends Admin
+ {
+     public function execute()
+     {
          $html = new HtmlPresent();
          $hako = new HakoPresent();
          $cgi = new Cgi();
@@ -39,7 +41,8 @@
          $html->footer();
      }
 
-     public function presents($data, &$hako) {
+     public function presents($data, &$hako)
+     {
          if ($data['ISLANDID']) {
              $num = $hako->idToNumber[$data['ISLANDID']];
              $hako->islands[$num]['present']['item'] = 0;
@@ -49,7 +52,8 @@
          }
      }
 
-     public function punish($data, &$hako) {
+     public function punish($data, &$hako)
+     {
          if ($data['ISLANDID']) {
              $punish =& $data['PUNISH'];
              if (($punish >= 0) && ($punish <= 8)) {

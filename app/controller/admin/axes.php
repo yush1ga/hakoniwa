@@ -5,10 +5,12 @@ namespace Hakoniwa\Admin;
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
-class Axes extends \Admin {
+class Axes extends \Admin
+{
     public $init;
 
-    public function __construct() {
+    public function __construct()
+    {
         global $init;
         $this->init = $init;
         $html = new \HtmlAxes();
