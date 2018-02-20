@@ -118,7 +118,7 @@ class Util
      * @param  string $p2 [description]
      * @return [type]     [description]
      */
-    public static function checkPassword(string $p1 = "", string $p2 = ""):bool
+    public static function checkPassword(string $p1 = "", string $p2 = ""): bool
     {
         global $init;
 
@@ -126,11 +126,14 @@ class Util
         if (empty($p2)) {
             return false;
         }
-        if (file_exists($init->passwordFile)) {
-            $fp = fopen($init->passwordFile, "r");
-            $masterPasswd = chop(fgets($fp, READ_LINE));
-            fclose($fp);
+        if (!file_exists($init->passwordFile)) {
+            HakoError::probrem();
+
+            return false;
         }
+        $fp = fopen($init->passwordFile, "r");
+        $masterPasswd = chop(fgets($fp, READ_LINE));
+        fclose($fp);
         // マスターパスワードチェック
         if (password_verify($p2, $masterPasswd)) {
             return true;
@@ -149,11 +152,11 @@ class Util
     }
 
     /**
-     * [checkSpecialPassword description]
-     * @param  string $p [description]
-     * @return [type]    [description]
+     * 特殊パスワードチェック
+     * @param  string $p 入力パスワード
+     * @return bool
      */
-    public static function checkSpecialPassword(string $p = ""):bool
+    public static function checkSpecialPassword(string $p = ""): bool
     {
         global $init;
 
@@ -161,27 +164,30 @@ class Util
         if (empty($p)) {
             return false;
         }
-        if (file_exists($init->passwordFile)) {
-            $fp = fopen($init->passwordFile, "r");
-            $specialPasswd = chop(fgets($fp, READ_LINE));//1行目を破棄
-            $specialPasswd = chop(fgets($fp, READ_LINE));
-            fclose($fp);
+        if (!file_exists($init->passwordFile)) {
+            HakoError::probrem();
+
+            return false;
         }
-        // 特殊パスワードチェック
+        $fp = fopen($init->passwordFile, "r");
+        $specialPasswd = chop(fgets($fp, READ_LINE));//1行目を破棄
+        $specialPasswd = chop(fgets($fp, READ_LINE));
+        fclose($fp);
+
         return password_verify($p, $specialPasswd);
     }
 
     /**
      * パスワードのエンコード
      */
-    public static function encode(string $s, bool $isLegacy = true):string
+    public static function encode(string $s, bool $isLegacy = true): string
     {
         return ($isLegacy)? crypt($s, 'h2') : password_hash($s, PASSWORD_DEFAULT, ['cost'=>10]);
     }
 
     /**
      * [0, num-1]の乱数生成
-     * @param  integer $num 正の整数（通例２以上）
+     * @param  integer $num 正の整数（通例2以上）
      * @return float   [0, $num-1]の範囲の実数
      */
     public static function random($num = 0)
@@ -189,9 +195,10 @@ class Util
         return ($num > 1)? mt_rand(0, $num - 1) : 0;
     }
 
-    //---------------------------------------------------
-    // ランダムな座標を生成
-    //---------------------------------------------------
+    /**
+     * ランダムな座標配列を生成
+     * @return [type] [description]
+     */
     public static function makeRandomPointArray()
     {
         global $init;
@@ -486,7 +493,7 @@ function println(...$strs)
     }
     echo PHP_EOL;
 }
-function h(string $str):string
+function h(string $str): string
 {
     return preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($str, ENT_QUOTES, 'UTF-8'));
 }

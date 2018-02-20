@@ -87,8 +87,8 @@ class HTML
         $factory    = min($info['factory'] * 10, 0);
         $commerce   = min($info['commerce'] * 10, 0);
         $mountain   = min($info['mountain'] * 10, 0);
-        $hatuden       = ($info['hatuden']  <= 0)? $init->notHave: $info['hatuden'] *10 . 'kW';
-        $taiji         = ($info['taiji']    <= 0)? "0".$init->unitMonster: $info['taiji'].$init->unitMonster;
+        $hatuden    = min($info['hatuden'] * 10, 0);
+        $taiji      = $info['taiji'];
         $peop          = ($info['peop'] < 0) ? $info['peop'].$init->unitPop : '+'.$info['peop'].$init->unitPop;
         $okane         = ($info['gold'] < 0) ? $info['gold'].$init->unitMoney : '+'.$info['gold'].$init->unitMoney;
         $gohan         = ($info['rice'] < 0) ? $info['rice'].$init->unitFood : '+'.$info['rice'].$init->unitFood;
@@ -105,7 +105,6 @@ class HTML
         $shitten       = $info['shitten'];
         $comment       = $info['comment'];
         $comment_turn  = $info['comment_turn'];
-        //$starturn     = $info['starturn'];
         $keep = '';
 
         $monster       = ($info['monster'] > 0)? '<strong class="monster">[怪獣'.$info['monster'].'体出現中]</strong>' :'';
@@ -115,32 +114,17 @@ class HTML
             $keep = '<span style="font-size:1.4em;color:#4f4dff;font-weight:700;" title="管理人預かり中">❄</span>';
         }
 
-        $name = Util::infoName($info, $hako->ally, $hako->idToAllyNumber);
+        $name = Util::islandName($info, $hako->ally, $hako->idToAllyNumber);
         $name = $info['absent'] == 0 ? $init->tagName_.$name.$init->_tagName : $init->tagName2_.$name.'('.$info['absent'].')'.$init->_tagName2;
 
-        $owner = (!empty($info['owner']))? $info['owner']: 'annonymous';
+        $owner = !empty($info['owner']) ? $info['owner']: 'annonymous';
 
         $prize = $hako->getPrizeList($info['prize']);
 
         $point = $info['point'];
 
-        $sora = "";
-        switch ($tenki) {
-                case 1:
-                    $sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
-                    break;
-                case 2:
-                    $sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
-                    break;
-                case 3:
-                    $sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
-                    break;
-                case 4:
-                    $sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
-                    break;
-                default:
-                    $sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
-            }
+        $sora_ = ['', '晴れ☀', '曇り☁', '雨☂', '雷⛈', '雪☃'];
+        $sora = "<img src=\"{$init->imgDir}/tenki{$tenki}.gif\" alt=\"{$sora_[$tenki]}\"". ' width="19" height="19">';
 
         $eiseis = "";
         for ($e = 0; $e < $init->EiseiNumber; $e++) {
