@@ -36,13 +36,13 @@ class LogIO
     {
         for ($i = $this->init->logMax - 1; $i >= 0; $i--) {
             $j = $i + 1;
-            $s = "{$this->init->dirName}/hakojima.log{$i}";
-            $d = "{$this->init->dirName}/hakojima.log{$j}";
-            if (is_file($s)) {
-                if (is_file($d)) {
-                    unlink($d);
+            $src = "{$this->init->dirName}/hakojima.log{$i}";
+            $dist = "{$this->init->dirName}/hakojima.log{$j}";
+            if (is_file($src)) {
+                if (is_file($dist)) {
+                    unlink($dist);
                 }
-                rename($s, $d);
+                rename($src, $dist);
             }
         }
     }
@@ -63,30 +63,25 @@ class LogIO
         $fp = fopen($fileName, "r");
         $row = 1;
 
-        echo "<div>";
+        println('<div>');
         while ($line = chop(fgets($fp, READ_LINE))) {
-            list($m, $turn, $id1, $id2, $message) = explode(",", $line, 5);
-            if ($m == 1) {
+            list($isSecret, $turn, $id1, $id2, $message) = explode(",", $line, 5);
+            if ($isSecret == 1) {
                 if (($mode == 0) || ($id1 != $id)) {
                     continue;
                 }
-                $message_prefix = "<strong>(機密)</strong>";
-            } else {
-                $message_prefix = "";
+                $message = "<strong>（機密）</strong> " . $message;
             }
-            if ($id != 0) {
-                if (($id != $id1) && ($id != $id2)) {
-                    continue;
-                }
+            if ($id != 0 && $id != $id1 && $id != $id2) {
+                continue;
             }
             if ($row == 1) {
-                echo "<h3>{$init->tagNumber_}ターン{$turn}の出来事{$init->_tagNumber}</h3>\n";
+                println('<h3 class="number">ターン', $turn, 'の出来事</h3>');
                 $row++;
             }
-            echo "<ul class='list-unstyled'><li>{$message_prefix}{$message}</li></ul>";
+            println('<ul class="list-unstyled"><li>', $message, '</li></ul>');
         }
-        echo "</div>";
-
+        println('</div>');
         fclose($fp);
     }
     //---------------------------------------------------
@@ -103,30 +98,23 @@ class LogIO
         $fp = fopen($fileName, "r");
         $history = [];
         $k = 0;
-        while ($line = chop(fgets($fp, READ_LINE))) {
-            array_push($history, $line);
+        while (false !== ($line = trim(fgets($fp, READ_LINE)))) {
+            $history[] = $line;
             $k++;
         }
 
         for ($i = 0; $i < $k; $i++) {
             list($turn, $his) = explode(",", array_pop($history), 2);
-            echo "<li>{$this->init->tagNumber_}ターン{$turn}{$this->init->_tagNumber}：$his</li>\n";
+            println('<li><span class="number">ターン', $turn, '</span>：', $his, '</li>');
         }
     }
     /**
      * 発見の記録を保存
-     *
-     * @todo file_put_contents()で代替できないか
      */
     public function history($str)
     {
-        $fileName = "{$this->init->dirName}/hakojima.his";
-        if (!is_file($fileName)) {
-            touch($fileName);
-        }
-        $fp = fopen($fileName, "a");
-        fputs($fp, "{$GLOBALS['ISLAND_TURN']},{$str}\n");
-        fclose($fp);
+        $fileName = $this->init->dirName . '/hakojima.his';
+        file_put_contents($fileName, "{$GLOBALS['ISLAND_TURN']},{$str}\n", FILE_APPEND | LOCK_EX);
     }
     /**
      * 発見の記録ログ調整
@@ -134,14 +122,14 @@ class LogIO
     public function historyTrim()
     {
         $count = 0;
-        $fileName = "{$this->init->dirName}/hakojima.his";
+        $fileName = $this->init->dirName . '/hakojima.his';
 
         if (is_file($fileName)) {
             $fp = fopen($fileName, "r");
 
             $line = [];
-            while ($l = chop(fgets($fp, READ_LINE))) {
-                array_push($line, $l);
+            while (false !== ($l = chop(fgets($fp, READ_LINE)))) {
+                $line[] =  $l;
                 $count++;
             }
             fclose($fp);
@@ -149,32 +137,46 @@ class LogIO
             if ($count > $this->init->historyMax) {
                 $fp = fopen($fileName, "w");
                 for ($i = ($count - $this->init->historyMax); $i < $count; $i++) {
-                    fputs($fp, "{$line[$i]}\n");
+                    fputs($fp, $line[$i] . "\n");
                 }
                 fclose($fp);
             }
         }
     }
-    //---------------------------------------------------
-    // ログ
-    //---------------------------------------------------
+    /**
+     * 通常ログ
+     * @param  string $str log statement
+     * @param  string $id  who done it
+     * @param  string $tid who target
+     * @return void
+     */
     public function out($str, $id = "", $tid = "")
     {
-        array_push($this->logPool, "0,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}");
+        $this->logPool[] = "0,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}";
     }
-    //---------------------------------------------------
-    // 機密ログ
-    //---------------------------------------------------
+
+    /**
+     * 機密ログ
+     * @param  string $str log statement
+     * @param  string $id  who done it
+     * @param  string $tid who target
+     * @return void
+     */
     public function secret($str, $id = "", $tid = "")
     {
-        array_push($this->secretLogPool, "1,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}");
+        $this->secretLogPool[] = "1,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}";
     }
-    //---------------------------------------------------
-    // 遅延ログ
-    //---------------------------------------------------
+
+    /**
+     * 遅延ログ
+     * @param  string $str log statement
+     * @param  string $id  who done it
+     * @param  string $tid who target
+     * @return void
+     */
     public function late($str, $id = "", $tid = "")
     {
-        array_push($this->lateLogPool, "0,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}");
+        $this->lateLogPool[] = "0,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}";
     }
     //---------------------------------------------------
     // ログ書き出し
@@ -188,17 +190,17 @@ class LogIO
         // 全部逆順にして書き出す
         if (!empty($this->secretLogPool)) {
             for ($i = count($this->secretLogPool) - 1; $i >= 0; $i--) {
-                fputs($fp, "{$this->secretLogPool[$i]}\n");
+                fputs($fp, $this->secretLogPool[$i]."\n");
             }
         }
         if (!empty($this->lateLogPool)) {
             for ($i = count($this->lateLogPool) - 1; $i >= 0; $i--) {
-                fputs($fp, "{$this->lateLogPool[$i]}\n");
+                fputs($fp, $this->lateLogPool[$i]."\n");
             }
         }
         if (!empty($this->logPool)) {
             for ($i = count($this->logPool) - 1; $i >= 0; $i--) {
-                fputs($fp, "{$this->logPool[$i]}\n");
+                fputs($fp, $this->logPool[$i]."\n");
             }
         }
         fclose($fp);
@@ -221,8 +223,7 @@ class LogIO
 
         $fp = fopen($fileName, "r");
         while (false !== ($line = fgets($fp, READ_LINE))) {
-            $line = chop($line);
-            echo $line.'<br>'.PHP_EOL;
+            println(chop($line), '<br>');
         }
         fclose($fp);
     }

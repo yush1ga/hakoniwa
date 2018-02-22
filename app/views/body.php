@@ -1,5 +1,5 @@
 <body>
-<div class="container-fluid">
+<div class="container">
 	<header>
 		<nav class="navbar navbar-default">
 			<div class="container-fluid">

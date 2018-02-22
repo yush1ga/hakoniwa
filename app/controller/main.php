@@ -1,6 +1,6 @@
 <?php
 
-require_once '../../config.php';
+require_once realpath(__DIR__.'../../').'config.php';
 require_once MODELPATH.'hako-file.php';
 require_once MODELPATH.'hako-cgi.php';
 
@@ -41,7 +41,7 @@ class Main
         }
         switch ($cgi->mode) {
             case "log":
-                // $html = new HtmlTop(); [NOTE]いらない気配
+                $html = new HtmlTop();
                 $html->header();
                 $html->log();
                 $html->footer();
