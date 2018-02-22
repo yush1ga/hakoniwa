@@ -98,7 +98,7 @@ class LogIO
         $fp = fopen($fileName, "r");
         $history = [];
         $k = 0;
-        while (false !== ($line = trim(fgets($fp, READ_LINE)))) {
+        while (false != ($line = trim(fgets($fp, READ_LINE)))) {
             $history[] = $line;
             $k++;
         }
@@ -128,7 +128,7 @@ class LogIO
             $fp = fopen($fileName, "r");
 
             $line = [];
-            while (false !== ($l = chop(fgets($fp, READ_LINE)))) {
+            while (false != ($l = chop(fgets($fp, READ_LINE)))) {
                 $line[] =  $l;
                 $count++;
             }

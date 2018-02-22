@@ -517,7 +517,7 @@ class Ally extends AllyIO
         global $init;
 
         $m = $this->readIslandsFile();
-        $this->islandList = $this->getIslandList($cgi->dataSet['defaultID']);
+        $this->islandList = $this->getIslandList($cgi->dataSet['defaultID'] ?? 0);
 
         if ($init->targetIsland == 1) {
             // 目標の島 所有の島が選択されたリスト

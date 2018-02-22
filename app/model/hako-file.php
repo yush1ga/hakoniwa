@@ -663,11 +663,9 @@ class Hako extends File
 
         $list = "";
         for ($i = 0; $i < $this->islandNumber; $i++) {
-            if ($init->allyUse) {
-                $name = Util::islandName($this->islands[$i], $this->ally, $this->idToAllyNumber); // 同盟マークを追加
-            } else {
-                $name = $this->islands[$i]['name'];
-            }
+            // 同盟マークを追加
+            $name = $init->allyUse ? Util::islandName($this->islands[$i], $this->ally, $this->idToAllyNumber) : $this->islands[$i]['name'] . $init->nameSuffix;
+
             $id = $this->islands[$i]['id'];
 
             // 攻撃目標をあらかじめ自分の島にする
@@ -675,12 +673,8 @@ class Hako extends File
                 $this->defaultTarget = $id;
             }
 
-            $s = ($id == $select) ? "selected" : "";
-            if ($init->allyUse) {
-                $list .= "<option value=\"$id\" $s>{$name}</option>\n"; // 同盟マークを追加
-            } else {
-                $list .= "<option value=\"$id\" $s>{$name}{$init->nameSuffix}</option>\n";
-            }
+            $s = ($id == $select) ? ' selected' : '';
+            $list .= '<option value="' . $id . '"' . $s . '>' . $name . "</option>\n";
         }
 
         return $list;
@@ -765,7 +759,7 @@ class Hako extends File
                 // 海底都市
                 $image = 'SeaCity.gif';
                 $naviTitle = '海底都市';
-                $naviText = "{$lv}{$init->unitPop}";
+                $naviText = $lv . $init->unitPop;
 
                 break;
 
@@ -773,7 +767,7 @@ class Hako extends File
                 // 海上都市
                 $image = 'FroCity.gif';
                 $naviTitle = '海上都市';
-                $naviText = "{$lv}{$init->unitPop}";
+                $naviText = $lv . $init->unitPop;
 
                 break;
 
@@ -805,7 +799,6 @@ class Hako extends File
                     $naviText = "{$owner}島所属<br>破損率：{$hp}%";
                 } else {
                     // 海賊船
-                    // $treasure = $ship[3] * 1000 + $ship[4] * 100; //memo: 未使用コード おそらくコピペミス
                     $naviText = "破損率：{$hp}%";
                 }
                 $image = "ship{$ship[1]}.gif"; // 船舶画像
@@ -979,22 +972,20 @@ class Hako extends File
 
             case $init->landNewtown:
                 // ニュータウン
-                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
-                $nwork = (int)($lv/15);
+                $nwork = intdiv($lv, 15) * 10;
                 $image = 'new.gif';
                 $naviTitle = 'ニュータウン';
-                $naviText = "{$lv}{$init->unitPop}/職場{$nwork}0{$init->unitPop}";
+                $naviText = "{$lv}{$init->unitPop}/職場{$nwork}{$init->unitPop}";
 
                 break;
 
             case $init->landBigtown:
                 // 現代都市
-                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
-                $mwork = (int)($lv/20);
-                $lwork = (int)($lv/30);
+                $mwork = intdiv($lv, 2);
+                $lwork = intdiv($lv, 3);
                 $image = 'big.gif';
                 $naviTitle = '現代都市';
-                $naviText = "{$lv}{$init->unitPop}/職場{$lwork}0{$init->unitPop}/農場{$mwork}0{$init->unitPop}";
+                $naviText = "{$lv}{$init->unitPop}/職場{$lwork}{$init->unitPop}/農場{$mwork}{$init->unitPop}";
 
                 break;
 

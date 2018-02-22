@@ -339,3 +339,8 @@ h2 {
 .p-t-harf { padding-top: 0.5rem !important;}
 .p-b-harf { padding-bottom: 0.5rem !important;}
 .p-v-harf { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important;}
+
+.cash {
+    color: #993;
+    font-weight: 700;
+}

@@ -215,10 +215,6 @@ class InitDefault
     public $lengthAllyTitle   = 30;   // 「同盟の情報」欄の上に表示される盟主メッセージのタイトル
     public $lengthAllyMessage = 1500; // 「同盟の情報」欄の上に表示される盟主メッセージ
 
-    // スタイルシートを改変していないので、ここに記述
-    public $tagMoney_  = '<span style="color:#993;font-weight:bold;">';
-    public $_tagMoney  = '</span>';
-
     // 以下は、表示関連で使用しているだけで、実際の機能を有していません、さらなる改造で実現可能です。
 
     // 加盟・脱退をコマンドで行うようにする？(0:しない、1:する)
@@ -257,11 +253,13 @@ class InitDefault
     public $dBaseHP       = 5;
     // 海底防衛施設の最大耐久力
     public $sdBaseHP      = 3;
-    // 防衛施設が怪獣に踏まれた時自爆するなら1、しないなら0
+    // 防衛施設が怪獣に踏まれた時自爆するか（1：する（デフォルト）、0：しない）
     public $dBaseAuto     = 1;
 
-    // 目標の島 所有の島が選択された状態でリストを生成 1、順位がTOPの島なら0
-    // ミサイルの誤射が多い場合などに使用すると良いかもしれない
+    // 「目標の島」初期値
+    // 1：自身の島
+    // 0：順位がTOPの島
+    // [NOTE] ミサイルの誤射が多い場合などに使用すると良いかもしれない
     public $targetIsland  = 1;
 
     //---------------------------------------------------
@@ -271,7 +269,7 @@ class InitDefault
     public $shipMax  = 5;
 
     // 船舶の種類（造船対象の船舶）
-    public $shipKind = 4; // 最大7
+    public $shipKind = 4; // 最大5
 
     // 船舶の名前（5,6のみ災害船舶と定義）
     public $shipName = [

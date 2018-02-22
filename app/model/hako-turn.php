@@ -254,6 +254,9 @@ class Turn
             } else {
                 $island['money'] += 10;
                 $island['absent']++;
+                if (DEBUG) {
+                    $island['absent'] = 0;
+                }
 
                 // 自動放棄
                 if ($island['absent'] > $init->giveupTurn) {

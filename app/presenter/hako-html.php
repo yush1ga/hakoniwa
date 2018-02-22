@@ -2319,7 +2319,7 @@ EOT;
 
         echo <<<END
 <h3>ターン：$lastTurn</h3>
-<p><strong>最終更新時間</strong>：$timeString</p>
+<p><strong>最終更新時刻</strong>：$timeString</p>
 <form action="$this_file" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="DELETE">
@@ -2332,17 +2332,17 @@ END;
             $time['tm_year'] += 1900;
             $time['tm_mon']++;
             echo <<<END
-<h4>最終更新時間の変更</h4>
+<h4>最終更新時刻の変更</h4>
 <form action="{$this_file}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
 	<input type="hidden" name="NUMBER" value="{$suf}">
-	<input type="text" size="4" name="YEAR" value="{$time['tm_year']}">年
-	<input type="text" size="2" name="MON" value="{$time['tm_mon']}">月
-	<input type="text" size="2" name="DATE" value="{$time['tm_mday']}">日
-	<input type="text" size="2" name="HOUR" value="{$time['tm_hour']}">時
-	<input type="text" size="2" name="MIN" value="{$time['tm_min']}">分
-	<input type="text" size="2" name="NSEC" value="{$time['tm_sec']}">秒
+	<input type="text" size="4" maxlength="4"name="YEAR" value="{$time['tm_year']}">年
+	<input type="text" size="2" maxlength="2"name="MON" value="{$time['tm_mon']}">月
+	<input type="text" size="2" maxlength="2"name="DATE" value="{$time['tm_mday']}">日
+	<input type="text" size="2" maxlength="2"name="HOUR" value="{$time['tm_hour']}">時
+	<input type="text" size="2" maxlength="2"name="MIN" value="{$time['tm_min']}">分
+	<input type="text" size="2" maxlength="2"name="NSEC" value="{$time['tm_sec']}">秒
 	<input type="submit" class="btn btn-warning btn-sm" value="変更">
 </form>
 END;
@@ -2832,14 +2832,13 @@ END;
         $makeCost = $init->costMakeAlly ? "{$init->costMakeAlly}{$init->unitMoney}" : '無料';
         $keepCost = $init->costKeepAlly ? "{$init->costKeepAlly}{$init->unitMoney}" : '無料';
         $joinCost = isset($init->comCost[$init->comAlly]) ? "{$init->comCost[$init->comAlly]}{$init->unitMoney}" : '無料';
-        $joinStr = $init->allyJoinComUse ? '' : "加盟・脱退の際の費用は、{$init->tagMoney_}$joinCost{$init->_tagMoney}です。<BR>";
-        $str3 = $adminMode ? "特殊パスワードは？（必須）<BR>
-<INPUT TYPE=\"password\" NAME=\"OLDPASS\" VALUE=\"{$data['defaultPassword']}\" SIZE=32 MAXLENGTH=32 class=f><BR>同盟" : "<div class='alert alert-info'><span class='attention'>（注意）</span><BR>
-同盟の結成・変更の費用は、{$init->tagMoney_}{$makeCost}{$init->_tagMoney}です。<BR>
-また、毎ターン必要とされる維持費は{$init->tagMoney_}$keepCost{$init->_tagMoney}です。<BR>
-（維持費は同盟に所属する島で均等に負担することになります）<BR>
-{$joinStr}
-</div>
+        $joinStr = $init->allyJoinComUse ? '' : '加盟・脱退の際の費用は、<span class="cash">' . $joinCost . '</span>です。<br>';
+        $str3 = $adminMode ? "特殊パスワードは？（必須）<br>
+<input type=\"password\" name=\"OLDPASS\" value=\"{$data['defaultPassword']}\" size=32 maxlength=32 class=f><br>同盟" : '<div class="alert alert-info"><span class="attention">（注意）</span><br>
+同盟の結成・変更の費用は、<span class="cash">' . $makeCost . '</span>です。<br>
+また、毎ターン必要とされる維持費は<span class="cash">' . $keepCost . '</span>です。<br>
+（維持費は同盟に所属する島で均等に負担することになります）<br>
+' . $joinStr . "</div>
 
 あなたの島は？（必須）<BR>
 <SELECT NAME=\"ISLANDID\" {$str2}>

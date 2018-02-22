@@ -1,6 +1,6 @@
 <?php
 
-require_once realpath(__DIR__.'../../').'config.php';
+require_once realpath(__DIR__.'/../../').'/config.php';
 require_once MODELPATH.'hako-file.php';
 require_once MODELPATH.'hako-cgi.php';
 
@@ -24,11 +24,11 @@ class Main
             HakoError::noDataFile();
             println('<p><a href="./hako-mente.php">→初期設定</a></p>');
             HTML::footer();
-            exit();
+            exit;
         }
         // [CHK] ファイルロック失敗
         if (false == ($lock = Util::lock())) {
-            exit();
+            exit;
         }
         $cgi->setCookies();
 
@@ -52,8 +52,8 @@ class Main
                 $turn = new Turn();
                 $html = new HtmlTop();
                 $html->header();
-                $turn->turnMain($hako, $cgi->dataSet);
                 // ターン処理後、通常トップページ描画
+                $turn->turnMain($hako, $cgi->dataSet);
                 $html->main($hako, $cgi->dataSet);
                 $html->footer();
 
