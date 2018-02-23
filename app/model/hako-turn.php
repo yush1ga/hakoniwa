@@ -6244,9 +6244,9 @@ class Turn
 
     /**
      * 地形の呼び方
-     * @param  Integar $land 地形ID
-     * @param  Integar $lv   メタデータ
-     * @return String        対応した名称
+     * @param  int $land 地形ID
+     * @param  int $lv   メタデータ
+     * @return string    対応した名称
      */
     public function landName(int $land, int $lv = 0): string
     {

@@ -129,12 +129,13 @@ class Edit
         global $init;
 
         echo <<<END
-<h1 class="title">{$init->title} <small>マップ・エディタ</small></h1>
+<h1 class="title">$init->title <small>マップエディタ</small></h1>
 <form action="{$GLOBALS['THIS_FILE']}" method="post">
-	<strong>パスワード：</strong>
-	<input type="password" size="32" maxlength="32" name="PASSWORD">
-	<input type="hidden" name="mode" value="list">
-	<input type="submit" value="一覧へ">
+    <label>パスワード：
+    <input type="password" size="32" name="PASSWORD" class="form-control">
+    </label>
+    <input type="hidden" name="mode" value="list">
+    <button type="submit" class="btn btn-default">一覧へ</button>
 </form>
 END;
     }
@@ -155,30 +156,32 @@ END;
         }
 
         echo <<<END
-<h1 class="title">マップ・エディタ</h1>
+<h1 class="title">マップエディタ</h1>
 <h2 class="Turn">ターン$hako->islandTurn</h2>
 <hr>
 <div id="IslandView">
 <h2>諸島の状況</h2>
-<p>島の名前をクリックすると、<strong>マップ</strong>が表示されます。</p>
+<p>島の名前をクリックするとマップエディタが表示されます。</p>
 
 <table class="table table-bordered table-condensed">
-<tr>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameSuffix}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-</tr>
+<thead>
+    <tr>
+        <th class="TitleCell head">$init->nameRank</th>
+        <th class="TitleCell head">$init->nameSuffix</th>
+        <th class="TitleCell head">$init->namePopulation</th>
+        <th class="TitleCell head">$init->nameArea</th>
+        <th class="TitleCell head">$init->nameFunds</th>
+        <th class="TitleCell head">$init->nameFood</th>
+        <th class="TitleCell head">$init->nameFarmSize</th>
+        <th class="TitleCell head">$init->nameFactoryScale</th>
+        <th class="TitleCell head">$init->nameMineScale</th>
+    </tr>
+</thead>
 END;
         // 表示内容は、管理者用の内容
         for ($i = 0; $i < $hako->islandNumber; $i++) {
             $island = $hako->islands[$i];
-            $j = ($island['isBF']) ? '★' : $i + 1;
+            $j = $island['isBF'] ? '★' : $i + 1;
             $id = $island['id'];
             $pop = $island['pop'] . $init->unitPop;
             $area = $island['area'] . $init->unitArea;
@@ -188,56 +191,56 @@ END;
             $factory = ($island['factory'] <= 0) ? $init->notHave : $island['factory'] * 10 . $init->unitPop;
             $mountain = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
             $comment = $island['comment'];
-            $comment_turn = $island['comment_turn'];
             $monster = ($island['monster'] > 0) ? '<strong class="monster">[怪獣'.$island['monster'].'体]</strong>' : '';
             $name = ($island['absent'] == 0) ? $init->tagName_.$island['name'].$init->nameSuffix.$init->_tagName : $init->tagName2_.$island['name'].$init->nameSuffix.'('.$island['absent'].')'.$init->_tagName2;
-            $owner = $island['owner'] ?? "コメント";
+            $owner = $island['owner'] ?: "anonymous";
 
             if ($hako->islandNumber - $i == $hako->islandNumberBF) {
-                echo "</table>\n</div>\n";
-                echo "<br>\n";
-                echo "<hr>\n\n";
-                echo "<div id=\"IslandView\">\n";
-                echo "<h2>Battle Fieldの状況</h2>\n";
-
                 echo <<<END
+</table>
+</div>
+<hr>
+<div id="IslandView">
+<h2>Battle Fieldの状況</h2>
 <table class="table table-bordered">
-<tr>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameSuffix}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-</tr>
+<thead>
+    <tr>
+        <th class="TitleCell head">$init->nameRank</th>
+        <th class="TitleCell head">$init->nameSuffix</th>
+        <th class="TitleCell head">$init->namePopulation</th>
+        <th class="TitleCell head">$init->nameArea</th>
+        <th class="TitleCell head">$init->nameFunds</th>
+        <th class="TitleCell head">$init->nameFood</th>
+        <th class="TitleCell head">$init->nameFarmSize</th>
+        <th class="TitleCell head">$init->nameFactoryScale</th>
+        <th class="TitleCell head">$init->nameMineScale</th>
+    </tr>
+</thead>
 END;
             }
-            echo "<tr>\n";
-            echo "<th class=\"NumberCell\" rowspan=\"2\">{$init->tagNumber_}$j{$init->_tagNumber}</th>\n";
-            echo "<td class=\"NameCell\" rowspan=\"2\"><a href=\"JavaScript:void(0);\" onClick=\"document.MAP{$id}.submit();return false;\">{$name}</a> {$monster}<br>\n{$prize}</td>\n";
             echo <<<END
+    <tr>
+        <th class="NumberCell number" rowspan=2>$j</th>
+        <td class="NameCell" rowspan=2><a href="#" onClick="document.MAP{$id}.submit();return !1;">$name</a> $monster<br>$prize</td>
 <form name="MAP{$id}" action="{$GLOBALS['THIS_FILE']}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="map">
 	<input type="hidden" name="Sight" value="{$id}">
 </form>
+        <td class="InfoCell">$pop</td>
+        <td class="InfoCell">$area</td>
+        <td class="InfoCell">$money</td>
+        <td class="InfoCell">$food</td>
+        <td class="InfoCell">$farm</td>
+        <td class="InfoCell">$factory</td>
+        <td class="InfoCell">$mountain</td>
+    </tr>
+    <tr>
+        <td class="CommentCell" colspan=7><span class="head">{$owner}：</span> $comment</td>
+    </tr>
 END;
-            echo "<td class=\"InfoCell\">$pop</td>\n";
-            echo "<td class=\"InfoCell\">$area</td>\n";
-            echo "<td class=\"InfoCell\">$money</td>\n";
-            echo "<td class=\"InfoCell\">$food</td>\n";
-            echo "<td class=\"InfoCell\">$farm</td>\n";
-            echo "<td class=\"InfoCell\">$factory</td>\n";
-            echo "<td class=\"InfoCell\">$mountain</td>\n";
-            echo "</tr>\n";
-            echo "<tr>\n";
-            echo "<td class=\"CommentCell\" colspan=\"7\">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>\n";
-            echo "</tr>\n";
         }
-        echo "</table>\n</div>\n";
+        println('</table>', "\n", '</div>');
     }
 
     /**
@@ -359,25 +362,23 @@ END;
         echo <<<END
 <script type="text/javascript">
 function ps(x, y, ld, lv) {
-	document.InputPlan.POINTX.options[x].selected = true;
-	document.InputPlan.POINTY.options[y].selected = true;
-	document.InputPlan.LAND.options[ld].selected = true;
+    lv = lv === undefined ? 0 : lv;
+	document.forms.InputPlan.POINTX.options[x].selected = true;
+	document.forms.InputPlan.POINTY.options[y].selected = true;
+    if (ld !== undefined)
+        document.forms.InputPlan.LAND.options[ld].selected = true;
 
 	if(ld == {$init->landMonster} || ld == {$init->landSleeper}) {
 		mn = Math.floor(lv / 10);
 		lv = lv - mn * 10;
 		document.InputPlan.MONSTER.options[mn].selected = true;
-		document.InputPlan.LEVEL.options[lv].selected = true;
-	} else {
-		document.InputPlan.LEVEL.options[lv].selected = true;
-	}
+    }
+	document.forms.InputPlan.LEVEL.value = lv;
 	return true;
 }
 </script>
 
-<div class="text-center">
-	{$init->tagBig_}{$init->tagName_}{$island['name']}{$init->nameSuffix}{$init->_tagName} マップ・エディタ{$init->_tagBig}<br>
-</div>
+<h1><span class="islName">{$island['name']}$init->nameSuffix</span> <small>マップエディタ</small></h1>
 
 <form name="TOP" action="{$GLOBALS['THIS_FILE']}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
@@ -389,118 +390,102 @@ END;
 
         // 説明文を表示
         echo <<<END
-<div class="text-center">
+<ul>
+    <li>一度変更したら<strong>元に戻すことはできません</strong>。十分に注意してください（再変更して誤魔化すことはできます）。</li>
+    <li>入力内容によっては、<strong>島データを破壊する恐れがあります</strong>。バックアップを確認してから行ってください。</li>
+    <li>このエディットは地形データを変更するのみで、他のデータへは即時反映されません。ターン更新の際に反映されます。</li>
+</ul>
+
 <table class="table table-bordered">
 <tr valign="top">
-<td class="CommandCell">
-	<b>レベルについて</b>
-	<ul>
-		<li><b>海、浅瀬</b><br>レベル0のとき海<br>1のとき浅瀬<br>それ以外のとき財宝
-		<li><b>荒地</b><br>レベル1のとき着弾点
-		<li><b>村、町、都市</b><br>レベル30未満が村<br>レベル100未満が町<br>レベル200未満が都市
-		<li><b>ミサイル基地</b><br>経験値
-		<li><b>山、採掘場</b><br>レベル1以上のとき採掘場
-		<li><b>怪獣</b><br>各怪獣の最大レベルを超える<br>設定はできません
-		<li><b>海底基地</b><br>経験値
-	</ul>
-</td>
 <td class="MapCell">
 END;
         // 地形出力
         $html->islandMap($hako, $island, 1);
 
-        // エディタ領域の表示
         echo <<<END
 </td>
 <td class="InputCell">
-<div class="text-center">
-	<form action="{$GLOBALS['THIS_FILE']}" method="post" name="InputPlan">
+	<form action="{$GLOBALS['THIS_FILE']}" method="post" id="InputPlan">
 		<input type="hidden" name="mode" value="regist">
 		<input type="hidden" name="ISLANDID" value="{$island['id']}">
 		<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 
-		<strong>マップ・エディタ</strong><br>
-		<hr>
-		<strong>座標(</strong>
-		<select name="POINTX">
+        <div class="form-inline">
+            <label for="POINTX">座標（</label>
+            <select name="POINTX" class="form-control">
 END;
         for ($i = 0; $i < $init->islandSize; $i++) {
-            if ($i == $data['defaultX']) {
-                echo "<option value=\"{$i}\" selected>{$i}</option>\n";
-            } else {
-                echo "<option value=\"{$i}\">{$i}</option>\n";
-            }
+            println('<option', ($i == $data['defaultX'] ? ' selected>' : '>'), $i, '</option>');
         }
-        echo "</select>, <select name=\"POINTY\">";
+        echo '</select>，<select name="POINTY" class="form-control">';
         for ($i = 0; $i < $init->islandSize; $i++) {
-            if ($i == $data['defaultY']) {
-                echo "<option value=\"{$i}\" selected>{$i}</option>\n";
-            } else {
-                echo "<option value=\"{$i}\">{$i}</option>\n";
-            }
+            println('<option', ($i == $data['defaultY'] ? ' selected>' : '>'), $i, '</option>');
         }
         echo <<<END
-		</select><strong>)</strong>
-		<hr>
-		<strong>地形</strong>
-		<select name="LAND">
+            </select><strong>）</strong>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="LAND">地形</label>
+            <select name="LAND" class="form-control">
 END;
         for ($i = 0; $i < count($landList); $i++) {
-            if ($landList[$i] == $data['defaultLAND']) {
-                echo "<option value=\"{$landList[$i]}\" selected>{$landName[$i]}</option>\n";
-            } else {
-                echo "<option value=\"{$landList[$i]}\">{$landName[$i]}</option>\n";
-            }
+            println('<option value="', $landList[$i], '"', ($i == $data['defaultLAND'] ? ' selected>' : '>'), $landName[$i], '</option>');
         }
         echo <<<END
-		</select>
-		<hr>
-		<strong>怪獣の種類</strong>
-		<select name="MONSTER">
+            </select>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="MONSTER">怪獣の種類</label>
+            <select name="MONSTER" class="form-control">
 END;
         for ($i = 0; $i < $init->monsterNumber; $i++) {
-            if ($i == $data['defaultMONSTER']) {
-                echo "<option value=\"{$i}\" selected>{$init->monsterName[$i]}</option>\n";
-            } else {
-                echo "<option value=\"{$i}\">{$init->monsterName[$i]}</option>\n";
-            }
+            println('<option value="', $i, '"', ($i == $data['defaultMONSTER'] ? ' selected>' : '>'), $init->monsterName[$i], '</option>');
         }
         echo <<<END
-		</select>
-		<hr>
-		<strong>船舶の種類</strong>
-		<select name="SHIP">
+            </select>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="SHIP">船舶の種類</label>
+            <select name="SHIP" class="form-control">
 END;
         for ($i = 0, $c=count($init->shipName); $i < $c; $i++) {
             if ($init->shipName[$i] != "") {
-                if ($i == $data['defaultSHIP']) {
-                    echo "<option value=\"{$i}\" selected>{$init->shipName[$i]}</option>\n";
-                } else {
-                    echo "<option value=\"{$i}\">{$init->shipName[$i]}</option>\n";
-                }
+                println('<option value="', $i, '"', ($i == $data['defaultSHIP'] ? ' selected>' : '>'), $init->shipName[$i], '</option>');
             }
         }
         echo <<<END
-		</select>
-		<hr>
-		<strong>レベル</strong>
-		<input type="number" min="0" max="512" size="4" maxlength="4" name="LEVEL" value="{$data['defaultLEVEL']}">
-		<hr>
-		<input type="submit" value="登録">
-	</form>
-</div>
-
-<ul>
-	<li>登録するときは十分注意願います。</li>
-	<li>データを破壊する場合があります。</li>
-	<li>バックアップを行ってから行う様にしましょう。</li>
-	<li>地形データを変更するのみで、他のデータは変更されません。<br>ターン更新で他のデータへ反映されます。</li>
-</ul>
-
+            </select>
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="LEVEL">レベル</label>
+            <input type="number" min="0" max="255" maxlength="4" name="LEVEL" value="{$data['defaultLEVEL']}" class="form-control">
+        </div>
+        <strong>レベルについて</strong>
+        <dl>
+            <dt>海、浅瀬</dt>
+            <dd>0：海<br>1：浅瀬<br>2～：財宝の埋まった海</dd>
+            <dt>荒地</dt>
+            <dd>0：普通の荒地<br>1：ミサイル痕のある荒地</dd>
+            <dt>街系</dt>
+            <dd>～30：村<br>～100：町<br>～200：都市<br>200～：大都市</dd>
+            <dt>ミサイル基地・海底基地</dt>
+            <dd>経験値</dd>
+            <dt>山、採掘場</dt>
+            <dd>1～：採掘場</dd>
+            <dt></dt>
+            <dd></dd>
+        </dl>
+        <hr>
+        <button type="submit" class="btn btn-info btn-block">変更</button>
+    </form>
 </td>
 </tr>
 </table>
-</div>
 END;
     }
 
