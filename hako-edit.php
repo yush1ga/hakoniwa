@@ -9,11 +9,10 @@
 require_once 'config.php';
 require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
-ini_set('display_errors', 0);
 
 $init = new Init();
 
-$THIS_FILE = $init->baseDir . "/hako-edit.php";
+$THIS_FILE = $init->baseDir . '/hako-edit.php';
 
 class CgiImitation
 {
@@ -30,7 +29,7 @@ class CgiImitation
 
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {
-                $this->dataSet["{$name}"] = str_replace(",", "", $value);
+                $this->dataSet[$name] = str_replace(",", "", $value);
             }
             if (!empty($_POST['Sight'])) {
                 $this->dataSet['ISLANDID'] = $_POST['Sight'];
@@ -84,34 +83,34 @@ class CgiImitation
     //---------------------------------------------------
     public function setCookies()
     {
-        $time = $_SERVER['REQUEST_TIME'] + 30; // 現在 + 30秒有効
+        $time = $_SERVER['REQUEST_TIME'] + 90; // 90秒間有効
 
         // Cookieの設定 & POSTで入力されたデータで、Cookieから取得したデータを更新
-        if ($this->dataSet['POINTX']) {
+        if (isset($this->dataSet['POINTX'])) {
             setcookie("POINTX", $this->dataSet['POINTX'], $time);
             $this->dataSet['defaultX'] = $this->dataSet['POINTX'];
         }
-        if ($this->dataSet['POINTY']) {
+        if (isset($this->dataSet['POINTY'])) {
             setcookie("POINTY", $this->dataSet['POINTY'], $time);
             $this->dataSet['defaultY'] = $this->dataSet['POINTY'];
         }
-        if ($this->dataSet['LAND']) {
+        if (isset($this->dataSet['LAND'])) {
             setcookie("LAND", $this->dataSet['LAND'], $time);
             $this->dataSet['defaultLAND'] = $this->dataSet['LAND'];
         }
-        if ($this->dataSet['MONSTER']) {
+        if (isset($this->dataSet['MONSTER'])) {
             setcookie("MONSTER", $this->dataSet['MONSTER'], $time);
             $this->dataSet['defaultMONSTER'] = $this->dataSet['MONSTER'];
         }
-        if ($this->dataSet['SHIP']) {
+        if (isset($this->dataSet['SHIP'])) {
             setcookie("SHIP", $this->dataSet['SHIP'], $time);
             $this->dataSet['defaultSHIP'] = $this->dataSet['SHIP'];
         }
-        if ($this->dataSet['LEVEL']) {
+        if (isset($this->dataSet['LEVEL'])) {
             setcookie("LEVEL", $this->dataSet['LEVEL'], $time);
             $this->dataSet['defaultLEVEL'] = $this->dataSet['LEVEL'];
         }
-        if ($this->dataSet['IMG']) {
+        if (isset($this->dataSet['IMG'])) {
             setcookie("IMG", $this->dataSet['IMG'], $time);
             $this->dataSet['defaultImg'] = $this->dataSet['IMG'];
         }
@@ -131,11 +130,12 @@ class Edit
         echo <<<END
 <h1 class="title">$init->title <small>マップエディタ</small></h1>
 <form action="{$GLOBALS['THIS_FILE']}" method="post">
-    <label>パスワード：
-    <input type="password" size="32" name="PASSWORD" class="form-control">
-    </label>
-    <input type="hidden" name="mode" value="list">
-    <button type="submit" class="btn btn-default">一覧へ</button>
+    <label for="PASSWORD">パスワード：</label>
+    <div class="form-inline">
+        <input type="password" size="32" name="PASSWORD" class="form-control">
+        <input type="hidden" name="mode" value="enter">
+        <button type="submit" class="btn btn-default">一覧へ</button>
+    </div>
 </form>
 END;
     }
@@ -221,7 +221,7 @@ END;
             echo <<<END
     <tr>
         <th class="NumberCell number" rowspan=2>$j</th>
-        <td class="NameCell" rowspan=2><a href="#" onClick="document.MAP{$id}.submit();return !1;">$name</a> $monster<br>$prize</td>
+        <td class="NameCell" rowspan=2><a href="#" onClick="document.MAP{$id}.submit();return !1;">$name</a> $monster</td>
 <form name="MAP{$id}" action="{$GLOBALS['THIS_FILE']}" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="map">
@@ -378,11 +378,10 @@ function ps(x, y, ld, lv) {
 }
 </script>
 
-<h1><span class="islName">{$island['name']}$init->nameSuffix</span> <small>マップエディタ</small></h1>
-
-<form name="TOP" action="{$GLOBALS['THIS_FILE']}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="mode" value="list">
+<h1><span class="islName">{$island['name']}$init->nameSuffix</span> <small>マップエディタ <button form="TOP" type="submit" class="btn btn-xs btn-link">リストに戻る</button></small></h1>
+<form id="TOP" action="{$GLOBALS['THIS_FILE']}" method="post">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="enter">
 </form>
 END;
         // 島の情報を表示
@@ -393,7 +392,7 @@ END;
 <ul>
     <li>一度変更したら<strong>元に戻すことはできません</strong>。十分に注意してください（再変更して誤魔化すことはできます）。</li>
     <li>入力内容によっては、<strong>島データを破壊する恐れがあります</strong>。バックアップを確認してから行ってください。</li>
-    <li>このエディットは地形データを変更するのみで、他のデータへは即時反映されません。ターン更新の際に反映されます。</li>
+    <li>ここでの変更は地形データに対してのみ即時反映され、他のデータへは即時反映されません。ターン更新の際に反映されます。</li>
 </ul>
 
 <table class="table table-bordered">
@@ -416,11 +415,13 @@ END;
             <select name="POINTX" class="form-control">
 END;
         for ($i = 0; $i < $init->islandSize; $i++) {
-            println('<option', ($i == $data['defaultX'] ? ' selected>' : '>'), $i, '</option>');
+            $sel = $i == ($data['defaultX'] ?? '') ? ' selected' : '';
+            println('<option', $sel, '>', $i, '</option>');
         }
         echo '</select>，<select name="POINTY" class="form-control">';
         for ($i = 0; $i < $init->islandSize; $i++) {
-            println('<option', ($i == $data['defaultY'] ? ' selected>' : '>'), $i, '</option>');
+            $sel = $i == ($data['defaultY'] ?? '') ? ' selected' : '';
+            println('<option', $sel, '>', $i, '</option>');
         }
         echo <<<END
             </select><strong>）</strong>
@@ -430,8 +431,9 @@ END;
             <label for="LAND">地形</label>
             <select name="LAND" class="form-control">
 END;
-        for ($i = 0; $i < count($landList); $i++) {
-            println('<option value="', $landList[$i], '"', ($i == $data['defaultLAND'] ? ' selected>' : '>'), $landName[$i], '</option>');
+        for ($i = 0, $c = count($landList); $i < $c; $i++) {
+            $sel = $landList[$i] == ($data['defaultLAND'] ?? '') ? ' selected' : '';
+            println('<option value="', $landList[$i], '"', $sel, '>', $landName[$i], '</option>');
         }
         echo <<<END
             </select>
@@ -442,7 +444,8 @@ END;
             <select name="MONSTER" class="form-control">
 END;
         for ($i = 0; $i < $init->monsterNumber; $i++) {
-            println('<option value="', $i, '"', ($i == $data['defaultMONSTER'] ? ' selected>' : '>'), $init->monsterName[$i], '</option>');
+            $sel = $i == ($data['defaultMONSTER'] ?? '') ? ' selected' : '';
+            println('<option value="', $i, '"', $sel, '>', $init->monsterName[$i], '</option>');
         }
         echo <<<END
             </select>
@@ -454,16 +457,19 @@ END;
 END;
         for ($i = 0, $c=count($init->shipName); $i < $c; $i++) {
             if ($init->shipName[$i] != "") {
-                println('<option value="', $i, '"', ($i == $data['defaultSHIP'] ? ' selected>' : '>'), $init->shipName[$i], '</option>');
+                $sel = $i == ($data['defaultSHIP'] ?? '') ? ' selected' : '';
+                println('<option value="', $i, '"', $sel, '>', $init->shipName[$i], '</option>');
             }
         }
+
+        $value = $data['defaultLEVEL'] ?? 0;
         echo <<<END
             </select>
         </div>
         <hr>
         <div class="form-group">
             <label for="LEVEL">レベル</label>
-            <input type="number" min="0" max="255" maxlength="4" name="LEVEL" value="{$data['defaultLEVEL']}" class="form-control">
+            <input type="number" min="0" max="255" maxlength="4" name="LEVEL" value="$value" class="form-control">
         </div>
         <strong>レベルについて</strong>
         <dl>
@@ -518,15 +524,16 @@ END;
         $ships = (int)$data['SHIP'];
         $level = $data['LEVEL'];
 
+        // 怪獣のレベル設定
         if ($ld == $init->landMonster || $ld == $init->landSleeper) {
-            // 怪獣のレベル設定
             $BHP = $init->monsterBHP[$mons];
 
             $DHP = ($init->monsterDHP[$mons] > 0) ? Util::random($init->monsterDHP[$mons] - 1) : Util::random($init->monsterDHP[$mons]);
             $level = $BHP + $DHP;
             $level = $mons * 100 + $level;
-        } elseif ($ld == $init->landShip) {
-            // 船舶のレベル設定
+        }
+        // 船舶のレベル設定
+        if ($ld == $init->landShip) {
             $level = Util::navyPack((int)$id, $ships, $init->shipHP[$ships], 0, 0);
         }
 
@@ -551,49 +558,38 @@ class EditMain
 {
     public function execute()
     {
-        $hako = new HakoEdit();
-        $cgi = new CgiImitation();
+        $hako = new HakoEdit;
+        $cgi = new CgiImitation;
         $cgi->parseInputData();
         $cgi->getCookies();
         if (!$hako->readIslands($cgi)) {
             HTML::header();
             HakoError::noDataFile();
             HTML::footer();
-            exit();
+            exit;
         }
         $cgi->setCookies();
         $edit = new Edit;
 
         switch ($cgi->mode) {
-            case "enter":
+            case 'enter':
                 $html = new HtmlTop();
                 $html->header();
                 $edit->main($hako, $cgi->dataSet);
-                $html->footer();
 
                 break;
 
-            case "list":
-                $html = new HtmlTop();
-                $html->header();
-                $edit->main($hako, $cgi->dataSet);
-                $html->footer();
-
-                break;
-
-            case "map":
+            case 'map':
                 $html = new HtmlTop();
                 $html->header();
                 $edit->editMap($hako, $cgi->dataSet);
-                $html->footer();
 
                 break;
 
-            case "regist":
+            case 'regist':
                 $html = new HtmlTop();
                 $html->header();
                 $edit->register($hako, $cgi->dataSet);
-                $html->footer();
 
                 break;
 
@@ -601,9 +597,9 @@ class EditMain
                 $html = new HtmlTop();
                 $html->header();
                 $edit->enter();
-                $html->footer();
         }
-        exit();
+        $html->footer();
+        exit;
     }
 }
 

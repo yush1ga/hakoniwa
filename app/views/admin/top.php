@@ -6,7 +6,7 @@
 
     <select name="menulist" class="form-control">
     <?php foreach ($menuList as $label => $url):?>
-         <option value="<?=$init->baseDir,$url?>"><?=$label?></option>
+        <option value="<?=$init->baseDir,$url?>"><?=$label?></option>
     <?php endforeach;?>
     </select>
 

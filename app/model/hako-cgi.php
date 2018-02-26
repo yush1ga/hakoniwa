@@ -35,7 +35,7 @@ class Cgi
             $this->dataSet['ISLANDID'] = $_GET['target'];
         }
 
-        $getMode = (array_key_exists('mode', $_GET)) ? $_GET['mode'] : "";
+        $getMode = (array_key_exists('mode', $_GET)) ? $_GET['mode'] : '';
         if ($getMode === "conf") {
             $this->mode = "conf";
         }

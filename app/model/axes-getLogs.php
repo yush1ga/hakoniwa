@@ -14,10 +14,10 @@ $filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init
 
 $file = file_exists($filePath)? file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : false;
 $return = [];
-if ($file!==false) {
+if ($file !== false) {
     foreach ($file as $value) {
-        list($datetime, $islId, $islName, $deptIp, $deptName) = explode(',', $value);
-        list($date, $time) = explode(' ', $datetime);
+        [$datetime, $islId, $islName, $deptIp, $deptName] = explode(',', $value);
+        [$date, $time] = explode(' ', $datetime);
 
         $deptIp = "127.0.0.1";
         $deptName = "(Test mode)";

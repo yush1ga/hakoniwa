@@ -1,6 +1,6 @@
 <?php
 /**
- * 箱庭諸島 S.E
+ * Re:箱庭諸島 S.E
  * @author Sotalbireo
  */
 class Admin
@@ -19,7 +19,7 @@ class Admin
         }
     }
 
-    public function passCheck():bool
+    public function passCheck(): bool
     {
         global $init;
 
@@ -33,12 +33,8 @@ class Admin
         $masterPassword = chop(fgets($fp, READ_LINE));
         fclose($fp);
 
-        if (!isset($this->dataSet['PASSWORD'])) {
-            HakoError::wrongPassword();
+        if (isset($this->dataSet['PASSWORD']) && password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
 
-            return false;
-        }
-        if (password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
             return true;
         } else {
             HakoError::wrongPassword();

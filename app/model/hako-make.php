@@ -74,8 +74,8 @@ class Make
 
         // 各種の値を設定
         $DAY = 86400; // the seconds of a day.
-        $island['name'] = htmlspecialchars($data['ISLANDNAME']);
-        $island['owner'] = htmlspecialchars($data['OWNERNAME']);
+        $island['name'] = h($data['ISLANDNAME']);
+        $island['owner'] = h($data['OWNERNAME']);
         $island['id'] = $hako->islandNextID;
         $hako->islandNextID++;
         $island['starturn'] = $hako->islandTurn;
@@ -101,7 +101,7 @@ class Make
         $htmlMap = new HtmlMap();
         $htmlMap->newIslandHead($island['name']);
         $htmlMap->islandInfo($island, $newNumber);
-        $htmlMap->islandMap($hako, $island, 1); //$htmlMap->islandMap($hako, $island, 1, $data);
+        $htmlMap->islandMap($hako, $island, 1);
     }
     //---------------------------------------------------
     // 新しい島を作成する

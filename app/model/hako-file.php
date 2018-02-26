@@ -1268,8 +1268,9 @@ class HakoEdit extends File
         global $init;
         $point = "($x,$y)";
         $naviExp = '';
-        $comStr = implode(",", $comStr);
+        $comStr = implode(',', $comStr);
         $naviPos = ($x < $init->islandSize / 2) ? 0 : 1;
+        $naviText = '';
 
         switch ($l) {
             case $init->landSea:
@@ -1285,7 +1286,7 @@ class HakoEdit extends File
                     // 財宝？
                     $image = 'land17.gif';
                     $naviTitle = '海';
-                    $naviText = $lv;
+                    $naviText = '#' . $lv;
                 }
 
                 break;

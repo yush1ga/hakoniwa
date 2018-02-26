@@ -70,8 +70,8 @@ class HTML
     {
         global $init;
 
-        $rank       = ($info['isBF']) ? '★' : $rank;
-        $population = ($info['pop'] > 1) ? $info['pop'] : 1;
+        $rank       = $info['isBF'] ? '★' : $rank;
+        $population = $info['pop'] > 1 ? $info['pop'] : 1;
         $id         = $info['id'];
         $area       = $info['area'];
         $point      = $info['point'];
@@ -83,18 +83,28 @@ class HTML
         $food       = $info['food'] . $init->unitFood;
         $unemployed = ($population - ($info['farm'] + $info['factory'] + $info['commerce'] + $info['mountain'] + $info['hatuden']) * 10) / $population * 100;
         $unemployed = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
-        $farm       = min($info['farm'] * 10, 0);
-        $factory    = min($info['factory'] * 10, 0);
-        $commerce   = min($info['commerce'] * 10, 0);
-        $mountain   = min($info['mountain'] * 10, 0);
-        $hatuden    = min($info['hatuden'] * 10, 0);
+        $farm       = max($info['farm'] * 10, 0);
+        $factory    = max($info['factory'] * 10, 0);
+        $commerce   = max($info['commerce'] * 10, 0);
+        $mountain   = max($info['mountain'] * 10, 0);
+        $hatuden    = max($info['hatuden'] * 10, 0);
         $taiji      = $info['taiji'];
         $peop          = ($info['peop'] < 0) ? $info['peop'].$init->unitPop : '+'.$info['peop'].$init->unitPop;
         $okane         = ($info['gold'] < 0) ? $info['gold'].$init->unitMoney : '+'.$info['gold'].$init->unitMoney;
         $gohan         = ($info['rice'] < 0) ? $info['rice'].$init->unitFood : '+'.$info['rice'].$init->unitFood;
         $poin          = ($info['pots'] < 0) ? $info['pots'].'pts' : '+'.$info['pots'].'pts';
-        $tenki         = $info['tenki'];
-        $team          = $info['team'];
+        $tenki      = $info['tenki'];
+        $team       = $info['team'];
+        $sport      = [
+            'matches' => $info['shiai'],
+            'won'     => $info['kachi'],
+            'lose'    => $info['make'],
+            'draw'    => $info['hikiwake'],
+            'attack'  => $info['kougeki'],
+            'defence' => $info['bougyo'],
+            'point'   => $info['tokuten'],
+            'lpoint'  => $info['shitten']
+        ];
         $shiai         = $info['shiai'];
         $kachi         = $info['kachi'];
         $make          = $info['make'];
@@ -104,7 +114,6 @@ class HTML
         $tokuten       = $info['tokuten'];
         $shitten       = $info['shitten'];
         $comment       = $info['comment'];
-        $comment_turn  = $info['comment_turn'];
         $keep = '';
 
         $monster       = ($info['monster'] > 0)? '<strong class="monster">[怪獣'.$info['monster'].'体出現中]</strong>' :'';
@@ -115,7 +124,7 @@ class HTML
         }
 
         $name = Util::islandName($info, $hako->ally, $hako->idToAllyNumber);
-        $name = $info['absent'] == 0 ? $init->tagName_.$name.$init->_tagName : $init->tagName2_.$name.'('.$info['absent'].')'.$init->_tagName2;
+        $name = $info['absent'] == 0 ? '<span class="islName">'.$name.'</span>' : '<span class="islName2">'.$name.'('.$info['absent'].')'.'</span>';
 
         $owner = !empty($info['owner']) ? $info['owner']: 'annonymous';
 
@@ -126,40 +135,34 @@ class HTML
         $sora_ = ['', '晴れ☀', '曇り☁', '雨☂', '雷⛈', '雪☃'];
         $sora = "<img src=\"{$init->imgDir}/tenki{$tenki}.gif\" alt=\"{$sora_[$tenki]}\"". ' width="19" height="19">';
 
-        $eiseis = "";
-        for ($e = 0; $e < $init->EiseiNumber; $e++) {
-            if (isset($eisei[$e])) {
-                if ($eisei[$e] > 0) {
-                    $eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eisei[$e]}%\" title=\"{$init->EiseiName[$e]} {$eisei[$e]}%\"> ";
+        $str_satelites = "";
+        for ($i = 0; $i < $init->EiseiNumber; $i++) {
+            if (isset($satelites[$i]) && $satelites[$i] > 0) {
+                $str_satelites .= "<img src=\"{$init->imgDir}/eisei{$i}.gif\" alt=\"{$init->EiseiName[$i]} {$eisei[$i]}%\" title=\"{$init->EiseiName[$i]} {$eisei[$i]}%\"> ";
+            }
+        }
+
+        $str_zins = "";
+        for ($i = 0; $i < $init->ZinNumber; $i++) {
+            if (isset($zins[$i]) && $zins[$i] > 0) {
+                $str_zins .= "<img src=\"{$init->imgDir}/zin{$i}.gif\" alt=\"{$init->ZinName[$i]}\" title=\"{$init->ZinName[$i]}\"> ";
+            }
+        }
+
+        $str_items = "";
+        for ($i = 0; $i < $init->ItemNumber; $i++) {
+            if (isset($items[$i]) && $items[$i] > 0) {
+                if ($i == 20) {
+                    $str_items .= "<img src=\"{$init->imgDir}/item{$i}.gif\" alt=\"{$init->ItemName[$i]} {$items[$i]}{$init->unitTree}\"  title=\"{$init->ItemName[$i]} {$item[$i]}{$init->unitTree}\"> ";
+                } else {
+                    $str_items .= "<img src=\"{$init->imgDir}/item{$i}.gif\" alt=\"{$init->ItemName[$i]}\" title=\"{$init->ItemName[$i]}\"> ";
                 }
             }
         }
 
-        $zins = "";
-        for ($z = 0; $z < $init->ZinNumber; $z++) {
-            if (isset($zin[$z])) {
-                if ($zin[$z] > 0) {
-                    $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
-                }
-            }
-        }
+        $lots = $lottery > 0 ? ' <img src="'.$init->imgDir.'/lot.gif" alt="くじ'.$lottery.'枚" title="'.$lottery.'枚">' : '';
 
-        $items = "";
-        for ($t = 0; $t < $init->ItemNumber; $t++) {
-            if (isset($item[$t])) {
-                if ($item[$t] > 0) {
-                    if ($t == 20) {
-                        $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"  title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
-                    } else {
-                        $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
-                    }
-                }
-            }
-        }
-
-        $lots = ($lot > 0)? ' <img src="'.$init->imgDir.'/lot.gif" alt="くじ：'.$lot.'枚" title="'.$lot.'枚">':'';
-
-        $viking = "";
+        $viking = '';
         for ($v = $init->shipKind, $c=count($init->shipName); $v < $c; $v++) {
             if ($island['ship'][$v] > 0) {
                 $viking .= " <img src=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" alt=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
@@ -640,7 +643,7 @@ class HtmlMap extends HTML
         global $init;
         $island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
 
-        $rank       = ($island['isBF']) ? '★' : $number + 1;
+        $rank       = $island['isBF'] ? '★' : $number + 1;
         $pop        = $island['pop'].$init->unitPop;
         $area       = $island['area'].$init->unitArea;
         $eisei      = $island['eisei'] ?? "";
@@ -743,7 +746,7 @@ class HtmlMap extends HTML
      * 地形出力
      * @param  [type]  $hako   [description]
      * @param  [type]  $island [description]
-     * @param  integer $mode   ミサイル基地等の機密情報表示有無(1/0) // [TODO]: boolにする
+     * @param  int     $mode   ミサイル基地等の機密情報表示有無(1/0) // [TODO]: boolにする
      * @return [type]          [description]
      */
     public function islandMap($hako, $island, $mode = 0)
@@ -762,16 +765,16 @@ class HtmlMap extends HTML
         $poin  = "";
 
         if (isset($island['peop'])) {
-            $peop = ($island['peop'] < 0) ? $island['peop'].$init->unitPop : '+'.$island['peop'].$init->unitPop;
+            $peop = ($island['peop'] < 0 ? '' : '+') . $island['peop'] . $init->unitPop;
         }
         if (isset($island['gold'])) {
-            $okane = ($island['gold'] < 0) ? $island['gold'].$init->unitMoney : '+'.$island['gold'].$init->unitMoney;
+            $okane = ($island['gold'] < 0 ? '' : '+') . $island['gold'] . $init->unitMoney;
         }
         if (isset($island['rice'])) {
-            $gohan = ($island['rice'] < 0) ? $island['rice'].$init->unitFood : '+'.$island['rice'].$init->unitFood;
+            $gohan = ($island['rice'] < 0 ? '' : '+') . $island['rice'] . $init->unitFood;
         }
         if (isset($island['pots'])) {
-            $poin = ($island['pots'] < 0) ? $island['pots'].'pts' : '+'.$island['pots'].'pts';
+            $poin = ($island['pots'] < 0 ? '' : '+') . $island['pots'] . 'pts';
         }
 
         if ($mode == 1) {
@@ -822,10 +825,10 @@ END;
     /**
      * 島の近況
      * @param  [type]  $island [description]
-     * @param  integer $mode   [description]
+     * @param  int     $mode   [description]
      * @return [type]          [description]
      */
-    public function islandRecent($island, $mode = 0)
+    public function islandRecent($island, int $mode = 0)
     {
         global $init;
 
@@ -854,7 +857,7 @@ END;
         $name   = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
         $width  = $init->islandSize * 32 + 50;
         $height = $init->islandSize * 32 + 100;
-        $defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
+        $defaultTarget = $init->targetIsland == 1 ? $island['id'] : $hako->defaultTarget;
 
         require_once(VIEWS.'/map/development/basic.php');
     }
@@ -874,39 +877,32 @@ END;
         $comName = "{$init->tagComName_}{$init->comName[$kind]}{$init->_tagComName}";
         $point = "{$init->tagName_}({$x},{$y}){$init->_tagName}";
 
-        if (isset($hako->idToName[$target])) {
-            $target = $hako->idToName[$target];
-        }
+        $target = !empty($hako->idToName[$target] ?? '') ? $hako->idToName[$target] : '無人';
+        $target = '<span class="islName">' . $target . $init->nameSuffix . '</span>';
 
-        if (empty($target)) {
-            $target = "無人";
-        }
-        $target = "{$init->tagName_}{$target}島{$init->_tagName}";
         $value = $arg * $init->comCost[$kind];
-        if ($value == 0) {
+        if ($value === 0) {
             $value = $init->comCost[$kind];
         }
         if ($value < 0) {
             $value = -$value;
-            if ($kind == $init->comSellTree) {
-                $value = "{$value}{$init->unitTree}";
-            } else {
-                $value = "{$value}{$init->unitFood}";
-            }
+            $value .= $kind == $init->comSellTree ? $init->unitTree : $init->unitFood;
+
         } elseif ($kind == $init->comHikidasi) {
-            $value = "{$value}0{$init->unitMoney} or {$value}0{$init->unitFood}";
+            $value *= 10;
+            $value = $value . $init->unitMoney . ' or '. $value . $init->unitFood;
         } else {
-            $value = "{$value}{$init->unitMoney}";
+            $value .= $init->unitMoney;
         }
-        $value = "{$init->tagName_}{$value}{$init->_tagName}";
+        $value = '<span class="islName">' . $value . '</span>';
         $j = sprintf("%02d：", $number + 1);
-        echo "<a href=\"javascript:void(0);\" onclick=\"ns({$number})\">{$init->tagNumber_}{$j}{$init->_tagNumber}";
+        echo '<a href="#noop" onclick="ns(' . $number . ');return !1;"><span class="number">' . $j . '</span>';
 
         switch ($kind) {
             case $init->comMissileSM:
             case $init->comDoNothing:
             case $init->comGiveup:
-                $str = "{$comName}";
+                $str = $comName;
 
                 break;
 
@@ -918,7 +914,7 @@ END;
             case $init->comMissileLD:
             case $init->comMissileLU:
                 // ミサイル系
-                $n = ($arg == 0) ? '無制限' : "{$arg}発";
+                $n = ($arg == 0) ? '無制限' : $arg . '発';
                 $str = "{$target}{$point}へ{$comName}（{$init->tagName_}{$n}{$init->_tagName}）";
 
                 break;
@@ -1116,8 +1112,7 @@ END;
         global $init;
 
         echo <<<END
-	<h1 class="text-center">{$init->tagBig_}{$init->nameSuffix}を発見しました！！{$init->_tagBig}
-		<small>{$init->tagBig_}{$init->tagName_}「{$name}{$init->nameSuffix}」{$init->_tagName}と命名します。{$init->_tagBig}</small>
+	<h1 class="text-center">{$init->nameSuffix}を発見しました！ <small><span class="big islName">「$name{$init->nameSuffix}」</span>と命名しました。</small>
 	</h1>
 END;
     }
@@ -1142,14 +1137,14 @@ END;
         echo <<<END
 <script>
 function ps(x, y) {
-	window.opener.document.InputPlan.POINTX.options[x].selected = true;
-	window.opener.document.InputPlan.POINTY.options[y].selected = true;
+	window.opener.document.forms.InputPlan.POINTX.options[x].selected = true;
+	window.opener.document.forms.InputPlan.POINTY.options[y].selected = true;
 	return true;
 }
 </script>
 
 <div class="text-center">
-{$init->tagBig_}{$init->tagName_}{$island['name']}{$init->nameSuffix}{$init->_tagName}{$init->_tagBig}<br>
+<span class="big islName">{$island['name']}$init->nameSuffix</span>
 </div>
 END;
         //島の地図
@@ -2229,7 +2224,7 @@ END;
         } else {
             echo <<<END
 <p><strong>マスタパスワードと特殊パスワードを決めてください。</strong></p>
-<p>マスタパスワードは、管理者権限でログインするために必要になります。<br>特殊パスワードは、マップエディットの際に資源を増加させる際などに用います。<br>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
+<p>マスタパスワードは、管理者権限でログインするために必要になります。<br>特殊パスワードは、マップエディットで資源を増加させる際などに用います。<br>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
 
 <form action="$this_file" method="post">
 

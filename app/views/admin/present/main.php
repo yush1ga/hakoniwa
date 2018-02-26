@@ -1,6 +1,6 @@
-<h1>管理ツール： <small>プレゼント</small></h1>
+<h1 class="title"><?=$init->title?> <small>管理ツール：プレゼント</small></h1>
 
-<?php if ($this->mode=='enter' && $this->passCheck()): ?>
+<?php if (($data['mode'] ?? '') == 'enter' && Admin::passCheck()): ?>
 <h2>援助</h2>
 <form action="<?=$this_file?>" method="post">
     <select name="ISLANDID"><?= $hako->islandList ?></select>に、
@@ -17,13 +17,13 @@
     <select name="POINTX">
     <option value="0" selected>0</option>
     <?php for ($i = 1; $i < $init->islandSize; $i++):?>
-        <option value="<?=$i?>"><?=$i?></option>
+        <option><?=$i?></option>
     <?php endfor;?>
     </select>,
     <select name="POINTY">
         <option value="0" selected>0</option>
     <?php for ($i = 1; $i < $init->islandSize; $i++):?>
-        <option value="<?=$i?>"><?=$i?></option>
+        <option><?=$i?></option>
     <?php endfor;?>
     </select>）に、
 
@@ -81,7 +81,7 @@ if (!$hasPresent) {
 
 
 <script>
-var w, p = 0;
+let w, p = 0;
 
 function settarget(part){
     p = part.options[part.selectedIndex].value;
@@ -97,10 +97,10 @@ function targetopen(){
 </script>
 
 <?php else:?>
-<form action="<?=$this_file?>" method="post">
-    <label>パスワード？：
-    <input type="password" maxlength="32" name="PASSWORD"></label>
+<form action="<?=$this_file?>" method="post" class="form-inline">
+    <label>パスワード：
+    <input type="password" length="32" name="PASSWORD" class="form-control"></label>
     <input type="hidden" name="mode" value="enter">
-    <input type="submit" value="メンテナンス">
+    <button type="submit" class="btn btn-default">メンテナンス</button>
 </form>
 <?php endif;?>
