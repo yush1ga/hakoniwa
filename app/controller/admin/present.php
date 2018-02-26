@@ -1,35 +1,34 @@
 <?php
+namespace Hakoniwa\Admin;
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
 
-class Present extends Admin
+class Present extends \Admin
 {
     public function execute()
     {
-        $html = new HtmlPresent;
-        $hako = new HakoPresent;
-        $cgi = new Cgi;
+        $html = new \HtmlPresent;
+        $hako = new \HakoPresent;
+        $cgi = new \Cgi;
         $this->parseInputData();
         $hako->init($this);
         $cgi->getCookies();
-        var_dump($this);
         $html->header();
 
-        switch ($this->mode) {
-            case "PRESENT":
-                if ($this->passCheck()) {
+        if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
+            switch ($this->mode) {
+                case "PRESENT":
                     $this->presents($this->dataSet, $hako);
-                }
 
-                break;
-            case "PUNISH":
-                if ($this->passCheck()) {
+                    break;
+                case "PUNISH":
                     $this->punish($this->dataSet, $hako);
-                }
 
-                break;
+                    break;
+            }
         }
         $html->main($this->dataSet, $hako);
         $html->footer();
@@ -49,7 +48,7 @@ class Present extends Admin
     public function punish($data, &$hako)
     {
         if ($data['ISLANDID']) {
-            $punish =& $data['PUNISH'];
+            $punish = &$data['PUNISH'];
             if (($punish >= 0) && ($punish <= 8)) {
                 $num = $hako->idToNumber[$data['ISLANDID']];
                 $hako->islands[$num]['present']['item'] = $punish;

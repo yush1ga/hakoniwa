@@ -1230,23 +1230,30 @@ class HakoBF extends File
 {
     public $islandListNoBF; // 普通の島リスト
     public $islandListBF;   // BFな島リスト
+    private $nil_list = '<option disabled>（変更可能な島はありません）</option>';
 
     public function init($cgi)
     {
         global $init;
+        $this->islandListNoBF = '';
+        $this->islandListBF = '';
 
         $this->readIslandsFile($cgi);
-        $this->islandListNoBF = '<option value="0"></option>'.PHP_EOL;
         for ($i = 0; $i < ($this->islandNumberNoBF); $i++) {
             $name = $this->islands[$i]['name'];
             $id = $this->islands[$i]['id'];
             $this->islandListNoBF .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
         }
-        $this->islandListBF = '<option value="0"></option>'.PHP_EOL;
         for ($i = $this->islandNumberNoBF; $i < $this->islandNumber; $i++) {
             $name = $this->islands[$i]['name'];
             $id = $this->islands[$i]['id'];
             $this->islandListBF .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
+        }
+        if ($this->islandListNoBF === '') {
+            $this->islandListNoBF = $this->nil_list;
+        }
+        if ($this->islandListBF === '') {
+            $this->islandListBF = $this->nil_list;
         }
     }
 }
@@ -1790,14 +1797,15 @@ class HakoPresent extends File
 class HakoKP extends File
 {
     public $islandListNoKP; // 普通の島リスト
-    public $islandListKP;   // 管理人預かり島リスト
+    public $islandListKP;   // 預かり島リスト
+    private $nil_list = '<option disabled>（変更可能な島はありません）</option>';
 
     public function init($cgi)
     {
         global $init;
         $this->readIslandsFile($cgi);
-        $this->islandListNoKP = '<option value="0"></option>'.PHP_EOL;
-        $this->islandListKP = '<option value="0"></option>'.PHP_EOL;
+        $this->islandListNoKP = '';
+        $this->islandListKP = '';
 
         for ($i = 0; $i < $this->islandNumber; $i++) {
             $name = $this->islands[$i]['name'];
@@ -1808,6 +1816,12 @@ class HakoKP extends File
             } else {
                 $this->islandListNoKP .= '<option value="'.$id.'">'.$name.$init->nameSuffix.'</option>'.PHP_EOL;
             }
+        }
+        if ($this->islandListNoKP === '') {
+            $this->islandListNoKP = $this->nil_list;
+        }
+        if ($this->islandListKP === '') {
+            $this->islandListKP = $this->nil_list;
         }
     }
 }

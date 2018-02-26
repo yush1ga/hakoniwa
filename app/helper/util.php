@@ -114,11 +114,11 @@ class Util
 
     /**
      * パスワードチェック
-     * @param  string $p1 [description]
-     * @param  string $p2 [description]
-     * @return [type]     [description]
+     * @param  string $p1
+     * @param  string $p2
+     * @return bool
      */
-    public static function checkPassword(string $p1 = "", string $p2 = ""): bool
+    public static function checkPassword(string $p1, string $p2): bool
     {
         global $init;
 
@@ -134,6 +134,7 @@ class Util
         $fp = fopen($init->passwordFile, "r");
         $masterPasswd = chop(fgets($fp, READ_LINE));
         fclose($fp);
+
         // マスターパスワードチェック
         if (password_verify($p2, $masterPasswd)) {
             return true;

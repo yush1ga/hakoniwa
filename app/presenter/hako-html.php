@@ -887,7 +887,6 @@ END;
         if ($value < 0) {
             $value = -$value;
             $value .= $kind == $init->comSellTree ? $init->unitTree : $init->unitFood;
-
         } elseif ($kind == $init->comHikidasi) {
             $value *= 10;
             $value = $value . $init->unitMoney . ' or '. $value . $init->unitFood;
@@ -2196,7 +2195,7 @@ class HtmlPresent extends HTML
 
         $width  = $init->islandSize * 32 + 50;
         $height = $init->islandSize * 32 + 100;
-        $defaultTarget = "";
+        $defaultTarget = '';
 
         require_once(VIEWS.'/admin/present/main.php');
     }

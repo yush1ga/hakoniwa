@@ -1,15 +1,19 @@
 <?php
+namespace Hakoniwa\Admin;
+
+require_once MODELPATH.'/admin.php';
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
-class Keep extends Admin
+class Keep extends \Admin
 {
     public function execute()
     {
-        $html = new HTMLKeep();
-        $cgi = new Cgi();
-        $hako = new HakoKP();
+        $html = new \HTMLKeep();
+        $cgi = new \Cgi();
+        $hako = new \HakoKP();
         $this->parseInputData();
         $hako->init($this);
         $cgi->getCookies();
@@ -17,31 +21,22 @@ class Keep extends Admin
 
         switch ($this->mode) {
             case "TOKP":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->toMode($this->dataSet['ISLANDID'], $hako);
                     $hako->init($this);
                 }
-                $html->main($this->dataSet, $hako);
 
                 break;
 
             case "FROMKP":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->fromMode($this->dataSet['ISLANDID'], $hako);
                     $hako->init($this);
-                }
-                $html->main($this->dataSet, $hako);
-
-                break;
-
-            case "enter":
-            default:
-                if ($this->passCheck()) {
-                    $html->main($this->dataSet, $hako);
                 }
 
                 break;
         }
+        $html->main($this->dataSet, $hako);
         $html->footer();
     }
 

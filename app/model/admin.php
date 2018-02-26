@@ -34,7 +34,6 @@ class Admin
         fclose($fp);
 
         if (isset($this->dataSet['PASSWORD']) && password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
-
             return true;
         } else {
             HakoError::wrongPassword();

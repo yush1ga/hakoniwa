@@ -44,7 +44,7 @@ class InitDefault
     public $unitTime = 10800;
 
     // ターン更新時の連続更新を許可するか？(0:しない、1:する); 1にすると負荷対策になります
-    public $contUpdate = 1;
+    public $contUpdate = 0;
 
     // 島の最大数 （15以上に増やすとバグが生じやすくなります）
     public $maxIsland = 15;
