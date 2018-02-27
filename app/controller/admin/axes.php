@@ -1,6 +1,7 @@
 <?php
 namespace Hakoniwa\Admin;
 
+require_once MODELPATH.'/admin.php';
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
@@ -19,18 +20,14 @@ class Axes extends \Admin
         $cgi->getCookies();
         $html->header();
 
-        switch ($this->mode) {
-            case "auth":
-                if ($this->passCheck()) {
-                    $html->main($this->dataSet);
-                }
-
-                break;
-            default:
-                $html->passwdChk();
-
-                break;
+        if (isset($this->dataSet['PASSWORD'])) {
+            if ($this->passCheck()) {
+                $html->main($this->dataSet);
+            }
+        } else {
+            $html->passwdChk();
         }
+
         $html->footer();
     }
 }

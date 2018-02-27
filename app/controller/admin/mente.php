@@ -1,6 +1,8 @@
 <?php
 namespace Hakoniwa\Admin\Maintenance;
 
+require_once MODELPATH.'/admin.php';
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
@@ -114,7 +116,7 @@ class Mente extends \Admin
     {
         global $init;
 
-        $dirName = (strcmp($id, "") == 0)? $init->dirName : $init->dirName.".bak{$id}";
+        $dirName = strcmp($id, "") == 0 ? $init->dirName : $init->dirName.".bak{$id}";
         $this->rmTree($dirName);
     }
 
@@ -198,6 +200,10 @@ class Mente extends \Admin
 
             return;
         }
+        if (!isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['SPASS1'])) {
+            \HakoError::necessaryBeSetAnotherPassword();
+        }
+
         $masterPasswd  = \Util::encode($this->dataSet['MPASS1'], false);
         $specialPasswd = \Util::encode($this->dataSet['SPASS1'], false);
         $fp = fopen($init->passwordFile, "w");

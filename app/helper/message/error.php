@@ -78,11 +78,15 @@ class HakoError
     {
         Util::makeTagMessage("特殊パスワードが入力されていないか間違っています", "danger");
     }
+    public static function necessaryBeSetAnotherPassword()
+    {
+        \Util::makeTagMessage('マスタパスワードと特殊パスワードには、別のフレーズを入力してください', 'danger');
+    }
 
     public function __destruct()
     {
         HTML::footer();
-        exit();
+        exit;
     }
 
     /**

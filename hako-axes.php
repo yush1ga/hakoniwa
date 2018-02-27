@@ -9,7 +9,6 @@ namespace Hakoniwa\Admin;
  */
 
 require_once 'config.php';
-require_once MODELPATH.'/admin.php';
 require_once MODELPATH.'/hako-cgi.php';
 require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/axes.php';

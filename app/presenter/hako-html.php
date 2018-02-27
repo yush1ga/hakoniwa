@@ -2210,38 +2210,8 @@ class HtmlMente extends HTML
         global $init;
         $this_file = $init->baseDir.'/hako-mente.php';
 
-        parent::pageTitle($init->title, 'メンテナンスツール');
-
-        if (file_exists($init->passwordFile)) {
-            echo <<<END
-<form action="$this_file" method="post">
-    <label>パスワード：
-    <input type="password" size="64" maxlength="64" name="PASSWORD"></label>
-    <input type="hidden" name="mode" value="enter">
-    <input type="submit" value="ログイン">
-END;
-        } else {
-            echo <<<END
-<p><strong>マスタパスワードと特殊パスワードを決めてください。</strong></p>
-<p>マスタパスワードは、管理者権限でログインするために必要になります。<br>特殊パスワードは、マップエディットで資源を増加させる際などに用います。<br>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
-
-<form action="$this_file" method="post">
-
-<h3>マスタパスワード：</h3>
-<label>(1) <input type="password" name="MPASS1" value="" size=32></label>
-<label>(2) <input type="password" name="MPASS2" value="" size=32></label>
-
-<h3>特殊パスワード：</h3>
-<label>(1) <input type="password" name="SPASS1" value="" size=32></label>
-<label>(2) <input type="password" name="SPASS2" value="" size=32></label>
-
-<hr style="margin:16px;border:0;padding:0;">
-
-<input type="hidden" name="mode" value="setup">
-<input type="submit" value="パスワードを設定する" class="btn btn-primary">
-END;
-        }
-        echo "</form>\n";
+        parent::pageTitle($init->title, 'データ管理ツール');
+        require_once VIEWS.'/admin/Maintenance/enter.php';
     }
 
     public function main($data)
@@ -2254,15 +2224,15 @@ END;
         // データ保存用ディレクトリの存在チェック
         if (!is_dir($dirName)) {
             if (!@mkdir($dirName, $init->dirMode, true)) {
-                Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\nゲーム設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
-                HTML::footer();
+                \Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\nゲーム設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
+                \HTML::footer();
                 exit();
             }
         }
         // データ保存用ディレクトリのパーミッションチェック
         if (!is_writeable($dirName) || !is_readable($dirName)) {
-            Util::makeTagMessage("データ保存用ディレクトリに対する適切な操作権限を所持していません。\nサーバー管理者にお問合せください。", 'danger');
-            HTML::footer();
+            \Util::makeTagMessage("データ保存用ディレクトリに対する適切な操作権限を所持していません。\nサーバー管理者にお問合せください。", 'danger');
+            \HTML::footer();
             exit();
         }
 
@@ -2274,7 +2244,7 @@ END;
 <form action="$this_file" method="post">
     <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
     <input type="hidden" name="mode" value="NEW">
-    <input type="submit" value="新しくデータを作る" class="btn btn-info">
+    <button type="submit" class="btn btn-info">新しくデータを作る</button>
 </form>
 EOT;
         }
@@ -2314,11 +2284,11 @@ EOT;
         echo <<<END
 <h3>ターン：$lastTurn</h3>
 <p><strong>最終更新時刻</strong>：$timeString</p>
-<form action="$this_file" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="mode" value="DELETE">
-	<input type="hidden" name="NUMBER" value="$suf">
-	<input type="submit" class="btn btn-danger btn-sm" value="このデータを削除">
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="DELETE">
+    <input type="hidden" name="NUMBER" value="$suf">
+    <button type="submit" class="btn btn-danger btn-sm">このデータを削除</button>
 </form>
 END;
         if (strcmp($suf, "") == 0) {
@@ -2327,10 +2297,10 @@ END;
             $time['tm_mon']++;
             echo <<<END
 <h4>最終更新時刻の変更</h4>
-<form action="{$this_file}" method="post">
+<form action="$this_file" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
-	<input type="hidden" name="NUMBER" value="{$suf}">
+	<input type="hidden" name="NUMBER" value="$suf">
 	<input type="text" size="4" maxlength="4"name="YEAR" value="{$time['tm_year']}">年
 	<input type="text" size="2" maxlength="2"name="MON" value="{$time['tm_mon']}">月
 	<input type="text" size="2" maxlength="2"name="DATE" value="{$time['tm_mday']}">日
@@ -2342,11 +2312,11 @@ END;
 END;
         } else {
             echo <<<END
-<form action="{$this_file}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	<input type="hidden" name="mode" value="CURRENT">
-	<input type="submit" class="btn btn-warning" value="このデータを現役に">
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="NUMBER" value="$suf">
+    <input type="hidden" name="mode" value="CURRENT">
+    <button type="submit" class="btn btn-warning">このデータを現役に</button>
 </form>
 END;
         }
@@ -2361,11 +2331,13 @@ class HtmlAxes extends HTML
         global $init;
         $this_file = $init->baseDir.'/hako-axes.php';
         parent::pageTitle($init->title, 'アクセスログ');
+
         echo <<<END
-<form action="{$this_file}" method="post">
-	<label>パスワード確認：<input type="password" size="32" maxlength="32" name="PASSWORD"></label>
-	<input type="hidden" name="mode" value="auth">
-	<input type="submit" value="入室する">
+<form action="$this_file" method="post" class="form-inline">
+    <label>パスワード：
+    <input type="password" size="32" name="PASSWORD" class="form-control"></label>
+    <input type="hidden" name="mode" value="auth">
+    <button type="submit" class="btn btn-default">サインイン</button>
 </form>
 END;
     }
@@ -2374,36 +2346,8 @@ END;
     {
         global $init;
         parent::pageTitle($init->title, 'アクセスログ');
-        $this->dataPrint($data);
-    }
 
-    // 表示モード
-    public function dataPrint($data)
-    {
-        global $init;
-
-        echo <<<END
-<hr>
-<form class="container">
-<button class="btn btn-default" onclick="Button_DispFilter(this, 'DATA-TABLE');return false;">オートフィルタ表示</button>
-<table id="DATA-TABLE" class="table table-condensed">
-<thead>
-<tr class="NumberCell">
-	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[0]);return false;">ログインした時間</button></th>
-	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[1,0]);return false;">島ID</button></th>
-	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[2,0]);return false;">島の名前</button></th>
-	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[3,0]);return false;">ＩＰ情報</button></th>
-	<th scope="col"><button class="btn btn-default" onclick="g_cSortTable.Button_Sort('DATA-TABLE',[4,0]);return false;">ホスト情報</button></th>
-</tr>
-</thead>
-<tbody>
-END;
-        $fp = fopen($init->dirName.'/'.$init->logname, 'r');
-        while (false !== ($line = fgets($fp))) {
-            println('<tr><td scope="row">', str_replace(',', "</td><td>", $line), '</td></tr>');
-        }
-        fclose($fp);
-        println("</tbody>\n</table>\n</form>");
+        require_once VIEWS.'/admin/Axes.php';
     }
 }
 
