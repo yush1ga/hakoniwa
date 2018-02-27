@@ -4270,9 +4270,11 @@ class Turn
                         $landValue[$x][$y]++;
                     }
 
+                    /**
+                     * Lv200以上の防災都市が隣接した場合、怪獣は死ぬ。
+                     * エターナルフォースブリザードじゃあないんだよ、なんやねん自分。
+                     */
                     if ((Turn::countAroundValue($island, $x, $y, $init->landProcity, 200, 7)) && ($monsSpec['kind'] != 26)) {
-                        // 周囲1Hexに別の怪獣がいる場合、その怪獣を攻撃する
-                        // 対象の怪獣が倒れて荒地になる
                         $land[$x][$y] = $init->landWaste;
                         $landValue[$x][$y] = 0;
                         $this->log->BariaAttack($id, $name, $lName, "($x,$y)", $mName, $tPoint);
@@ -4280,6 +4282,7 @@ class Turn
                         // 収入
                         $value = $init->monsterValue[$monsSpec['kind']];
                         if ($value > 0) {
+                            $value = max(1, intdiv($value, 10));
                             $island['money'] += $value;
                             $this->log->msMonMoney($id, $target, $mName, $value);
                         }
