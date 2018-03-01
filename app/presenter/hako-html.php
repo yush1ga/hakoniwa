@@ -27,7 +27,7 @@ class HTML
 
 
     /**
-     * HTML <footer>
+     * HTML <footer />
      * @return void
      */
     public static function footer()
@@ -48,9 +48,9 @@ class HTML
     }
 
     /**
-     * [timeToString description]
-     * @param  Integer $t Unixタイムスタンプ
-     * @return String     "Y年n月j日 G時i分s秒"形式の文字列
+     * "Y年n月j日 G時i分s秒"形式の文字列を返す
+     * @param  integer $t Unixタイムスタンプ
+     * @return string
      */
     public function timeToString(int $t): string
     {
@@ -2176,10 +2176,10 @@ class HtmlAdmin extends HTML
         $menuList  = [
             'データ管理'       => '/hako-mente.php',
             'アクセスログ閲覧' => '/hako-axes.php',
-            '島預かり管理'     => '/hako-keep.php',
             'プレゼント'       => '/hako-present.php',
             'マップエディタ'   => '/hako-edit.php',
-            'BF管理'           => '/hako-bf.php'
+            'BF管理'           => '/hako-bf.php',
+            '島預かり管理'     => '/hako-keep.php'
         ];
         require_once(VIEWS.'/admin/top.php');
     }
