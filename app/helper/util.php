@@ -188,12 +188,12 @@ class Util
 
     /**
      * [0, num-1]の乱数生成
-     * @param  integer $num 正の整数（通例2以上）
-     * @return float   [0, $num-1]の範囲の実数
+     * @param  int $num 正の整数（通例2以上）
+     * @return int      [0, $num-1]の範囲の整数
      */
-    public static function random($num = 0)
+    public static function random(int $num = 0): int
     {
-        return ($num > 1)? mt_rand(0, $num - 1) : 0;
+        return $num > 1 ? mt_rand(0, $num - 1) : 0;
     }
 
     /**
@@ -379,7 +379,7 @@ class Util
             }
         }
 
-        return ($badShips!=0);
+        return $badShips !== 0;
     }
 
     /**
@@ -409,7 +409,7 @@ class Util
 
     /**
      * ファイルをアンロックする
-     * @param  [type] $fp [description]
+     * @param  [type] $fp file pointer
      * @return void
      */
     public static function unlock($fp)
@@ -425,7 +425,7 @@ class Util
      * @param  string $status  アラート種類："success","info","warning","danger".
      * @return void
      */
-    public static function makeTagMessage($message, $status = "success")
+    public static function makeTagMessage($message, $status = 'success')
     {
         echo '<div class="alert alert-'.$status.'" role="alert">';
         echo nl2br($message, false);
@@ -437,7 +437,7 @@ class Util
      * @param  integer $max [description]
      * @return [type]       [description]
      */
-    public static function rand_string(int $max = 32):string
+    public static function rand_string(int $max = 32): string
     {
         return substr(md5(uniqid(rand_number(), true)), 0, $max);
     }
@@ -487,6 +487,8 @@ class Util
     }
 }
 
+
+
 function println(...$strs)
 {
     foreach ($strs as $str) {
@@ -494,6 +496,7 @@ function println(...$strs)
     }
     echo PHP_EOL;
 }
+
 function h(string $str): string
 {
     return preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($str, ENT_QUOTES, 'UTF-8'));

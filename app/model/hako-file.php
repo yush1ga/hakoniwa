@@ -28,7 +28,7 @@ class File
      * @param  [type] &$cgi [description]
      * @return [type]       [description]
      */
-    public function readIslandsFile(&$cgi)
+    public function readIslandsFile(&$cgi): bool
     {
         global $init;
 
@@ -221,47 +221,53 @@ class File
     /**
      * 地形データの書込
      * @param  integer $num    島ID
-     * @param  [type] $island [description]
+     * @param  array   $island 島データ
      * @return [type]         [description]
      */
-    public function writeLand(int $num, $island)
+    public function writeLand(int $num, array $island)
     {
         global $init;
-        if (($num <= -1) || ($num == $island['id'])) {
-            $fileName = $init->dirName."/island.{$island['id']}";
-
-            if (!is_file($fileName)) {
-                touch($fileName);
-            }
-            $fp_i = fopen($fileName, "w");
-
-            // 地形
-            $land = $island['land'];
-            $landValue = $island['landValue'];
-            for ($y = 0; $y < $init->islandSize; $y++) {
-                for ($x = 0; $x < $init->islandSize; $x++) {
-                    $l = sprintf("%02x%05x", $land[$x][$y], $landValue[$x][$y]);
-                    fputs($fp_i, $l);
-                }
-                fputs($fp_i, "\n");
-            }
-            // コマンド
-            $command = $island['command'];
-            for ($i = 0; $i < $init->commandMax; $i++) {
-                $com = sprintf(
-                    "%d,%d,%d,%d,%d\n",
-                    $command[$i]['kind'],
-                    $command[$i]['target'],
-                    $command[$i]['x'],
-                    $command[$i]['y'],
-                    $command[$i]['arg']
-                );
-                fputs($fp_i, $com);
-            }
-
-            fclose($fp_i);
+        if ($num > -1 && $num != $island['id']) {
+            return;
         }
+
+        $fileName = $init->dirName."/island.{$island['id']}";
+
+        if (!is_file($fileName)) {
+            touch($fileName);
+        }
+        $fp_i = fopen($fileName, "w");
+
+        // 地形
+        $land = $island['land'];
+        $landValue = $island['landValue'];
+
+        for ($y = 0; $y < $init->islandSize; $y++) {
+            for ($x = 0; $x < $init->islandSize; $x++) {
+                $land[$x][$y] %= 256;// 0-FF
+                $landValue[$x][$y] %= 1048576;// 0-FFFFF
+                $l = sprintf("%02x%05x", $land[$x][$y], $landValue[$x][$y]);
+                fputs($fp_i, $l);
+            }
+            fputs($fp_i, "\n");
+        }
+        // コマンド
+        $commands = $island['command'];
+        for ($i = 0; $i < $init->commandMax; $i++) {
+            $com = sprintf(
+                "%d,%d,%d,%d,%d\n",
+                $commands[$i]['kind'],
+                $commands[$i]['target'],
+                $commands[$i]['x'],
+                $commands[$i]['y'],
+                $commands[$i]['arg']
+            );
+            fputs($fp_i, $com);
+        }
+
+        fclose($fp_i);
     }
+
     /**
      * 同盟データファイル読込み
      * @return [type] [description]

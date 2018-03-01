@@ -1,25 +1,24 @@
 <div id="islandInfo" class="table-responsive">
     <table class="table table-bordered table-condensed">
-        <thead>
-            <tr>
-                <th><?= $init->nameRank ?></th>
-                <th><?= $init->namePopulation ?></th>
-                <th><?= $init->nameArea ?></th>
-                <th><?= $init->nameFunds ?><?= $lots ?></th>
-                <th><?= $init->nameFood ?></th>
-                <th><?= $init->nameUnemploymentRate ?></th>
-                <th><?= $init->nameFarmSize ?></th>
-                <th><?= $init->nameFactoryScale ?></th>
-                <th><?= $init->nameCommercialScale ?></th>
-                <th><?= $init->nameMineScale ?></th>
-                <th><?= $init->namePowerPlantScale ?></th>
-                <th><?= $init->namePowerSupplyRate ?></th>
-            </tr>
-        </thead>
+    <thead>
         <tr>
-            <th class="NumberCell" rowspan="4">
-                <?= $init->tagNumber_.$rank.$init->_tagNumber ?>
-            </th>
+            <th><?= $init->nameRank ?></th>
+            <th><?= $init->namePopulation ?></th>
+            <th><?= $init->nameArea ?></th>
+            <th><?= $init->nameFunds ?><?= $lots ?></th>
+            <th><?= $init->nameFood ?></th>
+            <th><?= $init->nameUnemploymentRate ?></th>
+            <th><?= $init->nameFarmSize ?></th>
+            <th><?= $init->nameFactoryScale ?></th>
+            <th><?= $init->nameCommercialScale ?></th>
+            <th><?= $init->nameMineScale ?></th>
+            <th><?= $init->namePowerPlantScale ?></th>
+            <th><?= $init->namePowerSupplyRate ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th class="NumberCell number" rowspan="4"><?= $rank ?></th>
             <td class="InfoCell"><?= $pop ?></td>
             <td class="InfoCell"><?= $area ?></td>
             <td class="InfoCell"><?= $money ?></td>
@@ -51,5 +50,6 @@
         <tr>
             <td colspan="11" class="CommentCell"><?= $comment ?></td>
         </tr>
+    </tbody>
     </table>
 </div>

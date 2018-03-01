@@ -7,8 +7,6 @@ node_modules/
 /beta/**/*.js
 *.js.map
 
-\.vs/
-
 composer.lock
 vendor/
 

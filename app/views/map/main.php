@@ -8,10 +8,12 @@
 ?>
 
 <form action="<?=$this_file?>" method="get" class="text-center">
-    <select name="Sight" class="form-control">
-        <?= strip_tags($hako->islandList, '<option>') ?>
-    </select>
-    <button type="submit" class="btn btn-default">観光</button>
+    <div class="form-group"><div class="form-inline">
+        <select name="Sight" class="form-control">
+            <?= strip_tags($hako->islandList, '<option>') ?>
+        </select>
+        <button type="submit" class="btn btn-default">→観光</button>
+    </div></div>
 </form>
 
 <?php

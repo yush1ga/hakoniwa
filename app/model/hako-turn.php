@@ -4289,14 +4289,15 @@ class Turn
 
                         break;
                     }
-                    // 硬化中?
+
+                    // 硬化中は何もしない
                     if ((($special & 0x4) && (($hako->islandTurn % 2) == 1)) ||
                         (($special & 0x10) && (($hako->islandTurn % 2) == 0))) {
-                        // 硬化中
                         break;
                     }
+
+                    // 仲間を呼ぶ
                     if ($special & 0x20) {
-                        // 仲間を呼ぶ怪獣
                         if ((Util::random(100) < 5) && ($pop >= $init->disMonsBorder1)) {
                             // 怪獣出現
                             $pop = $island['pop'];
@@ -4340,15 +4341,13 @@ class Turn
                             }
                         }
                     }
-                    // ワープする怪獣
+                    // ワープする
                     if ($special & 0x40) {
-                        $r = mt_rand(0, 100);
-                        if ($r < 20) { // 20%
-                            // ワープする
+                        if (mt_rand(0, 100) < 20) { // 20%
+                            // ワープ実行
                             $tg;
                             $tIsland = $island;
-                            $r = mt_rand(0, 100);
-                            if ($r < 50) { // 50%
+                            if (mt_rand(0, 100) < 50) { // 50%
                                 // ワープする島を決める
                                 $tg = Util::random($hako->islandNumber);
                                 $tIsland = $hako->islands[$tg];
@@ -5038,7 +5037,7 @@ class Turn
         }
 
         // 暴動判定
-        $island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
+        $island['pop'] = $island['pop'] < 1 ? 1 : $island['pop'];
         $unemployed = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
         if (($island['isBF'] != 1) && (Util::random(1000) < $unemployed) && ($unemployed > $init->disPoo) && ($island['pop'] >= $init->disPooPop)) {
             // 暴動発生
