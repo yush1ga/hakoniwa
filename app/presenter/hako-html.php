@@ -587,8 +587,14 @@ class HtmlMap extends HTML
         $timedata = date("Y年m月d日(D) H時i分s秒");
         $islandID = $data['ISLANDID'];
         $name = $island['name'].$init->nameSuffix;
-        $ip = (getenv('REMOTE_ADDR', true)?:getenv('REMOTE_ADDR'))?:'192.0.2.0';
-        $host = gethostbyaddr($ip);
+        $ip = getenv('REMOTE_ADDR', true);
+        if ($ip){
+            $host = gethostbyaddr($ip);
+        }
+        else {
+            $ip = '192.0.2.0';
+            $host = 'unknown';
+        }
 
         // ファイル頭に追記して最大容量超過分を切り捨て
         fputs($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
