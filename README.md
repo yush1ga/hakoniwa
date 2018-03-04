@@ -31,6 +31,7 @@
 ## はうつーぷれい
 
 1. 任意のディレクトリ（`/var/www/html`とか）にclone
+1. コンソールから`bin/composer install`（Windows鯖の人は別途インストーラをご利用くだしあ）
 1. `/hako-init-default.php`を参考にして、`/hako-init.php`をお好みに設定
 1. ブラウザでトップディレクトリを開く
 1. 指示に従い管理パスワード、ゲームデータを設定

@@ -6,7 +6,7 @@
 
 // ▼ デバッグモード　ON/OFF
 // true:デバッグON、 false:デバッグOFF
-define("DEBUG", true);
+define("DEBUG", false);
 
 
 
