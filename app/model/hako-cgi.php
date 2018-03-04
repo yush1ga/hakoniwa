@@ -7,7 +7,7 @@
  */
 class Cgi
 {
-    public $mode = "";
+    public $mode = '';
     public $dataSet = [];
 
     /**
@@ -18,7 +18,7 @@ class Cgi
     {
         global $init;
 
-        $this->mode = $_POST['mode'] ?? "";
+        $this->mode = $_POST['mode'] ?? '';
 
         if (!empty($_POST)) {
             while (list($name, $value) = each($_POST)) {

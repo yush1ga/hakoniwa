@@ -16,3 +16,6 @@
 			</div>
 		</nav>
 	</header>
+    <?php if (DEBUG) {
+    var_dump($_POST);
+} ?>

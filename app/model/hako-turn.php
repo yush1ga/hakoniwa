@@ -21,8 +21,8 @@ class Turn
      *
      * 最終更新時刻の更新→ ログファイル更新準備→ 収支計算→
      *   コマンド処理→ 島処理（座標個別）→ 島処理（全体）→
-     *
-     *
+     *   ターン杯処理→ 点数計算→ バックアップ→
+     *   ログ更新
      * @param  [type] &$hako ゲームデータ管理オブジェクト
      * @param  [type] $data  [description]
      * @return [type]        [description]
@@ -31,7 +31,7 @@ class Turn
     {
         global $init;
 
-        $this->log = new Log();
+        $this->log = new Log;
 
         // 最終更新時刻を更新
         $uptime = ($init->contUpdate == 1) ? 1 : intdiv($_SERVER['REQUEST_TIME'] - $hako->islandLastTime, $init->unitTime);
@@ -131,7 +131,9 @@ class Turn
                 // 死滅メッセージ
                 $this->log->dead($island['name']);
             }
-            if (isset($island['isDead']) && $island['isDead']) {
+
+            // 死んでたらファイル消す
+            if ($island['isDead'] ?? false) {
                 $island['pop']   = 0;
                 $island['point'] = 0;
 
@@ -3583,15 +3585,14 @@ class Turn
         $landValue = $island['landValue'];
         $oilFlag = $island['oil'];
 
-        // 増える人口のタネ値
-        $addpop  = 10; // 村、町
-        $addpop2 = 0;  // 都市
-
         // ???
         $pop = $island['pop'];
 
         $island['propaganda'] = $island['propaganda'] ?? 0;
 
+        // 増える人口のタネ値
+        $addpop  = 10; // 村、町
+        $addpop2 = 0;  // 都市
         // 人口タネ値修正
         // 食糧不足（-30）、 海賊船滞留中（0）、
         // 誘致活動（30,3）、遊園地がある（20,1)
@@ -3603,8 +3604,8 @@ class Turn
             $addpop = 30;
             $addpop2 = 3;
         } elseif ($island['park'] > 0) {
-            $addpop  += 10;
-            $addpop2 += 1;
+            $addpop  = 20;
+            $addpop2 = 1;
         } else {
         }
 
@@ -3954,7 +3955,7 @@ class Turn
                             $land[$x][$y] = $init->landMonster;
                             $landValue[$x][$y] = $lv;
                             // 怪獣情報
-                            $monsSpec = Util::monsterSpec($lv);
+                            $mName = Util::monsterSpec($lv)['name'];
                             // メッセージ
                             $this->log->EggBomb($id, $name, $mName, "($x,$y)", $lName);
 
@@ -3969,9 +3970,7 @@ class Turn
                     $nt = Turn::countAround($land, $x, $y, 19, [$init->landTown]); // 周囲2ヘックスの人口
                     $ns = Turn::countAround($land, $x, $y, 19, [$init->landSeaSide]); // 周囲2ヘックスの砂浜収容人数
                     // 収益の計算
-                    if ($nt > 0) {
-                        $value = $ns / $nt;
-                    }
+                    $value = $nt > 0 ? $ns / $nt : 0;
                     $value = (int)($lv * $value * $nt);
                     if ($value > 0) {
                         $island['money'] += $value;
@@ -4254,11 +4253,9 @@ class Turn
 
                 case $init->landMonster:
                     // 怪獣
-                    if (isset($monsterMove[$x][$y])) {
-                        if ($monsterMove[$x][$y] == 2) {
-                            // すでに動いた後
-                            break;
-                        }
+                    if (isset($monsterMove[$x][$y]) && $monsterMove[$x][$y] == 2) {
+                        // すでに動いた後
+                        break;
                     }
                     // 各要素の取り出し
                     $monsSpec = Util::monsterSpec($landValue[$x][$y]);
@@ -4277,14 +4274,14 @@ class Turn
                     if ((Turn::countAroundValue($island, $x, $y, $init->landProcity, 200, 7)) && ($monsSpec['kind'] != 26)) {
                         $land[$x][$y] = $init->landWaste;
                         $landValue[$x][$y] = 0;
-                        $this->log->BariaAttack($id, $name, $lName, "($x,$y)", $mName, $tPoint);
+                        $this->log->BariaAttack($id, $name, "($x,$y)", $mName);
 
                         // 収入
                         $value = $init->monsterValue[$monsSpec['kind']];
                         if ($value > 0) {
                             $value = max(1, intdiv($value, 10));
                             $island['money'] += $value;
-                            $this->log->msMonMoney($id, $target, $mName, $value);
+                            $this->log->msMonMoney($id, $id, $mName, $value);
                         }
 
                         break;
@@ -4412,11 +4409,10 @@ class Turn
                             // ワープしない
                         }
                     }
+                    // 瀕死になると大爆発
                     if ($special & 0x400) {
-                        // 瀕死になると大爆発
-                        if ($monsSpec['hp'] <= 1) { // 残り体力１なら
+                        if ($monsSpec['hp'] <= 1) { // 残り体力1以下なら爆発する
                             $point = "({$x}, {$y})";
-                            // 瀕死になったので爆発する
                             $this->log->MonsExplosion($id, $name, $point, $mName);
                             // 広域被害ルーチン
                             $this->wideDamage($id, $name, $land, $landValue, $x, $y);
@@ -4424,39 +4420,39 @@ class Turn
                             break;
                         }
                     }
+                    // 出現中はお金を増やしてくれる
                     if ($special & 0x1000) {
-                        // 出現中はお金を増やしてくれる
                         $point = "({$x}, {$y})";
-                        $money = (Util::random(100) + 1); // 1億円～100億円
+                        $money = (Util::random(100) + 1);
                         $island['money'] += $money;
-                        $str = "{$money}{$init->unitMoney}";
+                        $str = $money.$init->unitMoney;
                         $this->log->MonsMoney($id, $name, $mName, $point, "$str");
                     }
+                    // 出現中は食料を増やしてくれる
                     if ($special & 0x2000) {
-                        // 出現中は食料を増やしてくれる
                         $point = "({$x}, {$y})";
-                        $food  = (Util::random(10) + 1); // 1000トン～10000トン
+                        $food  = (Util::random(10) + 1);
                         $island['food'] += $food;
-                        $str = "{$food}{$init->unitFood}";
-
+                        $str = $food.$init->unitFood;
                         $this->log->MonsFood($id, $name, $mName, $point, "$str");
                     }
+                    // 出現中はお金を減らしてしまう
                     if ($special & 0x4000) {
-                        // 出現中はお金を減らしてしまう
                         $point = "({$x}, {$y})";
-                        $money = (Util::random(100) + 1); // 1億円～100億円
+                        $money = (Util::random(100) + 1);
                         $island['money'] -= $money;
-                        $str = "{$money}{$init->unitMoney}";
+                        $str = $money.$init->unitMoney;
                         $this->log->MonsMoney2($id, $name, $mName, $point, "$str");
                     }
+                    // 出現中は食料を腐らせてしまう
                     if ($special & 0x10000) {
-                        // 出現中は食料を腐らせてしまう
                         $point = "({$x}, {$y})";
-                        $food  = (Util::random(10) + 1); // 1000トン～10000トン
+                        $food  = (Util::random(10) + 1);
                         $island['food'] -= $food;
-                        $str = "{$food}{$init->unitFood}";
+                        $str = $food.$init->unitFood;
                         $this->log->MonsFood2($id, $name, $mName, $point, "$str");
                     }
+
                     // 動く方向を決定
                     for ($j = 0; $j < 3; $j++) {
                         $d = Util::random(6) + 1;
@@ -4471,8 +4467,7 @@ class Turn
                             $sx--;
                         }
                         // 範囲外判定
-                        if (($sx < 0) || ($sx >= $init->islandSize) ||
-                            ($sy < 0) || ($sy >= $init->islandSize)) {
+                        if (!\Util::isInnerLand($sx, $sy)) {
                             continue;
                         }
                         // 海、船舶、海基、海防、海底都市、海上都市、海底消防署、養殖場、油田、港、怪獣、山、ぞらす、記念碑以外
@@ -4499,61 +4494,57 @@ class Turn
                         // 動かなかった
                         break;
                     }
-                    // 動いた先の地形によりメッセージ
-                    $l = $land[$sx][$sy];
-                    $lv = $landValue[$sx][$sy];
-                    $lName = $this->landName($l, $lv);
+
+                    // 動く先の地形によりメッセージ分岐
+                    $toL = $land[$sx][$sy];
+                    $toLv = $landValue[$sx][$sy];
+                    $toLName = $this->landName($toL, $toLv);
                     $point = "({$sx}, {$sy})";
 
                     // 移動
                     $land[$sx][$sy] = $land[$x][$y];
                     $landValue[$sx][$sy] = $landValue[$x][$y];
 
-                    if (($special & 0x20000) && (Util::random(100) < 30)) { // 分裂確率30%
-                        // 分裂する怪獣
-                        // もと居た位置を怪獣に
-                        $land[$bx][$by] = $init->landMonster;
-                        $landValue[$bx][$by] = $lv;
+                    // 分裂？
+                    if (($special & 0x20000) && (Util::random(1000) < $init->rateMonsterDivision)) {
+                        $monsterMove[$x][$y] = 2;
                         // 怪獣情報
-                        $monsSpec = Util::monsterSpec($lv);
+                        $monsSpec = Util::monsterSpec($land[$x][$y]);
                         // メッセージ
-                        $this->log->monsBunretu($id, $name, $lName, $point, $mName);
+                        $this->log->monsBunretu($id, $name, $toLName, $point, $mName);
                     } else {
                         // もと居た位置を荒地に
                         $land[$x][$y] = $init->landWaste;
                         $landValue[$x][$y] = 0;
                     }
+
                     // 移動済みフラグ
                     if ($init->monsterSpecial[$monsSpec['kind']] & 0x2) {
                         // 移動済みフラグは立てない
                     } elseif ($init->monsterSpecial[$monsSpec['kind']] & 0x1) {
                         // 速い怪獣
-                        if (isset($monsterMove[$sx][$sy])) {
-                            $monsterMove[$sx][$sy] = $monsterMove[$x][$y] + 1;
-                        } else {
-                            $monsterMove[$sx][$sy] = 1;
-                        }
+                        $monsterMove[$sx][$sy] = isset($monsterMove[$sx][$sy]) ? $monsterMove[$x][$y] + 1 : 1;
                     } else {
                         // 普通の怪獣
                         $monsterMove[$sx][$sy] = 2;
                     }
-                    if (($l == $init->landDefence) && ($init->dBaseAuto == 1)) {
-                        // 防衛施設を踏んだ
-                        $this->log->monsMoveDefence($id, $name, $lName, $point, $mName);
 
+                    // 防衛施設を踏んだ && 自爆設定オン
+                    if (($toL == $init->landDefence) && ($init->dBaseAuto == 1)) {
+                        $this->log->monsMoveDefence($id, $name, $toLName, $point, $mName);
                         // 広域被害ルーチン
                         $this->wideDamage($id, $name, $land, $landValue, $sx, $sy);
                     } else {
                         // 行き先が荒地になる
                         if ($island['isBF'] != 1) {
-                            $this->log->monsMove($id, $name, $lName, $point, $mName);
+                            $this->log->monsMove($id, $name, $toLName, $point, $mName);
                         }
                     }
 
                     break;
 
+                // 捕獲怪獣
                 case $init->landSleeper:
-                    // 捕獲怪獣
                     // 各要素の取り出し
                     $monsSpec = Util::monsterSpec($landValue[$x][$y]);
                     $special  = $init->monsterSpecial[$monsSpec['kind']];
@@ -4567,316 +4558,316 @@ class Turn
 
                     break;
 
+                // 船舶
                 case $init->landShip:
-                    // 船舶
-                    if (isset($shipMove[$x][$y])) {
-                        if ($shipMove[$x][$y] != 1) {
-                            //船がまだ動いていない時
-                            $ship = Util::navyUnpack($landValue[$x][$y]);
-                            $lName = $init->shipName[$ship[1]];
-                            // $belongIsland = (isset($hako->islands[$ship[0]]['name']))? $hako->islands[$ship[0]]['name']."島所属" : "島籍不明";
-                            // $lName .= "（{$belongIsland}）";
+                    //船が既に動いていた時
+                    if (!isset($shipMove[$x][$y]) || $shipMove[$x][$y] == 1) {
+                        break;
+                    }
+                    $ship = Util::navyUnpack($landValue[$x][$y]);
+                    $lName = $init->shipName[$ship[1]];
+                    // $belongIsland = (isset($hako->islands[$ship[0]]['name']))? $hako->islands[$ship[0]]['name']."島所属" : "島籍不明";
+                    // $lName .= "（{$belongIsland}）";
 
-                            $tn = &$hako->idToNumber[$ship[0]];
-                            $tIsland = &$hako->islands[$tn];
-                            $tName = &$hako->idToName[$ship[0]];
+                    $tn = &$hako->idToNumber[$ship[0]];
+                    $tIsland = &$hako->islands[$tn];
+                    $tName = &$hako->idToName[$ship[0]];
 
-                            if ($init->shipCost[$ship[1]] > $tIsland['money'] && $ship[0] != 0) {
-                                // 維持費を払えなくなり海の藻屑となる
-                                $this->log->ShipRelease($id, $ship[0], $name, $tName, "($x,$y)", $init->shipName[$ship[1]]);
-                                $land[$x][$y] = $init->landSea;
-                                $landValue[$x][$y] = 0;
+                    if ($init->shipCost[$ship[1]] > $tIsland['money'] && $ship[0] != 0) {
+                        // 維持費を払えなくなり海の藻屑となる
+                        $this->log->ShipRelease($id, $ship[0], $name, $tName, "($x,$y)", $init->shipName[$ship[1]]);
+                        $land[$x][$y] = $init->landSea;
+                        $landValue[$x][$y] = 0;
 
-                                break;
-                            }
+                        break;
+                    }
 
-                            if ($ship[1] == 2) {
-                                // 海底探索船
-                                $cntTreasure = Turn::countAroundValue($island, $x, $y, $init->landSea, 100, 7);
-                                if ($cntTreasure) {
-                                    // 周囲1ヘックス以内に財宝あり
-                                    for ($s1 = 0; $s1 < 7; $s1++) {
-                                        $sx = $x + $init->ax[$s1];
-                                        $sy = $y + $init->ay[$s1];
-                                        // 行による位置調整
-                                        if ((($sy % 2) == 0) && (($y % 2) == 1)) {
-                                            $sx--;
-                                        }
-                                        if (($sx < 0) || ($sx >= $init->islandSize) || ($sy < 0) || ($sy >= $init->islandSize)) {
-                                            // 範囲外の場合何もしない
-                                            continue;
-                                        } else {
-                                            // 範囲内の場合
-                                            if ($land[$sx][$sy] == $init->landSea && $landValue[$sx][$sy] >= 100) {
-                                                // 財宝発見
-                                                if ($ship[0] == $island['id']) {
-                                                    // 自島所属であればすぐに財宝回収
-                                                    $island['money'] += $landValue[$sx][$sy];
-                                                } else {
-                                                    // 他島所属であれば積載して帰還するまで回収しない
-                                                    $ship[3] = round($landValue[$sx][$sy] / 1000);
-                                                    $ship[4] = round(($landValue[$sx][$sy] - $ship[3] * 1000) /100);
-                                                    $landValue[$x][$y] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
-                                                }
-                                                $tName = $hako->idToName[$ship[0]];
-                                                $this->log->FindTreasure($id, $ship[0], $name, $tName, "($x,$y)", $init->shipName[$ship[1]], $landValue[$sx][$sy]);
-
-                                                // 財宝があった地形は海になる
-                                                $land[$sx][$sy] = $init->landSea;
-                                                $landValue[$sx][$sy] = 0;
-
-                                                break;
-                                            }
-                                        }
-                                    }
+                    if ($ship[1] == 2) {
+                        // 海底探索船
+                        $cntTreasure = Turn::countAroundValue($island, $x, $y, $init->landSea, 100, 7);
+                        if ($cntTreasure) {
+                            // 周囲1ヘックス以内に財宝あり
+                            for ($s1 = 0; $s1 < 7; $s1++) {
+                                $sx = $x + $init->ax[$s1];
+                                $sy = $y + $init->ay[$s1];
+                                // 行による位置調整
+                                if ((($sy % 2) == 0) && (($y % 2) == 1)) {
+                                    $sx--;
                                 }
-                            } elseif ($ship[1] == 3) {
-                                // 戦艦
-                                if ($island['monster'] > 0 && $ship[4] != intval($hako->islandTurn) % 10) {
-                                    // 怪獣が出現しており、現在のターンで未攻撃の場合
-                                    for ($s2 = 0; $s2 < $init->pointNumber; $s2++) {
-                                        $sx = $this->rpx[$s2];
-                                        $sy = $this->rpy[$s2];
-                                        if ($land[$sx][$sy] == $init->landMonster || $land[$sx][$sy] == $init->landSleeper) {
-                                            // 対象となる怪獣の各要素取り出し
-                                            $monsSpec = Util::monsterSpec($landValue[$sx][$sy]);
-                                            $tLv = $landValue[$sx][$sy];
-                                            $tspecial  = $init->monsterSpecial[$monsSpec['kind']];
-                                            $tmonsName = $monsSpec['name'];
-                                            // 硬化中?
-                                            if ((($tspecial & 0x4) && (($hako->islandTurn % 2) == 1)) ||
-                                            (($tspecial & 0x10) && (($hako->islandTurn % 2) == 0))) {
-                                                // 硬化中なら効果なし
-                                                break;
-                                            }
-                                            if ($monsSpec['hp'] > 1) {
-                                                // 対象の体力を減らす
-                                                $landValue[$sx][$sy]--;
-                                            } else {
-                                                // 対象の怪獣が倒れて荒地になる
-                                                $land[$sx][$sy] = $init->landWaste;
-                                                $landValue[$sx][$sy] = 0;
-
-                                                // 収入
-                                                $value = $init->monsterValue[$monsSpec['kind']];
-                                                if ($value > 0) {
-                                                    $island['money'] += $value;
-                                                    $this->log->msMonMoney($id, '', $tmonsName, $value);
-                                                }
-                                            }
-                                            $tName = $hako->idToName[$ship[0]];
-                                            $this->log->SenkanMissile($id, $ship[0], $name, $tName, $lName, "($x,$y)", "($sx,$sy)", $tmonsName);
-
-                                            break;
-                                        }
-                                    }
-                                    // 1ターンに1度しか攻撃できない
-                                    $ship[4] = intval($hako->islandTurn) % 10;
+                                if (($sx < 0) || ($sx >= $init->islandSize) || ($sy < 0) || ($sy >= $init->islandSize)) {
+                                    // 範囲外の場合何もしない
+                                    continue;
                                 } else {
-                                }
-                                // 海賊船が出現していた場合攻撃する
-                                $cntViking = Turn::countAround($land, $x, $y, 19, [$init->landShip]);
-                                if ($cntViking && $ship[4] != intval($hako->islandTurn) % 10) {
-                                    //周囲2ヘックス以内に船舶あり
-                                    for ($s3 = 0; $s3 < 19; $s3++) {
-                                        $sx = $x + $init->ax[$s3];
-                                        $sy = $y + $init->ay[$s3];
-                                        // 行による位置調整
-                                        if ((($sy % 2) == 0) && (($y % 2) == 1)) {
-                                            $sx--;
-                                        }
-                                        if (($sx < 0) || ($sx >= $init->islandSize) || ($sy < 0) || ($sy >= $init->islandSize)) {
-                                            // 範囲外の場合何もしない
-                                            continue;
+                                    // 範囲内の場合
+                                    if ($land[$sx][$sy] == $init->landSea && $landValue[$sx][$sy] >= 100) {
+                                        // 財宝発見
+                                        if ($ship[0] == $island['id']) {
+                                            // 自島所属であればすぐに財宝回収
+                                            $island['money'] += $landValue[$sx][$sy];
                                         } else {
-                                            // 範囲内の場合
-                                            if ($land[$sx][$sy] == $init->landShip) {
-                                                $tShip = Util::navyUnpack($landValue[$sx][$sy]);
-                                                $tName = $hako->idToName[$ship[0]];
-                                                $tshipName = $init->shipName[$tShip[1]];
-                                                if ($tShip[1] > $init->shipKind) {
-                                                    // 海賊船だった場合攻撃する
-                                                    $tShip[2] -= 2;
-                                                    if ($tShip[2] <= 0) {
-                                                        // 海賊船を沈没させた
-                                                        $land[$sx][$sy] = $init->landSea;
-                                                        $this->log->SenkanAttack($id, $ship[0], $name, $tName, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $tshipName);
-                                                        $this->log->BattleSinking($id, $tShip[0], $name, $tshipName, "($sx,$sy)");
-                                                        // 30%の確率で財宝になる
-                                                        $treasure = $tShip[3] * 1000 + $tShip[4] * 100;
-                                                        if (Util::random(100) < 30 && $treasure > 0) {
-                                                            $landValue[$sx][$sy] = $treasure;
-                                                            $this->log->VikingTreasure($id, $name, "($sx,$sy)");
-                                                        } else {
-                                                            $landValue[$sx][$sy] = 0;
-                                                        }
-                                                    } else {
-                                                        // 海賊船にダメージ与えた
-                                                        $landValue[$sx][$sy] = Util::navyPack($tShip[0], $tShip[1], $tShip[2], $tShip[3], $tShip[4]);
-                                                        $this->log->SenkanAttack($id, $ship[0], $name, $tName, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $tshipName);
-                                                    }
-
-                                                    break;
-                                                }
-                                            }
+                                            // 他島所属であれば積載して帰還するまで回収しない
+                                            $ship[3] = round($landValue[$sx][$sy] / 1000);
+                                            $ship[4] = round(($landValue[$sx][$sy] - $ship[3] * 1000) /100);
+                                            $landValue[$x][$y] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
                                         }
-                                    }
-                                    // 1ターンに1度しか攻撃できない
-                                    $ship[4] = intval($hako->islandTurn) % 10;
-                                }
-                            } elseif ($ship[1] > $init->shipKind) {
-                                // 海賊船
-                                if (Util::random(1000) < $init->disVikingRob) {
-                                    // 強奪
-                                    $vMoney = round(Util::random($island['money'])/10);
-                                    $vFood  = round(Util::random($island['food'])/10);
-                                    $island['money'] -= $vMoney;
-                                    $island['food'] -= $vFood;
-                                    $this->log->RobViking($island['id'], $island['name'], "($x,$y)", $init->shipName[$ship[1]], $vMoney, $vFood);
+                                        $tName = $hako->idToName[$ship[0]];
+                                        $this->log->FindTreasure($id, $ship[0], $name, $tName, "($x,$y)", $init->shipName[$ship[1]], $landValue[$sx][$sy]);
 
-                                    // 所持金
-                                    $treasure = $ship[3] * 1000 + $ship[4] * 100;
-                                    $treasure += $vMoney;
-                                    $ship[3] = $treasure / 1000;
-                                    $ship[4] = ($treasure - $ship[1] * 1000) / 100;
-                                    // 海賊船ステータス更新
-                                    $landValue[$x][$y] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
-                                }
-                                // 攻撃
-                                $cntShip = Turn::countAround($land, $x, $y, 19, [$init->landPort, $init->landShip, $init->landFroCity]);
-                                if ($cntShip) {
-                                    //周囲2ヘックス以内に港または船舶または海上都市あり
-                                    if (Util::random(1000) < $init->disVikingAttack) {
-                                        // 海賊船の襲撃
-                                        for ($s4 = 0; $s4 < 19; $s4++) {
-                                            $sx = $x + $init->ax[$s4];
-                                            $sy = $y + $init->ay[$s4];
-                                            // 行による位置調整
-                                            if ((($sy % 2) == 0) && (($y % 2) == 1)) {
-                                                $sx--;
-                                            }
-                                            if (($sx < 0) || ($sx >= $init->islandSize) || ($sy < 0) || ($sy >= $init->islandSize)) {
-                                                // 範囲外の場合何もしない
-                                                continue;
-                                            } else {
-                                                // 範囲内の場合
-                                                if ($land[$sx][$sy] == $init->landPort) {
-                                                    // 港の場合浅瀬になる
-                                                    $land[$sx][$sy] = $init->landSea;
-                                                    $landValue[$sx][$sy] = 1;
-                                                    $this->log->BattleSinking($id, 0, $name, $this->landName($init->landPort, 1), "($sx,$sy)");
-                                                    $this->log->VikingAttack($id, $id, $name, $name, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $this->landName($init->landPort, 1));
+                                        // 財宝があった地形は海になる
+                                        $land[$sx][$sy] = $init->landSea;
+                                        $landValue[$sx][$sy] = 0;
 
-                                                    break;
-                                                } elseif ($land[$sx][$sy] == $init->landShip) {
-                                                    // 船舶の場合
-                                                    $tShip = Util::navyUnpack($landValue[$sx][$sy]);
-                                                    $tName = &$hako->idToName[$tShip[0]];
-                                                    $tshipName = $init->shipName[$tShip[1]];
-                                                    if ($tShip[1] < 10) {
-                                                        // 海賊船の攻撃
-                                                        $tShip[2] -= ($init->disVikingMinAtc + Util::random($init->disVikingMaxAtc - $init->disVikingMinAtc));
-                                                        if ($tShip[2] <= 0) {
-                                                            // 船舶沈没
-                                                            $land[$sx][$sy] = $init->landSea;
-                                                            $landValue[$sx][$sy] = 0;
-                                                            $this->log->ShipSinking($id, $tShip[0], $name, $tName, $tshipName, "($sx,$sy)");
-
-                                                            break;
-                                                        } else {
-                                                            // 船舶ダメージ
-                                                            $landValue[$sx][$sy] = Util::navyPack($tShip[0], $tShip[1], $tShip[2], $tShip[3], $tShip[4]);
-                                                            $this->log->VikingAttack($id, $tShip[0], $name, $tName, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $tshipName);
-
-                                                            break;
-                                                        }
-                                                    }
-                                                } elseif ($land[$sx][$sy] == $init->landFroCity) {
-                                                    // 海上都市の場合海になる
-                                                    $land[$sx][$sy] = $init->landSea;
-                                                    $landValue[$sx][$sy] = 0;
-                                                    $this->log->BattleSinking($id, 0, $name, $this->landName($init->landFroCity, 0), "($sx,$sy)");
-                                                    $this->log->VikingAttack($id, $id, $name, $name, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $this->landName($init->landFroCity, 0));
-
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                        break;
                                     }
                                 }
-                                if (Util::random(1000) < $init->disVikingAway) {
-                                    // 海賊船去る
-                                    $land[$x][$y] = $init->landSea;
-                                    $landValue[$x][$y] = 0;
-                                    $this->log->VikingAway($id, $name, "($x,$y)");
+                            }
+                        }
+                    } elseif ($ship[1] == 3) {
+                        // 戦艦
+                        if ($island['monster'] > 0 && $ship[4] != intval($hako->islandTurn) % 10) {
+                            // 怪獣が出現しており、現在のターンで未攻撃の場合
+                            for ($s2 = 0; $s2 < $init->pointNumber; $s2++) {
+                                $sx = $this->rpx[$s2];
+                                $sy = $this->rpy[$s2];
+                                if ($land[$sx][$sy] == $init->landMonster || $land[$sx][$sy] == $init->landSleeper) {
+                                    // 対象となる怪獣の各要素取り出し
+                                    $monsSpec = Util::monsterSpec($landValue[$sx][$sy]);
+                                    $tLv = $landValue[$sx][$sy];
+                                    $tspecial  = $init->monsterSpecial[$monsSpec['kind']];
+                                    $tmonsName = $monsSpec['name'];
+                                    // 硬化中?
+                                    if ((($tspecial & 0x4) && (($hako->islandTurn % 2) == 1)) ||
+                                    (($tspecial & 0x10) && (($hako->islandTurn % 2) == 0))) {
+                                        // 硬化中なら効果なし
+                                        break;
+                                    }
+                                    if ($monsSpec['hp'] > 1) {
+                                        // 対象の体力を減らす
+                                        $landValue[$sx][$sy]--;
+                                    } else {
+                                        // 対象の怪獣が倒れて荒地になる
+                                        $land[$sx][$sy] = $init->landWaste;
+                                        $landValue[$sx][$sy] = 0;
+
+                                        // 収入
+                                        $value = $init->monsterValue[$monsSpec['kind']];
+                                        if ($value > 0) {
+                                            $island['money'] += $value;
+                                            $this->log->msMonMoney($id, '', $tmonsName, $value);
+                                        }
+                                    }
+                                    $tName = $hako->idToName[$ship[0]];
+                                    $this->log->SenkanMissile($id, $ship[0], $name, $tName, $lName, "($x,$y)", "($sx,$sy)", $tmonsName);
 
                                     break;
                                 }
                             }
+                            // 1ターンに1度しか攻撃できない
+                            $ship[4] = intval($hako->islandTurn) % 10;
+                        } else {
+                        }
+                        // 海賊船が出現していた場合攻撃する
+                        $cntViking = Turn::countAround($land, $x, $y, 19, [$init->landShip]);
+                        if ($cntViking && $ship[4] != intval($hako->islandTurn) % 10) {
+                            //周囲2ヘックス以内に船舶あり
+                            for ($s3 = 0; $s3 < 19; $s3++) {
+                                $sx = $x + $init->ax[$s3];
+                                $sy = $y + $init->ay[$s3];
+                                // 行による位置調整
+                                if ((($sy % 2) == 0) && (($y % 2) == 1)) {
+                                    $sx--;
+                                }
+                                if (($sx < 0) || ($sx >= $init->islandSize) || ($sy < 0) || ($sy >= $init->islandSize)) {
+                                    // 範囲外の場合何もしない
+                                    continue;
+                                } else {
+                                    // 範囲内の場合
+                                    if ($land[$sx][$sy] == $init->landShip) {
+                                        $tShip = Util::navyUnpack($landValue[$sx][$sy]);
+                                        $tName = $hako->idToName[$ship[0]];
+                                        $tshipName = $init->shipName[$tShip[1]];
+                                        if ($tShip[1] > $init->shipKind) {
+                                            // 海賊船だった場合攻撃する
+                                            $tShip[2] -= 2;
+                                            if ($tShip[2] <= 0) {
+                                                // 海賊船を沈没させた
+                                                $land[$sx][$sy] = $init->landSea;
+                                                $this->log->SenkanAttack($id, $ship[0], $name, $tName, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $tshipName);
+                                                $this->log->BattleSinking($id, $tShip[0], $name, $tshipName, "($sx,$sy)");
+                                                // 30%の確率で財宝になる
+                                                $treasure = $tShip[3] * 1000 + $tShip[4] * 100;
+                                                if (Util::random(100) < 30 && $treasure > 0) {
+                                                    $landValue[$sx][$sy] = $treasure;
+                                                    $this->log->VikingTreasure($id, $name, "($sx,$sy)");
+                                                } else {
+                                                    $landValue[$sx][$sy] = 0;
+                                                }
+                                            } else {
+                                                // 海賊船にダメージ与えた
+                                                $landValue[$sx][$sy] = Util::navyPack($tShip[0], $tShip[1], $tShip[2], $tShip[3], $tShip[4]);
+                                                $this->log->SenkanAttack($id, $ship[0], $name, $tName, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $tshipName);
+                                            }
 
-                            if ($landValue[$x][$y] != 0) {
-                                // 船がまだ存在していたら
-                                // 動く方向を決定
-                                for ($s5 = 0; $s5 < 3; $s5++) {
-                                    $d = Util::random(6) + 1;
-                                    $sx = $x + $init->ax[$d];
-                                    $sy = $y + $init->ay[$d];
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            // 1ターンに1度しか攻撃できない
+                            $ship[4] = intval($hako->islandTurn) % 10;
+                        }
+                    } elseif ($ship[1] > $init->shipKind) {
+                        // 海賊船
+                        if (Util::random(1000) < $init->disVikingRob) {
+                            // 強奪
+                            $vMoney = round(Util::random($island['money'])/10);
+                            $vFood  = round(Util::random($island['food'])/10);
+                            $island['money'] -= $vMoney;
+                            $island['food'] -= $vFood;
+                            $this->log->RobViking($island['id'], $island['name'], "($x,$y)", $init->shipName[$ship[1]], $vMoney, $vFood);
+
+                            // 所持金
+                            $treasure = $ship[3] * 1000 + $ship[4] * 100;
+                            $treasure += $vMoney;
+                            $ship[3] = $treasure / 1000;
+                            $ship[4] = ($treasure - $ship[1] * 1000) / 100;
+                            // 海賊船ステータス更新
+                            $landValue[$x][$y] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
+                        }
+                        // 攻撃
+                        $cntShip = Turn::countAround($land, $x, $y, 19, [$init->landPort, $init->landShip, $init->landFroCity]);
+                        if ($cntShip) {
+                            //周囲2ヘックス以内に港または船舶または海上都市あり
+                            if (Util::random(1000) < $init->disVikingAttack) {
+                                // 海賊船の襲撃
+                                for ($s4 = 0; $s4 < 19; $s4++) {
+                                    $sx = $x + $init->ax[$s4];
+                                    $sy = $y + $init->ay[$s4];
                                     // 行による位置調整
                                     if ((($sy % 2) == 0) && (($y % 2) == 1)) {
                                         $sx--;
                                     }
-                                    // 範囲外判定
-                                    if (($sx < 0) || ($sx >= $init->islandSize) ||
-                                    ($sy < 0) || ($sy >= $init->islandSize)) {
+                                    if (!\Util::isInnerLand($sx, $sy)) {
+                                        // 範囲外の場合何もしない
                                         continue;
                                     }
-                                    // 海であれば、動く方向を決定
-                                    if (($land[$sx][$sy] == $init->landSea) && ($landValue[$sx][$sy] < 1)) {
+                                    // 範囲内の場合
+                                    if ($land[$sx][$sy] == $init->landPort) {
+                                        // 港の場合浅瀬になる
+                                        $land[$sx][$sy] = $init->landSea;
+                                        $landValue[$sx][$sy] = 1;
+                                        $this->log->BattleSinking($id, 0, $name, $this->landName($init->landPort, 1), "($sx,$sy)");
+                                        $this->log->VikingAttack($id, $id, $name, $name, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $this->landName($init->landPort, 1));
+
+                                        break;
+                                    } elseif ($land[$sx][$sy] == $init->landShip) {
+                                        // 船舶の場合
+                                        $tShip = Util::navyUnpack($landValue[$sx][$sy]);
+                                        $tName = &$hako->idToName[$tShip[0]];
+                                        $tshipName = $init->shipName[$tShip[1]];
+                                        if ($tShip[1] < 10) {
+                                            // 海賊船の攻撃
+                                            $tShip[2] -= ($init->disVikingMinAtc + Util::random($init->disVikingMaxAtc - $init->disVikingMinAtc));
+                                            if ($tShip[2] <= 0) {
+                                                // 船舶沈没
+                                                $land[$sx][$sy] = $init->landSea;
+                                                $landValue[$sx][$sy] = 0;
+                                                $this->log->ShipSinking($id, $tShip[0], $name, $tName, $tshipName, "($sx,$sy)");
+
+                                                break;
+                                            } else {
+                                                // 船舶ダメージ
+                                                $landValue[$sx][$sy] = Util::navyPack($tShip[0], $tShip[1], $tShip[2], $tShip[3], $tShip[4]);
+                                                $this->log->VikingAttack($id, $tShip[0], $name, $tName, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $tshipName);
+
+                                                break;
+                                            }
+                                        }
+                                    } elseif ($land[$sx][$sy] == $init->landFroCity) {
+                                        // 海上都市の場合海になる
+                                        $land[$sx][$sy] = $init->landSea;
+                                        $landValue[$sx][$sy] = 0;
+                                        $this->log->BattleSinking($id, 0, $name, $this->landName($init->landFroCity, 0), "($sx,$sy)");
+                                        $this->log->VikingAttack($id, $id, $name, $name, $init->shipName[$ship[1]], "($x,$y)", "($sx,$sy)", $this->landName($init->landFroCity, 0));
+
                                         break;
                                     }
                                 }
-                                if ($s5 == 3) {
-                                    // 動かなかった
-                                } else {
-                                    // 移動
-                                    $land[$sx][$sy] = $land[$x][$y];
-                                    $landValue[$sx][$sy] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
-                                    if ($ship[1] == 2) {
-                                        if ((Util::random(100) < 7) && ($island['tenki'] == 1) &&
-                                        ($island['item'][18] == 1) && ($island['item'][19] != 1)) {
-                                            // レッドダイヤ発見
-                                            $island['item'][19] = 1;
-                                            $this->log->RedFound($id, $name, '赤い宝石');
-                                        }
-                                        // 油田発見
-                                        if (Util::random(100) < 3) {
-                                            $lName = $init->shipName[$ship[1]];
-                                            $island['oil']++;
-                                            $land[$x][$y] = $init->landOil;
-                                            $landValue[$x][$y] = 0;
-                                            $this->log->tansakuoil($id, $name, $lName, $point);
-                                        } else {
-                                            // もと居た位置を海に
-                                            $land[$x][$y] = $init->landSea;
-                                            $landValue[$x][$y] = 0;
-                                        }
-                                    } else {
-                                        // もと居た位置を海に
-                                        $land[$x][$y] = $init->landSea;
-                                        $landValue[$x][$y] = 0;
-                                    }
-                                    // 移動済みフラグ
-                                    if (Util::random(2)) {
-                                        $shipMove[$sx][$sy] = 1;
-                                    }
+                            }
+                        }
+                        if (Util::random(1000) < $init->disVikingAway) {
+                            // 海賊船去る
+                            $land[$x][$y] = $init->landSea;
+                            $landValue[$x][$y] = 0;
+                            $this->log->VikingAway($id, $name, "($x,$y)");
+
+                            break;
+                        }
+                    }
+
+                    if ($landValue[$x][$y] != 0) {
+                        // 船がまだ存在していたら
+                        // 動く方向を決定
+                        for ($s5 = 0; $s5 < 3; $s5++) {
+                            $d = Util::random(6) + 1;
+                            $sx = $x + $init->ax[$d];
+                            $sy = $y + $init->ay[$d];
+                            // 行による位置調整
+                            if ((($sy % 2) == 0) && (($y % 2) == 1)) {
+                                $sx--;
+                            }
+                            // 範囲外判定
+                            if (($sx < 0) || ($sx >= $init->islandSize) ||
+                            ($sy < 0) || ($sy >= $init->islandSize)) {
+                                continue;
+                            }
+                            // 海であれば、動く方向を決定
+                            if (($land[$sx][$sy] == $init->landSea) && ($landValue[$sx][$sy] < 1)) {
+                                break;
+                            }
+                        }
+                        if ($s5 == 3) {
+                            // 動かなかった
+                        } else {
+                            // 移動
+                            $land[$sx][$sy] = $land[$x][$y];
+                            $landValue[$sx][$sy] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
+                            if ($ship[1] == 2) {
+                                if ((Util::random(100) < 7) && ($island['tenki'] == 1) &&
+                                ($island['item'][18] == 1) && ($island['item'][19] != 1)) {
+                                    // レッドダイヤ発見
+                                    $island['item'][19] = 1;
+                                    $this->log->RedFound($id, $name, '赤い宝石');
                                 }
+                                // 油田発見
+                                if (Util::random(100) < 3) {
+                                    $lName = $init->shipName[$ship[1]];
+                                    $island['oil']++;
+                                    $land[$x][$y] = $init->landOil;
+                                    $landValue[$x][$y] = 0;
+                                    $this->log->tansakuoil($id, $name, $lName, $point);
+                                } else {
+                                    // もと居た位置を海に
+                                    $land[$x][$y] = $init->landSea;
+                                    $landValue[$x][$y] = 0;
+                                }
+                            } else {
+                                // もと居た位置を海に
+                                $land[$x][$y] = $init->landSea;
+                                $landValue[$x][$y] = 0;
+                            }
+                            // 移動済みフラグ
+                            if (Util::random(2)) {
+                                $shipMove[$sx][$sy] = 1;
                             }
                         }
                     }
 
                 break;
             }
-            // すでに$init->landTownがcase文で使われているのでswitchを別に用意
+
+            // 火災判定
+            // [NOTE] すでに$init->landTownがcase文で使われているのでswitchを別に用意
             switch ($landKind) {
                 case $init->landTown:
                 case $init->landHaribote:
@@ -4890,7 +4881,6 @@ class Turn
                 case $init->landFroCity:
                 case $init->landNewtown:
                 case $init->landBigtown:
-                    // 火災判定
                     if (Turn::countAround($land, $x, $y, 19, [$init->landSyoubou, $init->landSsyoubou]) > 0) {
                         break;
                     }
@@ -4900,32 +4890,38 @@ class Turn
                         ($landKind == $init->landTown && ($lv <= 30))) {
                         break;
                     }
-                    if (Util::random(1000) < $init->disFire - (int)($island['eisei'][0] / 20)) {
-                        // 周囲の森と記念碑を数える
-                        if (Turn::countAround($land, $x, $y, 7, [$init->landForest, $init->landProcity, $init->landFusya, $init->landMonument]) == 0) {
-                            // 無かった場合、火災で壊滅
-                            $l = $land[$x][$y];
-                            $lv = $landValue[$x][$y];
-                            $point = "({$x}, {$y})";
-                            $lName = $this->landName($l, $lv);
-                            if (($landKind == $init->landNewtown) || ($landKind == $init->landBigtown)) {
-                                // ニュータウン、現代都市の場合
-                                $landValue[$x][$y] -= Util::random(100) + 50;
-                                $this->log->firenot($id, $name, $lName, $point);
-                                if ($landValue[$x][$y] <= 0) {
-                                    $land[$x][$y] = $init->landWaste;
-                                    $landValue[$x][$y] = 0;
-                                    $this->log->fire($id, $name, $lName, $point);
-                                }
-                            } elseif (($landKind == $init->landSeaCity) || ($landKind == $init->landFroCity)) {
-                                $land[$x][$y] = $init->landSea;
-                                $landValue[$x][$y] = 0;
-                                $this->log->fire($id, $name, $lName, $point);
-                            } else {
+                    // 防火（消火）判定
+                    if (!(Util::random(1000) < $init->disFire - intdiv($island['eisei'][0], 20))) {
+                        break;
+                    }
+
+                    // 周囲の森と記念碑を数える
+                    if (Turn::countAround($land, $x, $y, 7, [$init->landForest, $init->landProcity, $init->landFusya, $init->landMonument]) == 0) {
+                        // 無かった場合、火災で壊滅
+                        $l = $land[$x][$y];
+                        $lv = $landValue[$x][$y];
+                        $point = "({$x}, {$y})";
+                        $lName = $this->landName($l, $lv);
+
+                        // ニュータウン、現代都市の場合
+                        if (($landKind == $init->landNewtown) || ($landKind == $init->landBigtown)) {
+                            $landValue[$x][$y] -= Util::random(100) + 50;
+                            $this->log->firenot($id, $name, $lName, $point);
+                            if ($landValue[$x][$y] <= 0) {
                                 $land[$x][$y] = $init->landWaste;
                                 $landValue[$x][$y] = 0;
                                 $this->log->fire($id, $name, $lName, $point);
                             }
+                        } elseif (($landKind == $init->landSeaCity) || ($landKind == $init->landFroCity)) {
+                            // 海上・海底都市
+                            $land[$x][$y] = $init->landSea;
+                            $landValue[$x][$y] = 0;
+                            $this->log->fire($id, $name, $lName, $point);
+                        } else {
+                            // ほか
+                            $land[$x][$y] = $init->landWaste;
+                            $landValue[$x][$y] = 0;
+                            $this->log->fire($id, $name, $lName, $point);
                         }
                     }
 
@@ -5736,16 +5732,16 @@ class Turn
             if ((($sy % 2) == 0) && (($y % 2) == 1)) {
                 $sx--;
             }
+            // 範囲外判定
+            if (!\Util::isInnerLand($sx, $sy)) {
+                continue;
+            }
+
             $landKind = $land[$sx][$sy];
             $lv = $landValue[$sx][$sy];
             // ログ用の情報用意
             $landName = $this->landName($landKind, $lv);
             $point = "({$sx}, {$sy})";
-            // 範囲外判定
-            if (($sx < 0) || ($sx >= $init->islandSize) ||
-                ($sy < 0) || ($sy >= $init->islandSize)) {
-                continue;
-            }
             // 範囲による分岐
             if ($i < 7) {
                 // 中心、および1ヘックス
@@ -6230,10 +6226,7 @@ class Turn
             if ((($sy % 2) == 0) && (($y % 2) == 1)) {
                 $sx--;
             }
-            if (($sx < 0) || ($sx >= $init->islandSize) ||
-                ($sy < 0) || ($sy >= $init->islandSize)) {
-                // 範囲外の場合
-            } else {
+            if (\Util::isInnerLand($sx, $sy)) {
                 // 範囲内の場合
                 if ($land[$sx][$sy] == $kind && $landValue[$sx][$sy] >= $lv) {
                     $count++;

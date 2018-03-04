@@ -10,7 +10,7 @@
         for ($r = 0, $rank_len = sizeof($element); $r < $rank_len; $r++) {
             $max = 0;
 
-            // トップ判定（同値は	ID順）
+            // トップ判定（同値はID順）
             for ($i = 0; $i < $hako->islandNumber; $i++) {
                 $island = $hako->islands[$i];
                 if ($island['isBF'] === 1) {
@@ -18,7 +18,7 @@
                 }
 
                 if ($island[$element[$r]] > $max) {
-                    $max = ($r === 5)? '' : $island[$element[$r]]; //軍事レベルは非公開
+                    $max = $island[$element[$r]];
                     $rankid[$r] = $i;
                 }
             }
@@ -27,26 +27,37 @@
             $name   = ($island)? Util::islandName($island, $hako->ally, $hako->idToAllyNumber) : '';
 
             if (($r % 6) === 0) {
-                echo '<tr>', PHP_EOL;
+                println('<tr>');
             }
-
-            echo '<td width="15%" class="M">';
-            echo '<table class="table table-bordered" style="border:0">', PHP_EOL;
-
-            echo '<thead><tr><th>', $bumonName[$r], '</th></tr></thead>', PHP_EOL;
+            echo <<<END
+<td width="15%" class="M">
+    <table class="table table-bordered" style="border:0">
+        <thead><tr><th>{$bumonName[$r]}</th></tr></thead>
+        <tbody>
+END;
             if ($island) {
-                echo '<tr><td class="TenkiCell"><a class="islName" href="', $this_file, '?Sight=', $island['id'], '">', $name, '</a></td></tr>', PHP_EOL;
-                echo '<tr><td class="TenkiCell">', $max, $bumonUnit[$r], '</td></tr>', PHP_EOL;
+                $max = $r !== 5 ? $max : '';
+                echo <<<END
+            <tr>
+                <td class="TenkiCell"><a class="islName" href="$this_file?Sight={$island['id']}">$name</a></td>
+            </tr>
+            <tr>
+                <td class="TenkiCell">$max{$bumonUnit[$r]}</td>
+            </tr>
+END;
             } else {
-                echo '<tr><td class="TenkiCell islName">-</td></tr>', PHP_EOL;
-                echo '<tr><td class="TenkiCell islName">-</td></tr>', PHP_EOL;
+                echo <<<END
+            <tr><td class="TenkiCell islName">-</td></tr>
+            <tr><td class="TenkiCell islName">-</td></tr>
+END;
             }
-
-            echo "</table>";
-            echo "</td>";
+            echo <<<END
+    </table>
+</td>
+END;
 
             if (($r % 6) === 5) {
-                echo '</tr>', PHP_EOL;
+                println('</tr>');
             }
         }
 ?>

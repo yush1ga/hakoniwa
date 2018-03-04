@@ -4,9 +4,9 @@
 <?php if ($number < $init->maxIsland): ?>
 
 	<?php if ($init->registerMode == 1 && $init->adminMode == 0): ?>
-	<div class="alert alet-info">
-		当箱庭では不適当な島名などの事前チェックを行っています。<br>
-		参加希望の方は、管理者に「島名」と「パスワード」を送信してください。
+
+	<div class="alert alert-info">
+        <p>当箱庭では、ゲーム参加に際して事前チェックを行っています。<br>参加希望の方は、管理者にその旨と「<strong>希望する<?=$init->nameSuffix?>名</strong>」を送信してください。</p>
 	</div>
 
 	<?php else: ?>
@@ -27,11 +27,11 @@
 
 		<div class="form-group">
 			<label>パスワードは？</label>
-			<input type="password" class="form-control" name="PASSWORD" size="32" maxlength="32" required>
+			<input type="password" class="form-control" name="PASSWORD" size="32" required>
 		</div>
 		<div class="form-group">
 			<label>パスワード（確認のためもう一度）</label>
-			<input type="password" class="form-control" name="PASSWORD2" size="32" maxlength="32" required>
+			<input type="password" class="form-control" name="PASSWORD2" size="32" required>
 		</div>
 
 		<div class="form-group">
@@ -42,7 +42,7 @@
 	</form>
 	<?php endif;?>
 
-<?php else: ?>
-	<div class="alert alert-danger">このサーバーに登録できる<br>最大数に達しているため、現在登録できません。</div>
-<?php endif; ?>
+<?php else:?>
+	<div class="alert alert-danger"><p>現在、このサーバーの最大ユーザー数に達しているため登録できません。<br>詳しくは管理者にお問い合わせください。</p></div>
+<?php endif;?>
 </div>

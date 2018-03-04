@@ -12,36 +12,40 @@ class Main
 {
     public function execute()
     {
-        $hako = new \Hako();
-        $cgi  = new \Cgi();
+        global $init;
+
+        $hako = new \Hako;
+        $cgi  = new \Cgi;
 
         $cgi->parseInputData();
         $cgi->getCookies();
 
-        // [CHK] データファイルがない
-        if (!$hako->readIslands($cgi)) {
+        // 管理パスワード・データファイル存在確認
+        if (!file_exists($init->passwordFile) || !$hako->readIslands($cgi)) {
             HTML::header();
             HakoError::noDataFile();
             println('<p><a href="./hako-mente.php">→初期設定</a></p>');
             HTML::footer();
             exit;
         }
-        // [CHK] ファイルロック失敗
-        if (false == ($lock = Util::lock())) {
+
+        // ファイルロック失敗時、強制終了
+        if (false === ($lock = Util::lock())) {
             exit;
         }
+
         $cgi->setCookies();
 
-        if (strtolower($cgi->dataSet['DEVELOPEMODE'] ?? "") == "javascript") {
-            $html = new HtmlMapJS();
-            $com  = new MakeJS();
+        if (strtolower($cgi->dataSet['DEVELOPEMODE'] ?? '') == 'javascript') {
+            $html = new HtmlMapJS;
+            $com  = new MakeJS;
         } else {
-            $html = new HtmlMap();
-            $com  = new Make();
+            $html = new HtmlMap;
+            $com  = new Make;
         }
         switch ($cgi->mode) {
             case "log":
-                $html = new HtmlTop();
+                $html = new HtmlTop;
                 $html->header();
                 $html->log();
                 $html->footer();
@@ -49,8 +53,8 @@ class Main
                 break;
 
             case "turn":
-                $turn = new Turn();
-                $html = new HtmlTop();
+                $turn = new Turn;
+                $html = new HtmlTop;
                 $html->header();
                 // ターン処理後、通常トップページ描画
                 $turn->turnMain($hako, $cgi->dataSet);
@@ -115,7 +119,7 @@ class Main
                 break;
 
             case "conf":
-                $html = new HtmlTop();
+                $html = new HtmlTop;
                 $html->header();
                 $html->register($hako, $cgi->dataSet);
                 $html->footer();
@@ -123,12 +127,12 @@ class Main
                 break;
 
             default:
-                $html = new HtmlTop();
+                $html = new HtmlTop;
                 $html->header();
                 $html->main($hako, $cgi->dataSet);
                 $html->footer();
         }
         Util::unlock($lock);
-        exit();
+        exit;
     }
 }

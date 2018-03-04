@@ -370,10 +370,9 @@ class Util
     public static function hasBadShip($ships)
     {
         global $init;
-        $arrSize    = count($ships);
         $badShipsId = $init->shipKind;
         $badShips   = 0;
-        for ($i=$badShipsId; $i < $arrSize; $i++) {
+        for ($i=$badShipsId, $len = count($ships); $i < $len; $i++) {
             if (is_numeric($ships[$i]) && $ships[$i] > 0) {
                 $badShips++;
             }
@@ -448,7 +447,7 @@ class Util
      * @param integer $y
      * @return boolean
      */
-    public static function isInnerLand($x, $y)
+    public static function isInnerLand(int $x, int $y): bool
     {
         global $init;
 

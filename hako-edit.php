@@ -571,7 +571,7 @@ class EditMain
         $cgi->setCookies();
         $edit = new Edit;
 
-        switch ($cgi->mode) {
+        switch ($cgi->dataSet['mode']) {
             case 'enter':
                 $html = new HtmlTop();
                 $html->header();

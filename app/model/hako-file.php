@@ -32,7 +32,7 @@ class File
     {
         global $init;
 
-        $num = $cgi->dataSet['ISLANDID'] ?? "";
+        $num = $cgi->dataSet['ISLANDID'] ?? '';
         $fileName = $init->dirName.'/hakojima.dat';
         if (!is_file($fileName)) {
             return false;
@@ -48,11 +48,14 @@ class File
         $GLOBALS['ISLAND_TURN'] = $this->islandTurn;
 
         // ターン処理判定
-        if ((DEBUG && (strcmp(($cgi->dataSet['mode'] ?? ""), 'debugTurn') == 0)) ||
-             (($_SERVER['REQUEST_TIME'] - $this->islandLastTime) >= $init->unitTime)) {
+        $isDebug = DEBUG && (strcmp(($cgi->dataSet['mode'] ?? ''), 'debugTurn') == 0);
+        $isTimeout = ($_SERVER['REQUEST_TIME'] - $this->islandLastTime) >= $init->unitTime;
+        if ($isDebug || $isTimeout) {
             $cgi->mode = $data['mode'] = 'turn';
             $num = -1;
         }
+
+        // 特殊島の数かぞえ
         $islandNumberBF = $islandNumberKP = 0;
         for ($i = 0; $i < $this->islandNumber; $i++) {
             $this->islands[$i] = $this->readIsland($fp, $num);
@@ -69,6 +72,7 @@ class File
         $this->islandNumberKP = $islandNumberKP;
         $this->islandNumberNoBF = $this->islandNumber - $islandNumberBF;
         $this->islandNumberNoKP = $this->islandNumber - $islandNumberKP;
+
         fclose($fp);
 
         if ($init->allyUse) {
@@ -352,7 +356,7 @@ class File
     {
         global $init;
 
-        $fileName = $init->dirName.DIRECTORY_SEPARATOR.'hakojima.dat';
+        $fileName = $init->dirName.'/hakojima.dat';
 
         if (!is_file($fileName)) {
             touch($fileName);
@@ -458,7 +462,7 @@ class File
 
         // 地形
         if (($num <= -1) || ($num == $island['id'])) {
-            $fileName = $init->dirName.DIRECTORY_SEPARATOR.'island.'.$island['id'];
+            $fileName = $init->dirName.'/island.'.$island['id'];
 
             if (!is_file($fileName)) {
                 touch($fileName);
@@ -647,6 +651,7 @@ class Hako extends File
     public function readIslands(&$cgi)
     {
         global $init;
+
 
         $m = $this->readIslandsFile($cgi);
         $this->islandList = $this->getIslandList(($cgi->dataSet['defaultID'] ?? ""));

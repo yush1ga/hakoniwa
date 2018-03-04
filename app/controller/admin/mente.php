@@ -188,7 +188,7 @@ class Mente extends \Admin
 
         function isValidPasswd($passwd1='', $passwd2='')
         {
-            return !($passwd1=='' || $passwd2=='' || (0 != strcmp($passwd1, $passwd2)));
+            return $passwd1!=='' && $passwd2!=='' && strcmp($passwd1, $passwd2)===0;
         }
 
         if (!isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['MPASS2'])) {
@@ -200,8 +200,10 @@ class Mente extends \Admin
 
             return;
         }
-        if (!isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['SPASS1'])) {
+        if (isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['SPASS1'])) {
             \HakoError::necessaryBeSetAnotherPassword();
+
+            return;
         }
 
         $masterPasswd  = \Util::encode($this->dataSet['MPASS1'], false);

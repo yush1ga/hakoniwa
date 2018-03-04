@@ -18,6 +18,9 @@ define("LOCK_RETRY_COUNT", 10);
 define("LOCK_RETRY_INTERVAL", 1000);
 define("READ_LINE", 1024);
 
+// set Composer/Autoloader
+require_once __DIR__.'/vendor/autoload.php';
+
 if (DEBUG) {
     ini_set('display_errors', 1);
     set_time_limit(0);

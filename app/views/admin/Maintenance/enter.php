@@ -18,7 +18,7 @@
 特殊パスワードは、マップエディットで資源を増加させる際などに用います。<br>
 ※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</p>
 
-<form action="$this_file" method="post">
+<form action="<?=$this_file?>" method="post">
 
     <h3>マスタパスワード：</h3>
         <div class="form-group">

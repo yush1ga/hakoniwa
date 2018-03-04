@@ -15,27 +15,19 @@
         if ($init->islandListRange == 0) {
             $islandListSentinel = $hako->islandNumberNoBF;
         } else {
-            $islandListSentinel = $islandListStart + $init->islandListRange - 1;
-            if ($islandListSentinel > $hako->islandNumberNoBF) {
-                $islandListSentinel = $hako->islandNumberNoBF;
-            }
+            $islandListSentinel = min(($islandListStart + $init->islandListRange - 1), $hako->islandNumberNoBF);
         }
     }
 
-    if (($islandListStart  != 1) || ($islandListSentinel != $hako->islandNumberNoBF)) {
+    if (($islandListStart != 1) || ($islandListSentinel != $hako->islandNumberNoBF)) {
+        println('<nav aria-label="Page navigation"><ul class="pagination">');
         for ($i = 1; $i <= $hako->islandNumberNoBF ; $i += $init->islandListRange) {
             $j = min($i + $init->islandListRange - 1, $hako->islandNumberNoBF);
-            echo " ";
 
-            if ($i != $islandListStart) {
-                echo '<a href="', $this_file, "?islandListStart=", $i, '">';
-            }
-            echo " [ ". $i . " - " . $j . " ]";
-
-            if ($i != $islandListStart) {
-                echo "</a>";
-            }
+            $active = $i == $islandListStart ? ' class="active"' : '';
+            println('<li', $active, '><a href="', $this_file, '?islandListStart=', $i, "\">[$i - $j]</a></li>");
         }
+        println('</ul></nav>');
     }
     $islandListStart--;
     $this->islandTable($hako, $islandListStart, $islandListSentinel);

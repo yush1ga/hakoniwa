@@ -256,7 +256,7 @@ class HtmlTop extends HTML
         // set parent directory
         $views = VIEWS.'/top/';
 
-        // 読み込み
+        // サイトタイトルからお知らせまで
         require_once($views.'main.php');
 
         // 各部門ランキング
@@ -289,7 +289,7 @@ class HtmlTop extends HTML
      * @param  [type] $sentinel [description]
      * @return [type]           [description]
      */
-    public function islandTable(&$hako, $start, $sentinel)
+    public function islandTable(&$hako, int $start, int $sentinel)
     {
         global $init;
         $this_file = $init->baseDir.'/hako-main.php';
@@ -303,6 +303,10 @@ class HtmlTop extends HTML
 
         for ($i = $start; $i < $sentinel ; $i++) {
             $island        = $hako->islands[$i];
+            if ($island['isDead'] ?? false) {
+                continue;
+            }
+
             $island['pop'] = ($island['pop'] > 1) ? $island['pop'] : 1;
             $j             = ($island['isBF']) ? '★' : $i + 1;
             $id            = $island['id'];
@@ -496,8 +500,10 @@ END;
      * @param type $hako
      * @param type $data
      */
-    public function register(&$hako, $data = "")
+    public function register(&$hako, $data = '')
     {
+        global $init;
+
         require_once(VIEWS.'/conf/register.php');
     }
 
@@ -509,7 +515,7 @@ END;
     public function discovery($number)
     {
         global $init;
-        $this_file = $init->baseDir . "/hako-main.php";
+        $this_file = $init->baseDir . '/hako-main.php';
 
         require_once(VIEWS.'/conf/discovery.php');
     }
@@ -1110,10 +1116,7 @@ END;
     {
         global $init;
 
-        echo <<<END
-	<h1 class="text-center">{$init->nameSuffix}を発見しました！ <small><span class="big islName">「$name{$init->nameSuffix}」</span>と命名しました。</small>
-	</h1>
-END;
+        println('<h1 class="text-center">', $init->nameSuffix, 'を発見しました！ <br><small><span class="big islName">「', $name, $init->nameSuffix, '」</span>と命名しました。</small></h1>');
     }
 
     //---------------------------------------------------
