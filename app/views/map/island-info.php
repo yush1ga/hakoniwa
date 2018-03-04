@@ -1,101 +1,55 @@
 <div id="islandInfo" class="table-responsive">
     <table class="table table-bordered table-condensed">
-        <thead>
-            <tr>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameRank ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->namePopulation ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameArea ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFunds ?><?= $init->_tagTH ?><?= $lots ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFood ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameUnemploymentRate ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFarmSize ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameFactoryScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameCommercialScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->nameMineScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->namePowerPlantScale ?><?= $init->_tagTH ?>
-                </th>
-                <th <?= $init->bgTitleCell ?>>
-                    <?= $init->tagTH_ ?><?= $init->namePowerSupplyRate ?><?= $init->_tagTH ?>
-                </th>
-            </tr>
-        </thead>
+    <thead>
         <tr>
-            <th <?= $init->bgNumberCell ?> rowspan="4">
-                <?= $init->tagNumber_ ?><?= $rank ?><?= $init->_tagNumber ?>
-            </th>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $pop ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $area ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $money ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $food ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $unemployed ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $farm ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $factory ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $commerce ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $mountain ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $hatuden ?>
-            </td>
-            <td <?= $init->bgInfoCell ?>>
-                <?= $ene ?>
-            </td>
+            <th><?= $init->nameRank ?></th>
+            <th><?= $init->namePopulation ?></th>
+            <th><?= $init->nameArea ?></th>
+            <th><?= $init->nameFunds ?><?= $lots ?></th>
+            <th><?= $init->nameFood ?></th>
+            <th><?= $init->nameUnemploymentRate ?></th>
+            <th><?= $init->nameFarmSize ?></th>
+            <th><?= $init->nameFactoryScale ?></th>
+            <th><?= $init->nameCommercialScale ?></th>
+            <th><?= $init->nameMineScale ?></th>
+            <th><?= $init->namePowerPlantScale ?></th>
+            <th><?= $init->namePowerSupplyRate ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th class="NumberCell number" rowspan="4"><?= $rank ?></th>
+            <td class="InfoCell"><?= $pop ?></td>
+            <td class="InfoCell"><?= $area ?></td>
+            <td class="InfoCell"><?= $money ?></td>
+            <td class="InfoCell"><?= $food ?></td>
+            <td class="InfoCell"><?= $unemployed ?></td>
+            <td class="InfoCell"><?= $farm ?></td>
+            <td class="InfoCell"><?= $factory ?></td>
+            <td class="InfoCell"><?= $commerce ?></td>
+            <td class="InfoCell"><?= $mountain ?></td>
+            <td class="InfoCell"><?= $hatuden ?></td>
+            <td class="InfoCell"><?= $ene ?></td>
         </tr>
         <tr>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameWeather ?><?= $init->_tagTH ?></th>
+            <th><?= $init->nameWeather ?></th>
             <td class="TenkiCell"><?= $sora ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameMilitaryTechnology ?><?= $init->_tagTH ?></th>
-            <td <?= $init->bgInfoCell ?>><?= $arm ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameMonsterExterminationNumber ?><?= $init->_tagTH ?></th>
-            <td <?= $init->bgInfoCell ?>><?= $taiji ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?><?= $init->nameSatellite ?><?= $init->_tagTH ?></th>
+            <th><?= $init->nameMilitaryTechnology ?></th>
+            <td class="InfoCell"><?= $arm ?></td>
+            <th><?= $init->nameMonsterExterminationNumber ?></th>
+            <td class="InfoCell"><?= $taiji ?></td>
+            <th><?= $init->nameSatellite ?></th>
             <td class="ItemCell" colspan="4"><?= $eiseis ?></td>
         </tr>
         <tr>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?>ジン<?= $init->_tagTH ?></th>
+            <th>ジン</th>
             <td class="ItemCell" colspan="5"><?= $zins ?></td>
-            <th <?= $init->bgTitleCell ?>><?= $init->tagTH_ ?>アイテム<?= $init->_tagTH ?></th>
+            <th>アイテム</th>
             <td class="ItemCell" colspan="4"><?= $items ?></td>
         </tr>
         <tr>
-            <td colspan="11" <?= $init->bgCommentCell ?>><?= $comment ?></td>
+            <td colspan="11" class="CommentCell"><?= $comment ?></td>
         </tr>
+    </tbody>
     </table>
 </div>

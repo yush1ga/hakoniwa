@@ -1,4 +1,6 @@
 <?php
+namespace Hakoniwa;
+
 /**
  * 箱庭諸島 S.E - BattleField管理用ファイル -
  * @copyright 箱庭諸島 ver2.30
@@ -7,12 +9,11 @@
  */
 
 require_once 'config.php';
-require_once MODELPATH.'/admin.php';
 require_once MODELPATH.'/hako-cgi.php';
 require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/bf.php';
 
-$init  = new Init();
-$start = new BF();
+$init  = new \Init;
+$start = new Admin\BF;
 $start->execute();

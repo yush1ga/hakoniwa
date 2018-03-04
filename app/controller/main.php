@@ -1,119 +1,138 @@
 <?php
+
+require_once realpath(__DIR__.'/../../').'/config.php';
+require_once MODELPATH.'hako-file.php';
+require_once MODELPATH.'hako-cgi.php';
+
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
  */
+class Main
+{
+    public function execute()
+    {
+        global $init;
 
-class Main {
+        $hako = new \Hako;
+        $cgi  = new \Cgi;
 
-	function execute() {
-		$hako = new Hako();
-		$cgi  = new Cgi();
+        $cgi->parseInputData();
+        $cgi->getCookies();
 
-		$cgi->parseInputData();
-		$cgi->getCookies();
-		$fp = "";
+        // 管理パスワード・データファイル存在確認
+        if (!file_exists($init->passwordFile) || !$hako->readIslands($cgi)) {
+            HTML::header();
+            HakoError::noDataFile();
+            println('<p><a href="./hako-mente.php">→初期設定</a></p>');
+            HTML::footer();
+            exit;
+        }
 
-		if(!$hako->readIslands($cgi)) {
-			HTML::header();
-			HakoError::noDataFile();
-			HTML::footer();
-			Util::unlock($lock);
-			exit();
-		}
-		$lock = Util::lock($fp);
-		if(FALSE == $lock) {
-			exit();
-		}
-		$cgi->setCookies();
+        // ファイルロック失敗時、強制終了
+        if (false === ($lock = Util::lock())) {
+            exit;
+        }
 
-		$_developmode = (isset( $cgi->dataSet['DEVELOPEMODE'] )) ? $cgi->dataSet['DEVELOPEMODE'] : "";
-		if( mb_strtolower($_developmode) == "javascript") {
-			$html = new HtmlMapJS();
-			$com  = new MakeJS();
-		} else {
-			$html = new HtmlMap();
-			$com  = new Make();
-		}
-		switch($cgi->mode) {
-			case "turn":
-				$turn = new Turn();
-				$html = new HtmlTop();
-				$html->header();
-				$turn->turnMain($hako, $cgi->dataSet);
-				$html->main($hako, $cgi->dataSet); // ターン処理後、TOPページopen
-				$html->footer();
-				break;
+        $cgi->setCookies();
 
-			case "owner":
-				$html->header();
-				$html->owner($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+        if (strtolower($cgi->dataSet['DEVELOPEMODE'] ?? '') == 'javascript') {
+            $html = new HtmlMapJS;
+            $com  = new MakeJS;
+        } else {
+            $html = new HtmlMap;
+            $com  = new Make;
+        }
+        switch ($cgi->mode) {
+            case "log":
+                $html = new HtmlTop;
+                $html->header();
+                $html->log();
+                $html->footer();
 
-			case "command":
-				$html->header();
-				$com->commandMain($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+                break;
 
-			case "new":
-				$html->header();
-				$com->newIsland($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+            case "turn":
+                $turn = new Turn;
+                $html = new HtmlTop;
+                $html->header();
+                // ターン処理後、通常トップページ描画
+                $turn->turnMain($hako, $cgi->dataSet);
+                $html->main($hako, $cgi->dataSet);
+                $html->footer();
 
-			case "comment":
-				$html->header();
-				$com->commentMain($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+                break;
 
-			case "print":
-				$html->header();
-				$html->visitor($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+            case "owner":
+                $html->header();
+                $html->owner($hako, $cgi->dataSet);
+                $html->footer();
 
-			case "targetView":
-				$html->head();
-				$html->printTarget($hako, $cgi->dataSet);
-				//$html->footer();
-				break;
+                break;
 
-			case "change":
-				$html->header();
-				$com->changeMain($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+            case "command":
+                $html->header();
+                $com->commandMain($hako, $cgi->dataSet);
+                $html->footer();
 
-			case "ChangeOwnerName":
-				$html->header();
-				$com->changeOwnerName($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+                break;
 
-			case "conf":
-				$html = new HtmlTop();
-				$html->header();
-				$html->register($hako, $cgi->dataSet);
-				$html->footer();
-				break;
+            case "new":
+                $html->header();
+                $com->newIsland($hako, $cgi->dataSet);
+                $html->footer();
 
-			case "log":
-				$html = new HtmlTop();
-				$html->header();
-				$html->log();
-				$html->footer();
-				break;
+                break;
 
-			default:
-				$html = new HtmlTop();
-				$html->header();
-				$html->main($hako, $cgi->dataSet);
-				$html->footer();
-		}
-		Util::unlock($lock);
-		exit();
-	}
+            case "comment":
+                $html->header();
+                $com->commentMain($hako, $cgi->dataSet);
+                $html->footer();
+
+                break;
+
+            case "print":
+                $html->header();
+                $html->visitor($hako, $cgi->dataSet);
+                $html->footer();
+
+                break;
+
+            case "targetView":
+                $html->head();
+                $html->printTarget($hako, $cgi->dataSet);
+                //$html->footer();
+                break;
+
+            case "change":
+                $html->header();
+                $com->changeMain($hako, $cgi->dataSet);
+                $html->footer();
+
+                break;
+
+            case "ChangeOwnerName":
+                $html->header();
+                $com->changeOwnerName($hako, $cgi->dataSet);
+                $html->footer();
+
+                break;
+
+            case "conf":
+                $html = new HtmlTop;
+                $html->header();
+                $html->register($hako, $cgi->dataSet);
+                $html->footer();
+
+                break;
+
+            default:
+                $html = new HtmlTop;
+                $html->header();
+                $html->main($hako, $cgi->dataSet);
+                $html->footer();
+        }
+        Util::unlock($lock);
+        exit;
+    }
 }

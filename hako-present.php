@@ -1,4 +1,6 @@
 <?php
+namespace Hakoniwa;
+
 /**
  * 箱庭諸島 S.E - プレゼント定義用ファイル -
  * @copyright 箱庭諸島 ver2.30
@@ -13,6 +15,6 @@ require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/present.php';
 
-$init  = new Init();
-$start = new Present();
+$init  = new \Init();
+$start = new Admin\Present();
 $start->execute();

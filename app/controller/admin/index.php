@@ -1,18 +1,20 @@
 <?php
+namespace Hakoniwa\Admin;
+
 /**
- * 箱庭諸島 S.E
- * @author hiro <@hiro0218>
+ * Re:箱庭諸島SE
+ * @author sotalbireo <sotalbireo/hakoniwa>
  */
+class Main
+{
+    public function __construct()
+    {
+        $html = new \HtmlAdmin;
+        $cgi  = new \Cgi;
 
-class Admin {
-
-	function execute() {
-		$html = new HtmlAdmin();
-		$cgi  = new Cgi();
-
-		$cgi->getCookies();
-		$html->header();
-		$html->enter();
-		$html->footer();
-	}
+        $cgi->getCookies();
+        $html->header();
+        $html->render();
+        $html->footer();
+    }
 }

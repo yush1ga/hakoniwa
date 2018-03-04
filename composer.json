@@ -1,0 +1,13 @@
+{
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "@stable",
+        "jakub-onderka/php-parallel-lint": "@stable",
+        "jakub-onderka/php-console-highlighter": "@stable",
+        "psy/psysh": "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "load\\": "./"
+        }
+    }
+}

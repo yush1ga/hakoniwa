@@ -4,21 +4,21 @@
 <?php
 echo <<<END
 <tr>
-    <th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}同盟{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}マーク{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}島の数{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}総人口{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}占有率{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-    <th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}同盟{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}マーク{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}島の数{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}総人口{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}占有率{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
+    <th class="TitleCell">{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
 </tr>
 END;
 
-for($i=0; $i<$hako->allyNumber; $i++) {
+for ($i=0; $i<$hako->allyNumber; $i++) {
     //if($num && ($i != $hako->idToAllyNumber[$num])) {
     //	continue;
     //}
@@ -26,7 +26,7 @@ for($i=0; $i<$hako->allyNumber; $i++) {
     $j = $i + 1;
 
     $pop = $farm = $factory = $commerce = $mountain = $hatuden = $missiles = 0;
-    for($k=0; $k<$ally['number']; $k++) {
+    for ($k=0; $k<$ally['number']; $k++) {
         $id = $ally['memberId'][$k];
         $island = $hako->islands[$hako->idToNumber[$id]];
         $pop += $island['pop'];
@@ -46,20 +46,20 @@ for($i=0; $i<$hako->allyNumber; $i++) {
 
     echo <<<END
 <tr>
-    <th {$init->bgNumberCell} rowspan="2">{$init->tagNumber_}$j{$init->_tagNumber}</th>
-    <td {$init->bgNameCell} rowspan="2">{$name}</td>
+    <th class="NumberCell" rowspan="2">{$init->tagNumber_}$j{$init->_tagNumber}</th>
+    <td class="NameCell" rowspan="2">{$name}</td>
     <td class="TenkiCell"><b><font color="{$ally['color']}">{$ally['mark']}</font></b></td>
-    <td {$init->bgInfoCell}>{$ally['number']}{$init->nameSuffix}</td>
-    <td {$init->bgInfoCell}>{$pop}</td>
-    <td {$init->bgInfoCell}>{$ally['occupation']}%</td>
-    <td {$init->bgInfoCell}>{$farm}</td>
-    <td {$init->bgInfoCell}>{$factory}</td>
-    <td {$init->bgInfoCell}>{$commerce}</td>
-    <td {$init->bgInfoCell}>{$mountain}</td>
-    <td {$init->bgInfoCell}>{$hatuden}</td>
+    <td class="InfoCell">{$ally['number']}{$init->nameSuffix}</td>
+    <td class="InfoCell">{$pop}</td>
+    <td class="InfoCell">{$ally['occupation']}%</td>
+    <td class="InfoCell">{$farm}</td>
+    <td class="InfoCell">{$factory}</td>
+    <td class="InfoCell">{$commerce}</td>
+    <td class="InfoCell">{$mountain}</td>
+    <td class="InfoCell">{$hatuden}</td>
 </tr>
 <tr>
-    <td {$init->bgCommentCell} colspan="9">
+    <td class="CommentCell" colspan="9">
         {$init->tagTH_}<a href="{$allyfile}?Allypact={$ally['id']}">{$ally['oName']}</a>：{$init->_tagTH}{$ally['comment']}
     </td>
 </tr>

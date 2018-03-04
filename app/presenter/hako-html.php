@@ -10,1115 +10,1281 @@ require_once HELPERPATH.'/message/error.php';
 require_once HELPERPATH.'/message/success.php';
 require_once APPPATH.'/model/hako-log.php';
 
-class HTML {
-	/**
-	 * HTML <head>
-	 * @return [type] [description]
-	 */
-	static function header() {
-		global $init;
-		require_once(VIEWS.'/header.php');
-		require_once(VIEWS.'/body.php');
-	}
+class HTML
+{
+    public static function header()
+    {
+        global $init;
+        require_once(VIEWS.'/header.php');
+        require_once(VIEWS.'/body.php');
+    }
 
-	static function head() {
-		global $init;
-		require_once(VIEWS.'/header.php');
-	}
+    public static function head()
+    {
+        global $init;
+        require_once(VIEWS.'/header.php');
+    }
 
 
-	/**
-	 * HTML <footer>
-	 * @return [type] [description]
-	 */
-	static function footer() {
-		global $init;
-		require_once(VIEWS.'/footer.php');
-	}
+    /**
+     * HTML <footer />
+     * @return void
+     */
+    public static function footer()
+    {
+        global $init;
+        require_once(VIEWS.'/footer.php');
+    }
 
-	/**
-	 * 最終更新時刻 ＋ 次ターン更新時刻出力
-	 * @param  [type] $hako [description]
-	 * @return [type]       [description]
-	 */
-	function lastModified($hako) {
-		global $init;
-		require_once(VIEWS.'/lastModified.php');
-	}
+    /**
+     * 最終更新時刻 ＋ 次ターン更新予定時刻出力
+     * @param  [type] $hako [description]
+     * @return void
+     */
+    public function lastModified($hako)
+    {
+        global $init;
+        require_once(VIEWS.'/lastModified.php');
+    }
 
-	/**
-	 * [timeToString description]
-	 * @param  [type] $t [description]
-	 * @return [type]    [description]
-	 */
-	function timeToString($t) {
-		$time = localtime($t, TRUE);
-		$time['tm_year'] += 1900;
-		$time['tm_mon']++;
-		return "{$time['tm_year']}年 {$time['tm_mon']}月 {$time['tm_mday']}日 {$time['tm_hour']}時 {$time['tm_min']}分 {$time['tm_sec']}秒";
-	}
+    /**
+     * "Y年n月j日 G時i分s秒"形式の文字列を返す
+     * @param  integer $t Unixタイムスタンプ
+     * @return string
+     */
+    public function timeToString(int $t): string
+    {
+        return date("Y年n月j日 G時i分s秒", $t);
+    }
+
+    public function pageTitle(string $title, string $subtitle = '')
+    {
+        if ($subtitle=='') {
+            println('<h1 class="title">', $title, '</h1>');
+        } else {
+            println('<h1 class="title">', $title, ' <small>', $subtitle, '</small></h1>');
+        }
+    }
+
+    public function print_islandInfoTable($info, int $rank)
+    {
+        global $init;
+
+        $rank       = $info['isBF'] ? '★' : $rank;
+        $population = $info['pop'] > 1 ? $info['pop'] : 1;
+        $id         = $info['id'];
+        $area       = $info['area'];
+        $point      = $info['point'];
+        $satelites  = $info['eisei'];
+        $zins       = $info['zin'];
+        $items      = $info['item'];
+        $money      = Util::aboutMoney($info['money']);
+        $lottery    = $info['lot'];
+        $food       = $info['food'] . $init->unitFood;
+        $unemployed = ($population - ($info['farm'] + $info['factory'] + $info['commerce'] + $info['mountain'] + $info['hatuden']) * 10) / $population * 100;
+        $unemployed = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
+        $farm       = max($info['farm'] * 10, 0);
+        $factory    = max($info['factory'] * 10, 0);
+        $commerce   = max($info['commerce'] * 10, 0);
+        $mountain   = max($info['mountain'] * 10, 0);
+        $hatuden    = max($info['hatuden'] * 10, 0);
+        $taiji      = $info['taiji'];
+        $peop          = ($info['peop'] < 0) ? $info['peop'].$init->unitPop : '+'.$info['peop'].$init->unitPop;
+        $okane         = ($info['gold'] < 0) ? $info['gold'].$init->unitMoney : '+'.$info['gold'].$init->unitMoney;
+        $gohan         = ($info['rice'] < 0) ? $info['rice'].$init->unitFood : '+'.$info['rice'].$init->unitFood;
+        $poin          = ($info['pots'] < 0) ? $info['pots'].'pts' : '+'.$info['pots'].'pts';
+        $tenki      = $info['tenki'];
+        $team       = $info['team'];
+        $sport      = [
+            'matches' => $info['shiai'],
+            'won'     => $info['kachi'],
+            'lose'    => $info['make'],
+            'draw'    => $info['hikiwake'],
+            'attack'  => $info['kougeki'],
+            'defence' => $info['bougyo'],
+            'point'   => $info['tokuten'],
+            'lpoint'  => $info['shitten']
+        ];
+        $shiai         = $info['shiai'];
+        $kachi         = $info['kachi'];
+        $make          = $info['make'];
+        $hikiwake      = $info['hikiwake'];
+        $kougeki       = $info['kougeki'];
+        $bougyo        = $info['bougyo'];
+        $tokuten       = $info['tokuten'];
+        $shitten       = $info['shitten'];
+        $comment       = $info['comment'];
+        $keep = '';
+
+        $monster       = ($info['monster'] > 0)? '<strong class="monster">[怪獣'.$info['monster'].'体出現中]</strong>' :'';
+
+        if ($info['keep'] == 1) {
+            $comment = '<span class="attention">この島は管理人預かり中です</span>';
+            $keep = '<span style="font-size:1.4em;color:#4f4dff;font-weight:700;" title="管理人預かり中">❄</span>';
+        }
+
+        $name = Util::islandName($info, $hako->ally, $hako->idToAllyNumber);
+        $name = $info['absent'] == 0 ? '<span class="islName">'.$name.'</span>' : '<span class="islName2">'.$name.'('.$info['absent'].')'.'</span>';
+
+        $owner = !empty($info['owner']) ? $info['owner']: 'annonymous';
+
+        $prize = $hako->getPrizeList($info['prize']);
+
+        $point = $info['point'];
+
+        $sora_ = ['', '晴れ☀', '曇り☁', '雨☂', '雷⛈', '雪☃'];
+        $sora = "<img src=\"{$init->imgDir}/tenki{$tenki}.gif\" alt=\"{$sora_[$tenki]}\"". ' width="19" height="19">';
+
+        $str_satelites = "";
+        for ($i = 0; $i < $init->EiseiNumber; $i++) {
+            if (isset($satelites[$i]) && $satelites[$i] > 0) {
+                $str_satelites .= "<img src=\"{$init->imgDir}/eisei{$i}.gif\" alt=\"{$init->EiseiName[$i]} {$eisei[$i]}%\" title=\"{$init->EiseiName[$i]} {$eisei[$i]}%\"> ";
+            }
+        }
+
+        $str_zins = "";
+        for ($i = 0; $i < $init->ZinNumber; $i++) {
+            if (isset($zins[$i]) && $zins[$i] > 0) {
+                $str_zins .= "<img src=\"{$init->imgDir}/zin{$i}.gif\" alt=\"{$init->ZinName[$i]}\" title=\"{$init->ZinName[$i]}\"> ";
+            }
+        }
+
+        $str_items = "";
+        for ($i = 0; $i < $init->ItemNumber; $i++) {
+            if (isset($items[$i]) && $items[$i] > 0) {
+                if ($i == 20) {
+                    $str_items .= "<img src=\"{$init->imgDir}/item{$i}.gif\" alt=\"{$init->ItemName[$i]} {$items[$i]}{$init->unitTree}\"  title=\"{$init->ItemName[$i]} {$item[$i]}{$init->unitTree}\"> ";
+                } else {
+                    $str_items .= "<img src=\"{$init->imgDir}/item{$i}.gif\" alt=\"{$init->ItemName[$i]}\" title=\"{$init->ItemName[$i]}\"> ";
+                }
+            }
+        }
+
+        $lots = $lottery > 0 ? ' <img src="'.$init->imgDir.'/lot.gif" alt="くじ'.$lottery.'枚" title="'.$lottery.'枚">' : '';
+
+        $viking = '';
+        for ($v = $init->shipKind, $c=count($init->shipName); $v < $c; $v++) {
+            if ($island['ship'][$v] > 0) {
+                $viking .= " <img src=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" alt=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
+            }
+        }
+
+        $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist)? " 🔰":"";
+
+        $soccer = ($island['soccer'] > 0)?" <span title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">⚽</span>":"";
+
+        // 電力消費量
+        $enesyouhi = round(($island['pop'] / 100) + ($island['factory'] * 2/3) + ($island['commerce'] /3) + ($island['mountain'] /4));
+        if ($enesyouhi == 0) {
+            $ene = "電力消費なし";
+        } elseif ($island['hatuden'] == 0) {
+            $ene =  '<span style="color:#c7243a;">0%</span>';
+        } else {
+            // 電力供給率
+            $ene = round($island['hatuden'] / $enesyouhi * 100);
+            $ene = ($ene < 100) ? '<span style="color:#c7243a;">'.$ene.'%</span>' : $ene.'%';
+        }
+        echo <<<END
+    <tr>
+        <th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
+        <td class="NameCell" rowspan="5" valign="top">
+            <h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
+            {$prize}{$viking}<br>
+            {$zins}<br>
+            <small>({$peop} {$okane} {$gohan} {$poin})</small>
+        </td>
+        <td class="InfoCell">$point</td>
+        <td class="InfoCell">$pop</td>
+        <td class="InfoCell">$area</td>
+        <td class="TenkiCell">$sora</td>
+        <td class="InfoCell">$money</td>
+        <td class="InfoCell">$food</td>
+        <td class="InfoCell">$unemployed</td>
+    </tr>
+    <tr>
+        <th class="TitleCell head">{$init->nameFarmSize}</th>
+        <th class="TitleCell head">{$init->nameFactoryScale}</th>
+        <th class="TitleCell head">{$init->nameCommercialScale}</th>
+        <th class="TitleCell head">{$init->nameMineScale}</th>
+        <th class="TitleCell head">{$init->namePowerPlantScale}</th>
+        <th class="TitleCell head">{$init->namePowerSupplyRate}</th>
+        <th class="TitleCell head">{$init->nameSatellite}</th>
+    </tr>
+    <tr>
+        <td class="InfoCell">$farm</td>
+        <td class="InfoCell">$factory</td>
+        <td class="InfoCell">$commerce</td>
+        <td class="InfoCell">$mountain</td>
+        <td class="InfoCell">$hatuden</td>
+        <td class="InfoCell">$ene</td>
+        <td class="ItemCell">$eiseis</td>
+    </tr>
+    <tr>
+        <th class="TitleCell head">取得アイテム</th>
+        <td class="ItemCell" colspan="6">$items</td>
+    </tr>
+    <tr>
+        <td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
+    </tr>
+END;
+    }
 }
 
 
-class HtmlTop extends HTML {
-
-	function main($hako, $data) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
-		$allyfile  = $init->baseDir . "/hako-ally.php";
-
-		$radio  = "checked";
-		$radio2 = "";
-		if( !empty($data['defaultDevelopeMode']) && $data['defaultDevelopeMode'] == "javascript") {
-			$radio  = "";
-			$radio2 = "checked";
-		}
-
-		// セットするパスワードのチェック
-		$defaultPassword = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
-
-		// 読み込み
-		require_once(VIEWS.'/top/main.php');
-
-		// 各部門ランキング
-		require_once(VIEWS.'/top/category-rank.php');
-
-		// 同盟の状況
-		if($hako->allyNumber) {
-			require_once(VIEWS.'/top/ally-list.php');
-		}
-
-		// 各諸島の状況
-		require_once(VIEWS.'/top/island-list.php');
-
-		// Battle Fieldの状況
-		require_once(VIEWS.'/top/bf-list.php');
-
-		// 歴史
-		require_once(VIEWS.'/log/history.php');
-
-		// 管理者登録モード
-		if($init->registerMode) {
-			require_once(VIEWS.'/top/register-mode.php');
-		}
-	}
-
-	/**
-	 * 島の一覧表を表示
-	 * @param  [type] $hako     [description]
-	 * @param  [type] $start    [description]
-	 * @param  [type] $sentinel [description]
-	 * @return [type]           [description]
-	 */
-	function islandTable(&$hako, $start, $sentinel) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
-
-		if ($sentinel == 0) {
-			return;
-		}
-
-		echo '<div class="table-responsive">';
-		echo '<table class="table table-bordered table-condensed">';
-
-		for($i = $start; $i < $sentinel ; $i++) {
-			$island        = $hako->islands[$i];
-			$island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
-
-			$j            = ($island['isBF'])? '★': $i + 1;
-			$id           = $island['id'];
-			$pop          = $island['pop'] . $init->unitPop;
-			$area         = $island['area'] . $init->unitArea;
-			$point        = $island['point'];
-			$eisei        = $island['eisei'];
-			$zin          = $island['zin'];
-			$item         = $island['item'];
-			$money        = Util::aboutMoney($island['money']);
-			$lot          = $island['lot'];
-			$food         = $island['food'] . $init->unitFood;
-			$unemployed   = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
-			$unemployed   = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
-			$farm         = ($island['farm']     <= 0)? $init->notHave: $island['farm']    *10 . $init->unitPop;
-			$factory      = ($island['factory']  <= 0)? $init->notHave: $island['factory'] *10 . $init->unitPop;
-			$commerce     = ($island['commerce'] <= 0)? $init->notHave: $island['commerce']*10 . $init->unitPop;
-			$mountain     = ($island['mountain'] <= 0)? $init->notHave: $island['mountain']*10 . $init->unitPop;
-			$hatuden      = ($island['hatuden']  <= 0)? $init->notHave: $island['hatuden'] *10 . $init->unitPop;
-			$taiji        = ($island['taiji']    <= 0)? "0".$init->unitMonster: $island['taiji']. $init->unitMonster;
-			$peop         = ($island['peop'] < 0) ? "{$island['peop']}{$init->unitPop}" : "+{$island['peop']}{$init->unitPop}";
-			$okane        = ($island['gold'] < 0) ? "{$island['gold']}{$init->unitMoney}" : "+{$island['gold']}{$init->unitMoney}";
-			$gohan        = ($island['rice'] < 0) ? "{$island['rice']}{$init->unitFood}" : "+{$island['rice']}{$init->unitFood}";
-			$poin         = ($island['pots'] < 0) ? "{$island['pots']}pts" : "+{$island['pots']}pts";
-			$tenki        = $island['tenki'];
-			$team         = $island['team'];
-			$shiai        = $island['shiai'];
-			$kachi        = $island['kachi'];
-			$make         = $island['make'];
-			$hikiwake     = $island['hikiwake'];
-			$kougeki      = $island['kougeki'];
-			$bougyo       = $island['bougyo'];
-			$tokuten      = $island['tokuten'];
-			$shitten      = $island['shitten'];
-			$comment      = $island['comment'];
-			$comment_turn = $island['comment_turn'];
-			//$starturn     = $island['starturn'];
-			$monster      = '';
-
-			if($island['monster'] > 0) {
-				$monster = "<strong class=\"monster\">[怪獣{$island['monster']}体 出現中]</strong>";
-			}
-
-			if($island['keep'] == 1) {
-				$comment = "<span class=\"attention\">この島は管理人預かり中です。</span>";
-			}
-
-			$name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
-			if($island['absent'] == 0) {
-				$name = "{$init->tagName_}{$name}{$init->_tagName}";
-			} else {
-				$name = "{$init->tagName2_}{$name}({$island['absent']}){$init->_tagName2}";
-			}
-
-			$owner = (!empty($island['owner']))? $island['owner']: "コメント";
-
-			$prize = $island['prize'];
-			$prize = $hako->getPrizeList($prize);
-
-			$point = $island['point'];
-
-			// /*if($init->commentNew > 0 && ($comment_turn + $init->commentNew) > $hako->islandTurn) { */
-			// if( $comment_turn > $hako->islandTurn) {
-			// 	$comment .= " <span class=\"new\">New</span>";
-			// }
-
-			$sora = "";
-			switch ($tenki) {
-				case 1:
-					$sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
-					break;
-				case 2:
-					$sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
-					break;
-				case 3:
-					$sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
-					break;
-				case 4:
-					$sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
-					break;
-				default :
-					$sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
-			}
 
 
 
-			$eiseis = "";
-			for($e = 0; $e < $init->EiseiNumber; $e++) {
-				if (isset($eisei[$e])) {
-					if($eisei[$e] > 0) {
-						$eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eisei[$e]}%\" title=\"{$init->EiseiName[$e]} {$eisei[$e]}%\"> ";
-					} else {
-						$eiseis .= "";
-					}
-				}
-			}
+class HtmlTop extends HTML
+{
+    public function main($hako, $data)
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-main.php';
+        $allyfile  = $init->baseDir.'/hako-ally.php';
 
-			$zins = "";
-			for($z = 0; $z < $init->ZinNumber; $z++) {
-				if (isset($zin[$z])) {
-					if($zin[$z] > 0) {
-						$zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
-					} else {
-						$zins .= "";
-					}
-				}
-			}
+        // 開発モードのラジオボタンのチェックフラグ
+        $radio  = '';
+        $radio2 = 'checked';
+        if (strtolower($data['defaultDevelopeMode'] ?? "") != 'javascript') {
+            $radio  = 'checked';
+            $radio2 = '';
+        }
 
-			$items = "";
-			for($t = 0; $t < $init->ItemNumber; $t++) {
-				if (isset($item[$t])) {
-					if($item[$t] > 0) {
-						if($t == 20) {
-							$items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"  title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
-						} else {
-							$items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
-						}
-					} else {
-						$items .= "";
-					}
-				}
-			}
+        // セットするパスワードのチェック
+        $defaultPassword = $data['defaultPassword'] ?? '';
 
-			$lots = "";
-			if($lot > 0) {
-				$lots .= " <IMG SRC=\"{$init->imgDir}/lot.gif\" ALT=\"くじ：{$lot}枚\" title=\"{$lot}枚\">";
-			}
+        // set parent directory
+        $views = VIEWS.'/top/';
 
-			$viking = "";
-			for($v = $init->shipKind, $c=count($init->shipName); $v < $c; $v++) {
-				if($island['ship'][$v] > 0) {
-					$viking .= " <img src=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" alt=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
-				}
-			}
+        // サイトタイトルからお知らせまで
+        require_once($views.'main.php');
 
-			$start = "";
-			if(($hako->islandTurn - $island['starturn']) < $init->noAssist) {
-				$start .= " 🔰";//" <IMG SRC=\"{$init->imgDir}/start.gif\" width=\"16\" height=\"16\" ALT=\"初心者マーク\" title=\"初心者マーク\">";
-			}
+        // 各部門ランキング
+        require_once($views.'category-rank.php');
 
-			$soccer = "";
-			if($island['soccer'] > 0) {
-				//$soccer .= " <IMG SRC=\"{$init->imgDir}/soccer.gif\" width=\"16\" height=\"16\" ALT=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\" title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">";
-				$soccer .= " <span title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">⚽</span>";
-			}
+        // 同盟の状況
+        if ($hako->allyNumber) {
+            require_once($views.'ally-list.php');
+        }
 
-			// 電力消費量
-			$enesyouhi = round($island['pop'] / 100 + $island['factory'] * 2/3 + $island['commerce'] * 1/3 + $island['mountain'] * 1/4);
-			if($enesyouhi == 0) {
-				$ene = "電力消費なし";
-			} elseif($island['hatuden'] == 0) {
-				$ene =  "<font color=\"#C7243A\">0%</font>";
-			} else {
-				// 電力供給率
-				$ene = round($island['hatuden'] / $enesyouhi * 100);
-				if($ene < 100) {
-					// 供給電力不足
-					$ene = "<font color=\"#C7243A\">{$ene}%</font>";
-				} else {
-					// 供給電力充分
-					$ene = "{$ene}%";
-				}
-			}
-			$keep = isset($keep) ? $keep : "";
-			echo <<<END
+        // 各諸島の状況
+        require_once($views.'island-list.php');
+
+        // Battle Fieldの状況
+        require_once($views.'bf-list.php');
+
+        // 歴史
+        require_once(VIEWS.'/log/history.php');
+
+        // 管理者登録モード
+        if ($init->registerMode) {
+            require_once($views.'register-mode.php');
+        }
+    }
+
+    /**
+     * 島の一覧表を表示
+     * @param  [type] $hako     グローバルデータ
+     * @param  [type] $start    [description]
+     * @param  [type] $sentinel [description]
+     * @return [type]           [description]
+     */
+    public function islandTable(&$hako, int $start, int $sentinel)
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-main.php';
+
+        if ($sentinel == 0) {
+            return;
+        }
+
+        println('<div class="table-responsive">');
+        println('<table class="table table-bordered table-condensed">');
+
+        for ($i = $start; $i < $sentinel ; $i++) {
+            $island        = $hako->islands[$i];
+            if ($island['isDead'] ?? false) {
+                continue;
+            }
+
+            $island['pop'] = ($island['pop'] > 1) ? $island['pop'] : 1;
+            $j             = ($island['isBF']) ? '★' : $i + 1;
+            $id            = $island['id'];
+            $pop           = $island['pop'].$init->unitPop;
+            $area          = $island['area'].$init->unitArea;
+            $point         = $island['point'];
+            $eisei         = $island['eisei'];
+            $zin           = $island['zin'];
+            $item          = $island['item'];
+            $money         = Util::aboutMoney($island['money']);
+            $lot           = $island['lot'];
+            $food          = $island['food'] . $init->unitFood;
+            $unemployed    = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
+            $unemployed    = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
+            $farm          = ($island['farm']     <= 0)? $init->notHave: $island['farm']    *10 . $init->unitPop;
+            $factory       = ($island['factory']  <= 0)? $init->notHave: $island['factory'] *10 . $init->unitPop;
+            $commerce      = ($island['commerce'] <= 0)? $init->notHave: $island['commerce']*10 . $init->unitPop;
+            $mountain      = ($island['mountain'] <= 0)? $init->notHave: $island['mountain']*10 . $init->unitPop;
+            $hatuden       = ($island['hatuden']  <= 0)? $init->notHave: $island['hatuden'] *10 . 'kW';
+            $taiji         = ($island['taiji']    <= 0)? "0".$init->unitMonster: $island['taiji'].$init->unitMonster;
+            $peop          = ($island['peop'] < 0) ? $island['peop'].$init->unitPop : '+'.$island['peop'].$init->unitPop;
+            $okane         = ($island['gold'] < 0) ? $island['gold'].$init->unitMoney : '+'.$island['gold'].$init->unitMoney;
+            $gohan         = ($island['rice'] < 0) ? $island['rice'].$init->unitFood : '+'.$island['rice'].$init->unitFood;
+            $poin          = ($island['pots'] < 0) ? $island['pots'].'pts' : '+'.$island['pots'].'pts';
+            $tenki         = $island['tenki'];
+            $team          = $island['team'];
+            $shiai         = $island['shiai'];
+            $kachi         = $island['kachi'];
+            $make          = $island['make'];
+            $hikiwake      = $island['hikiwake'];
+            $kougeki       = $island['kougeki'];
+            $bougyo        = $island['bougyo'];
+            $tokuten       = $island['tokuten'];
+            $shitten       = $island['shitten'];
+            $comment       = $island['comment'];
+            $comment_turn  = $island['comment_turn'];
+            //$starturn     = $island['starturn'];
+            $keep = '';
+
+            $monster       = ($island['monster'] > 0)? '<strong class="monster">[怪獣'.$island['monster'].'体出現中]</strong>' :'';
+
+            if ($island['keep'] == 1) {
+                $comment = '<span class="attention">この島は管理人預かり中です</span>';
+                $keep = '<span style="font-size:1.4em;color:#4f4dff;font-weight:700;" title="管理人預かり中">❄</span>';
+            }
+
+            $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
+            $name = $island['absent'] == 0 ? $init->tagName_.$name.$init->_tagName : $init->tagName2_.$name.'('.$island['absent'].')'.$init->_tagName2;
+
+            $owner = (!empty($island['owner']))? $island['owner']: 'annonymous';
+
+            $prize = $hako->getPrizeList($island['prize']);
+
+            $point = $island['point'];
+
+            $sora = "";
+            switch ($tenki) {
+                case 1:
+                    $sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
+                    break;
+                case 2:
+                    $sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
+                    break;
+                case 3:
+                    $sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
+                    break;
+                case 4:
+                    $sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
+                    break;
+                default:
+                    $sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
+            }
+
+            $eiseis = "";
+            for ($e = 0; $e < $init->EiseiNumber; $e++) {
+                if (isset($eisei[$e])) {
+                    if ($eisei[$e] > 0) {
+                        $eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eisei[$e]}%\" title=\"{$init->EiseiName[$e]} {$eisei[$e]}%\"> ";
+                    }
+                }
+            }
+
+            $zins = "";
+            for ($z = 0; $z < $init->ZinNumber; $z++) {
+                if (isset($zin[$z])) {
+                    if ($zin[$z] > 0) {
+                        $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
+                    }
+                }
+            }
+
+            $items = "";
+            for ($t = 0; $t < $init->ItemNumber; $t++) {
+                if (isset($item[$t])) {
+                    if ($item[$t] > 0) {
+                        if ($t == 20) {
+                            $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"  title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
+                        } else {
+                            $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
+                        }
+                    }
+                }
+            }
+
+            $lots = ($lot > 0)? ' <img src="'.$init->imgDir.'/lot.gif" alt="くじ：'.$lot.'枚" title="'.$lot.'枚">':'';
+
+            $viking = "";
+            for ($v = $init->shipKind, $c=count($init->shipName); $v < $c; $v++) {
+                if ($island['ship'][$v] > 0) {
+                    $viking .= " <img src=\"{$init->imgDir}/ship{$v}.gif\" width=\"16\" height=\"16\" alt=\"{$init->shipName[$v]}出現中\" title=\"{$init->shipName[$v]}出現中\">";
+                }
+            }
+
+            $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist)? " 🔰":"";
+
+            $soccer = ($island['soccer'] > 0)?" <span title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">⚽</span>":"";
+
+            // 電力消費量
+            $enesyouhi = round(($island['pop'] / 100) + ($island['factory'] * 2/3) + ($island['commerce'] /3) + ($island['mountain'] /4));
+            if ($enesyouhi == 0) {
+                $ene = "電力消費なし";
+            } elseif ($island['hatuden'] == 0) {
+                $ene =  '<span style="color:#c7243a;">0%</span>';
+            } else {
+                // 電力供給率
+                $ene = round($island['hatuden'] / $enesyouhi * 100);
+                $ene = ($ene < 100) ? '<span style="color:#c7243a;">'.$ene.'%</span>' : $ene.'%';
+            }
+            echo <<<END
 	<thead>
 		<tr>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}島{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}得点{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameWeather}{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}{$lots}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameUnemploymentRate}{$init->_tagTH}</th>
+			<th class="TitleCell head">{$init->nameRank}</th>
+			<th class="TitleCell head">島</th>
+			<th class="TitleCell head">得点</th>
+			<th class="TitleCell head">{$init->namePopulation}</th>
+			<th class="TitleCell head">{$init->nameArea}</th>
+			<th class="TitleCell head">{$init->nameWeather}</th>
+			<th class="TitleCell head">{$init->nameFunds} {$lots}</th>
+			<th class="TitleCell head">{$init->nameFood}</th>
+			<th class="TitleCell head">{$init->nameUnemploymentRate}</th>
 		</tr>
 	</thead>
 	<tr>
-		<th {$init->bgNumberCell} rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
-		<td {$init->bgNameCell} rowspan="5" valign="top">
-			<h3><a href="{$this_file}?Sight={$id}">{$name}</a> <small>{$start}{$monster}{$soccer}</small></h3>
+		<th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
+		<td class="NameCell" rowspan="5" valign="top">
+			<h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
 			{$prize}{$viking}<br>
 			{$zins}<br>
 			<small>({$peop} {$okane} {$gohan} {$poin})</small>
 		</td>
-		<td {$init->bgInfoCell}>$point</td>
-		<td {$init->bgInfoCell}>$pop</td>
-		<td {$init->bgInfoCell}>$area</td>
+		<td class="InfoCell">$point</td>
+		<td class="InfoCell">$pop</td>
+		<td class="InfoCell">$area</td>
 		<td class="TenkiCell">$sora</td>
-		<td {$init->bgInfoCell}>$money</td>
-		<td {$init->bgInfoCell}>$food</td>
-		<td {$init->bgInfoCell}>$unemployed</td>
+		<td class="InfoCell">$money</td>
+		<td class="InfoCell">$food</td>
+		<td class="InfoCell">$unemployed</td>
 	</tr>
 	<tr>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePowerSupplyRate}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameSatellite}{$init->_tagTH}</th>
+		<th class="TitleCell head">{$init->nameFarmSize}</th>
+		<th class="TitleCell head">{$init->nameFactoryScale}</th>
+		<th class="TitleCell head">{$init->nameCommercialScale}</th>
+		<th class="TitleCell head">{$init->nameMineScale}</th>
+		<th class="TitleCell head">{$init->namePowerPlantScale}</th>
+		<th class="TitleCell head">{$init->namePowerSupplyRate}</th>
+		<th class="TitleCell head">{$init->nameSatellite}</th>
 	</tr>
 	<tr>
-		<td {$init->bgInfoCell}>$farm</td>
-		<td {$init->bgInfoCell}>$factory</td>
-		<td {$init->bgInfoCell}>$commerce</td>
-		<td {$init->bgInfoCell}>$mountain</td>
-		<td {$init->bgInfoCell}>{$hatuden}</td>
-		<td {$init->bgInfoCell}>$ene</td>
+		<td class="InfoCell">$farm</td>
+		<td class="InfoCell">$factory</td>
+		<td class="InfoCell">$commerce</td>
+		<td class="InfoCell">$mountain</td>
+		<td class="InfoCell">$hatuden</td>
+		<td class="InfoCell">$ene</td>
 		<td class="ItemCell">$eiseis</td>
 	</tr>
 	<tr>
-		<th {$init->bgTitleCell}>{$init->tagTH_}取得アイテム{$init->_tagTH}</th>
+		<th class="TitleCell head">取得アイテム</th>
 		<td class="ItemCell" colspan="6">$items</td>
 	</tr>
 	<tr>
-		<td {$init->bgCommentCell} colspan="7">{$init->tagTH_}{$owner}：{$init->_tagTH}$comment</td>
+		<td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
 	</tr>
 END;
-		}
-		echo "</table>";
-		echo "</div>";
-	}
+        }
+        echo "</table></div>";
+    }
 
-	/**
-	 * 島の登録と設定
-	 * @param type $hako
-	 * @param type $data
-	 */
-	function register(&$hako, $data = "") {
-		require_once(VIEWS.'/conf/register.php');
-	}
+    /**
+     * 島の登録と設定
+     * @param type $hako
+     * @param type $data
+     */
+    public function register(&$hako, $data = '')
+    {
+        global $init;
 
-	/**
-	 * 新しい島を探す
-	 * @param  [type] $number [description]
-	 * @return [type]         [description]
-	 */
-	function discovery($number) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
+        require_once(VIEWS.'/conf/register.php');
+    }
 
-		require_once(VIEWS.'/conf/discovery.php');
-	}
+    /**
+     * 新しい島を探す
+     * @param  [type] $number [description]
+     * @return [type]         [description]
+     */
+    public function discovery($number)
+    {
+        global $init;
+        $this_file = $init->baseDir . '/hako-main.php';
 
-	/**
-	 * 島の名前とパスワードの変更
-	 */
-	function changeIslandInfo($islandList = "") {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
+        require_once(VIEWS.'/conf/discovery.php');
+    }
 
-		require_once(VIEWS.'/conf/change/island-info.php');
-	}
+    /**
+     * 島の名前とパスワードの変更
+     */
+    public function changeIslandInfo($islandList = "")
+    {
+        global $init;
+        $this_file = $init->baseDir . "/hako-main.php";
 
-	/**
-	 * オーナー名の変更
-	 */
-	function changeOwnerName($islandList = "") {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
+        require_once(VIEWS.'/conf/change/island-info.php');
+    }
 
-		require_once(VIEWS.'/conf/change/owner-name.php');
-	}
+    /**
+     * オーナー名の変更
+     */
+    public function changeOwnerName($islandList = "")
+    {
+        global $init;
+        $this_file = $init->baseDir . "/hako-main.php";
 
-	/**
-	 * 最近の出来事
-	 */
-	function log() {
-		global $init;
-		require_once(VIEWS.'/log/recent.php');
-	}
+        require_once(VIEWS.'/conf/change/owner-name.php');
+    }
 
-	/**
-	 * お知らせ
-	 */
-	function infoPrint() {
-		global $init;
-		require_once(VIEWS.'/log/info.php');
-	}
+    /**
+     * 最近の出来事
+     */
+    public function log()
+    {
+        global $init;
+        require_once(VIEWS.'/log/recent.php');
+    }
 
+    /**
+     * お知らせ
+     */
+    public function infoPrint()
+    {
+        global $init;
+        require_once(VIEWS.'/log/info.php');
+    }
 }
 
 
-class HtmlMap extends HTML {
-	//---------------------------------------------------
-	// 開発画面
-	//---------------------------------------------------
-	function owner($hako, $data) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
+class HtmlMap extends HTML
+{
+    /**
+     * 開発画面
+     * @param  [type] $hako [description]
+     * @param  [type] $data [description]
+     * @return [type]       [description]
+     */
+    public function owner($hako, $data)
+    {
+        global $init;
+        $this_file = $init->baseDir . "/hako-main.php";
 
-		$id = $data['ISLANDID'];
-		$number = $hako->idToNumber[$id];
-		$island = $hako->islands[$number];
+        $id = $data['ISLANDID'];
+        $number = $hako->idToNumber[$id];
+        $island = $hako->islands[$number];
 
-		// パスワードチェック
-		if(!Util::checkPassword($island['password'], $data['PASSWORD'])){
-			HakoError::wrongPassword();
-			return;
-		}
+        // パスワードチェック
+        if (!Util::checkPassword($island['password'], $data['PASSWORD'])) {
+            HakoError::wrongPassword();
 
-		// 開発画面
-		$this->tempOwer($hako, $data, $number);
+            return;
+        }
 
-		// IP情報取得
-		$logfile = "{$init->dirName}/{$init->logname}";
-		$ax = $init->axesmax - 1;
-		$log = file($logfile);
-		$fp = fopen($logfile,"w");
-		$timedata = date("Y年m月d日(D) H時i分s秒");
-		$islandID = "{$data['ISLANDID']}";
-		$name = "{$island['name']}{$init->nameSuffix}";
-		$ip = getenv("REMOTE_ADDR");
-		$host = gethostbyaddr(getenv("REMOTE_ADDR"));
-		fputs($fp,$timedata.",".$islandID.",".$name.",".$ip.",".$host."\n");
-		for($i=0; $i<$ax; $i++) {
-			if ( isset($log[$i]) ) {
-				fputs($fp,$log[$i]);
-			}
-		}
-		fclose($fp);
+        // IP情報取得
+        $logfile = $init->dirName.'/'.$init->logname;
+        $log = file($logfile);
+        $fp = fopen($logfile, "w");
+        $timedata = date("Y年m月d日(D) H時i分s秒");
+        $islandID = $data['ISLANDID'];
+        $name = $island['name'].$init->nameSuffix;
+        $ip = getenv('REMOTE_ADDR', true);
+        if ($ip){
+            $host = gethostbyaddr($ip);
+        }
+        else {
+            $ip = '192.0.2.0';
+            $host = 'unknown';
+        }
 
-		$this->islandRecent($island, 1);
-	}
+        // ファイル頭に追記して最大容量超過分を切り捨て
+        fputs($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
+        for ($i=0,$ax=$init->axesmax-1; $i<$ax; $i++) {
+            if (isset($log[$i])) {
+                fputs($fp, $log[$i]);
+            }
+        }
+        fclose($fp);
 
-	/**
-	 * 観光画面
-	 * @param  [type] $hako [description]
-	 * @param  [type] $data [description]
-	 * @return [type]       [description]
-	 */
-	function visitor($hako, $data) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
+        // 開発画面
+        $this->tempOwer($hako, $data, $number);
 
-		// idから島番号を取得
-		$id = $data['ISLANDID'];
-		$number = isset($hako->idToNumber[$id]) ? $hako->idToNumber[$id] : -1;
+        // 島の近況
+        $this->islandRecent($island, 1);
+    }
 
-		// なぜかその島がない場合
-		if($number < 0 || $number > $hako->islandNumber) {
-			HakoError::problem();
-			return;
-		}
-		// 島の名前を取得
-		$island = $hako->islands[$number];
-		$name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
+    /**
+     * 観光画面
+     * @param  [type] $hako [description]
+     * @param  [type] $data [description]
+     * @return [type]       [description]
+     */
+    public function visitor($hako, $data)
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-main.php';
 
-		// 読み込み
-		require_once(VIEWS.'/map/main.php');
-	}
+        // idから島番号を取得
+        $id = $data['ISLANDID'];
+        $number = $hako->idToNumber[$id] ?? -1;
 
-	//---------------------------------------------------
-	// 島の情報
-	//---------------------------------------------------
-	function islandInfo($island, $number = 0, $mode = 0) {
-		global $init;
-		$island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
+        // なぜかその島がない場合
+        if ($number < 0 || $number > $hako->islandNumber) {
+            HakoError::problem();
 
-		$rank       = ($island['isBF']) ? '★' : $number + 1;
-		$pop        = $island['pop'] . $init->unitPop;
-		$area       = $island['area'] . $init->unitArea;
-		$eisei      = isset($island['eisei']) ? $island['eisei'] : "";
-		$zin        = isset($island['zin'])   ? $island['zin']   : "";
-		$item       = isset($island['item'])  ? $island['item']  : "";
-		$money      = ($mode == 0) ? Util::aboutMoney($island['money']) : "{$island['money']}{$init->unitMoney}";
-		$lot        = isset($island['lot'])  ? $island['lot']  : "";
-		$food       = $island['food'] . $init->unitFood;
-		$unemployed = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
-		$unemployed = '<font color="' . ($unemployed < 0 ? 'black' : '#C7243A') . '">' . sprintf("%-3d%%", $unemployed) . '</font>';
-		$farm       = ($island['farm'] <= 0) ? $init->notHave : $island['farm'] * 10 . $init->unitPop;
-		$factory    = ($island['factory'] <= 0) ? $init->notHave : $island['factory'] * 10 . $init->unitPop;
-		$commerce   = ($island['commerce'] <= 0) ? $init->notHave : $island['commerce'] * 10 . $init->unitPop;
-		$mountain   = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
-		$hatuden    = ($island['hatuden'] <= 0) ? $init->notHave : $island['hatuden'] * 10 . $init->unitPop;
-		$taiji      = ($island['taiji'] <= 0) ? "0匹" : $island['taiji'] * 1 . $init->unitMonster;
-		$tenki      = $island['tenki'];
-		$team       = $island['team'];
-		$shiai      = $island['shiai'];
-		$kachi      = $island['kachi'];
-		$make       = $island['make'];
-		$hikiwake   = $island['hikiwake'];
-		$kougeki    = $island['kougeki'];
-		$bougyo     = $island['bougyo'];
-		$tokuten    = $island['tokuten'];
-		$shitten    = $island['shitten'];
-		$comment    = $island['comment'];
+            return;
+        }
+        // 島の名前を取得
+        $island = $hako->islands[$number];
+        $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
 
-		if($island['keep'] == 1) {
-			$comment = "<span class=\"attention\">この島は管理人預かり中です。</span>";
-		}
+        // 読み込み
+        require_once(VIEWS.'/map/main.php');
+    }
 
-		$sora = "";
-		switch ($tenki) {
-			case 1:
-				$sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
-				break;
-			case 2:
-				$sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
-				break;
-			case 3:
-				$sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
-				break;
-			case 4:
-				$sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
-				break;
-			default :
-				$sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
-		}
+    //---------------------------------------------------
+    // 島の情報
+    //---------------------------------------------------
+    public function islandInfo($island, $number = 0, $mode = 0)
+    {
+        global $init;
+        $island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
 
-		$eiseis = "";
-		for($e = 0; $e < $init->EiseiNumber; $e++) {
-			$eiseip = "";
-			if ( isset($eisei[$e]) ) {
-				if($eisei[$e] > 0) {
-					$eiseip .= $eisei[$e];
-					$eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eiseip}%\" title=\"{$init->EiseiName[$e]} {$eiseip}%\"> ({$eiseip}%)";
-				} else {
-					$eiseis .= "";
-				}
-			}
-		}
+        $rank       = $island['isBF'] ? '★' : $number + 1;
+        $pop        = $island['pop'].$init->unitPop;
+        $area       = $island['area'].$init->unitArea;
+        $eisei      = $island['eisei'] ?? "";
+        $zin        = $island['zin'] ?? "";
+        $item       = $island['item'] ?? "";
+        $money      = ($mode == 0) ? Util::aboutMoney($island['money']) : $island['money'].$init->unitMoney;
+        $lot        = $island['lot'] ?? "";
+        $food       = $island['food'].$init->unitFood;
+        $unemployed = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
+        $unemployed = '<font color="' . ($unemployed < 0 ? 'black' : '#C7243A') . '">' . sprintf("%-3d%%", $unemployed) . '</font>';
+        $farm       = ($island['farm'] <= 0) ? $init->notHave : $island['farm'] * 10 . $init->unitPop;
+        $factory    = ($island['factory'] <= 0) ? $init->notHave : $island['factory'] * 10 . $init->unitPop;
+        $commerce   = ($island['commerce'] <= 0) ? $init->notHave : $island['commerce'] * 10 . $init->unitPop;
+        $mountain   = ($island['mountain'] <= 0) ? $init->notHave : $island['mountain'] * 10 . $init->unitPop;
+        $hatuden    = ($island['hatuden'] <= 0) ? $init->notHave : $island['hatuden'] * 10 . $init->unitPop;
+        $taiji      = (($island['taiji'] <= 0)? 0 : $island['taiji']).$init->unitMonster;
+        $tenki      = $island['tenki'];
+        $team       = $island['team'];
+        $shiai      = $island['shiai'];
+        $kachi      = $island['kachi'];
+        $make       = $island['make'];
+        $hikiwake   = $island['hikiwake'];
+        $kougeki    = $island['kougeki'];
+        $bougyo     = $island['bougyo'];
+        $tokuten    = $island['tokuten'];
+        $shitten    = $island['shitten'];
+        $comment    = $island['comment'];
 
-		$zins = "";
-		for($z = 0; $z < $init->ZinNumber; $z++) {
-			if ( isset($zin[$z]) ) {
-				if($zin[$z] > 0) {
-					$zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
-				} else {
-					$zins .= "";
-				}
-			}
-		}
+        if ($island['keep'] == 1) {
+            $comment = '<span class="attention">この島は管理人預かり中です。</span>';
+        }
 
-		$items = "";
-		for($t = 0; $t < $init->ItemNumber; $t++) {
-			if ( isset($item[$t]) ) {
-				if($item[$t] > 0) {
-					if($t == 20) {
-						$items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\" title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
-					} else {
-						$items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
-					}
-				} else {
-					$items .= "";
-				}
-			}
-		}
-		$lots = "";
-		if($lot > 0) {
-			$lots .= " <IMG SRC=\"{$init->imgDir}/lot.gif\" ALT=\"{$lot}枚\" title=\"{$lot}枚\">";
-		}
+        $_sora = ['','晴れ','曇り','雨','雷','雪'];
+        $sora = '<img src="'.$init->imgDir.'/tenki'.$tenki.'.gif" alt="'.$_sora[$tenki].'" title="'.$_sora[$tenki].'" width="19" height="19">';
 
-		if($mode == 1) {
-			$arm = "Lv.{$island['rena']}";
-		} else {
-			$arm = "機密事項";
-		}
+        $eiseis = "";
+        for ($e = 0; $e < $init->EiseiNumber; $e++) {
+            $eiseip = "";
+            if (isset($eisei[$e])) {
+                if ($eisei[$e] > 0) {
+                    $eiseip .= $eisei[$e];
+                    $eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eiseip}%\" title=\"{$init->EiseiName[$e]} {$eiseip}%\"> ({$eiseip}%)";
+                } else {
+                    $eiseis .= "";
+                }
+            }
+        }
 
-		// 電力消費量
-		$enesyouhi = round($island['pop'] / 100 + $island['factory'] * 2/3 + $island['commerce'] * 1/3 + $island['mountain'] * 1/4);
-		if($enesyouhi == 0) {
-			$ene = "電力消費なし";
-		} elseif($island['hatuden'] == 0) {
-			$ene =  "<font color=\"#C7243A\">0%</font>";
-		} else {
-			// 電力供給率
-			$ene = round($island['hatuden'] / $enesyouhi * 100);
-			if($ene < 100) {
-				// 供給電力不足
-				$ene = "<font color=\"#C7243A\">{$ene}%</font>";
-			} else {
-				// 供給電力充分
-				$ene = "{$ene}%";
-			}
-		}
+        $zins = "";
+        for ($z = 0; $z < $init->ZinNumber; $z++) {
+            if (isset($zin[$z])) {
+                if ($zin[$z] > 0) {
+                    $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
+                }
+            }
+        }
 
-		// 島の情報
-		require_once(VIEWS.'/map/island-info.php');
-	}
+        $items = "";
+        for ($t = 0; $t < $init->ItemNumber; $t++) {
+            if (isset($item[$t])) {
+                if ($item[$t] > 0) {
+                    if ($t == 20) {
+                        $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\" title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
+                    } else {
+                        $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
+                    }
+                }
+            }
+        }
+        $lots = "";
+        if ($lot > 0) {
+            $lots .= " <img src=\"{$init->imgDir}/lot.gif\" alt=\"{$lot}枚\" title=\"{$lot}枚\">";
+        }
 
-	//---------------------------------------------------
-	// 地形出力
-	// $mode = 1 -- ミサイル基地なども表示
-	//---------------------------------------------------
-	function islandMap($hako, $island, $mode = 0) {
-		global $init;
+        $arm = ($mode == 1) ? 'Lv.'.$island['rena'] : "機密事項";
 
-		$land = $island['land'];
-		$landValue = $island['landValue'];
-		$command = $island['command'];
-		$comStr = array();
+        // 電力消費量
+        $enesyouhi = round($island['pop'] / 100 + $island['factory'] * 2/3 + $island['commerce'] * 1/3 + $island['mountain'] * 1/4);
+        if ($enesyouhi == 0) {
+            $ene = "電力消費なし";
+        } elseif ($island['hatuden'] == 0) {
+            $ene =  "<font color=\"#C7243A\">0%</font>";
+        } else {
+            // 電力供給率
+            $ene = round($island['hatuden'] / $enesyouhi * 100);
+            if ($ene < 100) {
+                // 供給電力不足
+                $ene = "<font color=\"#C7243A\">{$ene}%</font>";
+            } else {
+                // 供給電力充分
+                $ene = "{$ene}%";
+            }
+        }
 
-		// 増減情報
-		$peop  = "";
-		$okane = "";
-		$gohan = "";
-		$poin  = "";
+        // 島の情報
+        require_once(VIEWS.'/map/island-info.php');
+    }
 
-		if (isset($island['peop'])){
-			$peop = ($island['peop'] < 0) ? "{$island['peop']}{$init->unitPop}" : "+{$island['peop']}{$init->unitPop}";
-		}
-		if (isset($island['gold'])){
-			$okane = ($island['gold'] < 0) ? "{$island['gold']}{$init->unitMoney}" : "+{$island['gold']}{$init->unitMoney}";
-		}
-		if (isset($island['rice'])){
-			$gohan = ($island['rice'] < 0) ? "{$island['rice']}{$init->unitFood}" : "+{$island['rice']}{$init->unitFood}";
-		}
-		if (isset($island['pots'])){
-			$poin = ($island['pots'] < 0) ? "{$island['pots']}pts" : "+{$island['pots']}pts";
-		}
+    /**
+     * 地形出力
+     * @param  [type]  $hako   [description]
+     * @param  [type]  $island [description]
+     * @param  int     $mode   ミサイル基地等の機密情報表示有無(1/0) // [TODO]: boolにする
+     * @return [type]          [description]
+     */
+    public function islandMap($hako, $island, $mode = 0)
+    {
+        global $init;
 
-		if($mode == 1) {
-			for($i = 0; $i < $init->commandMax; $i++) {
-				$j = $i + 1;
-				$com = $command[$i];
-				if($com['kind'] < 51) {
-					if ( isset($comStr[$com['x']][$com['y']]) ) {
-					$comStr[$com['x']][$com['y']] .= "[{$j}]{$init->comName[$com['kind']]} ";
-					}
-				}
-			}
-		}
+        $land = $island['land'];
+        $landValue = $island['landValue'];
+        $command = $island['command'];
+        $comStr = [];
 
-		require_once(VIEWS.'/map/development/map.php');
+        // 増減情報
+        $peop  = "";
+        $okane = "";
+        $gohan = "";
+        $poin  = "";
 
-		echo "<p class='text-center'>開始ターン：{$island['starturn']}</p>\n";
+        if (isset($island['peop'])) {
+            $peop = ($island['peop'] < 0 ? '' : '+') . $island['peop'] . $init->unitPop;
+        }
+        if (isset($island['gold'])) {
+            $okane = ($island['gold'] < 0 ? '' : '+') . $island['gold'] . $init->unitMoney;
+        }
+        if (isset($island['rice'])) {
+            $gohan = ($island['rice'] < 0 ? '' : '+') . $island['rice'] . $init->unitFood;
+        }
+        if (isset($island['pots'])) {
+            $poin = ($island['pots'] < 0 ? '' : '+') . $island['pots'] . 'pts';
+        }
 
-		if (isset($island['soccer'])){
-			if($island['soccer'] > 0) {
-				echo <<<END
+        if ($mode == 1) {
+            for ($i = 0; $i < $init->commandMax; $i++) {
+                $j = $i + 1;
+                $com = $command[$i];
+                if ($com['kind'] < 51) {
+                    if (isset($comStr[$com['x']][$com['y']])) {
+                        $comStr[$com['x']][$com['y']] .= "[{$j}]{$init->comName[$com['kind']]} ";
+                    }
+                }
+            }
+        }
+
+        require_once(VIEWS.'/map/development/map.php');
+
+        println('<p class="text-center">開始ターン：', $island['starturn'], '</p>');
+
+        if (isset($island['soccer']) && $island['soccer'] > 0) {
+            echo <<<END
 <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th {$init->bgTitleCell}>{$init->tagTH_}総合得点{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}成績{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}攻撃力{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}守備力{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}得点{$init->_tagTH}</th>
-			<th {$init->bgTitleCell}>{$init->tagTH_}失点{$init->_tagTH}</th>
+			<th class="TitleCell">{$init->tagTH_}総合得点{$init->_tagTH}</th>
+			<th class="TitleCell">{$init->tagTH_}成績{$init->_tagTH}</th>
+			<th class="TitleCell">{$init->tagTH_}攻撃力{$init->_tagTH}</th>
+			<th class="TitleCell">{$init->tagTH_}守備力{$init->_tagTH}</th>
+			<th class="TitleCell">{$init->tagTH_}得点{$init->_tagTH}</th>
+			<th class="TitleCell">{$init->tagTH_}失点{$init->_tagTH}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td {$init->bgInfoCell}>{$island['team']}</td>
-			<td {$init->bgInfoCell}>{$island['shiai']}戦{$island['kachi']}勝{$island['make']}敗{$island['hikiwake']}分</td>
-			<td {$init->bgInfoCell}>{$island['kougeki']}</td>
-			<td {$init->bgInfoCell}>{$island['bougyo']}</td>
-			<td {$init->bgInfoCell}>{$island['tokuten']}</td>
-			<td {$init->bgInfoCell}>{$island['shitten']}</td>
+			<td class="InfoCell">{$island['team']}</td>
+			<td class="InfoCell">{$island['shiai']}戦{$island['kachi']}勝{$island['make']}敗{$island['hikiwake']}分</td>
+			<td class="InfoCell">{$island['kougeki']}</td>
+			<td class="InfoCell">{$island['bougyo']}</td>
+			<td class="InfoCell">{$island['tokuten']}</td>
+			<td class="InfoCell">{$island['shitten']}</td>
 		</tr>
 	</tbody>
 </table>
 END;
-			}
-		}
-
-	}
+        }
+    }
 
 
-	/**
-	 * 島の近況
-	 * @param  [type]  $island [description]
-	 * @param  integer $mode   [description]
-	 * @return [type]          [description]
-	 */
-	function islandRecent($island, $mode = 0) {
-		global $init;
+    /**
+     * 島の近況
+     * @param  [type]  $island [description]
+     * @param  int     $mode   [description]
+     * @return [type]          [description]
+     */
+    public function islandRecent($island, int $mode = 0)
+    {
+        global $init;
 
-		echo "<hr>\n";
-
-		echo "<div id=\"RecentlyLog\">\n";
-		echo "<h2>{$island['name']}{$init->nameSuffix}の近況</h2>\n";
-		$log = new Log();
-		for($i = 0; $i < $init->logMax; $i++) {
-			$log->logFilePrint($i, $island['id'], $mode);
-		}
-		echo "</div>\n";
-	}
-
-	//---------------------------------------------------
-	// 開発画面
-	//---------------------------------------------------
-	function tempOwer($hako, $data, $number = 0) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
-
-		$island = $hako->islands[$number];
-		$name   = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
-		$width  = $init->islandSize * 32 + 50;
-		$height = $init->islandSize * 32 + 100;
-		$defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
-
-		require_once(VIEWS.'/map/development/basic.php');
-	}
-
-	//---------------------------------------------------
-	// 入力済みコマンド表示
-	//---------------------------------------------------
-	function tempCommand($number, $command, $hako) {
-		global $init;
-
-		$kind = $command['kind'];
-		$target = $command['target'];
-		$x = $command['x'];
-		$y = $command['y'];
-		$arg = $command['arg'];
-		$comName = "{$init->tagComName_}{$init->comName[$kind]}{$init->_tagComName}";
-		$point = "{$init->tagName_}({$x},{$y}){$init->_tagName}";
-
-		if ( isset($hako->idToName[$target]) ) {
-			$target = $hako->idToName[$target];
-		}
-
-		if(empty($target)) {
-			$target = "無人";
-		}
-		$target = "{$init->tagName_}{$target}島{$init->_tagName}";
-		$value = $arg * $init->comCost[$kind];
-		if($value == 0) {
-			$value = $init->comCost[$kind];
-		}
-		if($value < 0) {
-			$value = -$value;
-			if($kind == $init->comSellTree) {
-				$value = "{$value}{$init->unitTree}";
-			} else {
-				$value = "{$value}{$init->unitFood}";
-			}
-		} elseif($kind == $init->comHikidasi) {
-			$value = "{$value}0{$init->unitMoney} or {$value}0{$init->unitFood}";
-		} else {
-			$value = "{$value}{$init->unitMoney}";
-		}
-		$value = "{$init->tagName_}{$value}{$init->_tagName}";
-		$j = sprintf("%02d：", $number + 1);
-		echo "<a href=\"javascript:void(0);\" onclick=\"ns({$number})\">{$init->tagNumber_}{$j}{$init->_tagNumber}";
-
-		switch($kind) {
-			case $init->comMissileSM:
-			case $init->comDoNothing:
-			case $init->comGiveup:
-				$str = "{$comName}";
-				break;
-
-			case $init->comMissileNM:
-			case $init->comMissilePP:
-			case $init->comMissileST:
-			case $init->comMissileBT:
-			case $init->comMissileSP:
-			case $init->comMissileLD:
-			case $init->comMissileLU:
-				// ミサイル系
-				$n = ($arg == 0) ? '無制限' : "{$arg}発";
-				$str = "{$target}{$point}へ{$comName}({$init->tagName_}{$n}{$init->_tagName})";
-				break;
-
-			case $init->comEisei:
-				// 人工衛星発射
-				if($arg >= $init->EiseiNumber) {
-					$arg = 0;
-				}
-				$str = "{$init->tagComName_}{$init->EiseiName[$arg]}打ち上げ{$init->_tagComName}";
-				break;
-
-			case $init->comEiseimente:
-				// 人工衛星修復
-				if($arg >= $init->EiseiNumber) {
-					$arg = 0;
-				}
-				$str = "{$init->tagComName_}{$init->EiseiName[$arg]}修復{$init->_tagComName}";
-				break;
-
-			case $init->comEiseiAtt:
-				// 人工衛星破壊砲
-				if($arg >= $init->EiseiNumber) {
-					$arg = 0;
-				}
-				$str = "{$target}へ{$init->tagComName_}{$init->EiseiName[$arg]}破壊砲発射{$init->_tagComName}";
-				break;
-
-			case $init->comEiseiLzr:
-				// 衛星レーザー
-				$str = "{$target}{$point}へ{$comName}";
-				break;
-
-			case $init->comSendMonster:
-			case $init->comSendSleeper:
-				// 怪獣派遣
-				$str = "{$target}へ{$comName}";
-				break;
-
-			case $init->comSell:
-			case $init->comSellTree:
-				// 食料・木材輸出
-				$str ="{$comName}{$value}";
-				break;
-
-			case $init->comMoney:
-			case $init->comFood:
-				// 援助
-				$str = "{$target}へ{$comName}{$value}";
-				break;
-
-			case $init->comDestroy:
-				// 掘削
-				if($arg != 0) {
-					$str = "{$point}で{$comName}(予算{$value})";
-				} else {
-					$str = "{$point}で{$comName}";
-				}
-				break;
-
-			case $init->comLot:
-				// 宝くじ購入
-				if ($arg == 0) {
-					$arg = 1;
-				} elseif ($arg > 30) {
-					$arg = 30;
-				}
-				$str = "{$comName}(予算{$value})";
-				break;
-
-			case $init->comDbase:
-				// 防衛施設
-				if ($arg == 0) {
-					$arg = 1;
-				} elseif ($arg > $init->dBaseHP) {
-					$arg = $init->dBaseHP;
-				}
-				$str = "{$point}で{$comName}(耐久力{$arg})";
-				break;
-
-			case $init->comSdbase:
-				// 海底防衛施設
-				if ($arg == 0) {
-					$arg = 1;
-				} elseif ($arg > $init->sdBaseHP) {
-					$arg = $init->sdBaseHP;
-				}
-				$str = "{$point}で{$comName}(耐久力{$arg})";
-				break;
-
-			case $init->comSoukoM:
-				$flagm = 1;
-			case $init->comSoukoF:
-				// 倉庫建設
-				if($arg == 0) {
-					$str = "{$point}で{$comName}(セキュリティ強化)";
-				} else {
-					if($flagm == 1) {
-						$str = "{$point}で{$comName}({$value})";
-					} else {
-						$str = "{$point}で{$comName}({$value})";
-					}
-				}
-				break;
-
-			case $init->comHikidasi:
-				// 倉庫引き出し
-				if ($arg == 0) {
-					$arg = 1;
-				}
-				$str = "{$comName}({$value})";
-				break;
-
-			case $init->comMakeShip:
-				// 造船
-				if ($arg >= $init->shipKind) {
-					$arg = $init->shipKind - 1;
-				}
-				$str = "{$point}で{$comName}({$init->shipName[$arg]})";
-				break;
-
-			case $init->comShipBack:
-				// 船の破棄
-				$str = "{$point}で{$comName}";
-				break;
-
-			case $init->comFarm:
-			case $init->comSfarm:
-			case $init->comNursery:
-			case $init->comFactory:
-			case $init->comCommerce:
-			case $init->comMountain:
-			case $init->comHatuden:
-			case $init->comBoku:
-				// 回数付き
-				if($arg == 0) {
-					$str = "{$point}で{$comName}";
-				} else {
-					$str = "{$point}で{$comName}({$arg}回)";
-				}
-				break;
-
-			case $init->comPropaganda:
-			case $init->comOffense:
-			case $init->comDefense:
-			case $init->comPractice:
-				// 強化
-				$str = "{$comName}({$arg}回)";
-				break;
-
-			case $init->comPlaygame:
-				// 試合
-				$str = "{$target}と{$comName}";
-				break;
-
-			case $init->comSendShip:
-				// 船派遣
-				$str = "{$target}へ{$point}の{$comName}";
-				break;
-
-			case $init->comReturnShip:
-				// 船帰還
-				$str = "{$target}{$point}の{$comName}";
-				break;
-
-			default:
-				// 座標付き
-				$str = "{$point}で{$comName}";
-		}
-		echo "{$str}</a><br>";
-	}
-	//---------------------------------------------------
-	// 新しく発見した島
-	//---------------------------------------------------
-	function newIslandHead($name) {
-		global $init;
-
-		echo <<<END
-	<h1 class="text-center">{$init->tagBig_}{$init->nameSuffix}を発見しました！！{$init->_tagBig}
-		<small>{$init->tagBig_}{$init->tagName_}「{$name}{$init->nameSuffix}」{$init->_tagName}と命名します。{$init->_tagBig}</small>
-	</h1>
+        echo <<<END
+<hr>
+<div id="RecentlyLog">
+<h2>{$island['name']}{$init->nameSuffix}の近況</h2>
 END;
-	}
 
-	//---------------------------------------------------
-	// 目標捕捉モード
-	//---------------------------------------------------
-	function printTarget($hako, $data) {
-		global $init;
+        $log = new Log();
+        for ($i = 0; $i < $init->logMax; $i++) {
+            $log->logFilePrint($i, $island['id'], $mode);
+        }
+        println('</div>');
+    }
 
-		// idから島番号を取得
-		$id = $data['ISLANDID'];
-		$number = $hako->idToNumber[$id];
-		// なぜかその島がない場合
-		if($number < 0 || $number > $hako->islandNumber) {
-			HakoError::problem();
-			return;
-		}
-		$island = $hako->islands[$number];
-		echo <<<END
+    //---------------------------------------------------
+    // 開発画面
+    //---------------------------------------------------
+    public function tempOwer($hako, $data, $number = 0)
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-main.php';
+
+        $island = $hako->islands[$number];
+        $name   = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
+        $width  = $init->islandSize * 32 + 50;
+        $height = $init->islandSize * 32 + 100;
+        $defaultTarget = $init->targetIsland == 1 ? $island['id'] : $hako->defaultTarget;
+
+        require_once(VIEWS.'/map/development/basic.php');
+    }
+
+    //---------------------------------------------------
+    // 入力済みコマンド表示
+    //---------------------------------------------------
+    public function tempCommand($number, $command, $hako)
+    {
+        global $init;
+
+        $kind = $command['kind'];
+        $target = $command['target'];
+        $x = $command['x'];
+        $y = $command['y'];
+        $arg = $command['arg'];
+        $comName = "{$init->tagComName_}{$init->comName[$kind]}{$init->_tagComName}";
+        $point = "{$init->tagName_}({$x},{$y}){$init->_tagName}";
+
+        $target = !empty($hako->idToName[$target] ?? '') ? $hako->idToName[$target] : '無人';
+        $target = '<span class="islName">' . $target . $init->nameSuffix . '</span>';
+
+        $value = $arg * $init->comCost[$kind];
+        if ($value === 0) {
+            $value = $init->comCost[$kind];
+        }
+        if ($value < 0) {
+            $value = -$value;
+            $value .= $kind == $init->comSellTree ? $init->unitTree : $init->unitFood;
+        } elseif ($kind == $init->comHikidasi) {
+            $value *= 10;
+            $value = $value . $init->unitMoney . ' or '. $value . $init->unitFood;
+        } else {
+            $value .= $init->unitMoney;
+        }
+        $value = '<span class="islName">' . $value . '</span>';
+        $j = sprintf("%02d：", $number + 1);
+        echo '<a href="#noop" onclick="ns(' . $number . ');return !1;"><span class="number">' . $j . '</span>';
+
+        switch ($kind) {
+            case $init->comMissileSM:
+            case $init->comDoNothing:
+            case $init->comGiveup:
+                $str = $comName;
+
+                break;
+
+            case $init->comMissileNM:
+            case $init->comMissilePP:
+            case $init->comMissileST:
+            case $init->comMissileBT:
+            case $init->comMissileSP:
+            case $init->comMissileLD:
+            case $init->comMissileLU:
+                // ミサイル系
+                $n = ($arg == 0) ? '無制限' : $arg . '発';
+                $str = "{$target}{$point}へ{$comName}（{$init->tagName_}{$n}{$init->_tagName}）";
+
+                break;
+
+            case $init->comEisei:
+                // 人工衛星発射
+                if ($arg >= $init->EiseiNumber) {
+                    $arg = 0;
+                }
+                $str = "{$init->tagComName_}{$init->EiseiName[$arg]}打ち上げ{$init->_tagComName}";
+
+                break;
+
+            case $init->comEiseimente:
+                // 人工衛星修復
+                if ($arg >= $init->EiseiNumber) {
+                    $arg = 0;
+                }
+                $str = "{$init->tagComName_}{$init->EiseiName[$arg]}修復{$init->_tagComName}";
+
+                break;
+
+            case $init->comEiseiAtt:
+                // 人工衛星破壊砲
+                if ($arg >= $init->EiseiNumber) {
+                    $arg = 0;
+                }
+                $str = "{$target}へ{$init->tagComName_}{$init->EiseiName[$arg]}破壊砲発射{$init->_tagComName}";
+
+                break;
+
+            case $init->comEiseiLzr:
+                // 衛星レーザー
+                $str = "{$target}{$point}へ{$comName}";
+
+                break;
+
+            case $init->comSendMonster:
+            case $init->comSendSleeper:
+                // 怪獣派遣
+                $str = "{$target}へ{$comName}";
+
+                break;
+
+            case $init->comSell:
+            case $init->comSellTree:
+                // 食料・木材輸出
+                $str ="{$comName}{$value}";
+
+                break;
+
+            case $init->comMoney:
+            case $init->comFood:
+                // 援助
+                $str = "{$target}へ{$comName}{$value}";
+
+                break;
+
+            case $init->comDestroy:
+                // 掘削
+                if ($arg != 0) {
+                    $str = "{$point}で{$comName}（予算{$value}）";
+                } else {
+                    $str = "{$point}で{$comName}";
+                }
+
+                break;
+
+            case $init->comLot:
+                // 宝くじ購入
+                if ($arg == 0) {
+                    $arg = 1;
+                } elseif ($arg > 30) {
+                    $arg = 30;
+                }
+                $str = "{$comName}（予算{$value}）";
+
+                break;
+
+            case $init->comDbase:
+                // 防衛施設
+                if ($arg == 0) {
+                    $arg = 1;
+                } elseif ($arg > $init->dBaseHP) {
+                    $arg = $init->dBaseHP;
+                }
+                $str = "{$point}で{$comName}（耐久力{$arg}）";
+
+                break;
+
+            case $init->comSdbase:
+                // 海底防衛施設
+                if ($arg == 0) {
+                    $arg = 1;
+                } elseif ($arg > $init->sdBaseHP) {
+                    $arg = $init->sdBaseHP;
+                }
+                $str = "{$point}で{$comName}（耐久力{$arg}）";
+
+                break;
+
+            case $init->comSoukoM:
+                $flagm = 1;
+                // no break
+            case $init->comSoukoF:
+                // 倉庫建設
+                if ($arg == 0) {
+                    $str = "{$point}で{$comName}（セキュリティ強化）";
+                } else {
+                    if ($flagm == 1) {
+                        $str = "{$point}で{$comName}（{$value}）";
+                    } else {
+                        $str = "{$point}で{$comName}（{$value}）";
+                    }
+                }
+
+                break;
+
+            case $init->comHikidasi:
+                // 倉庫引き出し
+                if ($arg == 0) {
+                    $arg = 1;
+                }
+                $str = "{$comName}（{$value}）";
+
+                break;
+
+            case $init->comMakeShip:
+                // 造船
+                if ($arg >= $init->shipKind) {
+                    $arg = $init->shipKind - 1;
+                }
+                $str = "{$point}で{$comName}（{$init->shipName[$arg]}）";
+
+                break;
+
+            case $init->comShipBack:
+                // 船の破棄
+                $str = "{$point}で{$comName}";
+
+                break;
+
+            case $init->comFarm:
+            case $init->comSfarm:
+            case $init->comNursery:
+            case $init->comFactory:
+            case $init->comCommerce:
+            case $init->comMountain:
+            case $init->comHatuden:
+            case $init->comBoku:
+                // 回数付き
+                $str = "{$point}で{$comName}";
+                $str .= ($arg != 0) ?: "（{$arg}回）";
+
+                break;
+
+            case $init->comPropaganda:
+            case $init->comOffense:
+            case $init->comDefense:
+            case $init->comPractice:
+                // 強化
+                $str = "{$comName}（{$arg}回）";
+
+                break;
+
+            case $init->comPlaygame:
+                // 試合
+                $str = "{$target}と{$comName}";
+
+                break;
+
+            case $init->comSendShip:
+                // 船派遣
+                $str = "{$target}へ{$point}の{$comName}";
+
+                break;
+
+            case $init->comReturnShip:
+                // 船帰還
+                $str = "{$target}{$point}の{$comName}";
+
+                break;
+
+            default:
+                // 座標付き
+                $str = "{$point}で{$comName}";
+        }
+        echo "{$str}</a><br>";
+    }
+    //---------------------------------------------------
+    // 新しく発見した島
+    //---------------------------------------------------
+    public function newIslandHead($name)
+    {
+        global $init;
+
+        println('<h1 class="text-center">', $init->nameSuffix, 'を発見しました！ <br><small><span class="big islName">「', $name, $init->nameSuffix, '」</span>と命名しました。</small></h1>');
+    }
+
+    //---------------------------------------------------
+    // 目標捕捉モード
+    //---------------------------------------------------
+    public function printTarget($hako, $data)
+    {
+        global $init;
+
+        // idから島番号を取得
+        $id = $data['ISLANDID'];
+        $number = $hako->idToNumber[$id];
+        // なぜかその島がない場合
+        if ($number < 0 || $number > $hako->islandNumber) {
+            HakoError::problem();
+
+            return;
+        }
+        $island = $hako->islands[$number];
+        echo <<<END
 <script>
 function ps(x, y) {
-	window.opener.document.InputPlan.POINTX.options[x].selected = true;
-	window.opener.document.InputPlan.POINTY.options[y].selected = true;
+	window.opener.document.forms.InputPlan.POINTX.options[x].selected = true;
+	window.opener.document.forms.InputPlan.POINTY.options[y].selected = true;
 	return true;
 }
 </script>
 
 <div class="text-center">
-{$init->tagBig_}{$init->tagName_}{$island['name']}{$init->nameSuffix}{$init->_tagName}{$init->_tagBig}<br>
+<span class="big islName">{$island['name']}$init->nameSuffix</span>
 </div>
 END;
-		//島の地図
-		$this->islandMap($hako, $island, 2);
-	}
+        //島の地図
+        $this->islandMap($hako, $island, 2);
+    }
 }
 
 
-class HtmlMapJS extends HtmlMap {
+class HtmlMapJS extends HtmlMap
+{
 
-	//---------------------------------------------------
-	// 開発画面
-	//---------------------------------------------------
-	function tempOwer($hako, $data, $number = 0) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-main.php";
+    //---------------------------------------------------
+    // 開発画面
+    //---------------------------------------------------
+    public function tempOwer($hako, $data, $number = 0)
+    {
+        global $init;
+        $this_file = $init->baseDir . "/hako-main.php";
 
-		$island = $hako->islands[$number];
-		$name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
-		$width = $init->islandSize * 32 + 50;
-		$height = $init->islandSize * 32 + 100;
+        $island = $hako->islands[$number];
+        $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
+        $width = $init->islandSize * 32 + 50;
+        $height = $init->islandSize * 32 + 100;
 
-		// コマンドセット
-		$set_com = "";
-		$com_max = "";
-		$commandMax = $init->commandMax;
-		for($i = 0; $i < $commandMax; $i++) {
-			// 各要素の取り出し
-			$command = $island['command'][$i];
-			$s_kind = $command['kind'];
-			$s_target = $command['target'];
-			$s_x = $command['x'];
-			$s_y = $command['y'];
-			$s_arg = $command['arg'];
+        // コマンドセット
+        $set_com = "";
+        $com_max = "";
+        $commandMax = $init->commandMax;
+        for ($i = 0; $i < $commandMax; $i++) {
+            // 各要素の取り出し
+            $command = $island['command'][$i];
+            $s_kind = $command['kind'];
+            $s_target = $command['target'];
+            $s_x = $command['x'];
+            $s_y = $command['y'];
+            $s_arg = $command['arg'];
 
-			// コマンド登録
-			if($i == $commandMax - 1){
-				$set_com .= "[$s_kind, $s_x, $s_y, $s_arg, $s_target]\n";
-				$com_max .= "0";
-			} else {
-				$set_com .= "[$s_kind, $s_x, $s_y, $s_arg, $s_target],\n";
-				$com_max .= "0, ";
-			}
-		}
-		//コマンドリストセット
-		$l_kind;
-		$set_listcom = "";
-		$click_com = array("", "", "", "", "", "", "", "");
-		$All_listCom = 0;
-		$com_count = count($init->commandDivido);
-		for($m = 0; $m < $com_count; $m++) {
-			list($aa,$dd,$ff) = explode(",", $init->commandDivido[$m]);
-			$set_listcom .= "[ ";
-			for($i = 0; $i < $init->commandTotal; $i++) {
-				$l_kind = $init->comList[$i];
-				$l_cost = $init->comCost[$l_kind];
-				if($l_cost == 0) {
-					$l_cost = '無料';
-				} elseif($l_cost < 0) {
-					$l_cost = - $l_cost;
-					if($l_kind == 83) {
-						$l_cost .= $init->unitTree;
-					} else {
-						$l_cost .= $init->unitFood;
-					}
-				} else {
-					$l_cost .= $init->unitMoney;
-				}
-				if($l_kind > $dd-1 && $l_kind < $ff+1) {
-					$set_listcom .= "[$l_kind, '{$init->comName[$l_kind]}', '{$l_cost}'],\n";
-					if($m >= 0 && $m <= 7){
-						$click_com[$m] .= "<a href='javascript:void(0);' onclick='cominput(InputPlan, 6, {$l_kind})' onkeypress='cominput(InputPlan, 6, {$l_kind})' style='text-decoration:none'>{$init->comName[$l_kind]}({$l_cost})</a><br>\n";
-					}
-					$All_listCom++;
-				}
-				//if($l_kind < $ff+1) {
-				//	next;
-				//}
-			}
-			$bai = strlen($set_listcom);
-			$set_listcom = substr($set_listcom, 0, $bai - 2);
-			$set_listcom .= " ],\n";
-		}
-		$bai = strlen($set_listcom);
-		$set_listcom = substr($set_listcom, 0, $bai - 2);
-		if(empty($data['defaultKind'])) {
-			$default_Kind = 1;
-		} else {
-			$default_Kind = $data['defaultKind'];
-		}
-		// 船リストセット
-		$set_ships = "";
-		for($i = 0; $i < $init->shipKind; $i++) {
-			$set_ships .= "'".$init->shipName[$i]."',";
-		}
-		// 衛星リストセット
-		//$set_eisei = implode("," , $init->EiseiName);
-		$set_eisei = "";
-		for($i = 0; $i < count($init->EiseiName); $i++) {
-			$set_eisei .= "'".$init->EiseiName[$i]."',";
-		}
-		$set_eisei = substr($set_eisei, 0, -1);  // ケツカンマを削除
+            // コマンド登録
+            if ($i == $commandMax - 1) {
+                $set_com .= "[$s_kind, $s_x, $s_y, $s_arg, $s_target]\n";
+                $com_max .= "0";
+            } else {
+                $set_com .= "[$s_kind, $s_x, $s_y, $s_arg, $s_target],\n";
+                $com_max .= "0, ";
+            }
+        }
+        //コマンドリストセット
+        $l_kind;
+        $set_listcom = "";
+        $click_com = ["", "", "", "", "", "", "", ""];
+        $All_listCom = 0;
+        $com_count = count($init->commandDivido);
+        for ($m = 0; $m < $com_count; $m++) {
+            list($aa, $dd, $ff) = explode(",", $init->commandDivido[$m]);
+            $set_listcom .= "[ ";
+            for ($i = 0; $i < $init->commandTotal; $i++) {
+                $l_kind = $init->comList[$i];
+                $l_cost = $init->comCost[$l_kind];
+                if ($l_cost == 0) {
+                    $l_cost = '無料';
+                } elseif ($l_cost < 0) {
+                    $l_cost = - $l_cost;
+                    if ($l_kind == 83) {
+                        $l_cost .= $init->unitTree;
+                    } else {
+                        $l_cost .= $init->unitFood;
+                    }
+                } else {
+                    $l_cost .= $init->unitMoney;
+                }
+                if ($l_kind > $dd-1 && $l_kind < $ff+1) {
+                    $set_listcom .= "[$l_kind, '{$init->comName[$l_kind]}', '{$l_cost}'],\n";
+                    if ($m >= 0 && $m <= 7) {
+                        $click_com[$m] .= "<a href='javascript:void(0);' onclick='cominput(InputPlan, 6, {$l_kind})' onkeypress='cominput(InputPlan, 6, {$l_kind})' style='text-decoration:none'>{$init->comName[$l_kind]}({$l_cost})</a><br>\n";
+                    }
+                    $All_listCom++;
+                }
+                //if($l_kind < $ff+1) {
+                //	next;
+                //}
+            }
+            $bai = strlen($set_listcom);
+            $set_listcom = substr($set_listcom, 0, $bai - 2);
+            $set_listcom .= " ],\n";
+        }
+        $bai = strlen($set_listcom);
+        $set_listcom = substr($set_listcom, 0, $bai - 2);
+        if (empty($data['defaultKind'])) {
+            $default_Kind = 1;
+        } else {
+            $default_Kind = $data['defaultKind'];
+        }
+        // 船リストセット
+        $set_ships = "";
+        for ($i = 0; $i < $init->shipKind; $i++) {
+            $set_ships .= "'".$init->shipName[$i]."',";
+        }
+        // 衛星リストセット
+        //$set_eisei = implode("," , $init->EiseiName);
+        $set_eisei = "";
+        for ($i = 0; $i < count($init->EiseiName); $i++) {
+            $set_eisei .= "'".$init->EiseiName[$i]."',";
+        }
+        $set_eisei = substr($set_eisei, 0, -1);  // ケツカンマを削除
 
-		// 島リストセット
-		$set_island = "";
-		for($i = 0; $i < $hako->islandNumber; $i++) {
-			$l_name = $hako->islands[$i]['name'];
-			$l_name = preg_replace("/'/", "\'", $l_name);
-			$l_id = $hako->islands[$i]['id'];
-			if($i == $hako->islandNumber - 1){
-				$set_island .= "[$l_id, '$l_name']\n";
-			}else{
-				$set_island .= "[$l_id, '$l_name'],\n";
-			}
-		}
-		$set_island = substr($set_island, 0, -1);  // ケツカンマを削除
+        // 島リストセット
+        $set_island = "";
+        for ($i = 0; $i < $hako->islandNumber; $i++) {
+            $l_name = $hako->islands[$i]['name'];
+            $l_name = preg_replace("/'/", "\'", $l_name);
+            $l_id = $hako->islands[$i]['id'];
+            if ($i == $hako->islandNumber - 1) {
+                $set_island .= "[$l_id, '$l_name']\n";
+            } else {
+                $set_island .= "[$l_id, '$l_name'],\n";
+            }
+        }
+        $set_island = substr($set_island, 0, -1);  // ケツカンマを削除
 
 
-		$defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
+        $defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
 
-		require_once(VIEWS.'/map/development/js.php');
+        require_once(VIEWS.'/map/development/js.php');
 
-		echo <<<END
+        echo <<<END
 <script type="text/javascript">
 var w;
 var p = $defaultTarget;
 
 // ＪＡＶＡスクリプト開発画面配布元
 // あっぽー庵箱庭諸島（ http://appoh.execweb.cx/hakoniwa/ ）
-// Programmed by Jynichi Sakai(あっぽー)
+// Programmed by Jynichi Sakai（あっぽー）
 // ↑ 削除しないで下さい。
 var str;
 var g  = [$com_max];
@@ -1165,13 +1331,13 @@ function init() {
 		document.ch_numForm.AMOUNT.options[i].value = i;
 		document.ch_numForm.AMOUNT.options[i].text = i;
 	}
-	document.InputPlan.SENDPROJECT.disabled = true;
+	document.InputPlan.sendProj.disabled = true;
 	ns(0);
 }
 
 function cominput(theForm, x, k, z) {
-	var a = theForm.NUMBER.options[theForm.NUMBER.selectedIndex].value;
-	var b = theForm.COMMAND.options[theForm.COMMAND.selectedIndex].value;
+	var a = theForm.number.options[theForm.number.selectedIndex].value;
+	var b = theForm.commands.options[theForm.commands.selectedIndex].value;
 	var c = theForm.POINTX.options[theForm.POINTX.selectedIndex].value;
 	var d = theForm.POINTY.options[theForm.POINTY.selectedIndex].value;
 	var e = theForm.AMOUNT.options[theForm.AMOUNT.selectedIndex].value;
@@ -1263,7 +1429,7 @@ function cominput(theForm, x, k, z) {
 	str = '<font color="#C7243A"><b>■ 未送信 ■<\\/b><\\/font><br>' + str;
 	disp(str, "");
 	outp();
-	theForm.SENDPROJECT.disabled = false;
+	theForm.sendProj.disabled = false;
 	ns(newNs);
 
 	return true;
@@ -1330,14 +1496,14 @@ function plchg() {
 				strn2 = point + "で" + kind;
 			} else {
 				arg = c[3] * {$init->comCost[$init->comDestroy]};
-				arg = "（予\算" + arg + "{$init->unitMoney}）";
+				arg = "（予算" + arg + "{$init->unitMoney}）";
 				strn2 = point + "で" + kind + arg;
 			}
 		} else if(c[0] == $init->comLot) { // 宝くじ購入
 			if(c[3] == 0) c[3] = 1;
 			if(c[3] > 30) c[3] = 30;
 				arg = c[3] * {$init->comCost[$init->comLot]};
-				arg = "（予\算" + arg + "{$init->unitMoney}）";
+				arg = "（予算" + arg + "{$init->unitMoney}）";
 				strn2 = kind + arg;
 		} else if(c[0] == $init->comDbase) { // 防衛施設
 			if(c[3] == 0) c[3] = 1;
@@ -1453,7 +1619,7 @@ function disp(str,bgclr) {
 	if(str==null) {
 		str = "";
 	}
-	LayWrite('LINKMSG1', str);
+	LayWrite('IsSynced', str);
 	SetBG('plan', bgclr);
 }
 
@@ -1485,7 +1651,7 @@ function ns(x) {
 	if (x == $init->commandMax){
 		return true;
 	}
-	document.InputPlan.NUMBER.options[x].selected = true;
+	document.InputPlan.number.options[x].selected = true;
 	return true;
 }
 
@@ -1503,14 +1669,14 @@ function set_com(x, y, land) {
 					com_str += kind;
 				} else {
 					arg = c[3] * 200;
-					arg = "（予\算" + arg + "{$init->unitMoney}）";
+					arg = "（予算" + arg + "{$init->unitMoney}）";
 					com_str += kind + arg;
 				}
 			} else if(c[0] == $init->comLot){
 				if(c[3] == 0) c[3] = 1;
 				if(c[3] > 30) c[3] = 30;
 					arg = c[3] * 300;
-					arg = "（予\算" + arg + "{$init->unitMoney}）";
+					arg = "（予算" + arg + "{$init->unitMoney}）";
 					com_str += kind + arg;
 			} else if(c[0] == $init->comFarm ||
 				c[0] == $init->comSfarm ||
@@ -1544,36 +1710,36 @@ function SelectList(theForm) {
 	else { s = theForm.menu.options[theForm.menu.selectedIndex].value; }
 	if(s == ''){
 		u = 0; selected_ok = 0;
-		document.InputPlan.COMMAND.options.length = $All_listCom;
+		document.InputPlan.commands.options.length = $All_listCom;
 		for (i=0; i<comlist.length; i++) {
 			var command = comlist[i];
 			for (a=0; a<command.length; a++) {
 				comName = command[a][1] + "(" + command[a][2] + ")";
-				document.InputPlan.COMMAND.options[u].value = command[a][0];
-				document.InputPlan.COMMAND.options[u].text = comName;
+				document.InputPlan.commands.options[u].value = command[a][0];
+				document.InputPlan.commands.options[u].text = comName;
 				if(command[a][0] == $default_Kind){
-					document.InputPlan.COMMAND.options[u].selected = true;
+					document.InputPlan.commands.options[u].selected = true;
 					selected_ok = 1;
 				}
 				u++;
 			}
 		}
 		if(selected_ok == 0)
-			document.InputPlan.COMMAND.selectedIndex = 0;
+			document.InputPlan.commands.selectedIndex = 0;
 	} else {
 		var command = comlist[s];
-		document.InputPlan.COMMAND.options.length = command.length;
+		document.InputPlan.commands.options.length = command.length;
 		for (i=0; i<command.length; i++) {
 			comName = command[i][1] + "(" + command[i][2] + ")";
-			document.InputPlan.COMMAND.options[i].value = command[i][0];
-			document.InputPlan.COMMAND.options[i].text = comName;
+			document.InputPlan.commands.options[i].value = command[i][0];
+			document.InputPlan.commands.options[i].text = comName;
 			if(command[i][0] == $default_Kind){
-				document.InputPlan.COMMAND.options[i].selected = true;
+				document.InputPlan.commands.options[i].selected = true;
 				selected_ok = 1;
 			}
 		}
 		if(selected_ok == 0) {
-			document.InputPlan.COMMAND.selectedIndex = 0;
+			document.InputPlan.commands.selectedIndex = 0;
 		}
 	}
 }
@@ -1741,9 +1907,9 @@ function Kdown(e){
 		case '-': c = $init->comDoNothing; break; //INS 資金繰り
 		case '.': cominput(InputPlan,3); return; //DEL 削除
 		case'\b': //BS 一つ前削除
-		var no = document.InputPlan.COMMAND.selectedIndex;
+		var no = document.InputPlan.commands.selectedIndex;
 		if(no > 0) {
-			document.InputPlan.COMMAND.selectedIndex = no - 1;
+			document.InputPlan.commands.selectedIndex = no - 1;
 		}
 		cominput(InputPlan,3);
 		return;
@@ -1775,9 +1941,9 @@ function targetopen() {
 
 </script>
 END;
-		$this->islandInfo($island, $number, 1);
+        $this->islandInfo($island, $number, 1);
 
-		echo <<<END
+        echo <<<END
 <div id="menu" style="position:absolute; top:-500px;left:-500px; overflow:auto;width:360px;height:350px;">
 	<table border=0 class="PopupCell" onClick="menuclose()">
 		<tr valign=top>
@@ -1824,7 +1990,7 @@ END;
 
 <table class="table table-bordered">
 <tr valign="top">
-<td $init->bgInputCell>
+<td class="InputCell">
 
 <form action="{$this_file}" method="post" name="InputPlan">
 	<input type="hidden" name="mode" value="command">
@@ -1833,7 +1999,7 @@ END;
 
 	<div class="text-center">
 
-	<input type="submit" class="btn btn-primary btn-lg" value="計画送信" name="SENDPROJECT">
+	<button type="submit" name="sendProj" class="btn btn-primary btn-block">計画送信</button>
 
 	<hr>
 
@@ -1846,92 +2012,74 @@ END;
 
 	<hr>
 
-	<b>計画番号</b>
-	<select name="NUMBER">
+	<h4>計画番号</h4>
+	<select name="number">
 END;
-		// 計画番号
-		for($i = 0; $i < $init->commandMax; $i++) {
-			$j = $i + 1;
-			echo "<option value=\"$i\">$j</option>\n";
-		}
+        // 計画番号
+        for ($i = 0; $i < $init->commandMax;) {
+            echo '<option value="', $i, '">', ++$i, '</option>', "\n";
+        }
 
-		$open = "";
-		if ( isset($data['MENUOPEN']) ) {
-			if ($data['MENUOPEN'] == 'on') {
-				$open = "CHECKED";
-			} else {
-				$open = "";
-			}
-		}
+        $open = "";
+        if (isset($data['MENUOPEN'])) {
+            $open = ($data['MENUOPEN'] == 'on')? 'checked': '';
+        }
 
-		echo <<<END
+        echo <<<END
 	</select>
 
 	<hr>
 
 	<h3>開発計画</h3>
-	<label class="checkbox-inline">
-	  <input type="checkbox" name="NAVIOFF" $open>NaviOff
-	</label>
-	<label class="checkbox-inline">
-	  <input type="checkbox" name="MENUOPEN" $open>PopupOff<br>
-	</label>
-
-	<br>
+	<div>
+		<label class="checkbox-inline"><input type="checkbox" name="NAVIOFF" $open> NaviOff</label>
+		<label class="checkbox-inline"><input type="checkbox" name="MENUOPEN" $open> PopupOff</label>
+	</div>
 
 	<select name="menu" onchange="SelectList(InputPlan)">
 	<option value="">全種類</option>
 END;
-		for($i = 0; $i < $com_count; $i++) {
-			list($aa, $tmp) = explode(",", $init->commandDivido[$i], 2);
-			echo "<option value=\"$i\">{$aa}</option>\n";
-		}
-		echo <<<END
+        for ($i = 0; $i < $com_count; $i++) {
+            list($aa, $tmp) = explode(",", $init->commandDivido[$i], 2);
+            echo "<option value=\"$i\">{$aa}</option>\n";
+        }
+        echo <<<END
 	</select>
 	<br>
-	<select name="COMMAND">
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
-		<option>　　　　　　　　　　</option>
+	<select name="commands">
+		<option></option>
 	</select>
 
 	<hr>
 
-	<b>座標(</b>
+	<b>座標： (</b>
 	<select name="POINTX">
 END;
-		for($i = 0; $i < $init->islandSize; $i++) {
-			if (isset($data['defaultX'])){
-				if($i == $data['defaultX']) {
-					echo "<option value=\"$i\" selected>$i</option>\n";
-				} else {
-					echo "<option value=\"$i\">$i</option>\n";
-				}
-			} else {
-				echo "<option value=\"$i\">$i</option>\n";
-			}
-		}
-		echo "</select>, <select name=\"POINTY\">\n";
-		for($i = 0; $i < $init->islandSize; $i++) {
-			if (isset($data['defaultY'])){
-				if($i == $data['defaultY']) {
-					echo "<option value=\"$i\" selected>$i</option>\n";
-				} else {
-					echo "<option value=\"$i\">$i</option>\n";
-				}
-			} else {
-				echo "<option value=\"$i\">$i</option>\n";
-			}
-		}
+        for ($i = 0; $i < $init->islandSize; $i++) {
+            if (isset($data['defaultX'])) {
+                if ($i == $data['defaultX']) {
+                    echo "<option value=\"$i\" selected>$i</option>\n";
+                } else {
+                    echo "<option value=\"$i\">$i</option>\n";
+                }
+            } else {
+                echo "<option value=\"$i\">$i</option>\n";
+            }
+        }
+        echo "</select>, <select name=\"POINTY\">\n";
+        for ($i = 0; $i < $init->islandSize; $i++) {
+            if (isset($data['defaultY'])) {
+                if ($i == $data['defaultY']) {
+                    echo "<option value=\"$i\" selected>$i</option>\n";
+                } else {
+                    echo "<option value=\"$i\">$i</option>\n";
+                }
+            } else {
+                echo "<option value=\"$i\">$i</option>\n";
+            }
+        }
 
-		echo <<<END
+        echo <<<END
 	</select><b> )</b>
 
 	<hr>
@@ -1939,17 +2087,17 @@ END;
 	<b>数量</b>
 	<select name="AMOUNT">
 END;
-		// 数量
-		for($i = 0; $i < 100; $i++) {
-			echo "<option value=\"$i\">$i</option>\n";
-		}
+        // 数量
+        for ($i = 0; $i < 100; $i++) {
+            echo "<option value=\"$i\">$i</option>\n";
+        }
 
-		// 船舶数
-		$ownship = 0;
-		for($i = 0; $i < $init->shipKind; $i++) {
-			$ownship += $island['ship'][$i];
-		}
-		echo <<<END
+        // 船舶数
+        $ownship = 0;
+        for ($i = 0; $i < $init->shipKind; $i++) {
+            $ownship += $island['ship'][$i];
+        }
+        echo <<<END
 	</select>
 
 	<hr>
@@ -1970,7 +2118,7 @@ END;
 
 	<input type="hidden" name="ISLANDID" value="{$island['id']}">
 	<input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
-	<input type="submit" class="btn btn-primary btn-lg" value="計画送信" name="SENDPROJECT">
+	<button type="submit" name="sendProj" class="btn btn-primary btn-block">計画送信</button>
 
 	<p>最後に<span style="color:#c7243a;">計画送信ボタン</span>を<br>押すのを忘れないように。</p>
 
@@ -1978,8 +2126,8 @@ END;
 </form>
 
 <ul class="list-unstyled">
-<li>ミサイル発射上限数[<b> {$island['fire']} </b>]発</li>
-<li>所有船舶数[<b> {$ownship} </b>]隻</li>
+<li>ミサイル発射上限数[<strong> {$island['fire']} </strong>]発</li>
+<li>所有船舶数[<strong> {$ownship} </strong>]隻</li>
 </ul>
 
 <!-- <p>
@@ -1996,18 +2144,14 @@ F=海底基地建設'>ショートカットキー入力簡易説明</a>
 </p> -->
 
 </td>
-<td $init->bgMapCell id="plan" onmouseout="mc_out();return false;">
+<td class="MapCell" id="plan" onmouseout="mc_out();return false;">
 END;
-		$this->islandMap($hako, $island, 1); // 島の地図、所有者モード
-		$comment = $hako->islands[$number]['comment'];
-		echo <<<END
+        $this->islandMap($hako, $island, 1); // 島の地図、所有者モード
+        $comment = $hako->islands[$number]['comment'];
+        echo <<<END
 </td>
-<td $init->bgCommandCell id="plan">
-<ilayer name="PARENT_LINKMSG" width="100%" height="100%">
-<layer name="LINKMSG1" width="200"></layer>
-<span id="LINKMSG1"></span>
-</ilayer>
-<br>
+<td id="plan" class="CommandCell">
+<div id="IsSynced"></div>
 </td>
 </tr>
 </table>
@@ -2022,634 +2166,469 @@ END;
 <input type="hidden" name="PASSWORD" value="{$data['defaultPassword']}">
 <input type="hidden" name="mode" value="comment">
 <input type="hidden" name="ISLANDID" value="{$island['id']}">
-<input type="hidden" name="DEVELOPEMODE" value="cgi">
+<input type="hidden" name="DEVELOPEMODE" value="javascript">
 <span class="input-group-btn"><input type="submit" class="btn btn-primary" value="コメント更新"></span>
 </div>
 </form>
 </div>
 END;
-	}
-
+    }
 }
 
 
-class HtmlAdmin extends HTML {
+class HtmlAdmin extends HTML
+{
+    public function render()
+    {
+        global $init;
 
-	function enter() {
-		global $init;
-
-		$urllist  = array( ini_get('safe_mode') ? '/hako-mente-safemode.php' : '/hako-mente.php', '/hako-axes.php', '/hako-keep.php', '/hako-present.php', '/hako-edit.php', '/hako-bf.php');
-		$menulist = array('データ管理','アクセスログ閲覧','島預かり管理','プレゼント','マップエディタ','BattleField管理');
-
-		require_once(VIEWS.'/admin/top.php');
-	}
+        $menuList  = [
+            'データ管理'       => '/hako-mente.php',
+            'アクセスログ閲覧' => '/hako-axes.php',
+            'プレゼント'       => '/hako-present.php',
+            'マップエディタ'   => '/hako-edit.php',
+            'BF管理'           => '/hako-bf.php',
+            '島預かり管理'     => '/hako-keep.php'
+        ];
+        require_once(VIEWS.'/admin/top.php');
+    }
 }
 
-class HtmlPresent extends HTML {
+class HtmlPresent extends HTML
+{
+    public function main($data, $hako)
+    {
+        global $init;
+        $this_file = $init->baseDir . "/hako-present.php";
+        $main_file = $init->baseDir . "/hako-main.php";
 
-	function enter() {
-		global $init;
-		$this_file = $init->baseDir . "/hako-present.php";
-		$main_file = $init->baseDir . "/hako-main.php";
+        $width  = $init->islandSize * 32 + 50;
+        $height = $init->islandSize * 32 + 100;
+        $defaultTarget = '';
 
-		require_once(VIEWS.'/admin/present/top.php');
-	}
-
-	function main($data, $hako) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-present.php";
-		$main_file = $init->baseDir . "/hako-main.php";
-
-		$width  = $init->islandSize * 32 + 50;
-		$height = $init->islandSize * 32 + 100;
-		//$defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
-		$defaultTarget = "";
-
-		require_once(VIEWS.'/admin/present/main.php');
-	}
+        require_once(VIEWS.'/admin/present/main.php');
+    }
 }
 
-class HtmlMente extends HTML {
 
-	function enter() {
-		global $init;
-		$this_file = $init->baseDir . "/hako-mente.php";
 
-		echo "<h1 class=\"title\">メンテナンスツール</h1>";
-		if(file_exists("{$init->passwordFile}")) {
-			echo <<<END
-<form action="{$this_file}" method="post">
-<strong>パスワード：</strong>
-<input type="password" size="32" maxlength="32" name="PASSWORD">
-<input type="hidden" name="mode" value="enter">
-<input type="submit" value="メンテナンス">
-END;
-		} else {
-			echo <<<END
-<form action="{$this_file}" method="post">
-<H2>マスタパスワードと特殊パスワードを決めてください。</H2>
-<P>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</P>
-<B>マスタパスワード：</B><BR>
-(1) <INPUT type="password" name="MPASS1" value="$mpass1">&nbsp;&nbsp;(2) <INPUT type="password" name="MPASS2" value="$mpass2"><BR>
-<BR>
-<B>特殊パスワード：</B><BR>
-(1) <INPUT type="password" name="SPASS1" value="$spass1">&nbsp;&nbsp;(2) <INPUT type="password" name="SPASS2" value="$spass2"><BR>
-<BR>
-<input type="hidden" name="mode" value="setup">
-<INPUT type="submit" value="パスワードを設定する">
-END;
-		}
-		echo "</form>\n";
-	}
+class HtmlMente extends HTML
+{
+    public function enter()
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-mente.php';
 
-	function main($data) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-mente.php";
+        parent::pageTitle($init->title, 'データ管理ツール');
+        require_once VIEWS.'/admin/Maintenance/enter.php';
+    }
 
-		echo "<h1 class=\"title\">メンテナンスツール</h1>\n";
-		if(is_dir("{$init->dirName}")) {
-			$this->dataPrint($data);
-		} else {
-			echo "<hr>\n";
-			echo "<form action=\"{$this_file}\" method=\"post\">\n";
-			echo "<input type=\"hidden\" name=\"PASSWORD\" value=\"{$data['PASSWORD']}\">\n";
-			echo "<input type=\"hidden\" name=\"mode\" value=\"NEW\">\n";
-			echo "<input type=\"submit\" value=\"新しいデータを作る\">\n";
-			echo "</form>\n";
-		}
-		// バックアップデータ
-		$dir = opendir("./");
-		while($dn = readdir($dir)) {
-			$_dirName = preg_quote($init->dirName, "/");
-			if(preg_match("/{$_dirName}\.bak(.*)$/", $dn, $suf)) {
-				if (is_file("{$init->dirName}.bak{$suf[1]}/hakojima.dat")) {
-					$this->dataPrint($data, $suf[1]);
-				}
-			}
-		}
-		closedir($dir);
-	}
+    public function main($data)
+    {
+        global $init;
+        $this_file = $init->baseDir."/hako-mente.php";
+        $dirName = $init->dirName;
+        parent::pageTitle($init->title, 'メンテナンスツール');
 
-	// 表示モード
-	function dataPrint($data, $suf = "") {
-		global $init;
-		$this_file = $init->baseDir . "/hako-mente.php";
+        // データ保存用ディレクトリの存在チェック
+        if (!is_dir($dirName)) {
+            if (!@mkdir($dirName, $init->dirMode, true)) {
+                \Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\nゲーム設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
+                \HTML::footer();
+                exit();
+            }
+        }
+        // データ保存用ディレクトリのパーミッションチェック
+        if (!is_writeable($dirName) || !is_readable($dirName)) {
+            \Util::makeTagMessage("データ保存用ディレクトリに対する適切な操作権限を所持していません。\nサーバー管理者にお問合せください。", 'danger');
+            \HTML::footer();
+            exit();
+        }
 
-		echo "<HR>";
-		if(strcmp($suf, "") == 0) {
-			$fp = fopen("{$init->dirName}/hakojima.dat", "r");
-			echo "<h2>現役データ</h2>\n";
-		} else {
-			$fp = fopen("{$init->dirName}.bak{$suf}/hakojima.dat", "r");
-			echo "<h2>バックアップ{$suf}</h2>\n";
-		}
-		$lastTurn = chop(fgets($fp, READ_LINE));
-		$lastTime = chop(fgets($fp, READ_LINE));
-		fclose($fp);
-		$timeString = self::timeToString($lastTime);
-		echo <<<END
-<strong>ターン$lastTurn</strong><br>
-<strong>最終更新時間</strong>:$timeString<br>
-<form action="{$this_file}" method="post">
-<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-<input type="hidden" name="mode" value="DELETE">
-<input type="hidden" name="NUMBER" value="{$suf}">
-<input type="submit" value="このデータを削除">
+        if (is_file($dirName.'/hakojima.dat')) {
+            $this->dataPrint($data);
+        } else {
+            echo <<<EOT
+<hr>
+<form action="$this_file" method="post">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="NEW">
+    <button type="submit" class="btn btn-info">新しくデータを作る</button>
+</form>
+EOT;
+        }
+        // バックアップデータがあれば表示
+        $dir = opendir(dirname($dirName));
+        $dirCld = false !== strpos($dirName, "/") ? substr(strrchr($dirName, "/"), 1) : $dirName;
+        while (false !== ($dn = readdir($dir))) {
+            $_dirName = preg_quote($dirCld);
+            if (preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
+                if (is_file("{$dirName}.bak{$matches[1]}/hakojima.dat")) {
+                    $this->dataPrint($data, $matches[1]);
+                }
+            }
+        }
+        closedir($dir);
+    }
+
+    // 表示モード
+    public function dataPrint($data, $suf = "")
+    {
+        global $init;
+        $this_file = $init->baseDir."/hako-mente.php";
+
+        println('<hr>', PHP_EOL, '<section>');
+        if (strcmp($suf, "") == 0) {
+            $fp = fopen($init->dirName.'/hakojima.dat', "r");
+            println('<h2>現役データ</h2>');
+        } else {
+            $fp = fopen($init->dirName.".bak{$suf}/hakojima.dat", "r");
+            println('<h2>バックアップ <small>（bak', $suf, '）</small></h2>');
+        }
+        $lastTurn = chop(fgets($fp, READ_LINE));
+        $lastTime = chop(fgets($fp, READ_LINE));
+        fclose($fp);
+        $timeString = self::timeToString($lastTime);
+
+        echo <<<END
+<h3>ターン：$lastTurn</h3>
+<p><strong>最終更新時刻</strong>：$timeString</p>
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="DELETE">
+    <input type="hidden" name="NUMBER" value="$suf">
+    <button type="submit" class="btn btn-danger btn-sm">このデータを削除</button>
 </form>
 END;
-		if(strcmp($suf, "") == 0) {
-			$time = localtime($lastTime, TRUE);
-			$time['tm_year'] += 1900;
-			$time['tm_mon']++;
-			echo <<<END
-<h2>最終更新時間の変更</h2>
-<form action="{$this_file}" method="post">
+        if (strcmp($suf, "") == 0) {
+            $time = localtime($lastTime, true);
+            $time['tm_year'] += 1900;
+            $time['tm_mon']++;
+            echo <<<END
+<h4>最終更新時刻の変更</h4>
+<form action="$this_file" method="post">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	<input type="text" size="4" name="YEAR" value="{$time['tm_year']}">年
-	<input type="text" size="2" name="MON" value="{$time['tm_mon']}">月
-	<input type="text" size="2" name="DATE" value="{$time['tm_mday']}">日
-	<input type="text" size="2" name="HOUR" value="{$time['tm_hour']}">時
-	<input type="text" size="2" name="MIN" value="{$time['tm_min']}">分
-	<input type="text" size="2" name="NSEC" value="{$time['tm_sec']}">秒
-	<input type="submit" value="変更">
-</form>
-<form action="{$this_file}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="mode" value="STIME">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	1970年1月1日から<input type="text" size="32" name="SSEC" value="$lastTime">秒
-	<input type="submit" value="秒指定で変更">
+	<input type="hidden" name="NUMBER" value="$suf">
+	<input type="text" size="4" maxlength="4"name="YEAR" value="{$time['tm_year']}">年
+	<input type="text" size="2" maxlength="2"name="MON" value="{$time['tm_mon']}">月
+	<input type="text" size="2" maxlength="2"name="DATE" value="{$time['tm_mday']}">日
+	<input type="text" size="2" maxlength="2"name="HOUR" value="{$time['tm_hour']}">時
+	<input type="text" size="2" maxlength="2"name="MIN" value="{$time['tm_min']}">分
+	<input type="text" size="2" maxlength="2"name="NSEC" value="{$time['tm_sec']}">秒
+	<input type="submit" class="btn btn-warning btn-sm" value="変更">
 </form>
 END;
-		}
-	}
-
+        } else {
+            echo <<<END
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="NUMBER" value="$suf">
+    <input type="hidden" name="mode" value="CURRENT">
+    <button type="submit" class="btn btn-warning">このデータを現役に</button>
+</form>
+END;
+        }
+        println('</section>');
+    }
 }
 
-class HtmlMenteSafe extends HTML {
-	function enter() {
-		global $init;
-		$this_file = $init->baseDir . "/hako-mente-safemode.php";
+class HtmlAxes extends HTML
+{
+    public function passwdChk()
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-axes.php';
+        parent::pageTitle($init->title, 'アクセスログ');
 
-		echo "<h1 class=\"title\">メンテナンスツール</h1>";
-		if(file_exists("{$init->passwordFile}")) {
-			echo <<<END
-<form action="{$this_file}" method="post">
-<strong>パスワード：</strong>
-<input type="password" size="32" maxlength="32" name="PASSWORD">
-<input type="hidden" name="mode" value="enter">
-<input type="submit" value="メンテナンス">
-END;
-		} else {
-			echo <<<END
-<form action="{$this_file}" method="post">
-<H2>マスタパスワードと特殊パスワードを決めてください。</H2>
-<P>※入力ミスを防ぐために、それぞれ２回ずつ入力してください。</P>
-<B>マスタパスワード：</B><BR>
-(1) <INPUT type="password" name="MPASS1" value="$mpass1">&nbsp;&nbsp;(2) <INPUT type="password" name="MPASS2" value="$mpass2"><BR>
-<BR>
-<B>特殊パスワード：</B><BR>
-(1) <INPUT type="password" name="SPASS1" value="$spass1">&nbsp;&nbsp;(2) <INPUT type="password" name="SPASS2" value="$spass2"><BR>
-<BR>
-<input type="hidden" name="mode" value="setup">
-<INPUT type="submit" value="パスワードを設定する">
-END;
-		}
-		echo "</form>\n";
-	}
-
-	function main($data) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-mente-safemode.php";
-
-		echo "<h1 class=\"title\">{$init->title}<br>メンテナンスツール</h1>\n";
-		// データ保存用ディレクトリの存在チェック
-		if(!is_dir("{$init->dirName}")) {
-			echo "{$init->tagBig_}データ保存用のディレクトリが存在しません{$init->_tagBig}";
-			HTML::footer();
-			exit();
-		}
-		// データ保存用ディレクトリのパーミッションチェック
-		if(!is_writeable("{$init->dirName}") || !is_readable("{$init->dirName}")) {
-			echo "{$init->tagBig_}データ保存用のディレクトリのパーミッションが不正です。パーミッションを0777等の値に設定してください。{$init->_tagBig}";
-			HTML::footer();
-			exit();
-		}
-		if(is_file("{$init->dirName}/hakojima.dat")) {
-			$this->dataPrint($data);
-		} else {
-			echo "<hr>\n";
-			echo "<form action=\"{$this_file}\" method=\"post\">\n";
-			echo "<input type=\"hidden\" name=\"PASSWORD\" value=\"{$data['PASSWORD']}\">\n";
-			echo "<input type=\"hidden\" name=\"mode\" value=\"NEW\">\n";
-			echo "<input type=\"submit\" value=\"新しいデータを作る\">\n";
-			echo "</form>\n";
-		}
-		// バックアップデータ
-		$dir = opendir("./");
-		while($dn = readdir($dir)) {
-			$_dirName = preg_quote($init->dirName, "/");
-			if(preg_match("/{$_dirName}\.bak(.*)$/", $dn, $suf)) {
-				if (is_file("{$init->dirName}.bak{$suf[1]}/hakojima.dat")) {
-					$this->dataPrint($data, $suf[1]);
-				}
-			}
-		}
-		closedir($dir);
-	}
-
-	// 表示モード
-	function dataPrint($data, $suf = "") {
-		global $init;
-		$this_file = $init->baseDir . "/hako-mente-safemode.php";
-
-		echo "<HR>";
-		if(strcmp($suf, "") == 0) {
-			$fp = fopen("{$init->dirName}/hakojima.dat", "r");
-			echo "<h2>現役データ</h2>\n";
-		} else {
-			$fp = fopen("{$init->dirName}.bak{$suf}/hakojima.dat", "r");
-			echo "<h2>バックアップ{$suf}</h2>\n";
-		}
-		$lastTurn = chop(fgets($fp, READ_LINE));
-		$lastTime = chop(fgets($fp, READ_LINE));
-		fclose($fp);
-		$timeString = self::timeToString($lastTime);
-
-		echo <<<END
-<strong>ターン$lastTurn</strong><br>
-<strong>最終更新時間</strong>:$timeString<br>
-<strong>最終更新時間(秒数表示)</strong>:1970年1月1日から$lastTime 秒<br>
-<form action="{$this_file}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="mode" value="DELETE">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	<input type="submit" value="このデータを削除">
+        echo <<<END
+<form action="$this_file" method="post" class="form-inline">
+    <label>パスワード：
+    <input type="password" size="32" name="PASSWORD" class="form-control"></label>
+    <input type="hidden" name="mode" value="auth">
+    <button type="submit" class="btn btn-default">サインイン</button>
 </form>
 END;
-		if(strcmp($suf, "") == 0) {
-			$time = localtime($lastTime, TRUE);
-			$time['tm_year'] += 1900;
-			$time['tm_mon']++;
-			echo <<<END
-<h2>最終更新時間の変更</h2>
-<form action="{$this_file}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="mode" value="NTIME">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	<input type="text" size="4" name="YEAR" value="{$time['tm_year']}">年
-	<input type="text" size="2" name="MON" value="{$time['tm_mon']}">月
-	<input type="text" size="2" name="DATE" value="{$time['tm_mday']}">日
-	<input type="text" size="2" name="HOUR" value="{$time['tm_hour']}">時
-	<input type="text" size="2" name="MIN" value="{$time['tm_min']}">分
-	<input type="text" size="2" name="NSEC" value="{$time['tm_sec']}">秒
-	<input type="submit" value="変更">
-</form>
-<form action="{$this_file}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="mode" value="STIME">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	1970年1月1日から<input type="text" size="32" name="SSEC" value="$lastTime">秒
-	<input type="submit" value="秒指定で変更">
-</form>
-END;
-		} else {
-			echo <<<END
-<form action="{$this_file}" method="post">
-	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
-	<input type="hidden" name="NUMBER" value="{$suf}">
-	<input type="hidden" name="mode" value="CURRENT">
-	<input type="submit" value="このデータを現役に">
-</form>
-END;
-		}
-	}
+    }
 
+    public function main($data)
+    {
+        global $init;
+        parent::pageTitle($init->title, 'アクセスログ');
 
+        require_once VIEWS.'/admin/Axes.php';
+    }
 }
 
-class HtmlAxes extends HTML {
-	function enter() {
-		global $init;
-		$this_file = $init->baseDir . "/hako-axes.php";
 
-		echo <<<END
-<h1 class="title">{$init->title}<br>アクセスログ閲覧室</h1>
-<form action="{$this_file}" method="post">
-	<strong>パスワード：</strong>
-	<input type="password" size="32" maxlength="32" name="PASSWORD">
-	<input type="hidden" name="mode" value="enter">
-	<input type="submit" value="入室する">
-</form>
-END;
-	}
 
-	function main($data) {
-		global $init;
-		echo "<h1 class=\"title\">アクセスログ閲覧室</h1>\n";
-		$this->dataPrint($data);
-	}
-
-	// 表示モード
-	function dataPrint($data, $suf = "") {
-		global $init;
-
-		echo "<HR>";
-		echo <<<END
-<br>
-<h2>アクセスログ</h2>
-<form action="#">
-<input type="button" value="オートフィルタ表示" onclick="Button_DispFilter(this, 'DATA-TABLE')" onkeypress="Button_DispFilter(this, 'DATA-TABLE')">
-<table id="DATA-TABLE">
-	<thead>
-		<tr class="NumberCell">
-			<td scope="row" colspan=2><input type="button" tabindex="1" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [0])" value="ログインした時間"></td>
-			<td scope="row"><input type="button" tabindex="2" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [1, 0])" value="島ＩＤ"></td>
-			<td scope="row"><input type="button" tabindex="3" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [2, 0])" value="島の名前"></td>
-			<td scope="row"><input type="button" tabindex="4" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [3, 0])" value="ＩＰ情報"></td>
-			<td scope="row"><input type="button" tabindex="5" onclick="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" onkeypress="g_cSortTable.Button_Sort('DATA-TABLE', [4, 0])" value="ホスト情報"></td>
-		</tr>
-	</thead>
-	<tbody>
-END;
-		// ファイルを読み込み専用でオープンする
-		$fp = fopen("{$init->dirName}/{$init->logname}", 'r');
-
-		// 終端に達するまでループ
-		while (!feof($fp)) {
-			// ファイルから一行読み込む
-			$line = fgets($fp);
-			if($line !== FALSE) {
-				$num = str_replace([' ', ','], "</td><td scope=\"col\">", $line);
-				echo "<tr>\n";
-				echo "<td scope=\"col\">{$num}</td>\n";
-				echo "</tr>\n";
-			}
-		}
-		fclose($fp);
-		echo "</tbody>\n</table>\n</form>";
-	}
+class HtmlBF extends HTML
+{
+    public function main($data, $hako)
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-bf.php';
+        require_once(VIEWS.'/admin/bf.php');
+    }
 }
 
-class HtmlBF extends HTML {
-	function main($data, $hako) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-bf.php";
-		require_once(VIEWS.'/admin/bf.php');
-	}
+
+
+class HTMLKeep extends HTML
+{
+    public function main($data, $hako)
+    {
+        global $init;
+        $this_file = $init->baseDir.'/hako-keep.php';
+        require_once(VIEWS.'/admin/keep.php');
+    }
 }
 
-class HTMLKeep extends HTML {
-	function main($data, $hako) {
-		global $init;
-		$this_file = $init->baseDir . "/hako-keep.php";
-		require_once(VIEWS.'/admin/keep.php');
-	}
-}
-
-///
 
 
-class HtmlAlly extends HTML {
-	//--------------------------------------------------
-	// 初期画面
-	//--------------------------------------------------
-	function allyTop($hako, $data) {
-		global $init;
-		$this_file  = $init->baseDir . "/hako-ally.php";
+class HtmlAlly extends HTML
+{
+    //--------------------------------------------------
+    // 初期画面
+    //--------------------------------------------------
+    public function allyTop($hako, $data)
+    {
+        global $init;
+        $this_file  = $init->baseDir . "/hako-ally.php";
 
-		echo "<div class='row'>";
-		echo "<div class='col-xs-12'>";
-		echo "<h1>同盟管理ツール</h1>\n";
+        echo "<div class='row'>";
+        echo "<div class='col-xs-12'>";
+        echo "<h1>同盟管理ツール</h1>\n";
 
-		if($init->allyUse) {
-			echo <<<END
+        if ($init->allyUse) {
+            echo <<<END
 <input type="button" class="btn btn-default" value="同盟の結成・変更・解散・加盟・脱退はこちらから" onClick="JavaScript:location.replace('{$this_file}?JoinA=1')">
 <h2>各同盟の状況</h2>
 END;
-		}
-		$this->allyInfo($hako);
+        }
+        $this->allyInfo($hako);
 
-		echo "</div>";
-		echo "</div>";
+        echo "</div>",PHP_EOL,"</div>";
+    }
 
-	}
+    //--------------------------------------------------
+    // 同盟の状況
+    //--------------------------------------------------
+    public function allyInfo($hako, $view_ally_num = 0)
+    {
+        global $init;
+        $this_file  = $init->baseDir . "/hako-ally.php";
 
-	//--------------------------------------------------
-	// 同盟の状況
-	//--------------------------------------------------
-	function allyInfo($hako, $num = 0) {
-		global $init;
-		$this_file  = $init->baseDir . "/hako-ally.php";
+        $tag = "";
+        $allyNumber = (int)$hako->allyNumber;
+        if ($allyNumber <= 0) {
+            echo "同盟がありません。";
 
-		$tag = "";
-		$allyNumber = (int)$hako->allyNumber;
-		if ( $allyNumber <= 0 ) {
-			echo "同盟がありません。";
-			return;
-		}
+            return;
+        }
 
-		echo <<<END
-占有率は、同盟加盟の<b>総人口</b>により算出されたものです。
+        echo <<<END
+占有率は、同盟に加盟している{$init->nameSuffix}の<strong>総人口</strong>により算出されたものです。
 <div id="IslandView" class="table-responsive">
 <table class="table table-bordered">
 <thead>
 <tr>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}同盟{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}マーク{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}島の数{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}総人口{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}占有率{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-	<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}同盟{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}マーク{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}島の数{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}総人口{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}占有率{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
+	<th class="TitleCell">{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
 </tr>
 </thead>
 END;
 
-		for($i=0; $i<$allyNumber; $i++) {
-			if($num && ($i != $hako->idToAllyNumber[$num])) {
-				continue;
-			}
-			$ally = $hako->ally[$i];
-			$j = $i + 1;
-			$pop = $farm = $factory = $commerce = $mountain = $hatuden = $missiles = 0;
+        for ($i=0; $i<$allyNumber; $i++) {
+            if ($view_ally_num && ($i != $hako->idToAllyNumber[$view_ally_num])) {
+                continue;
+            }
+            $ally = $hako->ally[$i];
+            $j = $i + 1;
+            $pop = $farm = $factory = $commerce = $mountain = $hatuden = $missiles = 0;
 
-			$num = (int)$ally['number'];
-			for($k=0; $k<$num; $k++) {
-				$id = $ally['memberId'][$k];
-				$island = $hako->islands[$hako->idToNumber[$id]];
-				$pop      += $island['pop'];
-				$farm     += $island['farm'];
-				$factory  += $island['factory'];
-				$commerce += $island['commerce'];
-				$mountain += $island['mountain'];
-				$hatuden  += $island['hatuden'];
-			}
+            $num = (int)$ally['number'];
+            for ($k=0; $k<$num; $k++) {
+                $id = $ally['memberId'][$k];
+                $island = $hako->islands[$hako->idToNumber[$id]];
+                $pop      += $island['pop'];
+                $farm     += $island['farm'];
+                $factory  += $island['factory'];
+                $commerce += $island['commerce'];
+                $mountain += $island['mountain'];
+                $hatuden  += $island['hatuden'];
+            }
 
-			$name      = ($num) ? "{$init->tagName_}{$ally['name']}{$init->_tagName}" : "<a href=\"{$this_file}?AmiOfAlly={$ally['id']}\">{$ally['name']}</a>";
-			$pop       = $pop . $init->unitPop;
-			$farm      = ($farm <= 0)     ? $init->notHave : $farm * 10 . $init->unitPop;
-			$factory   = ($factory <= 0)  ? $init->notHave : $factory * 10 . $init->unitPop;
-			$commerce  = ($commerce <= 0) ? $init->notHave : $commerce * 10 . $init->unitPop;
-			$mountain  = ($mountain <= 0) ? $init->notHave : $mountain * 10 . $init->unitPop;
-			$hatuden   = ($hatuden <= 0)  ? "0kw" : $hatuden * 1000 . kw;
+            $name      = ($num) ? "{$init->tagName_}{$ally['name']}{$init->_tagName}" : "<a href=\"{$this_file}?AmiOfAlly={$ally['id']}\">{$ally['name']}</a>";
+            $pop       = $pop . $init->unitPop;
+            $farm      = ($farm <= 0)     ? $init->notHave : $farm * 10 . $init->unitPop;
+            $factory   = ($factory <= 0)  ? $init->notHave : $factory * 10 . $init->unitPop;
+            $commerce  = ($commerce <= 0) ? $init->notHave : $commerce * 10 . $init->unitPop;
+            $mountain  = ($mountain <= 0) ? $init->notHave : $mountain * 10 . $init->unitPop;
+            $hatuden   = ($hatuden <= 0)  ? '0kW' : ($hatuden*1000).'kW';
 
-			$ally['comment'] = isset($ally['comment']) ? $ally['comment'] : "";
+            $ally['comment'] = isset($ally['comment']) ? $ally['comment'] : "";
 
 
-			echo <<<END
+            echo <<<END
 <tbody>
 	<tr>
-		<th {$init->bgNumberCell} rowspan=2>{$init->tagNumber_}$j{$init->_tagNumber}</th>
-		<td {$init->bgNameCell} rowspan=2>{$name}</td>
-		<td {$init->bgMarkCell}><b><font color="{$ally['color']}">{$ally['mark']}</font></b></td>
-		<td {$init->bgInfoCell}>{$ally['number']}島</td>
-		<td {$init->bgInfoCell}>{$pop}</td>
-		<td {$init->bgInfoCell}>{$ally['occupation']}%</td>
-		<td {$init->bgInfoCell}>{$farm}</td>
-		<td {$init->bgInfoCell}>{$factory}</td>
-		<td {$init->bgInfoCell}>{$commerce}</td>
-		<td {$init->bgInfoCell}>{$mountain}</td>
-		<td {$init->bgInfoCell}>{$hatuden}</td>
+		<th class="NumberCell" rowspan=2>{$init->tagNumber_}$j{$init->_tagNumber}</th>
+		<td class="NameCell" rowspan=2>{$name}</td>
+		<td class="MarkCell"><b><span style="color:{$ally['color']}">{$ally['mark']}</span></b></td>
+		<td class="InfoCell">{$ally['number']}島</td>
+		<td class="InfoCell">{$pop}</td>
+		<td class="InfoCell">{$ally['occupation']}%</td>
+		<td class="InfoCell">{$farm}</td>
+		<td class="InfoCell">{$factory}</td>
+		<td class="InfoCell">{$commerce}</td>
+		<td class="InfoCell">{$mountain}</td>
+		<td class="InfoCell">{$hatuden}</td>
 	</tr>
 	<tr>
-		<td {$init->bgCommentCell} colspan=9>{$init->tagTH_}<a href="{$this_file}?Allypact={$ally['id']}">{$ally['oName']}</a>：{$init->_tagTH}{$ally['comment']}</td>
+		<td class="CommentCell" colspan=9>{$init->tagTH_}<a href="{$this_file}?Allypact={$ally['id']}">{$ally['oName']}</a>：{$init->_tagTH}{$ally['comment']}</td>
 	</tr>
 <tbody>
 END;
-		}
-		echo <<<END
+        }
+        echo <<<END
 </table>
 </div>
-<p>※ 同盟の名前をクリックすると「同盟の情報」欄へ、盟主島の名前だと「コメント変更」欄へ移動します。</p>
+<p>※ 同盟の名前をクリックすると「同盟の情報」欄へ、盟主の島名をクリックすると「コメント変更」欄へ移動します。</p>
 END;
+    }
 
-	}
+    //--------------------------------------------------
+    // 同盟の情報
+    //--------------------------------------------------
+    public function amityOfAlly($hako, $data)
+    {
+        global $init;
+        $this_file  = $init->baseDir . "/hako-ally.php";
 
-	//--------------------------------------------------
-	// 同盟の情報
-	//--------------------------------------------------
-	function amityOfAlly($hako, $data) {
-		global $init;
-		$this_file  = $init->baseDir . "/hako-ally.php";
+        $num = $data['ALLYID'];
+        $ally = $hako->ally[$hako->idToAllyNumber[$num]];
+        $allyName = "<span style=\"color:{$ally['color']};font-weight:bold;\">{$ally['mark']}</span>{$ally['name']}";
 
-		$num = $data['ALLYID'];
-		$ally = $hako->ally[$hako->idToAllyNumber[$num]];
-		$allyName = "<span style=\"color:{$ally['color']};font-weight:bold;\">{$ally['mark']}</span>{$ally['name']}";
-
-		echo <<<END
+        echo <<<END
 <div class='text-center'>
 	{$init->tagBig_}{$init->tagName_}{$allyName}{$init->_tagName}の情報{$init->_tagBig}<br>
 </div>
 
 <div ID='campInfo'>
 END;
-		// 同盟状況の表示
-		if($ally['number']) {
-			$this->allyInfo($hako, $num);
-		}
-		// メッセージ・盟約の表示
-		if($ally['message'] != '') {
-			$allyTitle   = ($allyTitle != '')? $ally['title']: '盟主からのメッセージ';
-			$allyMessage = $ally['message'];
-			echo <<<END
+        // 同盟状況の表示
+        if ($ally['number']) {
+            $this->allyInfo($hako, $num);
+        }
+        // メッセージ・盟約の表示
+        if ($ally['message'] != '') {
+            $allyTitle   = ($allyTitle != '')? $ally['title']: '盟主からのメッセージ';
+            $allyMessage = $ally['message'];
+            echo <<<END
 <hr>
 
 <table class="table table-bordered" width="80%">
-	<tr><th {$init->bgTitleCell}>{$init->tagTH_}$allyTitle{$init->_tagTH}</th></tr>
-	<tr><td {$init->bgCommentCell}><blockquote>$allyMessage</blockquote></td></tr>
+	<tr><th class="TitleCell">{$init->tagTH_}$allyTitle{$init->_tagTH}</th></tr>
+	<tr><td class="CommentCell"><blockquote>$allyMessage</blockquote></td></tr>
 </table>
 END;
-		}
+        }
         // メンバー一覧の表示
-		echo <<<END
+        echo <<<END
 <HR>
 <TABLE class="table table-bordered">
 	<TR>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}島{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</TH>
-		<TH {$init->bgTitleCell}>{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</TH>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-		<th {$init->bgTitleCell}>{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
+		<TH class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}島{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</TH>
+		<TH class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</TH>
+		<th class="TitleCell">{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
+		<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
+		<th class="TitleCell">{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
 	</TR>
 END;
-		if(!$ally['number']) {
-			echo "<TR><TH colspan=12>所属している島がありません！</TH></TR>";
-		}
-		foreach ($ally['memberId'] as $id) {
-			$number = $hako->idToNumber[$id];
-			if(!($number > -1)) continue;
-			$island = $hako->islands[$number];
-			$money = AllyUtil::aboutMoney($island['money']);
-			$farm = $island['farm'];
-			$factory = $island['factory'];
-			$commerce = $island['commerce'];
-			$mountain = $island['mountain'];
-			$hatuden = $island['hatuden'];
+        if (!$ally['number']) {
+            echo "<TR><TH colspan=12>所属している島がありません！</TH></TR>";
+        }
+        foreach ($ally['memberId'] as $id) {
+            $number = $hako->idToNumber[$id];
+            if (!($number > -1)) {
+                continue;
+            }
+            $island = $hako->islands[$number];
+            $money = AllyUtil::aboutMoney($island['money']);
+            $farm = $island['farm'];
+            $factory = $island['factory'];
+            $commerce = $island['commerce'];
+            $mountain = $island['mountain'];
+            $hatuden = $island['hatuden'];
             $ranking = $number + 1;
-			$name = AllyUtil::islandName($island, $hako->ally, $hako->idToAllyNumber);
-			if($island['absent']  == 0) {
-				$name = "{$init->tagName_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}{$init->_tagName}</a>";
-			} else {
-				$name = "{$init->tagName2_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}</a>({$island['absent']}){$init->_tagName2}";
-			}
-			$farm = ($farm == 0) ? $init->notHave : "{$farm}0$init->unitPop";
-			$factory = ($factory == 0) ? $init->notHave : "{$factory}0$init->unitPop";
-			$commerce  = ($commerce == 0) ? $init->notHave : "{$commerce}0$init->unitPop";
-			$mountain = ($mountain == 0) ? $init->notHave : "{$mountain}0$init->unitPop";
-			$hatuden  = ($hatuden == 0) ? "0kw" : "{$hatuden}000kw";
+            $name = AllyUtil::islandName($island, $hako->ally, $hako->idToAllyNumber);
+            if ($island['absent']  == 0) {
+                $name = "{$init->tagName_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}{$init->_tagName}</a>";
+            } else {
+                $name = "{$init->tagName2_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}</a>({$island['absent']}){$init->_tagName2}";
+            }
+            $farm = ($farm == 0) ? $init->notHave : "{$farm}0$init->unitPop";
+            $factory = ($factory == 0) ? $init->notHave : "{$factory}0$init->unitPop";
+            $commerce  = ($commerce == 0) ? $init->notHave : "{$commerce}0$init->unitPop";
+            $mountain = ($mountain == 0) ? $init->notHave : "{$mountain}0$init->unitPop";
+            $hatuden  = ($hatuden == 0) ? "0kw" : "{$hatuden}000kw";
 
-			echo <<<END
+            echo <<<END
 <TR>
-	<TH {$init->bgNumberCell}>{$init->tagNumber_}$ranking{$init->_tagNumber}</TH>
-	<TD {$init->bgNameCell}>$name</TD>
-	<TD {$init->bgInfoCell}>{$island['pop']}$init->unitPop</TD>
-	<TD {$init->bgInfoCell}>{$island['area']}$init->unitArea</TD>
-	<TD {$init->bgInfoCell}>$money</TD>
-	<TD {$init->bgInfoCell}>{$island['food']}$init->unitFood</TD>
-	<TD {$init->bgInfoCell}>$farm</TD>
-	<TD {$init->bgInfoCell}>$factory</TD>
-	<TD {$init->bgInfoCell}>$commerce</TD>
-	<TD {$init->bgInfoCell}>$mountain</TD>
-	<TD {$init->bgInfoCell}>$hatuden</TD>
+	<TH class="NumberCell">{$init->tagNumber_}$ranking{$init->_tagNumber}</TH>
+	<TD class="NameCell">$name</TD>
+	<TD class="InfoCell">{$island['pop']}$init->unitPop</TD>
+	<TD class="InfoCell">{$island['area']}$init->unitArea</TD>
+	<TD class="InfoCell">$money</TD>
+	<TD class="InfoCell">{$island['food']}$init->unitFood</TD>
+	<TD class="InfoCell">$farm</TD>
+	<TD class="InfoCell">$factory</TD>
+	<TD class="InfoCell">$commerce</TD>
+	<TD class="InfoCell">$mountain</TD>
+	<TD class="InfoCell">$hatuden</TD>
 </TR>
 END;
-		}
-		echo "</TABLE>\n";
+        }
+        echo "</TABLE>\n";
     }
 
-	//--------------------------------------------------
-	// 同盟コメントの変更
-	//--------------------------------------------------
-	function tempAllyPactPage($hako, $data) {
-		global $init;
-		$this_file  = $init->baseDir . "/hako-ally.php";
+    //--------------------------------------------------
+    // 同盟コメントの変更
+    //--------------------------------------------------
+    public function tempAllyPactPage($hako, $data)
+    {
+        global $init;
+        $this_file  = $init->baseDir . "/hako-ally.php";
 
-		$num = $data['ALLYID'];
-		$ally = $hako->ally[$hako->idToAllyNumber[$num]];
-		$allyMessage = $ally['message'];
+        $num = $data['ALLYID'];
+        $ally = $hako->ally[$hako->idToAllyNumber[$num]];
+        $allyMessage = $ally['message'];
 
-		$allyMessage = str_replace("<br>", "\n", $allyMessage);
-		$allyMessage = str_replace("&amp;", "&", $allyMessage);
-		$allyMessage = str_replace("&lt;", "<", $allyMessage);
-		$allyMessage = str_replace("&gt;", ">", $allyMessage);
-		$allyMessage = str_replace("&quot;", "\"", $allyMessage);
-		$allyMessage = str_replace("&#039;", "'", $allyMessage);
+        $allyMessage = str_replace("<br>", "\n", $allyMessage);
+        $allyMessage = str_replace("&amp;", "&", $allyMessage);
+        $allyMessage = str_replace("&lt;", "<", $allyMessage);
+        $allyMessage = str_replace("&gt;", ">", $allyMessage);
+        $allyMessage = str_replace("&quot;", "\"", $allyMessage);
+        $allyMessage = str_replace("&#039;", "'", $allyMessage);
 
-		$data['defaultPassword'] = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
-		echo <<<END
+        $data['defaultPassword'] = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
+        echo <<<END
 <div class='text-center'>
 	{$init->tagBig_}コメント変更（{$init->tagName_}{$ally['name']}{$init->_tagName}）{$init->_tagBig}<br>
 </div>
@@ -2664,14 +2643,14 @@ END;
 			<INPUT TYPE="hidden"  NAME="ALLYID" VALUE="{$ally['id']}">
 			<INPUT TYPE="submit" VALUE="送信" NAME="AllypactButton"><BR>
 
-			<B>コメント</B><small>(全角{$init->lengthAllyComment}字まで：トップページの「各同盟の状況」欄に表示されます)</small>
+			<B>コメント</B><small>（全角{$init->lengthAllyComment}字まで：トップページの「各同盟の状況」欄に表示されます）</small>
 			<INPUT TYPE="text" NAME="ALLYCOMMENT" VALUE="{$ally['comment']}" MAXLENGTH="50" class="form-control">
 
-			<B>メッセージ・盟約など</B><small>(「同盟の情報」欄の上に表示されます)</small><BR>
-			タイトル<small>(全角{$init->lengthAllyTitle}字まで)</small>
+			<B>メッセージ・盟約など</B><small>（「同盟の情報」欄の上に表示されます）</small><BR>
+			タイトル<small>（全角{$init->lengthAllyTitle}字まで）</small>
 			<INPUT TYPE="text" NAME="ALLYTITLE"  VALUE="{$ally['title']}" MAXLENGTH="50" class="form-control">
 
-			メッセージ<small>(全角{$init->lengthAllyMessage}字まで)</small>
+			メッセージ<small>（全角{$init->lengthAllyMessage}字まで）</small>
 			<TEXTAREA COLS=50 ROWS=16 NAME="ALLYMESSAGE" WRAP="soft" class="form-control">{$allyMessage}</TEXTAREA>
 			<BR>
 			「タイトル」を空欄にすると『盟主からのメッセージ』というタイトルになります。<BR>
@@ -2682,132 +2661,138 @@ END;
 </table>
 </DIV>
 END;
-	}
+    }
 
-	//--------------------------------------------------
-	// 同盟の結成・変更・解散・加盟・脱退
-	//--------------------------------------------------
-	function newAllyTop($hako, $data) {
-		global $init;
-		$this_file  = $init->baseDir . "/hako-ally.php";
+    //--------------------------------------------------
+    // 同盟の結成・変更・解散・加盟・脱退
+    //--------------------------------------------------
+    public function newAllyTop($hako, $data)
+    {
+        global $init;
+        $this_file  = $init->baseDir . "/hako-ally.php";
 
-		$adminMode = 0;
+        $adminMode = 0;
 
-		$jsAllyList      = "";
-		$jsAllyIdList    = "";
-		$jsAllyMarkList  = "";
-		$jsAllyColorList = "";
+        $jsAllyList      = "";
+        $jsAllyIdList    = "";
+        $jsAllyMarkList  = "";
+        $jsAllyColorList = "";
 
-		$data['defaultPassword'] = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
-		if(AllyUtil::checkPassword("", $data['defaultPassword'])) {
-			// 管理者の判定は、お菓子のパスワード、盟主の変更可
-			$adminMode = 1;
-		} elseif(!$init->allyUse) {
-			$this->allyTop($hako, $data);
-		}
+        $data['defaultPassword'] = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
+        if (AllyUtil::checkPassword("", $data['defaultPassword'])) {
+            // 管理者の判定は、お菓子のパスワード、盟主の変更可
+            $adminMode = 1;
+        } elseif (!$init->allyUse) {
+            $this->allyTop($hako, $data);
+        }
 
-		$jsIslandList    = "";
-		$num = (int)$hako->islandNumber;
-		for($i=0; $i<$num; $i++) {
-			$name = $hako->islands[$i]['name'];
-			$name = preg_replace("/'/", "\'", $name);
-			$id = $hako->islands[$i]['id'];
-			$jsIslandList .= "island[$id] = '$name';\n";
-		}
-		$data['defaultID'] = isset($data['defaultID']) ? $data['defaultID'] : "";
-		$n = '';
-		$n = isset($hako->idToAllyNumber[$data['defaultID']]) ? $hako->idToAllyNumber[$data['defaultID']] : "";
+        $jsIslandList    = "";
+        $num = (int)$hako->islandNumber;
+        for ($i=0; $i<$num; $i++) {
+            $name = $hako->islands[$i]['name'];
+            $name = preg_replace("/'/", "\'", $name);
+            $id = $hako->islands[$i]['id'];
+            $jsIslandList .= "island[$id] = '$name';\n";
+        }
+        $data['defaultID'] = isset($data['defaultID']) ? $data['defaultID'] : "";
+        $n = '';
+        $n = isset($hako->idToAllyNumber[$data['defaultID']]) ? $hako->idToAllyNumber[$data['defaultID']] : "";
 
-		if($n == '') {
-			$allyname = '';
-			$defaultMark = $hako->ally[0];
-			$defaultAllyId = '';
-		} else {
-			$allyname = $hako->ally[$n]['name'];
-			$allyname = preg_replace("/'/", "\'", $allyname);
-			$defaultMark = $hako->ally[$n]['mark'];
-			$defaultAllyId = $hako->ally[$n]['id'];
-		}
-		$defaultMark = '';
-		$markList = "";
-		foreach ($init->allyMark as $aMark) {
-			$s = '';
-			if($aMark == $defaultMark) {
-				$s = ' selected';
-			}
-			$markList .= "<option value=\"$aMark\"$s>$aMark</option>\n";
-		}
+        if ($n == '') {
+            $allyname = '';
+            $defaultMark = $hako->ally[0];
+            $defaultAllyId = '';
+        } else {
+            $allyname = $hako->ally[$n]['name'];
+            $allyname = preg_replace("/'/", "\'", $allyname);
+            $defaultMark = $hako->ally[$n]['mark'];
+            $defaultAllyId = $hako->ally[$n]['id'];
+        }
+        $defaultMark = '';
+        $markList = "";
+        foreach ($init->allyMark as $aMark) {
+            $s = '';
+            if ($aMark == $defaultMark) {
+                $s = ' selected';
+            }
+            $markList .= "<option value=\"$aMark\"$s>$aMark</option>\n";
+        }
 
-		$hx = array(0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F');
-		$colorList = array('','','','','','','');
-		for($i=1; $i<7; $i++) {
-			if($n == '') {
-				$allycolor[$i] = '0';
-			} else {
-				$allycolor[$i] = substr($hako->ally[$n]['color'], $i, 1);
-			}
-			for($j=0; $j<count($hx); $j++) {
-				$s = '';
-				if($hx[$j] == $allycolor[$i]) {
-					$s = ' selected';
-				}
-				$colorList[$i] .= "<option value=\"{$hx[$j]}\"$s>{$hx[$j]}</option>\n";
-			}
-		}
+        $hx = [0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F'];
+        $colorList = ['','','','','','',''];
+        for ($i=1; $i<7; $i++) {
+            if ($n == '') {
+                $allycolor[$i] = '0';
+            } else {
+                $allycolor[$i] = substr($hako->ally[$n]['color'], $i, 1);
+            }
+            for ($j=0; $j<count($hx); $j++) {
+                $s = '';
+                if ($hx[$j] == $allycolor[$i]) {
+                    $s = ' selected';
+                }
+                $colorList[$i] .= "<option value=\"{$hx[$j]}\"$s>{$hx[$j]}</option>\n";
+            }
+        }
 
-		$max = 201;
-		if($hako->allyNumber) {
-			$jsAllyList      = "var ally = [";
-			$jsAllyIdList    = "var allyID = [";
-			$jsAllyMarkList  = "var allyMark = [";
-			$jsAllyColorList = "var allyColor = [";
-			for($i=0; $i<count($hako->ally); $i++) {
-				$s = "";
-				if($hako->ally[$i]['id'] == $defaultAllyId) $s = ' selected';
-				$allyList = "";
-				$allyList .= "<option value=\"$i\"$s>{$hako->ally[$i]['name']}</option>\n";
-				$jsAllyList .= "'{$hako->ally[$i]['name']}'";
-				$jsAllyIdList .= "{$hako->ally[$i]['id']}";
-				$jsAllyMarkList .= "'{$hako->ally[$i]['mark']}'";
-				$jsAllyColorList .= "[";
-				for($j=0; $j<6; $j++) {
-					$jsAllyColorList .= '\'' . substr($hako->ally[$i]['color'], $j, 1) . '\'';
-					if($j < 5) $jsAllyColorList .= ',';
-				}
-				$jsAllyColorList .= "]";
-				if($i < count($hako->ally)) {
-					$jsAllyList .= ",\n";
-					$jsAllyIdList .= ",\n";
-					$jsAllyMarkList .= ",\n";
-					$jsAllyColorList .= ",\n";
-				}
-				if($max <= $hako->ally[$i]['id']) $max = $hako->ally[$i]['id'] + 1;
-			}
-			$jsAllyList .= "];\n";
-			$jsAllyIdList .= "];\n";
-			$jsAllyMarkList .= "];\n";
-			$jsAllyColorList .= "];\n";
-		}
-		$str1 = $adminMode ? '(メンテナンス)' : $init->allyJoinComUse ? '' : '・加盟・脱退';
-		$str2 = $adminMode ? '' : 'onChange="colorPack()" onClick="colorPack()"';
-		$makeCost = $init->costMakeAlly ? "{$init->costMakeAlly}{$init->unitMoney}" : '無料';
-		$keepCost = $init->costKeepAlly ? "{$init->costKeepAlly}{$init->unitMoney}" : '無料';
-		$joinCost = isset($init->comCost[$init->comAlly]) ? "{$init->comCost[$init->comAlly]}{$init->unitMoney}" : '無料';
-		$joinStr = $init->allyJoinComUse ? '' : "加盟・脱退の際の費用は、{$init->tagMoney_}$joinCost{$init->_tagMoney}です。<BR>";
-		$str3 = $adminMode ? "特殊パスワードは？（必須）<BR>
-<INPUT TYPE=\"password\" NAME=\"OLDPASS\" VALUE=\"{$data['defaultPassword']}\" SIZE=32 MAXLENGTH=32 class=f><BR>同盟" : "<div class='alert alert-info'><span class='attention'>(注意)</span><BR>
-同盟の結成・変更の費用は、{$init->tagMoney_}{$makeCost}{$init->_tagMoney}です。<BR>
-また、毎ターン必要とされる維持費は{$init->tagMoney_}$keepCost{$init->_tagMoney}です。<BR>
-（維持費は同盟に所属する島で均等に負担することになります）<BR>
-{$joinStr}
-</div>
+        $max = 201;
+        if ($hako->allyNumber) {
+            $jsAllyList      = "var ally = [";
+            $jsAllyIdList    = "var allyID = [";
+            $jsAllyMarkList  = "var allyMark = [";
+            $jsAllyColorList = "var allyColor = [";
+            for ($i=0; $i<count($hako->ally); $i++) {
+                $s = "";
+                if ($hako->ally[$i]['id'] == $defaultAllyId) {
+                    $s = ' selected';
+                }
+                $allyList = "";
+                $allyList .= "<option value=\"$i\"$s>{$hako->ally[$i]['name']}</option>\n";
+                $jsAllyList .= "'{$hako->ally[$i]['name']}'";
+                $jsAllyIdList .= "{$hako->ally[$i]['id']}";
+                $jsAllyMarkList .= "'{$hako->ally[$i]['mark']}'";
+                $jsAllyColorList .= "[";
+                for ($j=0; $j<6; $j++) {
+                    $jsAllyColorList .= '\'' . substr($hako->ally[$i]['color'], $j, 1) . '\'';
+                    if ($j < 5) {
+                        $jsAllyColorList .= ',';
+                    }
+                }
+                $jsAllyColorList .= "]";
+                if ($i < count($hako->ally)) {
+                    $jsAllyList .= ",\n";
+                    $jsAllyIdList .= ",\n";
+                    $jsAllyMarkList .= ",\n";
+                    $jsAllyColorList .= ",\n";
+                }
+                if ($max <= $hako->ally[$i]['id']) {
+                    $max = $hako->ally[$i]['id'] + 1;
+                }
+            }
+            $jsAllyList .= "];\n";
+            $jsAllyIdList .= "];\n";
+            $jsAllyMarkList .= "];\n";
+            $jsAllyColorList .= "];\n";
+        }
+        $str1 = $adminMode ? '（メンテナンス）' : $init->allyJoinComUse ? '' : '・加盟・脱退';
+        $str2 = $adminMode ? '' : 'onChange="colorPack()" onClick="colorPack()"';
+        $makeCost = $init->costMakeAlly ? "{$init->costMakeAlly}{$init->unitMoney}" : '無料';
+        $keepCost = $init->costKeepAlly ? "{$init->costKeepAlly}{$init->unitMoney}" : '無料';
+        $joinCost = isset($init->comCost[$init->comAlly]) ? "{$init->comCost[$init->comAlly]}{$init->unitMoney}" : '無料';
+        $joinStr = $init->allyJoinComUse ? '' : '加盟・脱退の際の費用は、<span class="cash">' . $joinCost . '</span>です。<br>';
+        $str3 = $adminMode ? "特殊パスワードは？（必須）<br>
+<input type=\"password\" name=\"OLDPASS\" value=\"{$data['defaultPassword']}\" size=32 maxlength=32 class=f><br>同盟" : '<div class="alert alert-info"><span class="attention">（注意）</span><br>
+同盟の結成・変更の費用は、<span class="cash">' . $makeCost . '</span>です。<br>
+また、毎ターン必要とされる維持費は<span class="cash">' . $keepCost . '</span>です。<br>
+（維持費は同盟に所属する島で均等に負担することになります）<br>
+' . $joinStr . "</div>
 
 あなたの島は？（必須）<BR>
 <SELECT NAME=\"ISLANDID\" {$str2}>
 {$hako->islandList}
 </SELECT><BR>あなた";
-		$str0 = ($adminMode || ($init->allyUse == 1)) ? '結成・' : '';
-		echo <<<END
+        $str0 = ($adminMode || ($init->allyUse == 1)) ? '結成・' : '';
+        echo <<<END
 <div class='text-center'>
 {$init->tagBig_}同盟の{$str0}変更・解散{$str1}{$init->_tagBig}<br>
 </div>
@@ -2818,10 +2803,10 @@ END;
 {$str3}のパスワードは？（必須）<BR>
 <INPUT TYPE="password" NAME="PASSWORD" SIZE="32" MAXLENGTH="32" class="f" class="form-control">
 END;
-		if($hako->allyNumber) {
-			$str4 = $adminMode ? '・結成・変更' : $init->allyJoinComUse ? '' : '・加盟・脱退';
-			$str5 = ($adminMode || $init->allyJoinComUse) ? '' : '<INPUT TYPE="submit" VALUE="加盟・脱退" NAME="JoinAllyButton" class="btn btn-default">';
-			echo <<<END
+        if ($hako->allyNumber) {
+            $str4 = $adminMode ? '・結成・変更' : $init->allyJoinComUse ? '' : '・加盟・脱退';
+            $str5 = ($adminMode || $init->allyJoinComUse) ? '' : '<INPUT TYPE="submit" VALUE="加盟・脱退" NAME="JoinAllyButton" class="btn btn-default">';
+            echo <<<END
 <BR>
 <BR><B>［解散{$str4}］</B>
 <BR>どの同盟ですか？<BR>
@@ -2833,13 +2818,13 @@ END;
 {$str5}
 <BR>
 END;
-		}
-		$str7 = $adminMode ? "盟主島の変更(上のメニューで同盟を選択)<BR> or 同盟の新規作成(上のメニューは無効)<BR><SELECT NAME=\"ALLYID\"><option value=\"$max\">新規作成\n{$hako->islandList}</option></SELECT><BR>" : "<BR><B>［{$str0}変更］</B><BR>";
-		echo <<<END
+        }
+        $str7 = $adminMode ? "盟主島の変更（上のメニューで同盟を選択）<BR> or 同盟の新規作成（上のメニューは無効）<BR><SELECT NAME=\"ALLYID\"><option value=\"$max\">新規作成\n{$hako->islandList}</option></SELECT><BR>" : "<BR><B>［{$str0}変更］</B><BR>";
+        echo <<<END
 <BR>
 {$str7}
-同盟の名前（変更）<small>(全角{$init->lengthAllyName}字まで)</small><BR>
-<INPUT TYPE="text" NAME="ALLYNAME" VALUE="$allyname" SIZE=32 MAXLENGTH=32 class="form-control"><BR>
+同盟の名前（変更）<small>(全角{$init->lengthAllyName}字まで）</small><BR>
+<INPUT TYPE="text" NAME="ALLYNAME" VALUE="$allyname" SIZE={(int)$init->lengthAllyName + 1} MAXLENGTH={$init->lengthAllyName} class="form-control"><BR>
 マーク（変更）<BR>
 <SELECT NAME="MARK" onChange="colorPack()" onClick="colorPack()">{$markList}</SELECT>
 <br>
@@ -2856,24 +2841,24 @@ END;
 </TR>
 <TR>
 	<TD>
-		<SELECT NAME="COLOR1" onChange="colorPack()" onClick="colorPack()">{$colorList[1]}</SELECT>
-		<SELECT NAME="COLOR2" onChange="colorPack()" onClick="colorPack()">{$colorList[2]}</SELECT>
+		<SELECT name="COLOR1" onChange="colorPack()" onClick="colorPack()">{$colorList[1]}</SELECT>
+		<SELECT name="COLOR2" onChange="colorPack()" onClick="colorPack()">{$colorList[2]}</SELECT>
 	</TD>
 	<TD>
-		<SELECT NAME="COLOR3" onChange="colorPack()" onClick="colorPack()">{$colorList[3]}</SELECT>
-		<SELECT NAME="COLOR4" onChange="colorPack()" onClick="colorPack()">{$colorList[4]}</SELECT>
+		<SELECT name="COLOR3" onChange="colorPack()" onClick="colorPack()">{$colorList[3]}</SELECT>
+		<SELECT name="COLOR4" onChange="colorPack()" onClick="colorPack()">{$colorList[4]}</SELECT>
 	</TD>
 	<TD>
-		<SELECT NAME="COLOR5" onChange="colorPack()" onClick="colorPack()">{$colorList[5]}</SELECT>
-		<SELECT NAME="COLOR6" onChange="colorPack()" onClick="colorPack()">{$colorList[6]}</SELECT>
+		<SELECT name="COLOR5" onChange="colorPack()" onClick="colorPack()">{$colorList[5]}</SELECT>
+		<SELECT name="COLOR6" onChange="colorPack()" onClick="colorPack()">{$colorList[6]}</SELECT>
 	</TD>
 </TR>
 </TABLE>
 
-<INPUT TYPE="submit" VALUE="結成 (変更)" NAME="NewAllyButton" class="btn btn-primary">
+<input type="submit" value="結成 （変更）" name="NewAllyButton" class="btn btn-primary">
 END;
-		if(!$adminMode) {
-			echo <<<END
+        if (!$adminMode) {
+            echo <<<END
 <script>
 function colorPack() {
 	var island = new Array(128);
@@ -2889,8 +2874,7 @@ function colorPack() {
 
 	str = "#" + a + b + c + d + e + f;
 
-	str = '表示サンプル：『<B><span class="number"><FONT color="' + str +'">' + mark + '</FONT></B>'
-		+ island[number] + '島</span>』';
+	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span>' + island[number] + '島</span>』';
 
 	document.getElementById("CTBL").innerHTML = str;
 
@@ -2912,8 +2896,8 @@ function allyPack() {
 	return true;
 }
 END;
-		} else {
-			echo <<<END
+        } else {
+            echo <<<END
 
 function colorPack() {
 	var island = new Array(128);
@@ -2928,8 +2912,7 @@ function colorPack() {
 
 	var str = "#" + a + b + c + d + e + f;
 
-	str = '表示サンプル：『<B><span class="number"><FONT color="' + str +'">' + mark + '</FONT></B>'
-		+ 'さんぷる島</span>』';
+	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span> ●●●島</span>』';
 
 	document.getElementById("CTBL").innerHTML = str;
 
@@ -2954,8 +2937,8 @@ function allyPack() {
 	return true;
 }
 END;
-		}
-		echo <<<END
+        }
+        echo <<<END
 colorPack();
 </script>
 </form>
@@ -2965,5 +2948,5 @@ colorPack();
 </table>
 </div>
 END;
-	}
+    }
 }
