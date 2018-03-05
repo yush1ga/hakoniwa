@@ -15,7 +15,7 @@ class LaunchTest extends \Init
     private $needExts = [
         'mbstring'
     ];
-    private function HasExtension(string $extName):bool
+    private function HasExtension(string $extName): bool
     {
         return extension_loaded($extName);
     }

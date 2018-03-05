@@ -22,7 +22,7 @@
     "phplint": "run-os",
     "phplint:linux:darwin": "vendor/bin/parallel-lint --exclude vendor .",
     "phplint:win32": "vendor\\bin\\parallel-lint --no-colors --exclude vendor .",
-    "server": "php -S localhost:8000 -t ./"
+    "server": "php -S localhost:8000 -t ./　Router.php"
   },
   "dependencies": {},
   "devDependencies": {
