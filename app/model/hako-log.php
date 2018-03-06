@@ -892,7 +892,7 @@ class Log extends LogIO
     // 怪獣現る
     public function monsCome($id, $name, $mName, $point, $lName)
     {
-        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}に<strong>怪獣{$mName}</strong>出現！！{$this->init->tagName_}{$point}{$this->init->_tagName}の<strong>{$lName}</strong>が踏み荒らされました。", $id);
+        $this->out("<a href=\"$this->this_file?Sight=$id\"><span class=\"islName\">$name{$this->init->nameSuffix}</span></a>に<strong>怪獣$mName</strong>出現！！<span class=\"islName\">$point</span>の<strong>{$lName}</strong>が踏み荒らされました。", $id);
     }
     // 船派遣した
     public function shipSend($id, $tId, $name, $sName, $point, $tName)

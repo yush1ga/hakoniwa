@@ -6,8 +6,9 @@
  * ほんまか？
  */
 if (php_sapi_name() === 'cli-server') {
-    if(!defined('DEBUG')){
+    if (!defined('DEBUG')) {
         define('DEBUG', true);
     }
 }
+
 return false;

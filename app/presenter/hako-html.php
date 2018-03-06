@@ -594,10 +594,9 @@ class HtmlMap extends HTML
         $islandID = $data['ISLANDID'];
         $name = $island['name'].$init->nameSuffix;
         $ip = getenv('REMOTE_ADDR', true);
-        if ($ip){
+        if ($ip) {
             $host = gethostbyaddr($ip);
-        }
-        else {
+        } else {
             $ip = '192.0.2.0';
             $host = 'unknown';
         }
