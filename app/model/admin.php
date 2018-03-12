@@ -7,6 +7,37 @@ class Admin
 {
     public $mode;
     public $dataSet = [];
+    private final $pointer = [
+        'filter' => FILTER_VALIDATE_INT,
+        'options' => [
+            'min_range' => 0,
+            'max_range' => $init->islandSize
+        ]
+    ];
+    private final $args = [
+        'mode',
+        'DEVELOPEMODE',
+        'ISLANDID'
+        'PASSWORD',
+
+        'defaultID' => FILTER_VALIDATE_INT,
+        'defaultTarget' => FILTER_VALIDATE_INT,
+        'defaultX',
+        'defaultY',
+        'defaultLAND',
+        'defaultMONSTER',
+        'defaultSHIP',
+        'defaultLEVEL',
+        'defaultImg',
+
+        'POINTX',
+        'POINTY',
+        'LAND',
+        'MONSTER',
+        'SHIP',
+        'LEVEL',
+        'IMG'
+    ];
 
     public function parseInputData()
     {
@@ -17,28 +48,6 @@ class Admin
                 $this->dataSet[$name] = str_replace(",", "", $value);
             }
         }
-    }
-
-    public function passCheck(): bool
-    {
-        global $init;
-
-        if (!file_exists($init->passwordFile)) {
-            HakoError::problem();
-
-            return false;
-        }
-
-        $fp = fopen($init->passwordFile, "r");
-        $masterPassword = chop(fgets($fp, READ_LINE));
-        fclose($fp);
-
-        if (isset($this->dataSet['PASSWORD']) && password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
-            return true;
-        } else {
-            HakoError::wrongPassword();
-
-            return false;
-        }
+        // $this->dataSet = filter_input_array(INPUT_POST, $this->args);
     }
 }

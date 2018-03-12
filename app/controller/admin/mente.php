@@ -17,11 +17,12 @@ class Mente extends \Admin
         $this->parseInputData();
         $cgi->getCookies();
 
+        $this->dataSet['PASSWORD'] = $this->dataSet['PASSWORD'] ?? '';
         $html->header();
 
         switch ($this->mode) {
             case "NEW":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->newMode();
                 }
                 $html->main($this->dataSet);
@@ -29,7 +30,7 @@ class Mente extends \Admin
                 break;
 
             case "CURRENT":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->currentMode($this->dataSet['NUMBER']);
                 }
                 $html->main($this->dataSet);
@@ -37,7 +38,7 @@ class Mente extends \Admin
                 break;
 
             case "DELETE":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->delMode($this->dataSet['NUMBER']);
                 }
                 $html->main($this->dataSet);
@@ -45,7 +46,7 @@ class Mente extends \Admin
                 break;
 
             case "NTIME":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->timeMode();
                 }
                 $html->main($this->dataSet);
@@ -53,7 +54,7 @@ class Mente extends \Admin
                 break;
 
             case "STIME":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->stimeMode($this->dataSet['SSEC']);
                 }
                 $html->main($this->dataSet);
@@ -67,7 +68,7 @@ class Mente extends \Admin
                 break;
 
             case "enter":
-                if ($this->passCheck()) {
+                if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $html->main($this->dataSet);
                 }
 
@@ -77,6 +78,10 @@ class Mente extends \Admin
                 $html->enter();
 
                 break;
+        }
+
+        if (!\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
+            \HakoError::wrongPassword();
         }
         $html->footer();
     }
@@ -93,7 +98,7 @@ class Mente extends \Admin
         touch($fileName);
         $fp = fopen($fileName, "w");
         fputs($fp, "1\n");
-        fputs($fp, "{$now}\n");
+        fputs($fp, "$now\n");
         fputs($fp, "0\n");
         fputs($fp, "1\n");
         fclose($fp);

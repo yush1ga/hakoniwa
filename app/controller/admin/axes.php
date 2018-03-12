@@ -21,8 +21,10 @@ class Axes extends \Admin
         $html->header();
 
         if (isset($this->dataSet['PASSWORD'])) {
-            if ($this->passCheck()) {
+            if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                 $html->main($this->dataSet);
+            } else {
+                \HakoError::wrongPassword();
             }
         } else {
             $html->passwdChk();
