@@ -301,7 +301,7 @@ class HtmlTop extends HTML
         println('<div class="table-responsive">');
         println('<table class="table table-bordered table-condensed">');
 
-        for ($i = $start; $i < $sentinel ; $i++) {
+        for ($i = $start; $i < $sentinel; $i++) {
             $island        = $hako->islands[$i];
             if ($island['isDead'] ?? false) {
                 continue;
@@ -420,7 +420,7 @@ class HtmlTop extends HTML
                 }
             }
 
-            $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist)? " 🔰":"";
+            $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist) ? '<sup>🔰</sup>':'';
 
             $soccer = ($island['soccer'] > 0)?" <span title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">⚽</span>":"";
 
@@ -444,18 +444,17 @@ class HtmlTop extends HTML
 			<th class="TitleCell head">{$init->namePopulation}</th>
 			<th class="TitleCell head">{$init->nameArea}</th>
 			<th class="TitleCell head">{$init->nameWeather}</th>
-			<th class="TitleCell head">{$init->nameFunds} {$lots}</th>
+			<th class="TitleCell head">{$init->nameFunds} $lots</th>
 			<th class="TitleCell head">{$init->nameFood}</th>
 			<th class="TitleCell head">{$init->nameUnemploymentRate}</th>
 		</tr>
 	</thead>
 	<tr>
-		<th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
+		<th class="NumberCell number" rowspan="5">$j</th>
 		<td class="NameCell" rowspan="5" valign="top">
-			<h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
-			{$prize}{$viking}<br>
-			{$zins}<br>
-			<small>({$peop} {$okane} {$gohan} {$poin})</small>
+			<h3><a href="$this_file?Sight=$id">$name</a>$keep$start<br><small>$monster$soccer</small></h3>
+			$prize $viking<br>$zins<br>
+			<small>（$peop $okane $gohan {$poin}）</small>
 		</td>
 		<td class="InfoCell">$point</td>
 		<td class="InfoCell">$pop</td>

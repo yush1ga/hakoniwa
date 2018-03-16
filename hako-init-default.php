@@ -125,7 +125,7 @@ class InitDefault
     //---------------------------------------------------
     public $nameRank                       = "順位";
     public $namePopulation                 = "人口";
-    public $nameArea                       = "面積";
+    public $nameArea                       = "領土";
     public $nameFunds                      = "資金";
     public $nameFood                       = "食料";
     public $nameUnemploymentRate           = "失業率";
@@ -318,23 +318,21 @@ class InitDefault
     //---------------------------------------------------
     // 災害に関する設定（確率：設定値 x 0.1%）
     //---------------------------------------------------
-    public $disEarthquake =   5;  // 地震
-    public $disTsunami    =  10;  // 津波
-    public $disTyphoon    =  20;  // 台風
-    public $disMeteo      =  15;  // 隕石
-    public $disHugeMeteo  =   3;  // 巨大隕石
-    public $disEruption   =   5;  // 噴火
-    public $disFire       =  10;  // 火災
-    public $disMaizo      =  30;  // 埋蔵金
-    public $disSto        =  10;  // ストライキ
-    public $disTenki      =  30;  // 天気
-    public $disTrain      = 300;  // 電車
-    public $disPoo        =  30;  // 失業暴動
-    public $disPooPop     = 500;  // 暴動が発生する最低人口
-
-    // 地盤沈下
-    public $disFallBorder = 260; //default: 100; // 安全限界の広さ(Hex数)
-    public $disFalldown   = 10;  //default:  30; // その広さを超えた場合の発生確率
+    public $disEarthquake =   5; // 地震
+    public $disTsunami    =  10; // 津波
+    public $disTyphoon    =  20; // 台風
+    public $disMeteo      =  15; // 隕石
+    public $disHugeMeteo  =   3; // 巨大隕石
+    public $disEruption   =   5; // 噴火
+    public $disFire       =  10; // 火災
+    public $disMaizo      =  30; // 埋蔵金
+    public $disSto        =  10; // ストライキ
+    public $disTenki      =  30; // 天気
+    public $disTrain      = 300; // 電車
+    public $disPoo        =  30; // 失業暴動
+    public $disPooPop     = 500; // 暴動発生の人口閾値
+    public $disFalldown   =  30; // 地盤沈下
+    public $disFallBorder = 150; // 地盤沈下発生の面積閾値
 
     //---------------------------------------------------
     // 怪獣に関する設定

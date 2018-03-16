@@ -7,6 +7,7 @@
 /**
  * Debug mode:
  * If the server running as cli-server, 'DEBUG' is always true.
+ * cf. "Router.php".
  */
 if (!defined('DEBUG')) {
     define('DEBUG', false);

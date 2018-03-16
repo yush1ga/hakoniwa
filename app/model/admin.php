@@ -5,19 +5,20 @@
  */
 class Admin
 {
-    public $mode;
-    public $dataSet = [];
-    private final $pointer = [
+    protected $mode;
+    protected $dataSet = [];
+    protected $d_dataSet = [];
+    private const POINTER = [
         'filter' => FILTER_VALIDATE_INT,
         'options' => [
             'min_range' => 0,
-            'max_range' => $init->islandSize
+            'max_range' => 10
         ]
     ];
-    private final $args = [
+    private const ARGS = [
         'mode',
         'DEVELOPEMODE',
-        'ISLANDID'
+        'ISLANDID',
         'PASSWORD',
 
         'defaultID' => FILTER_VALIDATE_INT,
@@ -48,6 +49,9 @@ class Admin
                 $this->dataSet[$name] = str_replace(",", "", $value);
             }
         }
-        // $this->dataSet = filter_input_array(INPUT_POST, $this->args);
+    }
+    public function d_parseInputData()
+    {
+        $this->d_dataSet = filter_input_array(INPUT_POST, array_merge($this::ARGS, $this->vargs));
     }
 }
