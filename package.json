@@ -17,8 +17,8 @@
   "scripts": {
     "compile": "webpack --color",
     "phpfix": "run-os",
-    "phpfix:linux:darwin": "vendor/bin/php-cs-fixer fix",
-    "phpfix:win32": "vendor\\bin\\php-cs-fixer fix",
+    "phpfix:linux:darwin": "vendor/bin/php-cs-fixer fix --allow-risky=yes",
+    "phpfix:win32": "vendor\\bin\\php-cs-fixer fix --allow-risky=yes",
     "phplint": "run-os",
     "phplint:linux:darwin": "vendor/bin/parallel-lint --exclude vendor .",
     "phplint:win32": "vendor\\bin\\parallel-lint --no-colors --exclude vendor .",
