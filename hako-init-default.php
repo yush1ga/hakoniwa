@@ -337,15 +337,15 @@ class InitDefault
     //---------------------------------------------------
     // 怪獣に関する設定
     //---------------------------------------------------
-    public $disMonsBorder1 = 2000;  // 人口基準1(怪獣レベル1)
-    public $disMonsBorder2 = 4000;  // 人口基準2(怪獣レベル2)
-    public $disMonsBorder3 = 6000;  // 人口基準3(怪獣レベル3)
-    public $disMonsBorder4 = 8000;  // 人口基準4(怪獣レベル4)
+    public $disMonsBorder1 =  2000; // 人口基準1(怪獣レベル1)
+    public $disMonsBorder2 =  4000; // 人口基準2(怪獣レベル2)
+    public $disMonsBorder3 =  6000; // 人口基準3(怪獣レベル3)
+    public $disMonsBorder4 =  8000; // 人口基準4(怪獣レベル4)
     public $disMonsBorder5 = 10000; // 人口基準5(怪獣レベル5)
     public $disMonster     = 2.5;   // 面積あたりの出現率(0.01%単位)
 
-    public $monsterLevel1  = 4;     // サンジラまで
-    public $monsterLevel2  = 9;     // いのらゴーストまで
+    public $monsterLevel1  =  4;    // サンジラまで
+    public $monsterLevel2  =  9;    // いのらゴーストまで
     public $monsterLevel3  = 15;    // かおくと（♀）まで
     public $monsterLevel4  = 23;    // 迎撃いのらまで
     public $monsterLevel5  = 26;    // インベーダーまで
@@ -381,7 +381,7 @@ class InitDefault
         '姫いのら',           # 25
         'インベーダー',       # 26
     ];
-    // 怪獣の画像(硬化中)
+    // 怪獣の画像（硬化中の差分）
     public $monsterImage   = [
         '', '', '', 'kouka.gif', 'kouka.gif',
         '', '', '', '', '',
@@ -432,6 +432,8 @@ class InitDefault
         0x2020, 0x4400, 0x10100, 0x101, 0x21,
         0x2121, 0x42
     ];
+    // 特殊能力「分裂する」の発生割合（単位：0.1%）
+    public $rateMonsterDivision = 100;
     // 撃退経験値
     public $monsterExp = [
         20, 6, 5, 7, 6,
@@ -451,8 +453,6 @@ class InitDefault
         10000, 50000
     ];
 
-    // 特殊能力「分裂する」の発生割合（単位：0.1%）
-    public $rateMonsterDivision = 100;
 
     //---------------------------------------------------
     // 賞に関する設定
@@ -523,9 +523,6 @@ class InitDefault
     /********************
         外見関係
     ********************/
-    // 大きい文字
-    public $tagBig_       = '<span class="big">';
-    public $_tagBig       = '</span>';
     // 島の名前など
     public $tagName_      = '<span class="islName">';
     public $_tagName      = '</span>';

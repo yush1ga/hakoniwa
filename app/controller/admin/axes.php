@@ -1,4 +1,5 @@
 <?php
+
 namespace Hakoniwa\Admin;
 
 require_once MODELPATH.'/admin.php';
@@ -14,8 +15,8 @@ class Axes extends \Admin
     {
         global $init;
         $this->init = $init;
-        $html = new \HtmlAxes();
-        $cgi  = new \Cgi();
+        $html = new \HtmlAxes;
+        $cgi  = new \Cgi;
         $this->parseInputData();
         $cgi->getCookies();
         $html->header();

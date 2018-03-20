@@ -10,7 +10,7 @@ require_once 'config.php';
 require_once MODELPATH.'/hako-cgi.php';
 require_once PRESENTER.'/hako-html.php';
 
-$init = new Init();
+$init = new Init;
 
 class MakeAlly
 {
@@ -389,14 +389,19 @@ class MakeAlly
         }
     }
 
-    //--------------------------------------------------
-    // 箱庭データとのデータ統合処理
-    //--------------------------------------------------
+    /**
+     * 同盟関連データの再計算
+     * @param  [type] &$hako [description]
+     * @return bool          更新があった場合true
+     */
     public function allyReComp(&$hako)
     {
-        $rt1 = $this->allyDelete($hako);    // 盟主不在により同盟データから削除
-        $rt2 = $this->allyMemberDel($hako);    // 放棄、無人島を同盟データから削除
-        $rt3 = $this->allyPopComp($hako);    // 人口の再集計（ターン処理に組み込んでいないため）
+        /**
+         * 同盟の消失・加盟脱退・所属人口の更新など
+         */
+        $rt1 = $this->allyDelete($hako);
+        $rt2 = $this->allyMemberDel($hako);
+        $rt3 = $this->allyPopComp($hako);
 
         if ($rt1 || $rt2 || $rt3) {
             // データ書き出し
@@ -407,21 +412,25 @@ class MakeAlly
             // メッセージ出力
             Success::allyDataUp();
 
-            return 1;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
-    //--------------------------------------------------
-    // 盟主不在により同盟データから削除
-    //--------------------------------------------------
+    /**
+     * 同盟主登録のある島IDが存在しないとき、登録先の同盟を消す
+     * @param  [type] &$hako [description]
+     * @return bool          削除処理が走った場合true
+     */
     public function allyDelete(&$hako)
     {
         $count = 0;
+
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $id = $hako->ally[$i]['id'];
-            if (!($hako->idToNumber[$id] > -1)) {
+
+            if ($hako->idToNumber[$id] < 0) {
                 // 配列から削除
                 $hako->ally[$i]['dead'] = 1;
                 $hako->idToAllyNumber[$id] = '';
@@ -437,64 +446,65 @@ class MakeAlly
             // データ格納先へ
             $hako->islands[$currentNumber] = $island;
 
-            return 1;
+            return true;
         }
 
-        return 0;
+        return false;
     }
 
-    //--------------------------------------------------
-    // 放棄、無人島を同盟データから削除
-    //--------------------------------------------------
+    /**
+     * 同盟在籍ユーザの更新
+     * @param  [type] &$hako [description]
+     * @return bool          更新があった場合true
+     */
     public function allyMemberDel(&$hako)
     {
-        $flg = 0;
+        $flg = false;
+
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $count = 0;
-            $allyMember = $hako->ally[$i]['memberId'];
-            $newAllyMember = [];
-            foreach ($allyMember as $id) {
+            $allyMembers = $hako->ally[$i]['memberId'];
+            $newAllyMembers = [];
+            foreach ($allyMembers as $id) {
                 if ($hako->idToNumber[$id] > -1) {
-                    array_push($newAllyMember, $id);
+                    array_push($newAllyMembers, $id);
                     $count++;
                 }
             }
             if ($count != $hako->ally[$i]['number']) {
-                $hako->ally[$i]['memberId'] = $newAllyMember;
+                $hako->ally[$i]['memberId'] = $newAllyMembers;
                 $hako->ally[$i]['number'] = $count;
-                $flg = 1;
+                $flg = true;
             }
         }
-        if ($flg) {
-            return 1;
-        }
 
-        return 0;
+        return $flg;
     }
 
-    //--------------------------------------------------
-    // 人口の再集計（ターンに組み込めば処理不要）
-    //--------------------------------------------------
+    /**
+     * 同盟ごとの所属人口集計
+     * [TODO] ターン処理にも挟む
+     * @param  [type] &$hako [description]
+     * @return bool          更新があった場合true
+     */
     public function allyPopComp(&$hako)
     {
-        $flg = 0;
+        $flg = false;
+
         for ($i=0; $i<$hako->allyNumber; $i++) {
             $score = 0;
-            $allyMember = $hako->ally[$i]['memberId'];
-            foreach ($allyMember as $id) {
+            $allyMembers = $hako->ally[$i]['memberId'];
+            foreach ($allyMembers as $id) {
                 $island = $hako->islands[$hako->idToNumber[$id]];
                 $score += $island['pop'];
             }
             if ($score != $hako->ally[$i]['score']) {
                 $hako->ally[$i]['score'] = $score;
-                $flg = 1;
+                $flg = true;
             }
         }
-        if ($flg) {
-            return 1;
-        }
 
-        return 0;
+        return $flg;
     }
 }
 
@@ -834,9 +844,9 @@ class AllyUtil extends Util
         }
         for ($i=0; $i<$hako->allyNumber; $i++) {
             if ($totalScore != 0) {
-                $hako->ally[$i]['occupation'] = (int)($hako->ally[$i]['score'] / $totalScore * 100);
+                $hako->ally[$i]['occupation'] = intdiv($hako->ally[$i]['score'], $totalScore * 100);
             } else {
-                $hako->ally[$i]['occupation'] = (int)(100 / $hako->allyNumber);
+                $hako->ally[$i]['occupation'] = intdiv(100, $hako->allyNumber);
             }
         }
 
@@ -904,10 +914,8 @@ class AllyUtil extends Util
         $s = h($s);
 
         if ($mode) {
-            $s = str_replace("\r\n", "<br>", $s);
-            $s = str_replace("\r", "<br>", $s);
-            $s = str_replace("\n", "<br>", $s);
-            $s = preg_replace('/(<br>){3,}/', '<br><br>', $s); // 大量改行対策
+            $s = strtr($s, array_fill_keys(["\r\n", "\r", "\n"], '<br>'));
+            $s = preg_replace('/(<br>){3,}/g', '<br><br>', $s); // 大量改行対策
         }
 
         return $s;
@@ -955,8 +963,8 @@ class Main
     {
         global $init;
 
-        $ally = new Ally();
-        $cgi = new Cgi();
+        $ally = new Ally;
+        $cgi = new Cgi;
 
         $this->parseInputData();
         $cgi->getCookies();
@@ -969,48 +977,49 @@ class Main
         }
         $cgi->setCookies();
 
-        $html = new HtmlAlly();
-        $com = new MakeAlly();
+        $html = new HtmlAlly;
+        $com = new MakeAlly;
         $html->header();
+
         switch ($this->mode) {
+            // 同盟の結成・変更・解散・加盟・脱退
             case "JoinA":
-                // 同盟の結成・変更・解散・加盟・脱退
                 $html->newAllyTop($ally, $this->dataSet);
 
                 break;
 
+            // 同盟の結成・変更
             case "newally":
-                // 同盟の結成・変更
                 $com->makeAllyMain($ally, $this->dataSet);
 
                 break;
 
+            // 同盟の解散
             case "delally":
-                // 同盟の解散
                 $com->deleteAllyMain($ally, $this->dataSet);
 
                 break;
 
+            // 同盟の加盟・脱退
             case "inoutally":
-                // 同盟の加盟・脱退
                 $com->joinAllyMain($ally, $this->dataSet);
 
                 break;
 
+            // コメントの変更
             case "Allypact":
-                // コメントの変更
                 $html->tempAllyPactPage($ally, $this->dataSet);
 
                 break;
 
+            // コメントの更新
             case "AllypactUp":
-                // コメントの更新
                 $com->allyPactMain($ally, $this->dataSet);
 
                 break;
 
+            // 同盟の情報
             case "AmiOfAlly":
-                // 同盟の情報
                 $html->amityOfAlly($ally, $this->dataSet);
 
                 break;
@@ -1067,8 +1076,8 @@ class Main
     }
 }
 
-$start = new Main();
-$start->execute();
+$start = new Main;
+$start->execute;
 
 // 人口を比較、同盟一覧用
 function scoreComp($x, $y)
