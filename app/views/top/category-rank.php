@@ -2,6 +2,7 @@
 	<h2>各部門ランキング</h2>
 	<div class="table-responsive">
 		<table class="table table-condensed">
+            <colgroup span=6 style="width:15%"></colgroup>
 <?php
         $element   = ['point', 'money', 'food', 'pop', 'area', 'fire', 'pots', 'gold', 'rice', 'peop', 'monster', 'taiji', 'farm', 'factory', 'commerce', 'hatuden', 'mountain', 'team'];
         $bumonName = ["総合ポイント", $init->nameFunds, $init->nameFood, $init->namePopulation, $init->nameArea, "軍事力", "成長", "収入", "収穫", "人口増加", "怪獣出現数", "怪獣退治数", "農場", "工場", "商業", "発電所", "採掘場", "サッカー"];
@@ -29,31 +30,32 @@
             if (($r % 6) === 0) {
                 println('<tr>');
             }
+            $max = $r !== 5 ? $max : '';
             echo <<<END
-<td width="15%" class="M">
-    <table class="table table-bordered" style="border:0">
+<td>
+    <table class="table table-condensed m-b-0">
         <thead><tr><th>{$bumonName[$r]}</th></tr></thead>
         <tbody>
+
 END;
             if ($island) {
-                $max = $r !== 5 ? $max : '';
                 echo <<<END
-            <tr>
-                <td class="TenkiCell"><a class="islName" href="$this_file?Sight={$island['id']}">$name</a></td>
-            </tr>
-            <tr>
-                <td class="TenkiCell">$max{$bumonUnit[$r]}</td>
-            </tr>
+            <tr><td class="TenkiCell"><a class="islName" href="$this_file?Sight={$island['id']}">$name</a></td></tr>
+            <tr><td class="TenkiCell">$max{$bumonUnit[$r]}</td></tr>
+
 END;
             } else {
                 echo <<<END
             <tr><td class="TenkiCell islName">-</td></tr>
             <tr><td class="TenkiCell islName">-</td></tr>
+
 END;
             }
             echo <<<END
+        </tbody>
     </table>
 </td>
+
 END;
 
             if (($r % 6) === 5) {

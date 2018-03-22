@@ -29,7 +29,7 @@ class MakeAlly
         $currentAnumber = $data['ALLYNUMBER'] ?? "";
         $allyName = htmlspecialchars($data['ALLYNAME']);
         $allyMark = $data['MARK'];
-        $allyColor = $data['COLOR1'].$data['COLOR2'].$data['COLOR3'].$data['COLOR4'].$data['COLOR5'].$data['COLOR6'];
+        $allyColor = $data['colorCode'];
         $adminMode = 0;
 
         // パスワードチェック
@@ -63,7 +63,6 @@ class MakeAlly
         }
         // 同盟名が正当かチェック
         if (preg_match("/[,\?\(\)\<\>\$]|^無人|^沈没$/", $allyName)) {
-            // 使えない名前
             HakoError::newIslandBadName();
 
             return;
@@ -73,7 +72,6 @@ class MakeAlly
         if (!($adminMode && ($allyID == '') && ($allyID < 200)) &&
             ((AllyUtil::nameToNumber($hako, $allyName) != -1) ||
             ((AllyUtil::aNameToId($hako, $allyName) != -1) && (AllyUtil::aNameToId($hako, $allyName) != $currentID)))) {
-            // すでに結成ずみ
             HakoError::newAllyAlready();
 
             return;
@@ -81,7 +79,6 @@ class MakeAlly
         // マークの重複チェック
         if (!($adminMode && ($allyID == '') && ($allyID < 200)) &&
             ((AllyUtil::aMarkToId($hako, $allyMark) != -1) && (AllyUtil::aMarkToId($hako, $allyMark) != $currentID))) {
-            // すでに使用ずみ
             HakoError::markAllyAlready();
 
             return;
@@ -89,18 +86,18 @@ class MakeAlly
         // passwordの判定
         $island = $hako->islands[$currentNumber];
         if (!$adminMode && !AllyUtil::checkPassword($island['password'], $data['PASSWORD'])) {
-            // password間違い
             HakoError::wrongPassword();
 
             return;
         }
+        // 結成資金不足判定
         if (!$adminMode && $island['money'] < $init->costMakeAlly) {
             HakoError::noMoney();
 
             return;
         }
         $n = $hako->idToAllyNumber[$currentID] ?? '';
-        if ($n != '') {
+        if ($n !== '') {
             if ($adminMode && ($allyID != '') && ($allyID < 200)) {
                 $allyMember = $hako->ally[$n]['memberId'];
                 $aIsland = $hako->islands[$hako->idToNumber[$allyID]];
@@ -165,7 +162,7 @@ class MakeAlly
             $hako->ally[$n]['id'] = $currentID;
             $memberId = [];
             if ($allyID < 200) {
-                $hako->ally[$n]['oName']    = $island['name']."島";
+                $hako->ally[$n]['oName']    = $island['name'].$init->nameSuffix;
                 $hako->ally[$n]['password'] = $island['password'];
                 $hako->ally[$n]['number']   = 1;
                 $memberId[0]                = $currentID;
@@ -359,7 +356,7 @@ class MakeAlly
         $hako->writeAllyFile();
 
         // トップへ
-        $html = new HtmlAlly();
+        $html = new HtmlAlly;
         $html->allyTop($hako, $data);
     }
 
@@ -1077,7 +1074,7 @@ class Main
 }
 
 $start = new Main;
-$start->execute;
+$start->execute();
 
 // 人口を比較、同盟一覧用
 function scoreComp($x, $y)

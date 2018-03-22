@@ -1,4 +1,5 @@
 <?php
+
 require_once 'config.php';
 
 require_once APPPATH.'/model/hako-log.php';
@@ -5982,7 +5983,7 @@ class Turn
 
                         // 山
                         case $init->landMountain:
-                            $area++;
+                            $area+=2;
                             $mountain += $value;
 
                             break;
@@ -6015,7 +6016,7 @@ class Turn
                         // 怪獣
                         case $init->landMonster:
                         case $init->landSleeper:
-                            $area++;
+                            $area+=2;
                             $monster++;
 
                             break;
@@ -6070,7 +6071,7 @@ class Turn
 
                         // 記念碑
                         case $init->landMonument:
-                            $area++;
+                            $area+=2;
                             if ($value == 23) {
                                 $m23++;
                             }

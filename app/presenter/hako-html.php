@@ -346,7 +346,7 @@ class HtmlTop extends HTML
             //$starturn     = $island['starturn'];
             $keep = '';
 
-            $monster       = ($island['monster'] > 0)? '<strong class="monster">[怪獣'.$island['monster'].'体出現中]</strong>' :'';
+            $monster       = ($island['monster'] > 0)? '<strong class="text-danger">[怪獣'.$island['monster'].'体出現中]</strong>' :'';
 
             if ($island['keep'] == 1) {
                 $comment = '<span class="attention">この島は管理人預かり中です</span>';
@@ -363,7 +363,7 @@ class HtmlTop extends HTML
             $point = $island['point'];
 
             $sora_ = ['', '晴れ☀', '曇り☁', '雨☂', '雷⛈', '雪☃'];
-            $sora  = "<img src=\"{$init->imgDir}/tenki{$tenki}.gif\" alt=\"{$sora_[$tenki]}\"". ' width="19" height="19">';
+            $sora  = "<img src=\"{$init->imgDir}/tenki{$tenki}.gif\" alt=\"{$sora_[$tenki]}\" title=\"{$sora_[$tenki]}\"". ' width="19" height="19">';
 
             $eiseis = "";
             for ($e = 0; $e < $init->EiseiNumber; $e++) {
@@ -435,11 +435,12 @@ class HtmlTop extends HTML
 		</tr>
 	</thead>
 	<tr>
-		<th class="NumberCell number" rowspan="5">$j</th>
-		<td class="NameCell" rowspan="5" valign="top">
-			<h3><a href="$this_file?Sight=$id">$name</a>$keep$start<br><small>$monster$soccer</small></h3>
-			$prize $viking<br>$zins<br>
-			<small>（$peop $okane $gohan {$poin}）</small>
+		<th class="NumberCell number" rowspan=5>$j</th>
+		<td class="NameCell" rowspan=4>
+			<h3><a href="$this_file?Sight=$id">$name</a>$keep$start</h3>
+            <div>$monster $soccer</div>
+			<div>$prize $viking</div>
+            <div>$zins</div>
 		</td>
 		<td class="InfoCell">$point</td>
 		<td class="InfoCell">$pop</td>
@@ -469,10 +470,11 @@ class HtmlTop extends HTML
 	</tr>
 	<tr>
 		<th class="TitleCell head">取得アイテム</th>
-		<td class="ItemCell" colspan="6">$items</td>
+		<td class="ItemCell" colspan=6>$items</td>
 	</tr>
 	<tr>
-		<td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
+        <td class="NameCell"><small>前ターン比： $poin / $peop / $okane / $gohan</small></td>
+		<td class="CommentCell" colspan=7><span class="head">{$owner}：</span> $comment</td>
 	</tr>
 END;
         }
@@ -2464,7 +2466,7 @@ END;
 </tbody>
 </table>
 </div>
-<p>※同盟の名前をクリックすると「同盟の情報」欄へ、盟主の島名をクリックすると「コメント変更」欄へ移動します。</p>
+<p>※盟主の島名をクリックすると「コメント変更」欄へ移動します。</p>
 END;
     }
 
