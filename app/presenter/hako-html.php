@@ -307,8 +307,8 @@ class HtmlTop extends HTML
                 continue;
             }
 
-            $island['pop'] = ($island['pop'] > 1) ? $island['pop'] : 1;
-            $j             = ($island['isBF']) ? '★' : $i + 1;
+            $island['pop'] = $island['pop'] > 1 ? $island['pop'] : 1;
+            $j             = $island['isBF'] ? '-' : $i + 1;
             $id            = $island['id'];
             $pop           = $island['pop'].$init->unitPop;
             $area          = $island['area'].$init->unitArea;

@@ -3594,9 +3594,12 @@ class Turn
         $addpop  = 10; // 村、町
         $addpop2 = 0;  // 都市
         // 人口タネ値修正
+        // バトルフィールド（30,30）、
         // 食糧不足（-30）、 海賊船滞留中（0）、
         // 誘致活動（30,3）、遊園地がある（20,1)
-        if ($island['food'] <= 0) {
+        if ($island['isBF'] ?? false) {
+            $addpop = $addpop2 = 30;
+        } elseif ($island['food'] <= 0) {
             $addpop = -30;
         } elseif (Util::hasBadShip($island['ship'])) {
             $addpop = 0;
@@ -3606,7 +3609,6 @@ class Turn
         } elseif ($island['park'] > 0) {
             $addpop  = 20;
             $addpop2 = 1;
-        } else {
         }
 
         // 船・怪獣の移動判定用変数を初期化
@@ -3641,23 +3643,23 @@ class Turn
                 // 町系
                 case $init->landTown:
                 case $init->landSeaCity:
+                    // 人口減少
                     if ($addpop < 0) {
-                        // 不足
                         $lv -= (Util::random(-$addpop) + 1);
-                        if (($lv <= 0) && ($landKind == $init->landSeaCity)) {
-                            // 海に戻す
-                            $land[$x][$y] = $init->landSea;
-                            $landValue[$x][$y] = 0;
-
-                            continue;
-                        } elseif (($lv <= 0) && ($landKind == $init->landTown)) {
-                            $land[$x][$y] = $init->landPlains;
+                        // 人口が1未満になった土地を平地・海に戻す
+                        if ($lv < 1) {
+                            if ($landKind === $init->landSeaCity) {
+                                $land[$x][$y] = $init->landSea;
+                            }
+                            if ($landKind === $init->landTown) {
+                                $land[$x][$y] = $init->landPlains;
+                            }
                             $landValue[$x][$y] = 0;
 
                             continue;
                         }
-                    } else {
-                        // 成長
+                        // 人口増
+                    } elseif ($addpop !== 0) {
                         if ($lv < 100) {
                             $lv += Util::random($addpop) + 1;
                             if ($lv > 100) {
@@ -3670,10 +3672,8 @@ class Turn
                             }
                         }
                     }
-                    if ($lv > 250) {
-                        $lv = 250;
-                    }
-                    $landValue[$x][$y] = $lv;
+                    // 最大値は250
+                    $landValue[$x][$y] = min($lv, 250);
 
                     break;
 
@@ -3687,18 +3687,18 @@ class Turn
                             }
                         }
                     }
+                    // 人口減少
                     if ($addpop < 0) {
-                        // 不足
                         $lv -= (Util::random(-$addpop) + 1);
-                        if ($lv <= 0) {
+                        if ($lv < 1) {
                             // 平地に戻す
                             $land[$x][$y] = $init->landPlains;
                             $landValue[$x][$y] = 0;
 
                             continue;
                         }
-                    } else {
-                        // 成長
+                        // 人口増
+                    } elseif ($addpop !== 0) {
                         if ($lv < 100) {
                             $lv += Util::random($addpop) + 1;
                             if ($lv > 100) {
@@ -3711,20 +3711,18 @@ class Turn
                             }
                         }
                     }
-                    if ($lv > 300) {
-                        $lv = 300;
-                    }
-                    $landValue[$x][$y] = $lv;
+                    // 最大値は300
+                    $landValue[$x][$y] = min(300, $lv);
 
                     break;
 
                 // 現代都市系
                 case $init->landBigtown:
+                    // 人口減少
                     if ($addpop < 0) {
-                        // 不足
                         $lv -= (Util::random(-$addpop) + 1);
-                        if ($lv <= 0) {
-                            // 平地に戻す
+                        // 平地に戻す
+                        if ($lv < 1) {
                             $land[$x][$y] = $init->landPlains;
                             $landValue[$x][$y] = 0;
 
@@ -3744,10 +3742,8 @@ class Turn
                             }
                         }
                     }
-                    if ($lv > 500) {
-                        $lv = 500;
-                    }
-                    $landValue[$x][$y] = $lv;
+                    // 最大値は500
+                    $landValue[$x][$y] = min(500, $lv);
 
                     break;
 
@@ -3755,7 +3751,7 @@ class Turn
                 case $init->landPlains:
                     if ($island['isBF'] == 1) { // BF勝手に村生成
                         $land[$x][$y] = $init->landTown;
-                        $landValue[$x][$y] = 10;
+                        $landValue[$x][$y] = 50;
                     } elseif (Util::random(5) == 0) {
                         // 周りに農場、町があれば、ここも町になる
                         // 確率でニュータウン化
@@ -3785,17 +3781,16 @@ class Turn
 
                 // 防災都市
                 case $init->landProcity:
-                    // $addpopが負数なら人口減
-                    // 人口が0以下で平地に
+                    // 人口減
                     if ($addpop < 0) {
                         $lv -= (Util::random(-$addpop) + 1);
-                        if ($lv <= 0) {
+                        if ($lv < 1) {
                             $land[$x][$y] = $init->landPlains;
                             $landValue[$x][$y] = 0;
 
                             continue;
                         }
-                    } else {
+                    } elseif ($addpop !== 0) {
                         // 成長
                         if ($lv < 100) {
                             $lv += Util::random($addpop) + 1;
@@ -3807,8 +3802,7 @@ class Turn
                             }
                         }
                     }
-                    $lv = min($lv, 200);
-                    $landValue[$x][$y] = $lv;
+                    $landValue[$x][$y] = min(200, $lv);
 
                     break;
 
@@ -3836,9 +3830,8 @@ class Turn
                             }
                         }
                     }
-                    if ($lv > 250) {
-                        $lv = 250;
-                    }
+                    $landValue[$x][$y] = min(250, $lv);
+
                     // 動く方向を決定
                     for ($fro = 0; $fro < 3; $fro++) {
                         $d = Util::random(6) + 1;
@@ -3863,7 +3856,7 @@ class Turn
                     }
                     // 移動
                     $land[$sx][$sy] = $land[$x][$y];
-                    $landValue[$sx][$sy] = $lv;
+                    $landValue[$sx][$sy] = $landValue[$x][$y];
 
                     // もと居た位置を海に
                     $land[$x][$y] = $init->landSea;
@@ -3874,8 +3867,8 @@ class Turn
                 // 森
                 case $init->landForest:
                     if ($lv < 200) {
-                        $landValue[$x][$y] += $island['zin'][3] == 1 ? 2 : 1;
-                        $landValue[$x][$y] = min($landValue[$x][$y], 200);
+                        $lv = $island['zin'][3] == 1 ? 2 : 1;
+                        $landValue[$x][$y] = min($landValue[$x][$y] + $lv, 200);
                     }
 
                     break;
@@ -3884,9 +3877,8 @@ class Turn
                 case $init->landCommerce:
                     // 確率でストライキ
                     if (Util::random(1000) < $init->disSto) {
-                        $landValue[$x][$y] -= 5;
-                        $landValue[$x][$y] = max($landValue[$x][$y], 0);
-                        $this->log->Sto($id, $name, $this->landName($landKind, $lv), "({$x}, {$y})");
+                        $landValue[$x][$y] = max($landValue[$x][$y] - 5, 0);
+                        $this->log->Sto($id, $name, $this->landName($landKind, $lv), "($x, $y)");
                     }
 
                     break;
@@ -3897,12 +3889,12 @@ class Turn
                     $lName = $this->landName($landKind, $lv);
 
                     switch ($lv) {
+                        // お土産
                         case 5:
                         case 6:
                         case 21:
                         case 24:
                         case 32:
-                            // お土産
                             if (Util::random(100) < 5) {
                                 $value = 1 + Util::random(49);
                                 $island['money'] += $value;
@@ -3912,10 +3904,10 @@ class Turn
 
                             break 2;
 
+                        // 収穫
                         case 1:
                         case 7:
                         case 33:
-                            // 収穫
                             if (Util::random(100) < 5) {
                                 // 人口1万人（100単位人口）ごとに1000トンの収穫
                                 $value = round($island['pop'] / 100) * 10 + Util::random(11);
@@ -3929,14 +3921,15 @@ class Turn
                             break 2;
 
                         case 15:
+                            // 銀行化
                             if (Util::random(100) < 5) {
-                                // 銀行化
                                 $land[$x][$y] = $init->landBank;
                                 $landValue[$x][$y] = 1;
                                 $this->log->Bank($id, $name, $lName, "($x,$y)");
                             }
 
                             break 2;
+
                         case 40:
                         case 41:
                         case 42:
@@ -3970,7 +3963,7 @@ class Turn
                     if ($value > 0) {
                         $island['money'] += $value;
                         // 収入ログ
-                        $str = "{$value}{$init->unitMoney}";
+                        $str = $value . $init->unitMoney;
                         $this->log->oilMoney($id, $name, $this->landName($landKind, $lv), "($x,$y)", $str);
                     }
                     if ($lv < 30) {
@@ -4022,17 +4015,14 @@ class Turn
                 case $init->landSoukoF:
                     $lName = $this->landName($landKind, $lv);
 
-                    // セキュリティと貯蓄を算出
-                    $sec = (int)($landValue[$x][$y] / 100);
+                    // セキュリティレベルと貯蓄を算出
+                    $sec = intdiv($landValue[$x][$y], 100);
                     $tyo = $landValue[$x][$y] % 100;
 
                     if (Util::random(100) < (10 - $sec)) {
                         // 強盗
                         $tyo = (int)($tyo / 100 * Util::random(100));
-                        $sec--;
-                        if ($sec < 0) {
-                            $sec = 0;
-                        }
+                        $sec = max($sec - 1, 0);
                         $landValue[$x][$y] = $sec * 100 + $tyo;
                         $this->log->SoukoLupin($id, $name, $lName, "($x, $y)");
                     }
@@ -4087,11 +4077,10 @@ class Turn
                     if ($value > 0) {
                         $this->log->ParkMoney($id, $name, $lName, "($x,$y)", $str);
                     }
-                    //遊園地イベント判定（毎ターン30%）
+                    //遊園地イベント発生判定（毎ターン30%）
                     if (Util::random(100) < 30) {
                         $value2=$value;
-                        // 食料消費
-                        // ターン消費規定量の半分
+                        // 食料消費（ターン消費規定量の半分）
                         $value = floor($island['pop'] * $init->eatenFood / 2);
                         $island['food'] -= $value;
                         $str = $value.$init->unitFood;
@@ -4099,8 +4088,7 @@ class Turn
                         if ($value > 0) {
                             $this->log->ParkEvent($id, $name, $lName, "($x,$y)", $str);
                         }
-                        // イベントの収支
-                        // 通常収入から±100%
+                        // イベントの収支（通常収入額±100%）
                         $value = floor((Util::random(200) - 100)/100 * $value2);
                         $island['money'] += $value;
                         if ($value > 0) {
@@ -4165,14 +4153,12 @@ class Turn
                     $l = $land[$sx][$sy];
                     $lv = $landValue[$sx][$sy];
                     $lName = $this->landName($l, $lv);
-                    $point = "({$sx}, {$sy})";
+                    $point = "($sx, $sy)";
 
                     // 移動
                     $land[$sx][$sy] = $land[$x][$y];
-
                     // もと居た位置を線路に
                     $land[$x][$y] = $init->landRail;
-
                     // 移動済みフラグ
                     $TrainMove[$sx][$sy] = 1;
 
@@ -4219,18 +4205,16 @@ class Turn
                     $l = $land[$sx][$sy];
                     $lv = $landValue[$sx][$sy];
                     $lName = $this->landName($l, $lv);
-                    $point = "({$sx}, {$sy})";
+                    $point = "($sx, $sy)";
                     if ($land[$sx][$sy] != $init->landSea) {
                         $this->log->ZorasuMove($id, $name, $lName, $point);
                     }
                     // 移動
                     $land[$sx][$sy] = $land[$x][$y];
                     $landValue[$sx][$sy] = $landValue[$x][$y];
-
                     // もと居た位置を海に
                     $land[$x][$y] = $init->landSea;
                     $landValue[$x][$y] = 0;
-
                     // 移動ずみフラグ
                     $ZorasuMove[$sx][$sy] = 1;
 
@@ -4389,8 +4373,6 @@ class Turn
                             }
 
                             break;
-                        } else {
-                            // ワープしない
                         }
                     }
                     // 瀕死になると大爆発
@@ -4499,12 +4481,10 @@ class Turn
                     }
 
                     // 移動済みフラグ
-                    if ($init->monsterSpecial[$monsSpec['kind']] & 0x2) {
-                        // 移動済みフラグは立てない
-                    } elseif ($init->monsterSpecial[$monsSpec['kind']] & 0x1) {
+                    if ($init->monsterSpecial[$monsSpec['kind']] & 0x1) {
                         // 速い怪獣
                         $monsterMove[$sx][$sy] = isset($monsterMove[$sx][$sy]) ? $monsterMove[$x][$y] + 1 : 1;
-                    } else {
+                    } elseif (!($init->monsterSpecial[$monsSpec['kind']] & 0x2)) {
                         // 普通の怪獣
                         $monsterMove[$sx][$sy] = 2;
                     }
@@ -4531,7 +4511,7 @@ class Turn
                     $mName    = $monsSpec['name'];
                     if (Util::random(1000) < $monsSpec['hp'] * 10) {
                         // (怪獣の体力 * 10)% の確率で捕獲解除
-                        $point = "({$x}, {$y})";
+                        $point = "($x, $y)";
                         $land[$x][$y] = $init->landMonster; // 捕獲解除
                         $this->log->MonsWakeup($id, $name, $lName, $point, $mName);
                     }
@@ -4707,19 +4687,17 @@ class Turn
                             $this->log->RobViking($island['id'], $island['name'], "($x,$y)", $init->shipName[$ship[1]], $vMoney, $vFood);
 
                             // 所持金
-                            $treasure = $ship[3] * 1000 + $ship[4] * 100;
-                            $treasure += $vMoney;
+                            $treasure = $ship[3] * 1000 + $ship[4] * 100 + $vMoney;
                             $ship[3] = $treasure / 1000;
                             $ship[4] = ($treasure - $ship[1] * 1000) / 100;
                             // 海賊船ステータス更新
                             $landValue[$x][$y] = Util::navyPack($ship[0], $ship[1], $ship[2], $ship[3], $ship[4]);
                         }
                         // 攻撃
-                        $cntShip = Turn::countAround($land, $x, $y, 19, [$init->landPort, $init->landShip, $init->landFroCity]);
-                        if ($cntShip) {
-                            //周囲2ヘックス以内に港または船舶または海上都市あり
+                        //周囲2hex以内に港または船舶または海上都市あり
+                        if (Turn::countAround($land, $x, $y, 19, [$init->landPort, $init->landShip, $init->landFroCity])) {
+                            // 海賊船の襲撃
                             if (Util::random(1000) < $init->disVikingAttack) {
-                                // 海賊船の襲撃
                                 for ($s4 = 0; $s4 < 19; $s4++) {
                                     $sx = $x + $init->ax[$s4];
                                     $sy = $y + $init->ay[$s4];
@@ -4797,8 +4775,7 @@ class Turn
                                 $sx--;
                             }
                             // 範囲外判定
-                            if (($sx < 0) || ($sx >= $init->islandSize) ||
-                            ($sy < 0) || ($sy >= $init->islandSize)) {
+                            if (!\Util::isInnerLand($sx, $sy)) {
                                 continue;
                             }
                             // 海であれば、動く方向を決定
@@ -4847,7 +4824,7 @@ class Turn
             }
 
             // 火災判定
-            // [NOTE] すでに$init->landTownがcase文で使われているのでswitchを別に用意
+            // [NOTE] すでに$init->landTownがcaseで使われているのでswitchを別に用意
             switch ($landKind) {
                 case $init->landTown:
                 case $init->landHaribote:
@@ -4880,7 +4857,7 @@ class Turn
                         // 無かった場合、火災で壊滅
                         $l = $land[$x][$y];
                         $lv = $landValue[$x][$y];
-                        $point = "({$x}, {$y})";
+                        $point = "($x, $y)";
                         $lName = $this->landName($l, $lv);
 
                         // ニュータウン、現代都市の場合
@@ -4933,14 +4910,14 @@ class Turn
         // 収入ログ
         if (isset($island['oilincome'])) {
             if ($island['oilincome'] > 0) {
-                $this->log->oilMoney($id, $name, "海底油田", "", "総額{$island['oilincome']}{$init->unitMoney}");
+                $this->log->oilMoney($id, $name, "海底油田", "", '総額'.$island['oilincome'].$init->unitMoney);
             }
         }
         if (isset($island['bank'])) {
             if ($island['bank'] > 0) {
                 $value = (int)($island['money'] * 0.005);
                 $island['money'] += $value;
-                $this->log->oilMoney($id, $name, "銀行", "", "総額{$value}{$init->unitMoney}");
+                $this->log->oilMoney($id, $name, "銀行", "", '総額'.$value.$init->unitMoney);
             }
         }
         // 天気判定
