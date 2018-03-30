@@ -32,6 +32,13 @@ class LaunchTest extends \Init
     public function __construct()
     {
         $this->chkExtensionLoaded();
+
+        try {
+            $tmp = random_int(0, 1);
+        } catch (Exception $e) {
+            echo $e;
+            die;
+        }
     }
 
     private function view_head()

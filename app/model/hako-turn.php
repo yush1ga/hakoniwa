@@ -1169,14 +1169,14 @@ class Turn
                     case $init->comHatuden:
                         // すでに発電所の場合
                         if ($landKind == $init->landHatuden) {
-                            $landValue[$x][$y] += 40; // 規模 +40000kw
-                            if ($landValue[$x][$y] > 300) {
-                                $landValue[$x][$y] = 300; // 最大 300000kw
+                            $landValue[$x][$y] += 40; // 規模 +40'000kw
+                            if ($landValue[$x][$y] > 250) {
+                                $landValue[$x][$y] = 250; // 最大 250'000kw
                             }
                         } else {
                             // 目的の場所を発電所に
                             $land[$x][$y] = $init->landHatuden;
-                            $landValue[$x][$y] = 40; // 規模 = 40000kw
+                            $landValue[$x][$y] = 40; // 規模 = 40'000kw
                         }
                         $this->log->landSuc($id, $name, $comName, $point);
 
@@ -2652,7 +2652,7 @@ class Turn
                                     }
                                     $tLandValue[$tx][$ty] -= 5;
                                 } elseif ((($tL == $init->landFactory) && ($tLv > 100)) ||
-                                    (($tL == $init->landHatuden) && ($tLv > 150)) ||
+                                    (($tL == $init->landHatuden) && ($tLv >= 100)) ||
                                     (($tL == $init->landCommerce) && ($tLv > 150)) ||
                                     (($tL == $init->landProcity) && ($tLv >= 160))) {
                                     // 工場、大型発電所、商業ビル、防災都市（規模減少）
@@ -4001,8 +4001,9 @@ class Turn
                 // 発電所
                 case $init->landHatuden:
                     $lName = $this->landName($landKind, $lv);
-                    if (Util::random(100000) < $landValue[$x][$y]) {
-                        // メルトダウン
+                    // メルトダウン
+                    if ($landValue[$x][$y] >= 100
+                        && Util::random(100000) < $landValue[$x][$y]) {
                         $land[$x][$y] = $init->landSea;
                         $landValue[$x][$y] = 0;
                         $this->log->CrushElector($id, $name, $lName, "($x, $y)");

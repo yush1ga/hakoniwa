@@ -191,9 +191,13 @@ class Util
      * @param  int $num 正の整数（通例2以上）
      * @return int      [0, $num-1]の範囲の整数
      */
-    public static function random(int $num = 0): int
+    public static function random(int $num = 0, int $max = PHP_INT_MIN): int
     {
-        return $num > 1 ? mt_rand(0, $num - 1) : 0;
+        if ($max !== PHP_INT_MIN) {
+            return random_int($num, $max);
+        } else {
+            return $num > 1 ? random_int(0, $num - 1) : 0;
+        }
     }
 
     /**
