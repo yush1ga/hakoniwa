@@ -16,8 +16,8 @@ if (!defined('DEBUG')) {
 /**
  * Global settings
  */
-ini_set('default_charset', 'UTF-8');
 date_default_timezone_set('Asia/Tokyo');
+ini_set('default_charset', 'UTF-8');
 $ISLAND_TURN;
 define("LOCK_RETRY_COUNT", 10);
 define("LOCK_RETRY_INTERVAL", 1000);
