@@ -2296,12 +2296,13 @@ END;
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
 	<input type="hidden" name="NUMBER" value="$suf">
-	<input type="text" size="4" maxlength="4"name="YEAR" value="{$time['tm_year']}">年
-	<input type="text" size="2" maxlength="2"name="MON" value="{$time['tm_mon']}">月
-	<input type="text" size="2" maxlength="2"name="DATE" value="{$time['tm_mday']}">日
-	<input type="text" size="2" maxlength="2"name="HOUR" value="{$time['tm_hour']}">時
-	<input type="text" size="2" maxlength="2"name="MIN" value="{$time['tm_min']}">分
-	<input type="text" size="2" maxlength="2"name="NSEC" value="{$time['tm_sec']}">秒
+    <input type="date" name="" value="{$time['tm_year']}-{$time['tm_mon']}-{$time['tm_mday']}" readonly>
+	<input type="text" size="4" maxlength="4" name="YEAR" value="{$time['tm_year']}">年
+	<input type="text" size="2" maxlength="2" name="MON" value="{$time['tm_mon']}">月
+	<input type="text" size="2" maxlength="2" name="DATE" value="{$time['tm_mday']}">日
+	<input type="text" size="2" maxlength="2" name="HOUR" value="{$time['tm_hour']}">時
+	<input type="text" size="2" maxlength="2" name="MIN" value="{$time['tm_min']}">分
+	<input type="text" size="2" maxlength="2" name="NSEC" value="{$time['tm_sec']}">秒
 	<input type="submit" class="btn btn-warning btn-sm" value="変更">
 </form>
 END;
