@@ -659,7 +659,7 @@ class AllyIO
     {
         global $init;
 
-        $fileName = "{$init->dirName}/{$init->allyData}";
+        $fileName = "$init->dirName/$init->allyData";
         if (!is_file($fileName)) {
             touch($fileName);
         }

@@ -3,6 +3,7 @@
  * Re:箱庭諸島SE
  * @copyright 2017 Re:箱庭諸島SE
  */
+define('VERSION', '0.0.1');
 
 /**
  * Debug mode:

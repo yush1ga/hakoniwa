@@ -1,6 +1,6 @@
 <hr>
 
-<footer>
+<footer class="container">
 <p>"<?= $init->title ?>" managed by <a href="https://twitter.com/<?= $init->twitterID ?>" target="_blank"><?= $init->adminName ?></a> （<a href="<?= $init->urlTopPage ?>" target="_blank"><?= $init->urlTopPage ?></a>）
 
 <?php if ($init->performance): ?>

@@ -59,7 +59,7 @@ class LaunchTest extends \Init
 <meta charset="utf-8">
 <meta http-equiv="x-uja-compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{$this->title} 動作テスト</title>
+<title>$this->title 動作テスト</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css" integrity="sha256-oDCP2dNW17Y1QhBwQ+u2kLaKxoauWvIGks3a4as9QKs=" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js" integrity="sha256-RKNmL9+6j/3jB72OcIg8OQr91Bi4OgFPnKQOFS1O+fo=" crossorigin="anonymous"></script>
@@ -69,7 +69,7 @@ class LaunchTest extends \Init
 <div class="ui middle aligned center aligned grid">
   <div class="column">
     <h2 class="ui teal image header">
-        <img src="{$this->imgDir}/monster1.gif" class="image">
+        <img src="$this->imgDir/monster1.gif" class="image">
         <div class="content">動作テスト</div>
     </h2>
     <div class="ui stacked left aligned segment">
@@ -85,6 +85,7 @@ END;
 </div>
 </body>
 </html>
+
 END;
     }
 

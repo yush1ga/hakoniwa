@@ -1,4 +1,5 @@
 <?php
+
 namespace Hakoniwa\Admin\Maintenance;
 
 require_once MODELPATH.'/admin.php';
@@ -12,8 +13,8 @@ class Mente extends \Admin
 {
     public function __construct()
     {
-        $html = new \HtmlMente();
-        $cgi = new \Cgi();
+        $html = new \HtmlMente;
+        $cgi = new \Cgi;
         $this->parseInputData();
         $cgi->getCookies();
 
@@ -90,18 +91,19 @@ class Mente extends \Admin
     {
         global $init;
 
-        // 現在の時間を取得
         $now = $_SERVER['REQUEST_TIME'];
         $now -= $now % $init->unitTime;
 
+        // 総合データファイル
         $fileName = $init->dirName.'/hakojima.dat';
-        touch($fileName);
-        $fp = fopen($fileName, "w");
-        fputs($fp, "1\n");
-        fputs($fp, "$now\n");
-        fputs($fp, "0\n");
-        fputs($fp, "1\n");
-        fclose($fp);
+        $txt = <<<EOM
+1
+$now
+0
+1
+
+EOM;
+        file_put_contents($fileName, $txt);
 
         // 同盟ファイル生成
         touch($init->dirName.'/ally.dat');
@@ -117,24 +119,24 @@ class Mente extends \Admin
         chmod($fileName, 0644);
     }
 
+
+
     public function delMode($id)
     {
         global $init;
 
-        $dirName = strcmp($id, "") == 0 ? $init->dirName : $init->dirName.".bak{$id}";
+        $dirName = strcmp($id, "") == 0 ? $init->dirName : $init->dirName.".bak$id";
         $this->rmTree($dirName);
     }
 
     public function timeMode()
     {
-        $year = $this->dataSet['YEAR'];
-        $day = $this->dataSet['DATE'];
-        $mon = $this->dataSet['MON'];
-        $hour = $this->dataSet['HOUR'];
-        $min = $this->dataSet['MIN'];
-        $sec = $this->dataSet['NSEC'];
-        $ctSec = mktime($hour, $min, $sec, $mon, $day, $year);
-        $this->stimeMode($ctSec);
+        $date = $this->dataSet['date'].' '.$this->dataSet['time'];
+        $date = date_parse_from_format('Y-m-d H:i', $date);
+        if (!checkdate($date['month'], $date['day'], $date['year']))
+            throw new Exception("指定された日付が不正", 1);
+        $toSetDate = mktime($date['hour'], $date['minute'], 0, $date['month'], $date['day'], $date['year']);
+        $this->stimeMode($toSetDate);
     }
 
     public function stimeMode($sec)

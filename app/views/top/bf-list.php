@@ -3,5 +3,6 @@
 
 <?php $this->islandTable($hako, $hako->islandNumberNoBF, $hako->islandNumber); ?>
 
+</div>
 <hr>
 <?php
