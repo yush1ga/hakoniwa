@@ -2857,7 +2857,7 @@ class Turn
                             $y        = $command['y'];
                             $arg      = $command['arg'];
                             $comName  = $init->comName[$kind];
-                            $point    = "({$x},{$y})";
+                            $point    = "($x, $y)";
                             $landName = $this->landName($landKind, $lv);
                         } else {
                             break;
@@ -2896,7 +2896,9 @@ class Turn
                     break;
                 }
                 // 実行許可ターンを経過したか？
-                if ((($hako->islandTurn - $island['starturn']) < $init->noMissile) || (($hako->islandTurn - $tIsland['starturn']) < $init->noMissile) || ($island['zin'][2] != 1)) {
+                if ((($hako->islandTurn - $island['starturn']) < $init->noMissile)
+                    || (($hako->islandTurn - $tIsland['starturn']) < $init->noMissile)
+                    || ($island['zin'][2] != 1)) {
                     $this->log->Forbidden($id, $name, $comName);
                     $returnMode = 0;
 
@@ -4181,20 +4183,17 @@ class Turn
                             $sx--;
                         }
                         // 範囲外判定
-                        if (\Util::isInnerLand($sx, $sy)) {
+                        if (!\Util::isInnerLand($sx, $sy)) {
                             continue;
                         }
                         // 移動可能先：
                         // 海、船舶、海基、海防、海底都市、海上都市、海底消防署、海底農場、油田
-                        if (($land[$sx][$sy] == $init->landSea) ||
-                            ($land[$sx][$sy] == $init->landShip) ||
-                            ($land[$sx][$sy] == $init->landSbase) ||
-                            ($land[$sx][$sy] == $init->landSdefence) ||
-                            ($land[$sx][$sy] == $init->landSeaCity) ||
-                            ($land[$sx][$sy] == $init->landFroCity) ||
-                            ($land[$sx][$sy] == $init->landSsyoubou) ||
-                            ($land[$sx][$sy] == $init->landSfarm) ||
-                            ($land[$sx][$sy] == $init->landOil)) {
+                        $candidates = [
+                            $init->landSea, $init->landShip, $init->landSbase, $init->landSdefence,
+                            $init->landSeaCity, $init->landFroCity, $init->landSsyoubou, $init->landSfarm,
+                            $init->landOil
+                        ];
+                        if (in_array($land[$sx][$sy], $candidates) {
                             break;
                         }
                     }
@@ -4289,19 +4288,20 @@ class Turn
                         $lv = $kind * 100
                             + $init->monsterBHP[$kind] + Util::random($init->monsterDHP[$kind]);
                         // どこに現れるか決める
+                        $candidates = [$init->landTown, $init->landBigtown, $init->landNewtown];
                         for ($ii = 0; $ii < $init->pointNumber; $ii++) {
                             $bx = $this->rpx[$ii];
                             $by = $this->rpy[$ii];
-                            if ($land[$bx][$by] == $init->landTown) {
+                            if (in_array($land[$bx][$by], $candidates)) {
                                 // 地形名
-                                $lName = $this->landName($init->landTown, $landValue[$bx][$by]);
+                                $lName = $this->landName($land[$bx][$by], $landValue[$bx][$by]);
                                 // そのヘックスを怪獣に
                                 $land[$bx][$by] = $init->landMonster;
                                 $landValue[$bx][$by] = $lv;
                                 // 怪獣情報
-                                $mName = Util::monsterSpec($lv)['name'];
+                                $mName = $init->monsterName[$kind];
                                 // メッセージ
-                                $this->log->monsCome($id, $name, $mName, "({$bx}, {$by})", $lName);
+                                $this->log->monsCome($id, $name, $mName, "($bx, $by)", $lName);
 
                                 break;
                             }
@@ -4332,27 +4332,18 @@ class Turn
                                 $bx = $this->rpx[$w];
                                 $by = $this->rpy[$w];
                                 // 海、船舶、海基、海防、海底都市、海上都市、海底消防署、養殖場、油田、港、怪獣、山、ぞらす、記念碑以外
-                                if (($tLand[$bx][$by] != $init->landSea) &&
-                                    ($tLand[$bx][$by] != $init->landShip) &&
-                                    ($tLand[$bx][$by] != $init->landSbase) &&
-                                    ($tLand[$bx][$by] != $init->landSdefence) &&
-                                    ($tLand[$bx][$by] != $init->landSeaCity) &&
-                                    ($tLand[$bx][$by] != $init->landFroCity) &&
-                                    ($tLand[$bx][$by] != $init->landSsyoubou) &&
-                                    ($tLand[$bx][$by] != $init->landSfarm) &&
-                                    ($tLand[$bx][$by] != $init->landNursery) &&
-                                    ($tLand[$bx][$by] != $init->landOil) &&
-                                    ($tLand[$bx][$by] != $init->landPort) &&
-                                    ($tLand[$bx][$by] != $init->landMountain) &&
-                                    ($tLand[$bx][$by] != $init->landMonument) &&
-                                    ($tLand[$bx][$by] != $init->landZorasu) &&
-                                    ($tLand[$bx][$by] != $init->landSleeper) &&
-                                    ($tLand[$bx][$by] != $init->landMonster)) {
+                                $candidates = [
+                                    $init->landSea, $init->landShip, $init->landSbase, $init->landSdefence,
+                                    $init->landSeaCity, $init->landFroCity, $init->landSsyoubou, $init->landSfarm,
+                                    $init->landNursery, $init->landOil, $init->landPort, $init->landMountain,
+                                    $init->landMonument, $init->landZorasu, $init->landSleeper, $init->landMonster
+                                ];
+                                if (!in_array($tLand[$bx][$by], $candidates) {
                                     break;
                                 }
                             }
                             // ワープ！
-                            $this->log->monsWarp($id, $tId, $name, $mName, "({$x}, {$y})", $tName);
+                            $this->log->monsWarp($id, $tId, $name, $mName, "($x, $y)", $tName);
                             $this->log->monsCome($tId, $tName, $mName, "($bx, $by)", $this->landName($tLand[$bx][$by], $tLandValue[$bx][$by]));
 
                             if ($id == $tId) {
@@ -5251,14 +5242,14 @@ class Turn
         // 怪獣判定
         $r = ($island['isBF'] == 1)? Util::random(500): Util::random(10000);
         $pop = $island['pop'];
-        $isMons = (($presentItem == 3) && ($pop >= $init->disMonsBorder1));
+        $presentMob = (($presentItem == 3) && ($pop >= $init->disMonsBorder1));
 
         if (!isset($island['monstersend'])) {
             $island['monstersend'] = 0;
         }
         do {
             if ((($r < ($init->disMonster * $island['area'])) &&
-                ($pop >= $init->disMonsBorder1)) || ($isMons) || ($island['monstersend'] > 0)) {
+                ($pop >= $init->disMonsBorder1)) || $presentMob || ($island['monstersend'] > 0)) {
                 // 怪獣出現
                 // 種類を決める
                 if ($island['monstersend'] > 0) {
@@ -5286,22 +5277,22 @@ class Turn
                     + $init->monsterBHP[$kind] + Util::random($init->monsterDHP[$kind]);
 
                 // どこに現れるか決める
+                // （平地・ビッグタウン・ニュータウンのみ対象）
+                $candidates = [$init->landTown, $init->landBigtown, $init->landNewtown];
                 for ($i = 0; $i < $init->pointNumber; $i++) {
                     $bx = $this->rpx[$i];
                     $by = $this->rpy[$i];
-                    if (($land[$bx][$by] == $init->landTown) ||
-                        ($land[$bx][$by] == $init->landBigtown) ||
-                        ($land[$bx][$by] == $init->landNewtown)) {
+
+                    if (in_array($land[$bx][$by], $candidates)) {
                         // 地形名
-                        $lName = $this->landName($init->landTown, $landValue[$bx][$by]);
+                        $lName = $this->landName($land[$bx][$by], $landValue[$bx][$by]);
                         // そのヘックスを怪獣に
                         $land[$bx][$by] = $init->landMonster;
                         $landValue[$bx][$by] = $lv;
                         // 怪獣情報
-                        $monsSpec = Util::monsterSpec($lv);
-                        $mName = $monsSpec['name'];
+                        $mName = $init->monsterName[$kind];
                         // メッセージ
-                        $this->log->monsCome($id, $name, $mName, "({$bx}, {$by})", $lName);
+                        $this->log->monsCome($id, $name, $mName, "($bx, $by)", $lName);
 
                         break;
                     }
@@ -5399,7 +5390,7 @@ class Turn
             }
             $landKind = $land[$x][$y];
             $lv = $landValue[$x][$y];
-            $point = "({$x}, {$y})";
+            $point = "($x, $y)";
             // メッセージ
             $this->log->hugeMeteo($id, $name, $point);
             // 広域被害ルーチン
@@ -5511,7 +5502,7 @@ class Turn
             }
             $landKind = $land[$x][$y];
             $lv = $landValue[$x][$y];
-            $point = "({$x}, {$y})";
+            $point = "($x, $y)";
             $this->log->eruption($id, $name, $this->landName($landKind, $lv), $point);
             $land[$x][$y] = $init->landMountain;
             $landValue[$x][$y] = 0;
@@ -5533,7 +5524,7 @@ class Turn
                     // 範囲内の場合
                     $landKind = $land[$sx][$sy];
                     $lv = $landValue[$sx][$sy];
-                    $point = "({$sx}, {$sy})";
+                    $point = "($sx, $sy)";
                     if (($landKind == $init->landSea) ||
                         ($landKind == $init->landOil) ||
                         ($landKind == $init->landSeaCity) ||
@@ -5699,7 +5690,7 @@ class Turn
             $lv = $landValue[$sx][$sy];
             // ログ用の情報用意
             $landName = $this->landName($landKind, $lv);
-            $point = "({$sx}, {$sy})";
+            $point = "($sx, $sy)";
             // 範囲による分岐
             if ($i < 7) {
                 // 中心、および1ヘックス
@@ -6235,8 +6226,7 @@ class Turn
 
             case $init->landSeaResort:
                 return $lv < 30 ? '海の家'
-                    : $lv <100 ? '民宿'
-                    : 'リゾートホテル';
+                    : ($lv <100 ? '民宿' : 'リゾートホテル');
 
             case $init->landWaste:
                 return '荒地';
@@ -6249,9 +6239,8 @@ class Turn
 
             case $init->landTown:
                 return $lv < 30 ? '村'
-                    : $lv < 100 ? '町'
-                    : $lv < 200 ? '都市'
-                    : '大都市';
+                    : ($lv < 100 ? '町'
+                    : ($lv < 200 ? '都市' : '大都市'));
 
             case $init->landProcity:
                 return '防災都市';

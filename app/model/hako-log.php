@@ -458,7 +458,7 @@ class Log extends LogIO
     // 実行許可ターン
     public function Forbidden($id, $name, $comName)
     {
-        $this->out("<A href=\"{$this->this_file}?Sight={$id}\">{$this->init->tagName_}{$name}{$this->init->nameSuffix}</A>{$this->init->_tagName}で予定されていた{$this->init->tagComName_}{$comName}{$this->init->_tagComName}は、実行が許可されませんでした。", $id);
+        $this->out("<a href=\"{$this->this_file}?Sight=$id\"><span class=\"islName\">$name{$this->init->nameSuffix}</span></a>で予定されていた<span class=\"command\">$comNameは、実行が許可されませんでした。", $id);
     }
     // 管理人預かり中のため許可されない
     public function CheckKP($id, $name, $comName)
