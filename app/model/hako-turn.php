@@ -1443,10 +1443,10 @@ class Turn
 
                         break;
 
+                    // 記念碑
                     case $init->comMonument:
-                        // 記念碑
+                        // すでに記念碑の場合
                         if ($landKind == $init->landMonument) {
-                            // すでに記念碑の場合
                             // ターゲット取得
                             $tn = $hako->idToNumber[$target];
                             if ($tn !== 0 && empty($tn)) {
