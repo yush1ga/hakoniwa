@@ -206,7 +206,7 @@ class MakeAlly
     //--------------------------------------------------
     // 解散
     //--------------------------------------------------
-    public function deleteAllyMain($hako, $data)
+    public function delete_alliance($hako, $data)
     {
         global $init;
 
@@ -589,7 +589,7 @@ class AllyIO
             return false;
         }
         $fp = fopen($fileName, "r");
-        AllyUtil::lockr($fp);
+        AllyUtil::lock_on_read($fp);
         $this->allyNumber = chop(fgets($fp, READ_LINE));
         if ($this->allyNumber == '') {
             $this->allyNumber = 0;
@@ -664,7 +664,7 @@ class AllyIO
             touch($fileName);
         }
         $fp = fopen($fileName, "w");
-        AllyUtil::lockw($fp);
+        AllyUtil::lock_on_write($fp);
         fputs($fp, $this->allyNumber . "\n");
 
         for ($i = 0; $i < $this->allyNumber; $i++) {
@@ -680,29 +680,30 @@ class AllyIO
     //--------------------------------------------------
     public function writeAlly($fp, $ally)
     {
-        fputs($fp, $ally['name'] . "\n");
-        fputs($fp, $ally['mark'] . "\n");
-        fputs($fp, $ally['color'] . "\n");
-        fputs($fp, $ally['id'] . "\n");
-        fputs($fp, $ally['oName'] . "\n");
-        fputs($fp, $ally['password'] . "\n");
-        fputs($fp, $ally['score'] . "\n");
-        fputs($fp, $ally['number'] . "\n");
-        fputs($fp, $ally['occupation'] . "\n");
-        $allymember = join(",", $ally['memberId']);
-        fputs($fp, $allymember . "\n");
+        $ally_members = join(",", $ally['memberId']);
         $ext = join(",", $ally['ext']);
-        fputs($fp, $ext . "\n");
-        if (isset($ally['comment'])) {
-            fputs($fp, $ally['comment'] . "\n");
-        } else {
-            fputs($fp, "\n");
-        }
-        if (isset($ally['title']) && isset($ally['message'])) {
-            fputs($fp, $ally['title'] . '<>' . $ally['message'] . "\n");
-        } else {
-            fputs($fp, '<>'. "\n");
-        }
+        $comment = $ally['comment'] ?? '';
+        $message = (isset($ally['title']) && isset($ally['message']))
+            ? $ally['title'] . '<>' . $ally['message']
+            : '<>';
+
+        fwrite($fp, <<<EOL
+{$ally['name']}
+{$ally['mark']}
+{$ally['color']}
+{$ally['id']}
+{$ally['oName']}
+{$ally['password']}
+{$ally['score']}
+{$ally['number']}
+{$ally['occupation']}
+$ally_members
+$ext
+$comment
+$message
+
+EOL
+        );
     }
 
     //---------------------------------------------------
@@ -717,7 +718,7 @@ class AllyIO
             return false;
         }
         $fp = fopen($fileName, "r");
-        AllyUtil::lockr($fp);
+        AllyUtil::lock_on_read($fp);
         $this->islandTurn     = chop(fgets($fp, READ_LINE));
         $this->islandLastTime = chop(fgets($fp, READ_LINE));
         $this->islandNumber   = chop(fgets($fp, READ_LINE));
@@ -855,7 +856,23 @@ class AllyUtil extends Util
     //---------------------------------------------------
     public static function allySort(&$hako)
     {
-        usort($hako->ally, 'scoreComp');
+        /**
+         * 人口を比較、同盟一覧用
+         * @return integer  $xのほうが大きければ-1、$yのほうが大きければ1
+         */
+        function comparator($x, $y)
+        {
+            if ($x['dead'] ?? 0 == 1) {
+                return +1;
+            }
+            if ($y['dead'] ?? 0 == 1) {
+                return -1;
+            }
+            // mean ($x['score'] > $y['score']) ? -1 : 1;
+            return $y['score'] <=> $x['score'];
+        }
+
+        usort($hako->ally, 'comparator');
     }
 
     //---------------------------------------------------
@@ -903,9 +920,12 @@ class AllyUtil extends Util
         return -1;
     }
 
-    //---------------------------------------------------
-    // エスケープ文字の処理
-    //---------------------------------------------------
+    /**
+     * 文字のエスケープ処理
+     * @param  string  $s    任意の入力文字列
+     * @param  integer $mode boolキャスト：nl2brの有無（複数改行の圧縮機能あり）
+     * @return string        キャスト済み文字列
+     */
     public static function htmlEscape($s, $mode = 0)
     {
         $s = h($s);
@@ -923,7 +943,7 @@ class AllyUtil extends Util
     //---------------------------------------------------
     // ファイルをロックする(書き込み時)
     //---------------------------------------------------
-    public static function lockw($fp)
+    public static function lock_on_write($fp)
     {
         set_file_buffer($fp, 0);
         if (!flock($fp, LOCK_EX)) {
@@ -935,7 +955,7 @@ class AllyUtil extends Util
     //---------------------------------------------------
     // ファイルをロックする(読み込み時)
     //---------------------------------------------------
-    public static function lockr($fp)
+    public static function lock_on_read($fp)
     {
         set_file_buffer($fp, 0);
         if (!flock($fp, LOCK_SH)) {
@@ -946,9 +966,10 @@ class AllyUtil extends Util
 }
 
 
-//------------------------------------------------------------
-// メイン処理
-//------------------------------------------------------------
+
+/**
+ * class Main
+ */
 class Main
 {
     public $mode;
@@ -993,7 +1014,7 @@ class Main
 
             // 同盟の解散
             case "delally":
-                $com->deleteAllyMain($ally, $this->dataSet);
+                $com->delete_alliance($ally, $this->dataSet);
 
                 break;
 
@@ -1035,7 +1056,7 @@ class Main
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
-    public function parseInputData()
+    private function parseInputData()
     {
         global $init;
 
@@ -1073,19 +1094,7 @@ class Main
     }
 }
 
+
+
 $start = new Main;
 $start->execute();
-
-// 人口を比較、同盟一覧用
-function scoreComp($x, $y)
-{
-    if (isset($x['dead']) && $x['dead'] == 1) {
-        // 死滅フラグが立っていれば後ろへ
-        return +1;
-    }
-    if (isset($y['dead']) && $y['dead'] == 1) {
-        return -1;
-    }
-    // mean ($x['score'] > $y['score']) ? -1 : 1;
-    return $y['score'] <=> $x['score'];
-}
