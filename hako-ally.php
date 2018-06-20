@@ -24,7 +24,7 @@ class MakeAlly
     {
         global $init;
 
-        $currentID = $data['ISLANDID'];
+        $current_ID = $data['ISLANDID'];
         $allyID = $data['ALLYID'] ?? "";
         $currentAnumber = $data['ALLYNUMBER'] ?? "";
         $allyName = htmlspecialchars($data['ALLYNAME']);
@@ -45,9 +45,9 @@ class MakeAlly
                         }
                     }
                 }
-                $currentID = $max;
+                $current_ID = $max;
             } else {
-                $currentID = $hako->ally[$currentAnumber]['id'];
+                $current_ID = $hako->ally[$currentAnumber]['id'];
             }
         }
         if (!$init->allyUse && !$adminMode) {
@@ -68,17 +68,17 @@ class MakeAlly
             return;
         }
         // 名前の重複チェック
-        $currentNumber = $hako->idToNumber[$currentID];
+        $currentNumber = $hako->idToNumber[$current_ID];
         if (!($adminMode && ($allyID == '') && ($allyID < 200)) &&
             ((AllyUtil::nameToNumber($hako, $allyName) != -1) ||
-            ((AllyUtil::aNameToId($hako, $allyName) != -1) && (AllyUtil::aNameToId($hako, $allyName) != $currentID)))) {
+            ((AllyUtil::aNameToId($hako, $allyName) != -1) && (AllyUtil::aNameToId($hako, $allyName) != $current_ID)))) {
             HakoError::newAllyAlready();
 
             return;
         }
         // マークの重複チェック
         if (!($adminMode && ($allyID == '') && ($allyID < 200)) &&
-            ((AllyUtil::aMarkToId($hako, $allyMark) != -1) && (AllyUtil::aMarkToId($hako, $allyMark) != $currentID))) {
+            ((AllyUtil::aMarkToId($hako, $allyMark) != -1) && (AllyUtil::aMarkToId($hako, $allyMark) != $current_ID))) {
             HakoError::markAllyAlready();
 
             return;
@@ -96,7 +96,7 @@ class MakeAlly
 
             return;
         }
-        $n = $hako->idToAllyNumber[$currentID] ?? '';
+        $n = $hako->idToAllyNumber[$current_ID] ?? '';
         if ($n !== '') {
             if ($adminMode && ($allyID != '') && ($allyID < 200)) {
                 $allyMember = $hako->ally[$n]['memberId'];
@@ -137,7 +137,7 @@ class MakeAlly
             for ($i = 0; $i < $hako->allyNumber; $i++) {
                 $allyMember = $hako->ally[$i]['memberId'];
                 foreach ($allyMember as $id) {
-                    if ($id == $currentID) {
+                    if ($id == $current_ID) {
                         $flag = 1;
 
                         break;
@@ -159,13 +159,13 @@ class MakeAlly
             }
             // 新規
             $n = $hako->allyNumber;
-            $hako->ally[$n]['id'] = $currentID;
+            $hako->ally[$n]['id'] = $current_ID;
             $memberId = [];
             if ($allyID < 200) {
                 $hako->ally[$n]['oName']    = $island['name'].$init->nameSuffix;
                 $hako->ally[$n]['password'] = $island['password'];
                 $hako->ally[$n]['number']   = 1;
-                $memberId[0]                = $currentID;
+                $memberId[0]                = $current_ID;
                 $hako->ally[$n]['score']    = $island['pop'];
             } else {
                 $hako->ally[$n]['oName']    = '';
@@ -178,7 +178,7 @@ class MakeAlly
             $island['allyId']               = $memberId;
             $ext = [0];
             $hako->ally[$n]['ext']          = $ext;
-            $hako->idToAllyNumber[$currentID] = $n;
+            $hako->idToAllyNumber[$current_ID] = $n;
             $hako->allyNumber++;
         }
 
@@ -194,7 +194,7 @@ class MakeAlly
         $hako->islands[$currentNumber] = $island;
 
         // データ書き出し
-        AllyUtil::allyOccupy($hako);
+        AllyUtil::calculates_share($hako);
         AllyUtil::allySort($hako);
         $hako->writeAllyFile();
 
@@ -210,18 +210,18 @@ class MakeAlly
     {
         global $init;
 
-        $currentID = $data['ISLANDID'];
+        $current_ID = $data['ISLANDID'];
         $currentAnumber = $data['ALLYNUMBER'];
-        $currentNumber = $hako->idToNumber[$currentID];
+        $currentNumber = $hako->idToNumber[$current_ID];
         $island = $hako->islands[$currentNumber];
-        $n = $hako->idToAllyNumber[$currentID];
+        $n = $hako->idToAllyNumber[$current_ID];
         $adminMode = 0;
 
         // パスワードチェック
         $passCheck = isset($data['OLDPASS']) ? AllyUtil::checkPassword("", $data['OLDPASS']) : false;
         if ($passCheck) {
             $n = $currentAnumber;
-            $currentID = $hako->ally[$n]['id'];
+            $current_ID = $hako->ally[$n]['id'];
             $adminMode = 1;
         } else {
             // passwordの判定
@@ -238,7 +238,7 @@ class MakeAlly
                 return;
             }
             // 念のためIDもチェック
-            if ($hako->ally[$n]['id'] != $currentID) {
+            if ($hako->ally[$n]['id'] != $current_ID) {
                 HakoError::wrongAlly();
 
                 return;
@@ -255,21 +255,21 @@ class MakeAlly
             $island = $hako->islands[$hako->idToNumber[$id]];
             $newId = [];
             foreach ($island['allyId'] as $aId) {
-                if ($aId != $currentID) {
+                if ($aId != $current_ID) {
                     array_push($newId, $aId);
                 }
             }
             $island['allyId'] = $newId;
         }
         $hako->ally[$n]['dead'] = 1;
-        $hako->idToAllyNumber[$currentID] = '';
+        $hako->idToAllyNumber[$current_ID] = '';
         $hako->allyNumber--;
 
         // データ格納先へ
         $hako->islands[$currentNumber] = $island;
 
         // データ書き出し
-        AllyUtil::allyOccupy($hako);
+        AllyUtil::calculates_share($hako);
         AllyUtil::allySort($hako);
         $hako->writeAllyFile();
 
@@ -285,9 +285,9 @@ class MakeAlly
     {
         global $init;
 
-        $currentID = $data['ISLANDID'];
+        $current_ID = $data['ISLANDID'];
         $currentAnumber = $data['ALLYNUMBER'];
-        $currentNumber = $hako->idToNumber[$currentID];
+        $currentNumber = $hako->idToNumber[$current_ID];
         $island = $hako->islands[$currentNumber];
 
         // パスワードチェック
@@ -299,7 +299,7 @@ class MakeAlly
         }
 
         // 盟主チェック
-        if ($hako->idToAllyNumber[$currentID]) {
+        if ($hako->idToAllyNumber[$current_ID]) {
             HakoError::leaderAlready();
 
             return;
@@ -318,7 +318,7 @@ class MakeAlly
 
         foreach ($allyMember as $id) {
             if (!($hako->idToNumber[$id] > -1)) {
-            } elseif ($id == $currentID) {
+            } elseif ($id == $current_ID) {
                 $flag = 1;
             } else {
                 array_push($newAllyMember, $id);
@@ -338,7 +338,7 @@ class MakeAlly
             $ally['number']--;
         } else {
             // 加盟
-            array_push($newAllyMember, $currentID);
+            array_push($newAllyMember, $current_ID);
             array_push($island['allyId'], $ally['id']);
             $ally['score'] += $island['pop'];
             $ally['number']++;
@@ -351,7 +351,7 @@ class MakeAlly
         $hako->ally[$currentAnumber] = $ally;
 
         // データ書き出し
-        AllyUtil::allyOccupy($hako);
+        AllyUtil::calculates_share($hako);
         AllyUtil::allySort($hako);
         $hako->writeAllyFile();
 
@@ -402,7 +402,7 @@ class MakeAlly
 
         if ($rt1 || $rt2 || $rt3) {
             // データ書き出し
-            AllyUtil::allyOccupy($hako);
+            AllyUtil::calculates_share($hako);
             AllyUtil::allySort($hako);
             $hako->writeAllyFile();
 
@@ -833,7 +833,7 @@ class AllyUtil extends Util
     //---------------------------------------------------
     // 同盟の占有率の計算
     //---------------------------------------------------
-    public static function allyOccupy(&$hako)
+    public static function calculates_share(&$hako)
     {
         $totalScore = 0;
 
@@ -974,6 +974,7 @@ class Main
 {
     public $mode;
     public $dataSet = [];
+    private $filter_flag = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
     //--------------------------------------------------
     // モード分岐
     //--------------------------------------------------
@@ -1003,6 +1004,17 @@ class Main
             // 同盟の結成・変更・解散・加盟・脱退
             case "JoinA":
                 $html->newAllyTop($ally, $this->dataSet);
+
+                break;
+
+            case "register":
+                $html->register($ally, $this->dataSet);
+
+                break;
+
+            case 'confirm':
+                // $html->confirm($ally, $this->dataSet);
+                $html->register($ally, $this->dataSet);
 
                 break;
 
@@ -1079,6 +1091,10 @@ class Main
                 $this->mode = "inoutally";
             }
         }
+        if (filter_has_var(INPUT_GET, 'p')) {
+            $this->mode = filter_input(INPUT_GET, 'p', FILTER_SANITIZE_STRING, $this->filter_flag);
+            // $this->dataSet['ALLYID'] = ;
+        }
         if (!empty($_GET['AmiOfAlly'])) {
             $this->mode = "AmiOfAlly";
             $this->dataSet['ALLYID'] = $_GET['AmiOfAlly'];
@@ -1086,10 +1102,6 @@ class Main
         if (!empty($_GET['Allypact'])) {
             $this->mode = "Allypact";
             $this->dataSet['ALLYID'] = $_GET['Allypact'];
-        }
-        if (!empty($_GET['JoinA'])) {
-            $this->mode = "JoinA";
-            $this->dataSet['ALLYID'] = $_GET['JoinA'];
         }
     }
 }

@@ -17,5 +17,6 @@
 </header>
 <div class="container">
     <?php if (DEBUG) {
+    var_dump($_GET);
     var_dump($_POST);
 } ?>

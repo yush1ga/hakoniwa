@@ -4193,7 +4193,7 @@ class Turn
                             $init->landSeaCity, $init->landFroCity, $init->landSsyoubou, $init->landSfarm,
                             $init->landOil
                         ];
-                        if (in_array($land[$sx][$sy], $candidates) {
+                        if (in_array($land[$sx][$sy], $candidates)) {
                             break;
                         }
                     }
@@ -4338,7 +4338,7 @@ class Turn
                                     $init->landNursery, $init->landOil, $init->landPort, $init->landMountain,
                                     $init->landMonument, $init->landZorasu, $init->landSleeper, $init->landMonster
                                 ];
-                                if (!in_array($tLand[$bx][$by], $candidates) {
+                                if (!in_array($tLand[$bx][$by], $candidates)) {
                                     break;
                                 }
                             }

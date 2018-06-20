@@ -2388,9 +2388,10 @@ class HtmlAlly extends HTML
 
         if ($init->allyUse) {
             echo <<<END
-<input type="button" class="btn btn-default" value="同盟の結成・変更・解散・加盟・脱退はこちらから" onClick="JavaScript:location.replace('$this_file?JoinA=1')">
+            <button class="btn btn-default" onClick="JavaScript:location.replace('$this_file?p=register')">同盟の結成</button>
+            <button class="btn btn-default" onClick="JavaScript:location.replace('$this_file?JoinA=1')">同盟の変更・解散・加盟・脱退はこちらから</button>
 
-<h2>各同盟の状況</h2>
+            <h2>各同盟の状況</h2>
 END;
         }
         $this->allyInfo($hako);
@@ -2626,6 +2627,14 @@ END;
     //--------------------------------------------------
     // 同盟の結成・変更・解散・加盟・脱退
     //--------------------------------------------------
+    public function register($hako, $data)
+    {
+        global $init;
+        $this_file  = $init->baseDir . "/hako-ally.php";
+
+        require VIEWS . 'Alliance/Register.php';
+    }
+
     public function newAllyTop($hako, $data)
     {
         global $init;
@@ -2736,7 +2745,7 @@ END
 あなたの島は？（必須）<BR>
 <select name="ISLANDID" onChange="colorPack()" onClick="colorPack()">
 {$hako->islandList}
-</select><BR>あなた"
+</select><BR>あなた
 END;
         $str0 = ($adminMode || ($init->allyUse == 1)) ? '結成・' : '';
         echo <<<END
