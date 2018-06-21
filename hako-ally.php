@@ -1095,6 +1095,10 @@ class Main
             $this->mode = filter_input(INPUT_GET, 'p', FILTER_SANITIZE_STRING, $this->filter_flag);
             // $this->dataSet['ALLYID'] = ;
         }
+        if (!empty($_GET['JoinA'])) {
+            $this->mode = "JoinA";
+            $this->dataSet['ALLYID'] = $_GET['JoinA'];
+        }
         if (!empty($_GET['AmiOfAlly'])) {
             $this->mode = "AmiOfAlly";
             $this->dataSet['ALLYID'] = $_GET['AmiOfAlly'];

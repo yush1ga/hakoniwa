@@ -35,10 +35,12 @@ class InitDefault
     // ゲーム全般に関する設定
     //---------------------------------------------------
     // ゲームタイトル
-    public $title      = "Re:箱庭諸島SE";
-    public $adminName  = "管理人";
+    public $title      = "Re:箱庭諸島";
     public $urlTopPage = "http://www.example.com/";
-    public $twitterID  = "TwitterJP";
+
+    // 管理人の名前と連絡先
+    public $admin_name  = "管理人";
+    public $admin_address  = 'https://twitter.com/twitter';
 
     // 1ターンが何秒か ※"10800"（3時間）より短くすることは非推奨
     public $unitTime = 10800;
@@ -191,10 +193,13 @@ class InitDefault
 
     // 同盟作成を許可するか？
     // (0:しない、1:する、2:管理者のみ)
-    public $allyUse     = 2;
+    public $allyUse     = 1;
 
     // ひとつの同盟にしか加盟できないようにするか？(0:しない、1:する)
     public $allyJoinOne = 1;
+
+    // 最大同時存在可能数
+    public $alliance_maximum_limit = 200;
 
     // 同盟データの管理ファイル
     public $allyData    = 'ally.dat';
@@ -213,11 +218,12 @@ class InitDefault
         '￥','℃','仝'
     ];
 
-    // 入力文字数の制限 (全角文字数で指定) 実際は、<input> 内の MAXLENGTH を直に修正してください。 (;^_^A
-    public $lengthAllyName    = 15;   // 同盟の名前
-    public $lengthAllyComment = 40;   // 「各同盟の状況」欄に表示される盟主のコメント
-    public $lengthAllyTitle   = 30;   // 「同盟の情報」欄の上に表示される盟主メッセージのタイトル
-    public $lengthAllyMessage = 1500; // 「同盟の情報」欄の上に表示される盟主メッセージ
+    // 名前に使ってはいけない語句
+    public $denying_name_words = [
+        '?', ',', '\s', '(', ')',
+        '<', '>', '$', '無人', '沈没'
+    ];
+    public $regex_denying_name = '';
 
     // 以下は、表示関連で使用しているだけで、実際の機能を有していません、さらなる改造で実現可能です。
 
@@ -940,6 +946,10 @@ class InitDefault
         $this->CPU_start = microtime();
         $this->setpubliciable();
         mt_srand($_SERVER['REQUEST_TIME']);
-        // 日本時間にあわせる
+
+        foreach ($this->denying_name_words as $word) {
+            $this->regex_denying_name .= (strpos($word, '/') !== 0) ? preg_quote($word) : $word;
+        }
+        $this->regex_denying_name = '/' . $this->regex_denying_name . '/';
     }
 }

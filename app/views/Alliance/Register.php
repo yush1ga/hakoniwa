@@ -11,7 +11,7 @@ $keep = $init->costKeepAlly
     ? '<span class="cash">' . $init->costKeepAlly . $init->unitMoney . '</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
     : '必要ありません。';
 
-$regexp = '[^,\?\(\)\<\>\$(無人)(沈没)]';
+$regexp = '^[^?,\s\(\)<>$(無人)(沈没)]+$';
 ?>
 <h2>同盟の結成</h2>
 <div class="alert alert-info">
@@ -37,8 +37,8 @@ $regexp = '[^,\?\(\)\<\>\$(無人)(沈没)]';
         </div>
     </div>
     <div class="form-group">
-        <label for="" class="col-sm-2 control-label">パスワード</label>
-        <div class="col-sm-10"><input type="password" id="" class="form-control"></div>
+        <label for="Password" class="col-sm-2 control-label">パスワード</label>
+        <div class="col-sm-10"><input type="password" id="Password" class="form-control"></div>
     </div>
 </div>
 <h3>新しく作る同盟の情報</h3>
@@ -59,7 +59,7 @@ $regexp = '[^,\?\(\)\<\>\$(無人)(沈没)]';
     <div class="form-group">
         <label for="AllianceColor" class="col-sm-2 control-label">色</label>
         <div class="col-sm-4">
-            <input type="color" value="#000000" id="AllianceColor" class="form-control" maxlength=7 pattern="#[0-9a-fA-F]{6}" required>
+            <input type="color" value="#000000" id="AllianceColor" class="form-control" maxlength=7 pattern="^#[0-9a-fA-F]{6}$" required>
         </div>
     </div>
     <div class="form-group">

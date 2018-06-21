@@ -15,7 +15,7 @@
                 iam = option.textContent;
         }
 
-        t.innerHTML = `<span style="color:${color.value}">${sign.options[sign.value].textContent} ${name.value}</span> ${iam}`;
+        t.innerHTML = `<span style="color:${color.value}">${sign.options[sign.value].textContent}</span> ${name.value}<br><span style="color:${color.value}">${sign.options[sign.value].textContent}</span> ${iam}`;
     };
 
     const verify = () => {

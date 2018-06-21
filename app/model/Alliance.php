@@ -68,8 +68,7 @@ class Alliance
         }
 
         // 同盟名が正当かチェック
-        $denying_name = '/[,\?\(\)\<\>\$]|^無人|^沈没$/';
-        if (preg_match($denying_name, $candidate['name'])) {
+        if (preg_match($init->regex_denying_name, $candidate['name'])) {
             HakoError::newIslandBadName();
 
             return;
@@ -628,21 +627,28 @@ class Alliance
         return false;
     }
 
+    /**
+     * 同盟の名前と記章が既存のものと重複しないか
+     * @return bool しなけりゃtrue
+     */
     private function check_duplicate()
     {
-        if ()
         $current_number = $hako->idToNumber[$current_ID];
-        if (!($admin_mode && ($allyID == '') && ($allyID < 200)) &&
-            ((Util::nameToNumber($hako, $allyName) != -1) ||
-            ((Util::aNameToId($hako, $allyName) != -1) && (Util::aNameToId($hako, $allyName) != $current_ID)))) {
+        if ((Util::nameToNumber($hako, $allyName) != -1)
+            ||
+            (
+                (Util::aNameToId($hako, $allyName) != -1)
+                && (Util::aNameToId($hako, $allyName) != $current_ID)
+            )
+        ) {
             HakoError::newAllyAlready();
 
             return;
         }
 
-        // マークの重複チェック
-        if (!($admin_mode && ($allyID == '') && ($allyID < 200)) &&
-            ((Util::aMarkToId($hako, $allyMark) != -1) && (Util::aMarkToId($hako, $allyMark) != $current_ID))) {
+        if (Util::aMarkToId($hako, $allyMark) != -1
+            && Util::aMarkToId($hako, $allyMark) != $current_ID
+        ) {
             HakoError::markAllyAlready();
 
             return;
@@ -740,5 +746,30 @@ class Alliance
         }
 
         return $flg;
+    }
+
+    private function verification($hako, $data) {
+        global $init;
+        $msg = [];
+
+        if (isset($data['Whoami'], $data['Password'])) {
+            $msg[] = $init->nameSuffix . '名とパスワードを正しく入力してください';
+        }
+
+        if (!preg_match($init->regex_denying_name, $data['AllianceName'])) {
+            $msg[] = '利用できない文字・単語が含まれています'
+        }
+
+        if ($admin_mode) {
+            if ($data['alliance_id'] == '' || $data['alliance_id'] >= $init->alliance_maximum_limit) {
+                $msg[] = '不正な入力です（管理者モード）'
+            }
+        }
+
+        if (!$this->check_duplicate($hako, $data)) {
+            $msg[] = 'すでに利用されている記章・名前です'
+        }
+
+        return  [($msg === [] ? 0 * 1), $msg];
     }
 }

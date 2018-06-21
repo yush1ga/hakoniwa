@@ -55,20 +55,19 @@ class Util_alliance extends Util
     }
 
     /**
-     * 島の名前から番号を算出
+     * 島の名前からIDを逆引き
      * @param          $hako ゲーム総合データ
      * @param  string  $name 島の名前
-     * @return integer       島ID
+     * @return integer       該当の島ID（>=0）、なければ-1
      */
     public static function nameToNumber($hako, $name)
     {
-        // 全島から探す
         for ($i = 0; $i < $hako->islandNumber; $i++) {
             if (strcmp($name, $hako->islands[$i]['name']) == 0) {
                 return $i;
             }
         }
-        // 見つからなかった場合
+
         return -1;
     }
 
