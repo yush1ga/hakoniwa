@@ -1,17 +1,10 @@
 <?php
-/**
- * global $init;
- * $this_file  = $init->baseDir . '/hako-ally.php';
- */
-
 $estb = $init->costMakeAlly
     ? '<span class="cash">' . $init->costMakeAlly . $init->unitMoney . '</span>必要です。'
     : '必要ありません。';
 $keep = $init->costKeepAlly
     ? '<span class="cash">' . $init->costKeepAlly . $init->unitMoney . '</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
     : '必要ありません。';
-
-$regexp = '^[^?,\s\(\)<>$(無人)(沈没)]+$';
 ?>
 <h2>同盟の結成</h2>
 <div class="alert alert-info">
@@ -65,7 +58,7 @@ $regexp = '^[^?,\s\(\)<>$(無人)(沈没)]+$';
     <div class="form-group">
         <label for="AllianceName" class="col-sm-2 control-label">名前</label>
         <div class="col-sm-10">
-            <input type="text" value="サンプル" id="AllianceName" class="form-control" pattern="<?= $regexp ?>" required aria-describedby="AllianceNameHelp">
+            <input type="text" value="サンプル" id="AllianceName" class="form-control" required aria-describedby="AllianceNameHelp">
             <p id="AllianceNameHelp" class="help-block">利用できない文字・単語については<a href="https://github.com/Sotalbireo/hakoniwa/wiki/FAQ#島名同盟名に使えない文字単語" target="_blank">こちら</a>を参照ください（別サイトが開きます）。</p>
         </div>
     </div>
@@ -81,7 +74,9 @@ $regexp = '^[^?,\s\(\)<>$(無人)(沈没)]+$';
 </div>
 </form>
 
-<script charset="utf-8">
-<?php require 'script/AllianceSample.js'; ?>
+<script charset="utf-8" id="lll">
+const denyingNameWords = <?= $denying_name_words ?>;
+const regexDenyingNameWords = new RegExp('<?= $regex_denying_name_words ?>');
+<?php require 'script/Alliance.js'; ?>
 </script>
 <?php

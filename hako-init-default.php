@@ -206,7 +206,7 @@ class InitDefault
 
     // 同盟のマーク
     public $allyMark = [
-        "🐶","🐵","🐦",
+        '●', "🐶","🐵","🐦",
         'Б','Г','Д','Ж','Й',
         'Ф','Ц','Ш','Э','Ю',
         'Я','б','Θ','Σ','Ψ',
@@ -220,10 +220,9 @@ class InitDefault
 
     // 名前に使ってはいけない語句
     public $denying_name_words = [
-        '?', ',', '\s', '(', ')',
-        '<', '>', '$', '無人', '沈没'
+        '無人', '沈没'
     ];
-    public $regex_denying_name = '';
+    public $regex_denying_name_words = '/[,?\"\`\s\(\)\<\>$]/';
 
     // 以下は、表示関連で使用しているだけで、実際の機能を有していません、さらなる改造で実現可能です。
 
@@ -946,10 +945,5 @@ class InitDefault
         $this->CPU_start = microtime();
         $this->setpubliciable();
         mt_srand($_SERVER['REQUEST_TIME']);
-
-        foreach ($this->denying_name_words as $word) {
-            $this->regex_denying_name .= (strpos($word, '/') !== 0) ? preg_quote($word) : $word;
-        }
-        $this->regex_denying_name = '/' . $this->regex_denying_name . '/';
     }
 }
