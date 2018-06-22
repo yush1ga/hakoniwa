@@ -1,5 +1,0 @@
-<?php if ($adminMode): ?>
-
-<?php else: ?>
-
-<?php endif ?>

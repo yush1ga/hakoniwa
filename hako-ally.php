@@ -1050,7 +1050,8 @@ class Main
 
             // 同盟の情報
             case "AmiOfAlly":
-                $html->amityOfAlly($ally, $this->dataSet);
+            case 'detail':
+                $html->detail($ally, $this->dataSet);
 
                 break;
 

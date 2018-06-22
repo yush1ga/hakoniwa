@@ -7,12 +7,6 @@
     const color = f.querySelector('#AllianceColor');
     const name = f.querySelector('#AllianceName');
 
-    const denyingColor = new RegExp(color.getAttribute('pattern'));
-    const denyingName = {
-        words: '',
-        regex: ''
-    };
-
     const update = () => {
         let iam = 0;
 
@@ -28,7 +22,7 @@
         let hasError = false;
 
         // white list
-        if (denyingColor.test(color.value)) {
+        if ((new RegExp(color.getAttribute('pattern'))).test(color.value)) {
             color.parentNode.parentNode.classList.remove('has-error');
         } else {
             color.parentNode.parentNode.classList.add('has-error');
@@ -36,8 +30,9 @@
         }
 
         // black list
-        if (denyingName.regex.test(name.value)
-            || denyingName.words.some(w => name.value.indexOf(w) !== -1)) {
+        if (name.value === ''
+            || regexDenyingNameWords.test(name.value)
+            || denyingNameWords.some(w => name.value.indexOf(w) !== -1)) {
             name.parentNode.parentNode.classList.add('has-error');
             hasError = true;
         } else {
@@ -46,6 +41,11 @@
 
         return !hasError;
     };
+
+
+
+
+
 
     update();
     f.addEventListener('change', ()=>{

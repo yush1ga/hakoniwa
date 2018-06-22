@@ -2376,26 +2376,22 @@ class HTMLKeep extends HTML
 
 class HtmlAlly extends HTML
 {
+    private $this_file;
+
+    function __construct()
+    {
+        global $init;
+        $this->this_file = $init->baseDir . '/hako-ally.php';
+    }
+
     //--------------------------------------------------
     // 初期画面
     //--------------------------------------------------
     public function allyTop($hako, $data)
     {
         global $init;
-        $this_file  = $init->baseDir . '/hako-ally.php';
 
-        parent::pageTitle($init->title, '同盟管理ツール');
-
-        if ($init->allyUse) {
-            echo <<<END
-            <button class="btn btn-default" onClick="JavaScript:location.replace('$this_file?p=register')">同盟の結成</button>
-            <button class="btn btn-default" onClick="JavaScript:location.replace('$this_file?JoinA=1')">同盟の変更・解散・加盟・脱退はこちらから</button>
-
-            <h2>各同盟の状況</h2>
-END;
-        }
-        $this->allyInfo($hako);
-        println('</div>', PHP_EOL, '</div>');
+        require VIEWS . 'Alliance/Index.php';
     }
 
     //--------------------------------------------------
@@ -2404,171 +2400,78 @@ END;
     public function allyInfo($hako, $view_ally_num = 0)
     {
         global $init;
-        $this_file  = $init->baseDir . '/hako-ally.php';
 
-        $tag = "";
-        $allyNumber = (int)$hako->allyNumber;
-        if ($allyNumber < 1) {
-            println('<p>同盟がありません</p>');
-
-            return;
-        }
-
-        echo <<<END
-<p>占有率は、同盟に加盟している{$init->nameSuffix}の<strong>総人口</strong>により算出されたものです。</p>
-<div id="IslandView" class="table-responsive">
-<table class="table table-bordered">
-<thead>
-<tr>
-	<th class="TitleCell head">$init->nameRank</th>
-	<th class="TitleCell head">同盟</th>
-	<th class="TitleCell head">徽章</th>
-	<th class="TitleCell head">{$init->nameSuffix}の数</th>
-	<th class="TitleCell head">総人口</th>
-	<th class="TitleCell head">占有率</th>
-</tr>
-</thead>
-<tbody>
-END;
-
-        for ($i=0; $i<$allyNumber; $i++) {
+        $alliances_number = (int)$hako->allyNumber;
+        $alliances = [];
+        for($i = 0; $i < $alliances_number; $i++) {
             if ($view_ally_num && ($i != $hako->idToAllyNumber[$view_ally_num])) {
                 continue;
             }
-            $ally = $hako->ally[$i];
-            $j = $i + 1;
-            $pop = 0;
+            $alliance = $hako->ally[$i];
 
-            $num = (int)$ally['number'];
-            for ($k=0; $k<$num; $k++) {
-                $id = $ally['memberId'][$k];
-                $island = $hako->islands[$hako->idToNumber[$id]];
-                $pop += $island['pop'];
+            $alliance['members'] = (int)$alliance['number'];
+            $alliance['owner']   = $alliance['oName'];
+            $alliance['population'] = 0;
+            $alliance['name'] = '<a href="'.$this->this_file.'?AmiOfAlly='.$alliance['id'].'" class="">'. $alliance['name'] .'</a>';
+
+            for($ii = 0; $ii < $alliance['members']; $ii++) {
+                $member_id = $alliance['memberId'][$ii];
+                $member_island = $hako->islands[$hako->idToNumber[$member_id]];
+                $alliance['population'] += $member_island['pop'];
             }
+            unset($ii);
 
-            $name = $num ? "{$init->tagName_}{$ally['name']}{$init->_tagName}" : "<a href=\"{$this_file}?AmiOfAlly={$ally['id']}\">{$ally['name']}</a>";
-
-            $ally['comment'] = $ally['comment'] ?? "";
-
-
-            echo <<<END
-	<tr>
-		<th class="NumberCell number" rowspan=2>$j</th>
-		<td class="NameCell" rowspan=2>$name</td>
-		<td class="MarkCell"><strong style="color:{$ally['color']}">{$ally['mark']}</strong></td>
-		<td class="InfoCell">{$ally['number']}{$init->nameSuffix}</td>
-		<td class="InfoCell">$pop{$init->unitPop}</td>
-		<td class="InfoCell">{$ally['occupation']}%</td>
-	</tr>
-	<tr>
-		<td class="CommentCell" colspan=4><span class="head"><a href="$this_file?Allypact={$ally['id']}">{$ally['oName']}</a>： </span>{$ally['comment']}</td>
-	</tr>
-END;
+            $alliances[] = $alliance;
         }
-        echo <<<END
-</tbody>
-</table>
-</div>
-<p>※盟主の島名をクリックすると「コメント変更」欄へ移動します。</p>
-END;
+
+        require VIEWS . 'Alliance/List.php';
     }
 
     //--------------------------------------------------
     // 同盟の情報
     //--------------------------------------------------
-    public function amityOfAlly($hako, $data)
+    public function detail($hako, $data)
     {
         global $init;
-        $this_file  = $init->baseDir . '/hako-ally.php';
 
         $num = $data['ALLYID'];
-        $ally = $hako->ally[$hako->idToAllyNumber[$num]];
-        $allyName = "<span style=\"color:{$ally['color']};font-weight:bold;\">{$ally['mark']}</span>{$ally['name']}";
+        $alliance = $hako->ally[$hako->idToAllyNumber[$num]];
+        $islands = [];
+        $unit = '0' . $init->unitPop;
 
-        echo <<<END
-<p class="text-center big"><span class="head">$allyName</span>の情報</p>
-<div id="campInfo">
-END;
-        // 同盟状況の表示
-        if ($ally['number']) {
-            $this->allyInfo($hako, $num);
-        }
-        // メッセージ・盟約の表示
-        if ($ally['message'] != '') {
-            $allyTitle   = ($allyTitle != '')? $ally['title']: '盟主からのメッセージ';
-            $allyMessage = $ally['message'];
-            echo <<<END
-<hr>
+        $alliance['title'] = $alliance['title'] !== '' ? $alliance['title'] : '盟主からのメッセージ';
 
-<table class="table table-bordered" width="80%">
-	<tr><th class="TitleCell head">$allyTitle</th></tr>
-	<tr><td class="CommentCell"><blockquote>$allyMessage</blockquote></td></tr>
-</table>
-END;
-        }
-        // メンバー一覧の表示
-        echo <<<END
-<hr>
-<table class="table table-bordered">
-	<tr>
-		<th class="TitleCell head">$init->nameRank</th>
-		<th class="TitleCell head">$init->nameSuffix</th>
-		<th class="TitleCell head">$init->namePopulation</th>
-		<th class="TitleCell head">$init->nameArea</th>
-		<th class="TitleCell head">$init->nameFunds</th>
-		<th class="TitleCell head">$init->nameFood</th>
-		<th class="TitleCell head">$init->nameFarmSize</th>
-		<th class="TitleCell head">$init->nameFactoryScale</th>
-		<th class="TitleCell head">$init->nameCommercialScale</th>
-		<th class="TitleCell head">$init->nameMineScale</th>
-		<th class="TitleCell head">$init->namePowerPlantScale</th>
-	</tr>
-END;
-        if (!$ally['number']) {
-            echo "<tr><th colspan=12>所属している島がありません！</th></tr>";
-        }
-        foreach ($ally['memberId'] as $id) {
+        foreach ($alliance['memberId'] as $id) {
             $number = $hako->idToNumber[$id];
-            if (!($number > -1)) {
+            if ($number < 0) {
                 continue;
             }
-            $island = $hako->islands[$number];
-            $money = AllyUtil::aboutMoney($island['money']);
-            $farm = $island['farm'];
-            $factory = $island['factory'];
-            $commerce = $island['commerce'];
-            $mountain = $island['mountain'];
-            $hatuden = $island['hatuden'];
-            $ranking = $number + 1;
-            $name = AllyUtil::islandName($island, $hako->ally, $hako->idToAllyNumber);
+            $island = [];
+            $isl = $hako->islands[$number];
+            $island['pop'] = $isl['pop'];
+            $island['area'] = $isl['area'];
+            $island['money'] = Util::aboutMoney($isl['money']);
+            $island['food'] = $isl['food'];
+            $island['farm'] = (int)$isl['farm'] === 0 ? $init->notHave : $isl['farm'] . $unit;
+            $island['factory'] = (int)$isl['factory'] === 0 ? $init->notHave : $isl['factory'] . $unit;
+            $island['commerce'] = (int)$isl['commerce'] === 0 ? $init->notHave : $isl['commerce'] . $unit;
+            $island['mountain'] = (int)$isl['mountain'] === 0 ? $init->notHave : $mountain . $unit;
+            $island['hatuden'] = (int)$isl['hatuden'] * 1000 . 'kW';
+            $island['rank'] = $number + 1;
+            $island['name'] = Util::islandName($isl, $hako->ally, $hako->idToAllyNumber);
+            $island['absent'] = $isl['absent'];
+            $island['id'] = $isl['id'];
+
             if ($island['absent']  == 0) {
                 $name = "{$init->tagName_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}{$init->_tagName}</a>";
             } else {
                 $name = "{$init->tagName2_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}</a>({$island['absent']}){$init->_tagName2}";
             }
-            $farm = ($farm == 0) ? $init->notHave : "{$farm}0$init->unitPop";
-            $factory = ($factory == 0) ? $init->notHave : "{$factory}0$init->unitPop";
-            $commerce  = ($commerce == 0) ? $init->notHave : "{$commerce}0$init->unitPop";
-            $mountain = ($mountain == 0) ? $init->notHave : "{$mountain}0$init->unitPop";
-            $hatuden  = ($hatuden == 0) ? "0kw" : "{$hatuden}000kw";
 
-            echo <<<END
-<TR>
-	<TH class="NumberCell number">$ranking</TH>
-	<TD class="NameCell">$name</TD>
-	<TD class="InfoCell">{$island['pop']}$init->unitPop</TD>
-	<TD class="InfoCell">{$island['area']}$init->unitArea</TD>
-	<TD class="InfoCell">$money</TD>
-	<TD class="InfoCell">{$island['food']}$init->unitFood</TD>
-	<TD class="InfoCell">$farm</TD>
-	<TD class="InfoCell">$factory</TD>
-	<TD class="InfoCell">$commerce</TD>
-	<TD class="InfoCell">$mountain</TD>
-	<TD class="InfoCell">$hatuden</TD>
-</TR>
-END;
+            $islands[] = $island;
         }
-        echo "</TABLE>\n";
+        unset($island);
+        require VIEWS . 'Alliance/Detail.php';
     }
 
     //--------------------------------------------------

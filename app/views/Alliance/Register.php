@@ -74,7 +74,7 @@ $keep = $init->costKeepAlly
 </div>
 </form>
 
-<script charset="utf-8" id="lll">
+<script charset="utf-8">
 const denyingNameWords = <?= $denying_name_words ?>;
 const regexDenyingNameWords = new RegExp('<?= $regex_denying_name_words ?>');
 <?php require 'script/Alliance.js'; ?>
