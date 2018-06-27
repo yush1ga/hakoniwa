@@ -198,9 +198,6 @@ class InitDefault
     // ひとつの同盟にしか加盟できないようにするか？(0:しない、1:する)
     public $allyJoinOne = 1;
 
-    // 最大同時存在可能数
-    public $alliance_maximum_limit = 200;
-
     // 同盟データの管理ファイル
     public $allyData    = 'ally.dat';
 

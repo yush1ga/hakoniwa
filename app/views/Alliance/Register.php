@@ -13,14 +13,14 @@ $keep = $init->costKeepAlly
     <p>維持費は<?= $keep ?></p>
 </div>
 
-<form action="<= $this_file ?>?p=confirm" method="post">
+<form id="Establishment" action="<?=$this_file?>?p=confirm">
 <h3>あなた（同盟主）の情報</h3>
 <div class="form-horizontal">
     <div class="form-group">
         <label for="Whoami" class="col-sm-2 control-label"><?= $init->nameSuffix ?>名</label>
         <div class="col-sm-10">
             <div class="input-group">
-                <select id="Whoami" class="form-control">
+                <select name="Whoami" class="form-control">
                 <?php /* foreach ($variable as $key => $value):
                     <option><?= $value ?></option>
                 <?php endforeach*/ ?>
@@ -31,7 +31,7 @@ $keep = $init->costKeepAlly
     </div>
     <div class="form-group">
         <label for="Password" class="col-sm-2 control-label">パスワード</label>
-        <div class="col-sm-10"><input type="password" id="Password" class="form-control"></div>
+        <div class="col-sm-10"><input type="text" name="Password" class="form-control" required pattern="\w+"></div>
     </div>
 </div>
 <h3>新しく作る同盟の情報</h3>
@@ -40,25 +40,25 @@ $keep = $init->costKeepAlly
         <label for="AllianceSign" class="col-sm-2 control-label">記章</label>
         <div class="col-sm-10">
             <div class="form-inline">
-                <select id="AllianceSign" class="form-control" aria-describedby="AllianceSignHelp">
+                <select name="AllianceSign" class="form-control" aria-describedby="AllianceSignHelp">
                 <?php foreach ($init->allyMark as $key => $value): ?>
                     <option value="<?= $key ?>"><?= $value ?></option>
                 <?php endforeach ?>
                 </select>
             </div>
-            <p id="AllianceSignHelp" class="help-block">すでにある同盟と同じ記章は利用できません。<br>ご利用の端末やブラウザ、フォントなどの影響によって見た目が変化することがありますが、そういうものです。</p>
+            <p name="AllianceSignHelp" class="help-block">すでにある同盟と同じ記章は利用できません。<br>ご利用の端末やブラウザ、フォントなどの影響によって見た目が変化することがありますが、そういうものです。</p>
         </div>
     </div>
     <div class="form-group">
         <label for="AllianceColor" class="col-sm-2 control-label">色</label>
         <div class="col-sm-4">
-            <input type="color" value="#000000" id="AllianceColor" class="form-control" maxlength=7 pattern="^#[0-9a-fA-F]{6}$" required>
+            <input type="color" value="#000000" name="AllianceColor" class="form-control" maxlength=7 pattern="^#[0-9a-fA-F]{6}$" required>
         </div>
     </div>
     <div class="form-group">
         <label for="AllianceName" class="col-sm-2 control-label">名前</label>
         <div class="col-sm-10">
-            <input type="text" value="サンプル" id="AllianceName" class="form-control" required aria-describedby="AllianceNameHelp">
+            <input type="text" value="" placeholder="サンプル" name="AllianceName" class="form-control" required aria-describedby="AllianceNameHelp">
             <p id="AllianceNameHelp" class="help-block">利用できない文字・単語については<a href="https://github.com/Sotalbireo/hakoniwa/wiki/FAQ#島名同盟名に使えない文字単語" target="_blank">こちら</a>を参照ください（別サイトが開きます）。</p>
         </div>
     </div>
@@ -70,13 +70,30 @@ $keep = $init->costKeepAlly
     </div>
 </div>
 <div class="row">
-    <button type="button" value="prev:register" class="col-sm-offset-4 col-sm-4 btn btn-info">確認</button>
+    <button type="button" name="Confirm" value="prev:register" class="col-sm-offset-4 col-sm-4 btn btn-info">確認</button>
 </div>
 </form>
 
+<div id="ModalConfirm" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">確認</h4>
+            </div>
+            <div class="modal-body">
+                test
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">登録</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script charset="utf-8">
-const denyingNameWords = <?= $denying_name_words ?>;
-const regexDenyingNameWords = new RegExp('<?= $regex_denying_name_words ?>');
+const denyingNameWords = <?=$denying_name_words?>;
+const regexDenyingNameWords = new RegExp('<?=$regex_denying_name_words?>');
 <?php require 'script/Alliance.js'; ?>
 </script>
 <?php

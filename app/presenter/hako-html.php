@@ -2533,7 +2533,6 @@ END;
     public function register($hako, $data)
     {
         global $init;
-        $this_file  = $init->baseDir . "/hako-ally.php";
 
         function hsc($str) {
             return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
@@ -2637,10 +2636,15 @@ END;
             $jsAllyColorList .= "];\n";
         }
         $str1 = $adminMode ? '（メンテナンス）' : $init->allyJoinComUse ? '' : '・加盟・脱退';
+
         $makeCost = $init->costMakeAlly ? "{$init->costMakeAlly}{$init->unitMoney}" : '無料';
+
         $keepCost = $init->costKeepAlly ? "{$init->costKeepAlly}{$init->unitMoney}" : '無料';
+
         $joinCost = isset($init->comCost[$init->comAlly]) ? "{$init->comCost[$init->comAlly]}{$init->unitMoney}" : '無料';
+
         $joinStr = $init->allyJoinComUse ? '' : '加盟・脱退の際の費用は、<span class="cash">' . $joinCost . '</span>です。<br>';
+
         $str3 = $adminMode ? <<<END
 特殊パスワードは？（必須）<br>
 <input type="password" name="OLDPASS" value="{$data['defaultPassword']}" size=32 class=f><br>
@@ -2702,9 +2706,6 @@ END;
 <input type="color" name="colorCode" onChange="colorPack()" onClick="colorPack()" class="form-control" value="$">
 
 <input type="submit" value="結成 （変更）" name="NewAllyButton" class="btn btn-primary">
-END;
-        if (!$adminMode) {
-            echo <<<END
 <script>
 function colorPack() {
 	let island = new Array(128);
@@ -2733,51 +2734,6 @@ function allyPack() {
 	colorPack();
 	return true;
 }
-END;
-        } else {
-            echo <<<END
-function colorPack() {
-	var island = new Array(128);
-	$jsIslandList
-	var a = document.AcForm.COLOR1.value;
-	var b = document.AcForm.COLOR2.value;
-	var c = document.AcForm.COLOR3.value;
-	var d = document.AcForm.COLOR4.value;
-	var e = document.AcForm.COLOR5.value;
-	var f = document.AcForm.COLOR6.value;
-	var mark = document.AcForm.MARK.value;
-
-	var str = "#" + a + b + c + d + e + f;
-
-	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span> ●●●島</span>』';
-
-	document.getElementById("CTBL").innerHTML = str;
-
-	return true;
-}
-
-function allyPack() {
-	{$jsAllyList}
-	{$jsAllyIdList}
-	{$jsAllyMarkList}
-	{$jsAllyColorList}
-	document.AcForm.ALLYID.value   = allyID[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.ALLYNAME.value = ally[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.MARK.value     = allyMark[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.COLOR1.value   = allyColor[document.AcForm.ALLYNUMBER.value][0];
-	document.AcForm.COLOR2.value   = allyColor[document.AcForm.ALLYNUMBER.value][1];
-	document.AcForm.COLOR3.value   = allyColor[document.AcForm.ALLYNUMBER.value][2];
-	document.AcForm.COLOR4.value   = allyColor[document.AcForm.ALLYNUMBER.value][3];
-	document.AcForm.COLOR5.value   = allyColor[document.AcForm.ALLYNUMBER.value][4];
-	document.AcForm.COLOR6.value   = allyColor[document.AcForm.ALLYNUMBER.value][5];
-	colorPack();
-	return true;
-}
-END;
-        }
-        echo <<<END
-colorPack();
-</script>
 </form>
 
 </td>

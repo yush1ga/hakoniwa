@@ -1,6 +1,8 @@
 <?php
 namespace Hakoniwa\Model;
 
+require_once __DIR__.'/../../vendor/autoload.php';
+
 use \Hakoniwa\Helper\Util_alliance as Util;
 
 /**
@@ -9,37 +11,76 @@ use \Hakoniwa\Helper\Util_alliance as Util;
  */
 class Alliance
 {
+    private const MAX_ALLIANCE_ID = 200;
+
+
+
+    public function confirm($game, $data) {
+        global $init;
+
+        $data['Password'] = base64_decode($data['Password'], true);
+
+        $user_ID = (int)$data['Whoami'];
+        // $password = base64_decode($data['Password'] ?? '', true);
+        $candidate = [
+            'name'  => htmlspecialchars($data['AllianceName']),
+            'sign'  => (int)$data['AllianceSign'],
+            'color' => $data['AllianceColor']
+        ];
+
+        $checked = [
+            'id' => [true, ''],
+            'pass' => [true, ''],
+            'name' => [true, ''],
+            'sign' => [true, ''],
+            'color' => [true, ''],
+            'other' => [true, '']
+        ];
+
+        $islands = $game->islands;
+
+        if ($init->allyJoinOne && count($islands[(int)$game->idToNumber[$user_ID]]) > 1) {
+            $checked['other'] = [false, 'reach_join_limit'];
+        }
+
+        header('Content-Type:application/json;charset=utf-8');
+        echo json_encode($game);
+        return;
+
+
+
+    }
+
+
+
     /**
      * 結成
      * @param  [type] $hako [description]
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function register($hako, $data)
+    public function register($hako, $data, $dry_run = false)
     {
         global $init;
 
-        $current_ID = $data['ISLANDID'];
-        $allyID = $data['ALLYID'] ?? "";
-        $current_alliance_number = $data['ALLYNUMBER'] ?? "";
+        // $current_ID = $data['ISLANDID'];
+        $user_ID = $data['Whoami'];
+        $password = $data['Password'];
         $candidate = [
-            'name'  => htmlspecialchars($data['ALLYNAME']),
-            'mark'  => $data['MARK'],
-            'color' => $data['colorCode']
+            'name'  => htmlspecialchars($data['AllianceName']),
+            'sign'  => $data['AllianceSign'],
+            'color' => $data['AllianceColor']
         ];
-        $allyName = ;
-        $allyMark = ;
-        $allyColor = ;
+        // $allyName = ;
+        // $allyMark = ;
+        // $allyColor = ;
         $admin_mode = false;
-        $MAX_ALLIANCE_ID = 200;
 
         // パスワードチェック
-        $data['OLDPASS'] = $data['OLDPASS'] ?? "";
-
-        if (Util::checkPassword("", $data['OLDPASS'])) {
+        if (Util::checkPassword("", $password)) {
             $admin_mode = true;
 
-            if ($allyID > $MAX_ALLIANCE_ID) {
+            if ($allyID > MAX_ALLIANCE_ID) {
                 $max = $allyID;
                 if ($hako->allyNumber) {
                     for ($i = 0; $i < count($hako->ally); $i++) {
@@ -54,54 +95,44 @@ class Alliance
             }
         }
 
+        $island = $hako->islands[$user_ID];
+        if (!$admin_mode
+            && !Util::checkPassword($island['password'], $data['Password'])) {
+            HakoError::wrongPassword();
+
+            return;
+        }
+
+
         if (!$init->allyUse && !$admin_mode) {
             HakoError::newAllyForbbiden();
 
             return;
         }
 
-        // 同盟名があるかチェック
-        if ($candidate['name'] === '') {
-            HakoError::newAllyNoName();
-
-            return;
+        function is_match_in_array($string, $array) {
+            foreach ($array as $v) {
+                if (strpos($string, $v) !== false) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         // 同盟名が正当かチェック
-        if (preg_match($init->regex_denying_name, $candidate['name'])) {
+        if ($candidate['name'] === ''
+            || preg_match($init->regex_denying_name_words, $candidate['name'])
+            || is_match_in_array($candidate['name'], $init->denying_name_words)) {
             HakoError::newIslandBadName();
 
             return;
         }
 
-        // 名前の重複チェック
-        $current_number = $hako->idToNumber[$current_ID];
-        if (!($admin_mode && ($allyID == '') && ($allyID < 200)) &&
-            ((Util::nameToNumber($hako, $allyName) != -1) ||
-            ((Util::aNameToId($hako, $allyName) != -1) && (Util::aNameToId($hako, $allyName) != $current_ID)))) {
-            HakoError::newAllyAlready();
-
-            return;
-        }
-
-        // マークの重複チェック
-        if (!($admin_mode && ($allyID == '') && ($allyID < 200)) &&
-            ((Util::aMarkToId($hako, $allyMark) != -1) && (Util::aMarkToId($hako, $allyMark) != $current_ID))) {
-            HakoError::markAllyAlready();
-
-            return;
-        }
-
-        // passwordの判定
-        $island = $hako->islands[$current_number];
-        if (!$admin_mode && !Util::checkPassword($island['password'], $data['PASSWORD'])) {
-            HakoError::wrongPassword();
-
-            return;
-        }
+        $this->check_duplicate();
 
         // 結成資金不足判定
-        if (!$admin_mode && $island['money'] < $init->costMakeAlly) {
+        if ($admin_mode) {/* thru */}
+        else if ($island['money'] < $init->costMakeAlly) {
             HakoError::noMoney();
 
             return;
@@ -629,16 +660,19 @@ class Alliance
 
     /**
      * 同盟の名前と記章が既存のものと重複しないか
-     * @return bool しなけりゃtrue
+     * @param          $hako
+     * @param  string  $name 同盟の名前
+     * @param  integer $sign 同盟の記章
+     * @return bool          しなけりゃtrue
      */
-    private function check_duplicate()
+    private function check_duplicate($hako, $name, $sign)
     {
         $current_number = $hako->idToNumber[$current_ID];
-        if ((Util::nameToNumber($hako, $allyName) != -1)
+        if ((Util::nameToNumber($hako, $name) != -1)
             ||
             (
-                (Util::aNameToId($hako, $allyName) != -1)
-                && (Util::aNameToId($hako, $allyName) != $current_ID)
+                (Util::aNameToId($hako, $name) != -1)
+                && (Util::aNameToId($hako, $name) != $current_ID)
             )
         ) {
             HakoError::newAllyAlready();
@@ -646,8 +680,8 @@ class Alliance
             return;
         }
 
-        if (Util::aMarkToId($hako, $allyMark) != -1
-            && Util::aMarkToId($hako, $allyMark) != $current_ID
+        if (Util::aMarkToId($hako, $sign) != -1
+            && Util::aMarkToId($hako, $sign) != $current_ID
         ) {
             HakoError::markAllyAlready();
 
@@ -746,30 +780,5 @@ class Alliance
         }
 
         return $flg;
-    }
-
-    private function verification($hako, $data) {
-        global $init;
-        $msg = [];
-
-        if (isset($data['Whoami'], $data['Password'])) {
-            $msg[] = $init->nameSuffix . '名とパスワードを正しく入力してください';
-        }
-
-        if (!preg_match($init->regex_denying_name, $data['AllianceName'])) {
-            $msg[] = '利用できない文字・単語が含まれています'
-        }
-
-        if ($admin_mode) {
-            if ($data['alliance_id'] == '' || $data['alliance_id'] >= $init->alliance_maximum_limit) {
-                $msg[] = '不正な入力です（管理者モード）'
-            }
-        }
-
-        if (!$this->check_duplicate($hako, $data)) {
-            $msg[] = 'すでに利用されている記章・名前です'
-        }
-
-        return  [($msg === [] ? 0 * 1), $msg];
     }
 }

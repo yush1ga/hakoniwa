@@ -9,200 +9,12 @@
 require_once 'config.php';
 require_once MODELPATH.'/hako-cgi.php';
 require_once PRESENTER.'/hako-html.php';
+require_once MODELPATH.'/Alliance.php';
 
 $init = new Init;
 
 class MakeAlly
 {
-    /**
-     * 結成・変更メイン
-     * @param  [type] $hako [description]
-     * @param  [type] $data [description]
-     * @return [type]       [description]
-     */
-    public function makeAllyMain($hako, $data)
-    {
-        global $init;
-
-        $current_ID = $data['ISLANDID'];
-        $allyID = $data['ALLYID'] ?? "";
-        $currentAnumber = $data['ALLYNUMBER'] ?? "";
-        $allyName = htmlspecialchars($data['ALLYNAME']);
-        $allyMark = $data['MARK'];
-        $allyColor = $data['colorCode'];
-        $adminMode = 0;
-
-        // パスワードチェック
-        $data['OLDPASS'] = $data['OLDPASS'] ?? "";
-        if (AllyUtil::checkPassword("", $data['OLDPASS'])) {
-            $adminMode = 1;
-            if ($allyID > 200) {
-                $max = $allyID;
-                if ($hako->allyNumber) {
-                    for ($i=0; $i < count($hako->ally); $i++) {
-                        if ($max <= $hako->ally[$i]['id']) {
-                            $max = $hako->ally[$i]['id'] + 1;
-                        }
-                    }
-                }
-                $current_ID = $max;
-            } else {
-                $current_ID = $hako->ally[$currentAnumber]['id'];
-            }
-        }
-        if (!$init->allyUse && !$adminMode) {
-            HakoError::newAllyForbbiden();
-
-            return;
-        }
-        // 同盟名があるかチェック
-        if ($allyName == '') {
-            HakoError::newAllyNoName();
-
-            return;
-        }
-        // 同盟名が正当かチェック
-        if (preg_match("/[,\?\(\)\<\>\$]|^無人|^沈没$/", $allyName)) {
-            HakoError::newIslandBadName();
-
-            return;
-        }
-        // 名前の重複チェック
-        $currentNumber = $hako->idToNumber[$current_ID];
-        if (!($adminMode && ($allyID == '') && ($allyID < 200)) &&
-            ((AllyUtil::nameToNumber($hako, $allyName) != -1) ||
-            ((AllyUtil::aNameToId($hako, $allyName) != -1) && (AllyUtil::aNameToId($hako, $allyName) != $current_ID)))) {
-            HakoError::newAllyAlready();
-
-            return;
-        }
-        // マークの重複チェック
-        if (!($adminMode && ($allyID == '') && ($allyID < 200)) &&
-            ((AllyUtil::aMarkToId($hako, $allyMark) != -1) && (AllyUtil::aMarkToId($hako, $allyMark) != $current_ID))) {
-            HakoError::markAllyAlready();
-
-            return;
-        }
-        // passwordの判定
-        $island = $hako->islands[$currentNumber];
-        if (!$adminMode && !AllyUtil::checkPassword($island['password'], $data['PASSWORD'])) {
-            HakoError::wrongPassword();
-
-            return;
-        }
-        // 結成資金不足判定
-        if (!$adminMode && $island['money'] < $init->costMakeAlly) {
-            HakoError::noMoney();
-
-            return;
-        }
-        $n = $hako->idToAllyNumber[$current_ID] ?? '';
-        if ($n !== '') {
-            if ($adminMode && ($allyID != '') && ($allyID < 200)) {
-                $allyMember = $hako->ally[$n]['memberId'];
-                $aIsland = $hako->islands[$hako->idToNumber[$allyID]];
-                $flag = 0;
-                foreach ($allyMember as $id) {
-                    if ($id == $allyID) {
-                        $flag = 1;
-
-                        break;
-                    }
-                }
-                if (!$flag) {
-                    if ($aIsland['allyId'][0] == '') {
-                        $flag = 2;
-                    }
-                }
-                if (!$flag) {
-                    echo "変更できません。\n";
-
-                    return;
-                }
-                $hako->ally[$n]['id']    = $allyID;
-                $hako->ally[$n]['oName'] = $aIsland['name'];
-                if ($flag == 2) {
-                    $hako->ally[$n]['password'] = $aIsland['password'];
-                    $hako->ally[$n]['score']    = $aIsland['pop'];
-                    $hako->ally[$n]['number'] ++;
-                    array_push($hako->ally[$n]['memberId'], $aIsland['id']);
-                    array_push($aIsland['allyId'], $aIsland['id']);
-                }
-            } else {
-                // すでに結成ずみなら変更
-            }
-        } else {
-            // 他の島の同盟に入っている場合は、結成できない
-            $flag = 0;
-            for ($i = 0; $i < $hako->allyNumber; $i++) {
-                $allyMember = $hako->ally[$i]['memberId'];
-                foreach ($allyMember as $id) {
-                    if ($id == $current_ID) {
-                        $flag = 1;
-
-                        break;
-                    }
-                }
-                if ($flag) {
-                    break;
-                }
-            }
-            if ($flag) {
-                HakoError::otherAlready();
-
-                return;
-            }
-            if (($init->allyUse == 2) && !$adminMode && !AllyUtil::checkPassword("", $data['PASSWORD'])) {
-                HakoError::newAllyForbbiden();
-
-                return;
-            }
-            // 新規
-            $n = $hako->allyNumber;
-            $hako->ally[$n]['id'] = $current_ID;
-            $memberId = [];
-            if ($allyID < 200) {
-                $hako->ally[$n]['oName']    = $island['name'].$init->nameSuffix;
-                $hako->ally[$n]['password'] = $island['password'];
-                $hako->ally[$n]['number']   = 1;
-                $memberId[0]                = $current_ID;
-                $hako->ally[$n]['score']    = $island['pop'];
-            } else {
-                $hako->ally[$n]['oName']    = '';
-                $hako->ally[$n]['password'] = AllyUtil::encode($data['PASSWORD']);
-                $hako->ally[$n]['number']   = 0;
-                $hako->ally[$n]['score']    = 0;
-            }
-            $hako->ally[$n]['occupation']   = 0;
-            $hako->ally[$n]['memberId']     = $memberId;
-            $island['allyId']               = $memberId;
-            $ext = [0];
-            $hako->ally[$n]['ext']          = $ext;
-            $hako->idToAllyNumber[$current_ID] = $n;
-            $hako->allyNumber++;
-        }
-
-        // 同盟の各種の値を設定
-        $hako->ally[$n]['name']  = $allyName;
-        $hako->ally[$n]['mark']  = $allyMark;
-        $hako->ally[$n]['color'] = $allyColor;
-
-        // 費用をいただく
-        $island['money'] -= (!$adminMode) ? $init->costMakeAlly : 0;
-
-        // データ格納先へ
-        $hako->islands[$currentNumber] = $island;
-
-        // データ書き出し
-        AllyUtil::calculates_share($hako);
-        AllyUtil::allySort($hako);
-        $hako->writeAllyFile();
-
-        // トップへ
-        $html = new HtmlAlly();
-        $html->allyTop($hako, $data);
-    }
-
     //--------------------------------------------------
     // 解散
     //--------------------------------------------------
@@ -998,60 +810,75 @@ class Main
 
         $html = new HtmlAlly;
         $com = new MakeAlly;
-        $html->header();
 
         switch ($this->mode) {
             // 同盟の結成・変更・解散・加盟・脱退
             case "JoinA":
+                $html->header();
                 $html->newAllyTop($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             case "register":
+                $html->header();
                 $html->register($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             case 'confirm':
-                // $html->confirm($ally, $this->dataSet);
-                $html->register($ally, $this->dataSet);
+                $model = new Hakoniwa\Model\Alliance;
+                $model->confirm($ally, $this->dataSet);
 
                 break;
 
             // 同盟の結成・変更
             case "newally":
+                $html->header();
                 $com->makeAllyMain($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             // 同盟の解散
             case "delally":
+                $html->header();
                 $com->delete_alliance($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             // 同盟の加盟・脱退
             case "inoutally":
+                $html->header();
                 $com->joinAllyMain($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             // コメントの変更
             case "Allypact":
+                $html->header();
                 $html->tempAllyPactPage($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             // コメントの更新
             case "AllypactUp":
+                $html->header();
                 $com->allyPactMain($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
             // 同盟の情報
             case "AmiOfAlly":
             case 'detail':
+                $html->header();
                 $html->detail($ally, $this->dataSet);
+                $html->footer();
 
                 break;
 
@@ -1060,11 +887,12 @@ class Main
                 if ($com->allyReComp($ally)) {
                     break;
                 }
+                $html->header();
                 $html->allyTop($ally, $this->dataSet);
+                $html->footer();
 
             break;
         }
-        $html->footer();
     }
     //---------------------------------------------------
     // POST、GETのデータを取得
