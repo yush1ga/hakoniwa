@@ -74,20 +74,19 @@ class Util
     }
 
     /**
-     * 島の名前から番号を算出
-     * @param  [type] $hako [description]
-     * @param  [type] $name [description]
-     * @return [type]       [description]
+     * 島の名前からIDを逆引き
+     * @param          $hako ゲーム総合データ
+     * @param  string  $name 島の名前
+     * @return integer       該当の島ID（>=0）、なければ-1
      */
     public static function nameToNumber($hako, $name)
     {
-        // 全島から探す
         for ($i = 0; $i < $hako->islandNumber; $i++) {
             if (strcmp($name, $hako->islands[$i]['name']) == 0) {
                 return $i;
             }
         }
-        // 見つからなかった場合
+
         return -1;
     }
 
@@ -105,9 +104,9 @@ class Util
             $i = $idToAllyNumber[$id];
             $mark  = $ally[$i]['mark'];
             $color = $ally[$i]['color'];
-            $name .= '<span style="color:'.$color.'";font-weight:bold;>' . $mark . '</span> ';
+            $name .= '<span style="color:'.$color.'";>'.$mark.'</span> ';
         }
-        $name .= $island['name'] . "島";
+        $name .= $island['name'].'島';
 
         return $name;
     }
@@ -122,7 +121,6 @@ class Util
     {
         global $init;
 
-        // nullチェック
         if (empty($p2)) {
             return false;
         }
@@ -488,6 +486,24 @@ class Util
 
         $mode = $_POST['mode'] ?? '';
     }
+
+    /**
+     * 文字のエスケープ処理
+     * @param  string  $s    任意の入力文字列
+     * @param  integer $mode boolキャスト：nl2brの有無（複数改行の圧縮機能あり）
+     * @return string        キャスト済み文字列
+     */
+    public static function htmlEscape($s, $mode = 0): string
+    {
+        $s = preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($s, ENT_QUOTES, 'UTF-8'));
+
+        if ($mode) {
+            $s = strtr($s, array_fill_keys(["\r\n", "\r", "\n"], '<br>'));
+            $s = preg_replace('/(<br>){3,}/g', '<br><br>', $s); // 大量改行対策
+        }
+
+        return $s;
+    }
 }
 
 
@@ -498,9 +514,4 @@ function println(...$strs)
         echo $str;
     }
     echo PHP_EOL;
-}
-
-function h(string $str): string
-{
-    return preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($str, ENT_QUOTES, 'UTF-8'));
 }

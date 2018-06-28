@@ -6,6 +6,10 @@ $keep = $init->costKeepAlly
     ? '<span class="cash">' . $init->costKeepAlly . $init->unitMoney . '</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
     : '必要ありません。';
 ?>
+<style>
+
+</style>
+
 <h2>同盟の結成</h2>
 <div class="alert alert-info">
     <p><strong class="text-danger">（注意）</strong></p>
@@ -13,7 +17,7 @@ $keep = $init->costKeepAlly
     <p>維持費は<?= $keep ?></p>
 </div>
 
-<form id="Establishment" action="<?=$this_file?>?p=confirm">
+<form id="Establishment" action="<?=$this->this_file?>?p=confirm">
 <h3>あなた（同盟主）の情報</h3>
 <div class="form-horizontal">
     <div class="form-group">
@@ -70,11 +74,15 @@ $keep = $init->costKeepAlly
     </div>
 </div>
 <div class="row">
-    <button type="button" name="Confirm" value="prev:register" class="col-sm-offset-4 col-sm-4 btn btn-info">確認</button>
+<?php if($init->allyUse): ?>
+    <button type="button" name="Confirm" class="col-sm-offset-4 col-sm-4 btn btn-info">確認</button>
+<?php else: ?>
+    <button type="button" class="col-sm-offset-4 col-sm-4 btn btn-default" disabled onclick="return !1;">設定により同盟を結成できません</button>
+<?php endif; ?>
 </div>
 </form>
 
-<div id="ModalConfirm" class="modal fade" tabindex="-1" role="dialog">
+<div id="Modal" class="modal fade" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -84,16 +92,21 @@ $keep = $init->costKeepAlly
                 test
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">登録</button>
+                <form id="ModalConfirm" action="<?=$this->this_file?>?p=a" method="post">
+                    <input name="temp" type="hidden" value="">
+                    <button name="cancel" type="button" class="btn btn-default">やめる</button>
+                    <button type="submit" class="btn btn-primary">登録する</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
 <script charset="utf-8">
+;(function(){
 const denyingNameWords = <?=$denying_name_words?>;
 const regexDenyingNameWords = new RegExp('<?=$regex_denying_name_words?>');
 <?php require 'script/Alliance.js'; ?>
+})();
 </script>
 <?php

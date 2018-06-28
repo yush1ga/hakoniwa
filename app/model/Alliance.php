@@ -1,7 +1,8 @@
 <?php
 namespace Hakoniwa\Model;
 
-require_once __DIR__.'/../../vendor/autoload.php';
+// require_once __DIR__.'/../../vendor/autoload.php';
+require_once HELPERPATH.'Util_alliance.php';
 
 use \Hakoniwa\Helper\Util_alliance as Util;
 
@@ -14,41 +15,57 @@ class Alliance
     private const MAX_ALLIANCE_ID = 200;
 
 
-
+    /**
+     * 同盟登録確認
+     * -[] 島名とパスワードの対応
+     * -[] 記章重複
+     * -[] 色バリデート
+     * -[] 名前バリデート
+     * -[] 資金不足（設定時のみ）
+     * -[] 多重登録（設定時のみ）
+     * -[] 管理者判定（設定時のみ）
+     * @param  [type] $game [description]
+     * @param  [type] $data [description]
+     * @return [type]       [description]
+     */
     public function confirm($game, $data) {
         global $init;
 
         $data['Password'] = base64_decode($data['Password'], true);
 
         $user_ID = (int)$data['Whoami'];
-        // $password = base64_decode($data['Password'] ?? '', true);
+        $password = base64_decode($data['Password'] ?? '', true);
+        $island = $game->islands[(int)$game->idToNumber[$user_ID]];
         $candidate = [
             'name'  => htmlspecialchars($data['AllianceName']),
             'sign'  => (int)$data['AllianceSign'],
             'color' => $data['AllianceColor']
         ];
 
+        $admin_mode = Util::checkPassword("", $password);
         $checked = [
-            'id' => [true, ''],
-            'pass' => [true, ''],
-            'name' => [true, ''],
-            'sign' => [true, ''],
-            'color' => [true, ''],
-            'other' => [true, '']
+            'id' =>    ['status' => true, 'message' => ''],
+            'pass' =>  ['status' => true, 'message' => ''],
+            'name' =>  ['status' => true, 'message' => ''],
+            'sign' =>  ['status' => true, 'message' => ''],
+            'color' => ['status' => true, 'message' => ''],
+            'other' => ['status' => true, 'messages' => []],
+            'temp' => ''
         ];
 
-        $islands = $game->islands;
+        if ($init->allyJoinOne && count($island['allyId']) > 0) {
+            $checked['other']['status'] = false;
+            $checked['other']['messages'][] = 'reach_join_limit';
+        }
 
-        if ($init->allyJoinOne && count($islands[(int)$game->idToNumber[$user_ID]]) > 1) {
-            $checked['other'] = [false, 'reach_join_limit'];
+        if ($admin_mode) {/* thru */}
+        else if ($island['money'] < $init->costMakeAlly) {
+            $checked['other']['status'] = false;
+            $checked['other']['messages'][] = 'not_enough_money';
         }
 
         header('Content-Type:application/json;charset=utf-8');
-        echo json_encode($game);
-        return;
-
-
-
+        echo json_encode($checked);
     }
 
 
@@ -660,19 +677,19 @@ class Alliance
 
     /**
      * 同盟の名前と記章が既存のものと重複しないか
-     * @param          $hako
+     * @param          $game
      * @param  string  $name 同盟の名前
      * @param  integer $sign 同盟の記章
      * @return bool          しなけりゃtrue
      */
-    private function check_duplicate($hako, $name, $sign)
+    private function check_duplicate($game, $name, $sign)
     {
-        $current_number = $hako->idToNumber[$current_ID];
-        if ((Util::nameToNumber($hako, $name) != -1)
+        $current_number = $game->idToNumber[$current_ID];
+        if ((Util::nameToNumber($game, $name) != -1)
             ||
             (
-                (Util::aNameToId($hako, $name) != -1)
-                && (Util::aNameToId($hako, $name) != $current_ID)
+                (Util::aNameToId($game, $name) != -1)
+                && (Util::aNameToId($game, $name) != $current_ID)
             )
         ) {
             HakoError::newAllyAlready();
@@ -680,8 +697,8 @@ class Alliance
             return;
         }
 
-        if (Util::aMarkToId($hako, $sign) != -1
-            && Util::aMarkToId($hako, $sign) != $current_ID
+        if (Util::aMarkToId($game, $sign) != -1
+            && Util::aMarkToId($game, $sign) != $current_ID
         ) {
             HakoError::markAllyAlready();
 

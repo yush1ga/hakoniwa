@@ -195,8 +195,8 @@ class InitDefault
     // (0:しない、1:する、2:管理者のみ)
     public $allyUse     = 1;
 
-    // ひとつの同盟にしか加盟できないようにするか？(0:しない、1:する)
-    public $allyJoinOne = 1;
+    // ひとつの同盟にしか加盟できないようにするか？
+    public $allyJoinOne = true;
 
     // 同盟データの管理ファイル
     public $allyData    = 'ally.dat';
