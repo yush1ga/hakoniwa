@@ -502,7 +502,9 @@ class AllyIO
             ? $ally['title'] . '<>' . $ally['message']
             : '<>';
 
-        fwrite($fp, <<<EOL
+        fwrite(
+            $fp,
+            <<<EOL
 {$ally['name']}
 {$ally['mark']}
 {$ally['color']}

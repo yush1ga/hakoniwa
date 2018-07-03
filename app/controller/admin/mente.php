@@ -133,8 +133,9 @@ EOM;
     {
         $date = $this->dataSet['date'].' '.$this->dataSet['time'];
         $date = date_parse_from_format('Y-m-d H:i', $date);
-        if (!checkdate($date['month'], $date['day'], $date['year']))
+        if (!checkdate($date['month'], $date['day'], $date['year'])) {
             throw new Exception("指定された日付が不正", 1);
+        }
         $toSetDate = mktime($date['hour'], $date['minute'], 0, $date['month'], $date['day'], $date['year']);
         $this->stimeMode($toSetDate);
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Hakoniwa\Model;
 
 // require_once __DIR__.'/../../vendor/autoload.php';
@@ -21,21 +22,22 @@ class Alliance
      * -[] 記章重複
      * -[] 色バリデート
      * -[] 名前バリデート
-     * -[] 資金不足（設定時のみ）
-     * -[] 多重登録（設定時のみ）
+     * -[x] 資金不足（設定時のみ）
+     * -[x] 多重登録（設定時のみ）
      * -[] 管理者判定（設定時のみ）
      * @param  [type] $game [description]
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function confirm($game, $data) {
+    public function confirm($game, $data)
+    {
         global $init;
 
         $data['Password'] = base64_decode($data['Password'], true);
 
-        $user_ID = (int)$data['Whoami'];
+        $island_ID = (int)$data['Whoami'];
         $password = base64_decode($data['Password'] ?? '', true);
-        $island = $game->islands[(int)$game->idToNumber[$user_ID]];
+        $island = $game->islands[(int)$game->idToNumber[$island_ID]];
         $candidate = [
             'name'  => htmlspecialchars($data['AllianceName']),
             'sign'  => (int)$data['AllianceSign'],
@@ -58,8 +60,16 @@ class Alliance
             $checked['other']['messages'][] = 'reach_join_limit';
         }
 
-        if ($admin_mode) {/* thru */}
-        else if ($island['money'] < $init->costMakeAlly) {
+        if ($admin_mode) {/* thru */
+        } else if (!Util::checkPassword($island['password'], $password)) {
+            // HakoError::wrongPassword();
+
+            $checked['pass']['status'] = false;
+            $checked['pass']['message'] = 'wrong_password';
+        }
+
+        if ($admin_mode) {/* thru */
+        } else if ($island['money'] < $init->costMakeAlly) {
             $checked['other']['status'] = false;
             $checked['other']['messages'][] = 'not_enough_money';
         }
@@ -127,12 +137,14 @@ class Alliance
             return;
         }
 
-        function is_match_in_array($string, $array) {
+        function is_match_in_array($string, $array)
+        {
             foreach ($array as $v) {
                 if (strpos($string, $v) !== false) {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -148,8 +160,8 @@ class Alliance
         $this->check_duplicate();
 
         // 結成資金不足判定
-        if ($admin_mode) {/* thru */}
-        else if ($island['money'] < $init->costMakeAlly) {
+        if ($admin_mode) {/* thru */
+        } elseif ($island['money'] < $init->costMakeAlly) {
             HakoError::noMoney();
 
             return;

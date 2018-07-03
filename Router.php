@@ -8,7 +8,8 @@ if (php_sapi_name() === 'cli-server') {
     if (!defined('DEBUG')) {
         define('DEBUG', true);
     }
-    function dump($var) {
+    function dump($var)
+    {
         echo '<pre>';
         var_dump($var);
         echo '</pre>';

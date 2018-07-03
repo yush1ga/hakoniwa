@@ -2,6 +2,7 @@
     const f = document.forms.Establishment;
     const t = document.querySelector('#AllianceSample p');
     const m = document.querySelector('#Modal');
+    const mb = document.querySelector('#ModalBackdrop');
 
     const whoami = f.Whoami;
     const sign = f.AllianceSign;
@@ -47,12 +48,16 @@
         open: targ => {
             document.body.style.paddingRight = modal.paddingWidth + 'px';
             document.body.classList.add('modal-open');
+            mb.style.display = 'block';
+            mb.classList.add('in');
             targ.style.display = 'block';
             targ.classList.add('in');
         },
         close: targ => {
             document.body.style.paddingRight = '';
             document.body.classList.remove('modal-open');
+            mb.style.display = 'none';
+            mb.classList.remove('in');
             targ.style.display = 'none';
             targ.classList.remove('in');
         },
@@ -81,7 +86,7 @@
 
 
 
-    document.forms.ModalConfirm.cancel.addEventListener('click', _ => {modal.close(m)});
+    document.forms.ModalConfirm.cancel.addEventListener('click', () => {modal.close(m)});
 
     confirmBtn.addEventListener('click', async ev => {
         const body = new FormData(f);
@@ -96,24 +101,25 @@
             body
         };
 
-        let json = {};
+        let obj = {};
 
         try {
             const resp = await fetch(f.action, fetchOption);
-            json = await resp.json();
+            obj = await resp.json();
         } catch (e) {
             console.error(e.stack);
             return;
         }
 
-        Object.keys(json).forEach(key => {
-            if(!json[key].status)
-            console.log(`${key} => ${json[key].message || json[key].messages}`)
+        Object.keys(obj).forEach(key => {
+            if(!obj[key].status)
+            console.log(`${key} => ${obj[key].message || obj[key].messages}`)
             modal.open(m);
 
         });
 
-        console.dir(json);
+        m.querySelector('.modal-body').innerHTML = `<pre><code>${JSON.stringify(obj)}</code></pre>`;
+
     });
 
 

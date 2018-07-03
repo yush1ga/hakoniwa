@@ -2378,7 +2378,7 @@ class HtmlAlly extends HTML
 {
     private $this_file;
 
-    function __construct()
+    public function __construct()
     {
         global $init;
         $this->this_file = $init->baseDir . '/hako-ally.php';
@@ -2403,7 +2403,7 @@ class HtmlAlly extends HTML
 
         $alliances_number = (int)$hako->allyNumber;
         $alliances = [];
-        for($i = 0; $i < $alliances_number; $i++) {
+        for ($i = 0; $i < $alliances_number; $i++) {
             if ($view_ally_num && ($i != $hako->idToAllyNumber[$view_ally_num])) {
                 continue;
             }
@@ -2414,7 +2414,7 @@ class HtmlAlly extends HTML
             $alliance['population'] = 0;
             $alliance['name'] = '<a href="'.$this->this_file.'?AmiOfAlly='.$alliance['id'].'" class="">'. $alliance['name'] .'</a>';
 
-            for($ii = 0; $ii < $alliance['members']; $ii++) {
+            for ($ii = 0; $ii < $alliance['members']; $ii++) {
                 $member_id = $alliance['memberId'][$ii];
                 $member_island = $hako->islands[$hako->idToNumber[$member_id]];
                 $alliance['population'] += $member_island['pop'];
@@ -2534,7 +2534,8 @@ END;
     {
         global $init;
 
-        function hsc($str) {
+        function hsc($str)
+        {
             return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
         }
 

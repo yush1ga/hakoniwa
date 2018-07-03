@@ -74,7 +74,7 @@ $keep = $init->costKeepAlly
     </div>
 </div>
 <div class="row">
-<?php if($init->allyUse): ?>
+<?php if ($init->allyUse): ?>
     <button type="button" name="Confirm" class="col-sm-offset-4 col-sm-4 btn btn-info">確認</button>
 <?php else: ?>
     <button type="button" class="col-sm-offset-4 col-sm-4 btn btn-default" disabled onclick="return !1;">設定により同盟を結成できません</button>
@@ -88,9 +88,7 @@ $keep = $init->costKeepAlly
             <div class="modal-header">
                 <h4 class="modal-title">確認</h4>
             </div>
-            <div class="modal-body">
-                test
-            </div>
+            <div id="ModalBody" class="modal-body"></div>
             <div class="modal-footer">
                 <form id="ModalConfirm" action="<?=$this->this_file?>?p=a" method="post">
                     <input name="temp" type="hidden" value="">
@@ -101,6 +99,7 @@ $keep = $init->costKeepAlly
         </div>
     </div>
 </div>
+<div id="ModalBackdrop" class="modal-backdrop fade" style="display:none"></div>
 
 <script charset="utf-8">
 ;(function(){

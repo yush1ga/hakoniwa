@@ -5,7 +5,7 @@ parent::pageTitle($init->title, '同盟管理ページ');
 
 <p><a href="<?=$this->this_file?>?p=register" class="btn btn-default">同盟の結成</a></p>
 
-<?PHP endif; ?>
+<?php endif; ?>
 
 <h2>各同盟の状況</h2>
 
