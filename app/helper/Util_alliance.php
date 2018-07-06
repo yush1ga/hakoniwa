@@ -1,4 +1,5 @@
 <?php
+
 namespace Hakoniwa\Helper;
 
 require_once 'util.php';
@@ -70,9 +71,12 @@ class Util_alliance extends \Util
         return -1;
     }
 
-    //---------------------------------------------------
-    // 同盟のマークからIDを得る
-    //---------------------------------------------------
+    /**
+     * 同盟のマークからIDを得る
+     * @param         $hako ゲーム総合データ
+     * @param  string $mark
+     * @return [type]       [description]
+     */
     public static function aMarkToId($hako, $mark)
     {
         // 全島から探す

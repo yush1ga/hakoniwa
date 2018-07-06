@@ -2539,12 +2539,8 @@ END;
             return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
         }
 
-        $denying_name_words = '[';
-        foreach ($init->denying_name_words as $word) {
-            $denying_name_words .= "'" . hsc($word) . "',";
-        }
-        $denying_name_words = rtrim($denying_name_words, ',') . ']';
-        $regex_denying_name_words = trim($init->regex_denying_name_words, '/');
+        $denying_name_words = '["' . implode('","', $init->denying_name_words) . '"]';
+        $regex_denying_name_words = $init->regex_denying_name_words;
 
         require VIEWS . 'Alliance/Register.php';
     }

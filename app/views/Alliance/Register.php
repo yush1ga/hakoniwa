@@ -17,7 +17,7 @@ $keep = $init->costKeepAlly
     <p>維持費は<?= $keep ?></p>
 </div>
 
-<form id="Establishment" action="<?=$this->this_file?>?p=confirm">
+<form id="Establishment" action="<?=$this->this_file?>?p=confirm" method="post">
 <h3>あなた（同盟主）の情報</h3>
 <div class="form-horizontal">
     <div class="form-group">
@@ -62,7 +62,7 @@ $keep = $init->costKeepAlly
     <div class="form-group">
         <label for="AllianceName" class="col-sm-2 control-label">名前</label>
         <div class="col-sm-10">
-            <input type="text" value="" placeholder="サンプル" name="AllianceName" class="form-control" required aria-describedby="AllianceNameHelp">
+            <input type="text" value="" placeholder="サンプル" name="AllianceName" class="form-control" pattern="\w{1,}" required aria-describedby="AllianceNameHelp">
             <p id="AllianceNameHelp" class="help-block">利用できない文字・単語については<a href="https://github.com/Sotalbireo/hakoniwa/wiki/FAQ#島名同盟名に使えない文字単語" target="_blank">こちら</a>を参照ください（別サイトが開きます）。</p>
         </div>
     </div>
@@ -90,11 +90,8 @@ $keep = $init->costKeepAlly
             </div>
             <div id="ModalBody" class="modal-body"></div>
             <div class="modal-footer">
-                <form id="ModalConfirm" action="<?=$this->this_file?>?p=a" method="post">
-                    <input name="temp" type="hidden" value="">
-                    <button name="cancel" type="button" class="btn btn-default">やめる</button>
-                    <button type="submit" class="btn btn-primary">登録する</button>
-                </form>
+                <button name="cancel" type="button" class="btn btn-default" data-dismiss="modal">やめる</button>
+                <button type="submit" class="btn btn-primary" name="mode" value="establish" form="Establishment" formaction="<?=$this->this_file?>" disabled>登録する</button>
             </div>
         </div>
     </div>
@@ -104,7 +101,7 @@ $keep = $init->costKeepAlly
 <script charset="utf-8">
 ;(function(){
 const denyingNameWords = <?=$denying_name_words?>;
-const regexDenyingNameWords = new RegExp('<?=$regex_denying_name_words?>');
+const regexDenyingNameWords = <?=$regex_denying_name_words?>;
 <?php require 'script/Alliance.js'; ?>
 })();
 </script>

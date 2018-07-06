@@ -2,7 +2,6 @@
     const f = document.forms.Establishment;
     const t = document.querySelector('#AllianceSample p');
     const m = document.querySelector('#Modal');
-    const mb = document.querySelector('#ModalBackdrop');
 
     const whoami = f.Whoami;
     const sign = f.AllianceSign;
@@ -45,19 +44,20 @@
     };
 
     const modal = {
+        cover: document.querySelector('#ModalBackdrop'),
         open: targ => {
             document.body.style.paddingRight = modal.paddingWidth + 'px';
             document.body.classList.add('modal-open');
-            mb.style.display = 'block';
-            mb.classList.add('in');
+            modal.cover.style.display = 'block';
+            modal.cover.classList.add('in');
             targ.style.display = 'block';
             targ.classList.add('in');
         },
         close: targ => {
             document.body.style.paddingRight = '';
             document.body.classList.remove('modal-open');
-            mb.style.display = 'none';
-            mb.classList.remove('in');
+            modal.cover.style.display = 'none';
+            modal.cover.classList.remove('in');
             targ.style.display = 'none';
             targ.classList.remove('in');
         },
@@ -76,6 +76,62 @@
     }
     modal.paddingWidth = modal.getPaddingWidth();
 
+    const confirm = async () => {
+        const body = new FormData(f);
+        body.set('Password', btoa(unescape(encodeURIComponent(f.Password.value))));
+
+        const fetchOption = {
+            method: 'POST',
+            mode: 'same-origin',
+            headers: {'Accept': 'application/json'},
+            body
+        };
+
+        let obj = {};
+        try {
+            const resp = await fetch(f.action, fetchOption);
+            obj = await resp.json();
+            // obj = await resp.text();
+            // console.log(obj)
+        } catch (e) {
+            console.error(e.stack);
+            return;
+        }
+
+        //[TODO] PHP側に用意する
+        const messageTemplate = {
+            reach_join_limit: "あなたが同時に所属できる同盟の最大数を超えています",
+            wrong_password: "入力されたパスワードが間違っています",
+            no_password: "パスワードを入力してください",
+            not_enough_money: "同盟を結成するための経費が不足しています",
+            duplicate_name: "すでに使われている同盟名です",
+            duplicate_sign: "すでに使われている記章です",
+            illegal_name: "同盟名に、利用できない文字・単語が含まれています",
+            illegal_color: "色の指定が無効です"
+        };
+        let message = "";
+
+        Object.keys(obj).forEach(key => {
+            if(!obj[key].status)
+                if(obj[key].hasOwnProperty('messages')) {
+                    for(let msg of obj[key].messages) {
+                        message += `<li>${messageTemplate[msg] || msg}</li>`;
+                    }
+                } else {
+                    message += `<li>${messageTemplate[obj[key].message] || obj[key].message}</li>`;
+                }
+        });
+
+        if(message==='') {
+            m.querySelector('button[type="submit"]').disabled = !1;
+        }
+        message = message === '' ? '<p>以下の内容で登録しますか？</p>' : `<ul>${message}</ul>`;
+
+        m.querySelector('.modal-body').innerHTML = message + `<table class="table table-condensed"><tbody><tr><th>記章</th><td><span style="color:${color.value}">${sign.options[sign.value].textContent}</span></td></tr><tr><th>色</th><td><span style="color:${color.value}">◆</span> ${color.value}</td></tr><tr><th>名前</th><td>${name.value}</td></tr></tbody></table>`;
+        modal.open(m);
+    };
+
+
 
 
 
@@ -84,50 +140,12 @@
         if(verify()) update();
     });
 
+    m.querySelector('button[name="cancel"]').addEventListener('click', () => {modal.close(m)});
 
+    confirmBtn.addEventListener('click', confirm);
 
-    document.forms.ModalConfirm.cancel.addEventListener('click', () => {modal.close(m)});
-
-    confirmBtn.addEventListener('click', async ev => {
-        const body = new FormData(f);
-        body.set('Password', btoa(unescape(encodeURIComponent(f.Password.value))));
-
-        const fetchOption = {
-            method: 'POST',
-            mode: 'same-origin',
-            headers: {
-                'Accept': 'application/json'
-            },
-            body
-        };
-
-        let obj = {};
-
-        try {
-            const resp = await fetch(f.action, fetchOption);
-            obj = await resp.json();
-        } catch (e) {
-            console.error(e.stack);
-            return;
-        }
-
-        Object.keys(obj).forEach(key => {
-            if(!obj[key].status)
-            console.log(`${key} => ${obj[key].message || obj[key].messages}`)
-            modal.open(m);
-
-        });
-
-        m.querySelector('.modal-body').innerHTML = `<pre><code>${JSON.stringify(obj)}</code></pre>`;
-
+    f.addEventListener('submit', _ => {
+        f.Password.value = btoa(unescape(encodeURIComponent(f.Password.value)));
+        return true;
     });
-
-
-
-
-
-
-
-
-
 })();

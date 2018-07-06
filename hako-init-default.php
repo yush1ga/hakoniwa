@@ -217,9 +217,9 @@ class InitDefault
 
     // 名前に使ってはいけない語句
     public $denying_name_words = [
-        '無人', '沈没'
+        '無人', '沈没', 'サンプル'
     ];
-    public $regex_denying_name_words = '/[,?\"\\\'\`\s\(\)\<\>$]/';
+    public $regex_denying_name_words = "/[,?\"\'`\s\(\)<>$]/";
 
     // 以下は、表示関連で使用しているだけで、実際の機能を有していません、さらなる改造で実現可能です。
 

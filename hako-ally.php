@@ -703,6 +703,22 @@ class Main
 
                 break;
 
+            case 'establish':
+                $model = new Hakoniwa\Model\Alliance;
+                $progress_error = false;
+                if ($model->confirm($ally, $this->dataSet, true)) {
+                    $model->establish($ally, $this->dataSet);
+                } else {
+                    $progress_error = true;
+                }
+
+                $html->header();
+                $_ = $progress_error ? HakoError::probrem() : Success::standard();
+                $html->allyTop($ally, $this->dataSet);
+                $html->footer();
+
+                break;
+
             // 同盟の結成・変更
             case "newally":
                 $html->header();

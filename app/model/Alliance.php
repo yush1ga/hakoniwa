@@ -18,22 +18,14 @@ class Alliance
 
     /**
      * 同盟登録確認
-     * -[] 島名とパスワードの対応
-     * -[] 記章重複
-     * -[] 色バリデート
-     * -[] 名前バリデート
-     * -[x] 資金不足（設定時のみ）
-     * -[x] 多重登録（設定時のみ）
-     * -[] 管理者判定（設定時のみ）
      * @param  [type] $game [description]
      * @param  [type] $data [description]
+     * @param  bool   $dry_run  jsonを返さずboolだけ返す
      * @return [type]       [description]
      */
-    public function confirm($game, $data)
+    public function confirm($game, $data, $dry_run = false)
     {
         global $init;
-
-        $data['Password'] = base64_decode($data['Password'], true);
 
         $island_ID = (int)$data['Whoami'];
         $password = base64_decode($data['Password'] ?? '', true);
@@ -51,90 +43,32 @@ class Alliance
             'name' =>  ['status' => true, 'message' => ''],
             'sign' =>  ['status' => true, 'message' => ''],
             'color' => ['status' => true, 'message' => ''],
-            'other' => ['status' => true, 'messages' => []],
-            'temp' => ''
+            'other' => ['status' => true, 'messages' => []]
         ];
-
-        if ($init->allyJoinOne && count($island['allyId']) > 0) {
-            $checked['other']['status'] = false;
-            $checked['other']['messages'][] = 'reach_join_limit';
-        }
+        $is_valid = true;
 
         if ($admin_mode) {/* thru */
-        } else if (!Util::checkPassword($island['password'], $password)) {
+        } elseif ($password === '') {
+            $checked['pass']['status'] = false;
+            $checked['pass']['message'] = 'no_password';
+            $is_valid = false;
+        } elseif (!Util::checkPassword($island['password'], $password)) {
             // HakoError::wrongPassword();
-
             $checked['pass']['status'] = false;
             $checked['pass']['message'] = 'wrong_password';
+            $is_valid = false;
         }
 
-        if ($admin_mode) {/* thru */
-        } else if ($island['money'] < $init->costMakeAlly) {
-            $checked['other']['status'] = false;
-            $checked['other']['messages'][] = 'not_enough_money';
+        if ($this->is_duplicate_name($game, $candidate['name'])) {
+            $checked['name']['status'] = false;
+            $checked['name']['message'] = 'duplicate_name';
+            $is_valid = false;
         }
 
-        header('Content-Type:application/json;charset=utf-8');
-        echo json_encode($checked);
-    }
-
-
-
-    /**
-     * 結成
-     * @param  [type] $hako [description]
-     * @param  [type] $data [description]
-     * @return [type]       [description]
-     */
-    public function register($hako, $data, $dry_run = false)
-    {
-        global $init;
-
-        // $current_ID = $data['ISLANDID'];
-        $user_ID = $data['Whoami'];
-        $password = $data['Password'];
-        $candidate = [
-            'name'  => htmlspecialchars($data['AllianceName']),
-            'sign'  => $data['AllianceSign'],
-            'color' => $data['AllianceColor']
-        ];
-        // $allyName = ;
-        // $allyMark = ;
-        // $allyColor = ;
-        $admin_mode = false;
-
-        // パスワードチェック
-        if (Util::checkPassword("", $password)) {
-            $admin_mode = true;
-
-            if ($allyID > MAX_ALLIANCE_ID) {
-                $max = $allyID;
-                if ($hako->allyNumber) {
-                    for ($i = 0; $i < count($hako->ally); $i++) {
-                        if ($max <= $hako->ally[$i]['id']) {
-                            $max = $hako->ally[$i]['id'] + 1;
-                        }
-                    }
-                }
-                $current_ID = $max;
-            } else {
-                $current_ID = $hako->ally[$current_alliance_number]['id'];
-            }
-        }
-
-        $island = $hako->islands[$user_ID];
-        if (!$admin_mode
-            && !Util::checkPassword($island['password'], $data['Password'])) {
-            HakoError::wrongPassword();
-
-            return;
-        }
-
-
-        if (!$init->allyUse && !$admin_mode) {
-            HakoError::newAllyForbbiden();
-
-            return;
+        if ($this->is_duplicate_sign($game, $init->allyMark[$candidate['sign']])) {
+            $checked['sign']['status'] = false;
+            $checked['sign']['message'] = 'duplicate_sign';
+            $is_valid = false;
         }
 
         function is_match_in_array($string, $array)
@@ -147,131 +81,94 @@ class Alliance
 
             return false;
         }
-
-        // 同盟名が正当かチェック
         if ($candidate['name'] === ''
             || preg_match($init->regex_denying_name_words, $candidate['name'])
             || is_match_in_array($candidate['name'], $init->denying_name_words)) {
-            HakoError::newIslandBadName();
-
-            return;
+            $checked['name']['status'] = false;
+            $checked['name']['message'] = 'illegal_name';
+            $is_valid = false;
         }
 
-        $this->check_duplicate();
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $candidate['color'])) {
+            $checked['color']['status'] = false;
+            $checked['color']['message'] = 'illegal_color';
+            $is_valid = false;
+        }
 
-        // 結成資金不足判定
+        if ($init->allyJoinOne && count($island['allyId']) > 0) {
+            $checked['other']['status'] = false;
+            $checked['other']['messages'][] = 'reach_join_limit';
+            $is_valid = false;
+        }
+
+
         if ($admin_mode) {/* thru */
         } elseif ($island['money'] < $init->costMakeAlly) {
-            HakoError::noMoney();
-
-            return;
+            $checked['other']['status'] = false;
+            $checked['other']['messages'][] = 'not_enough_money';
+            $is_valid = false;
         }
 
-        $n = $hako->idToAllyNumber[$current_ID] ?? '';
-        if ($n !== '') {
-            if ($admin_mode && ($allyID != '') && ($allyID < 200)) {
-                $alliance_member = $hako->ally[$n]['memberId'];
-                $aIsland = $hako->islands[$hako->idToNumber[$allyID]];
-                $flag = 0;
-                foreach ($alliance_member as $id) {
-                    if ($id == $allyID) {
-                        $flag = 1;
-
-                        break;
-                    }
-                }
-                if (!$flag) {
-                    if ($aIsland['allyId'][0] == '') {
-                        $flag = 2;
-                    }
-                }
-                if (!$flag) {
-                    echo "変更できません。\n";
-
-                    return;
-                }
-                $hako->ally[$n]['id']    = $allyID;
-                $hako->ally[$n]['oName'] = $aIsland['name'];
-                if ($flag == 2) {
-                    $hako->ally[$n]['password'] = $aIsland['password'];
-                    $hako->ally[$n]['score']    = $aIsland['pop'];
-                    $hako->ally[$n]['number'] ++;
-                    array_push($hako->ally[$n]['memberId'], $aIsland['id']);
-                    array_push($aIsland['allyId'], $aIsland['id']);
-                }
-            } else {
-                // すでに結成ずみなら変更
-            }
+        if (!$dry_run) {
+            header('Content-Type:application/json;charset=utf-8');
+            echo json_encode($checked);
         } else {
-            // 他の島の同盟に入っている場合は、結成できない
-            $flag = 0;
-            for ($i = 0; $i < $hako->allyNumber; $i++) {
-                $alliance_member = $hako->ally[$i]['memberId'];
-                foreach ($alliance_member as $id) {
-                    if ($id == $current_ID) {
-                        $flag = 1;
-
-                        break;
-                    }
-                }
-                if ($flag) {
-                    break;
-                }
-            }
-            if ($flag) {
-                HakoError::otherAlready();
-
-                return;
-            }
-            if (($init->allyUse == 2) && !$admin_mode && !AllyUtil::checkPassword("", $data['PASSWORD'])) {
-                HakoError::newAllyForbbiden();
-
-                return;
-            }
-            // 新規
-            $n = $hako->allyNumber;
-            $hako->ally[$n]['id'] = $current_ID;
-            $memberId = [];
-            if ($allyID < 200) {
-                $hako->ally[$n]['oName']    = $island['name'].$init->nameSuffix;
-                $hako->ally[$n]['password'] = $island['password'];
-                $hako->ally[$n]['number']   = 1;
-                $memberId[0]                = $current_ID;
-                $hako->ally[$n]['score']    = $island['pop'];
-            } else {
-                $hako->ally[$n]['oName']    = '';
-                $hako->ally[$n]['password'] = AllyUtil::encode($data['PASSWORD']);
-                $hako->ally[$n]['number']   = 0;
-                $hako->ally[$n]['score']    = 0;
-            }
-            $hako->ally[$n]['occupation']   = 0;
-            $hako->ally[$n]['memberId']     = $memberId;
-            $island['allyId']               = $memberId;
-            $ext = [0];
-            $hako->ally[$n]['ext']          = $ext;
-            $hako->idToAllyNumber[$current_ID] = $n;
-            $hako->allyNumber++;
+            return $is_valid;
         }
+    }
+
+
+
+    /**
+     * 結成
+     * @param  [type] $game [description]
+     * @param  [type] $data [description]
+     * @return [type]       [description]
+     */
+    public function establish($game, $data)
+    {
+        global $init;
+
+        $island_ID = (int)$data['Whoami'];
+        $password = base64_decode($data['Password'] ?? '', true);
+        $island = $game->islands[(int)$game->idToNumber[$island_ID]];
+        $alliance = [
+            'name'  => htmlspecialchars($data['AllianceName']),
+            'sign'  => (int)$data['AllianceSign'],
+            'sign_str'  => $init->allyMark[(int)$data['AllianceSign']],
+            'color' => $data['AllianceColor']
+        ];
+        $admin_mode = Util::checkPassword("", $password);
+
+        $alliances_int = $game->allyNumber;
+        $game->ally[$alliances_int]['id'] = $island_ID;
+        $members_ID = [];
+
+        $game->ally[$alliances_int]['oName'] = $island['name'].$init->nameSuffix;
+        $game->ally[$alliances_int]['password'] = $island['password'];
+        $game->ally[$alliances_int]['number'] = 1;
+        $members_ID[0] = $island_ID;
+        $game->ally[$alliances_int]['score'] = $island['pop'];
+
+        $game->ally[$alliances_int]['occupation']   = 0;
+        $game->ally[$alliances_int]['memberId']     = $members_ID;
+        $island['allyId']               = $alliances_int;
+        $game->ally[$alliances_int]['ext'] = [0];
+        $game->idToAllyNumber[$alliances_int] = $alliances_int;
+        $game->allyNumber++;
 
         // 同盟の各種の値を設定
-        $hako->ally[$n]['name']  = $allyName;
-        $hako->ally[$n]['mark']  = $allyMark;
-        $hako->ally[$n]['color'] = $allyColor;
+        $game->ally[$alliances_int]['name']  = $alliance['name'];
+        $game->ally[$alliances_int]['mark']  = $alliance['sign'];
+        $game->ally[$alliances_int]['color'] = $alliance['color'];
 
-        // 費用をいただく
         $island['money'] -= !$admin_mode ? $init->costMakeAlly : 0;
 
-        // データ格納先へ
-        $hako->islands[$current_number] = $island;
-
         // データ書き出し
-        Util::calculates_share($hako);
-        Util::allySort($hako);
-        $hako->writeAllyFile();
-
-        // トップへ
-        $html = new HtmlAlly();
-        $html->allyTop($hako, $data);
+        $game->islands[$island_ID] = $island;
+        Util::calculates_share($game);
+        Util::allySort($game);
+        $game->writeAllyFile();
     }
 
     /**
@@ -716,6 +613,15 @@ class Alliance
 
             return;
         }
+    }
+
+    private function is_duplicate_sign($game, $sign)
+    {
+        return Util::aMarkToId($game, $sign) !== -1;
+    }
+    private function is_duplicate_name($game, $name)
+    {
+        return Util::aNameToId($game, $name) !== -1;
     }
 
     /**

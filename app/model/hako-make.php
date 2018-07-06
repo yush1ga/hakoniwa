@@ -74,8 +74,8 @@ class Make
 
         // 各種の値を設定
         $DAY = 86400; // the seconds of a day.
-        $island['name'] = h($data['ISLANDNAME']);
-        $island['owner'] = h($data['OWNERNAME']);
+        $island['name'] = Util::htmlEscape($data['ISLANDNAME']);
+        $island['owner'] = Util::htmlEscape($data['OWNERNAME']);
         $island['id'] = $hako->islandNextID;
         $hako->islandNextID++;
         $island['starturn'] = $hako->islandTurn;
@@ -83,7 +83,7 @@ class Make
         $island['absent'] = $init->giveupTurn - (max($DAY / $init->unitTime, $init->unitTime / $DAY));
         $island['comment'] = '（未登録）';
         $island['comment_turn'] = $hako->islandTurn;
-        $island['password'] = Util::encode($data['PASSWORD']);
+        $island['password'] = Util::encode($data['PASSWORD'], false);
         $island['tenki'] = 1;
         $island['team'] = $island['shiai'] = $island['kachi'] = $island['make'] = $island['hikiwake'] = $island['kougeki'] = $island['bougyo'] = $island['tokuten'] = $island['shitten'] = 0;
 
