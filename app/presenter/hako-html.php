@@ -2412,7 +2412,6 @@ class HtmlAlly extends HTML
             $alliance['members'] = (int)$alliance['number'];
             $alliance['owner']   = $alliance['oName'];
             $alliance['population'] = 0;
-            $alliance['name'] = '<a href="'.$this->this_file.'?AmiOfAlly='.$alliance['id'].'" class="">'. $alliance['name'] .'</a>';
 
             for ($ii = 0; $ii < $alliance['members']; $ii++) {
                 $member_id = $alliance['memberId'][$ii];
@@ -2452,20 +2451,20 @@ class HtmlAlly extends HTML
             $island['area'] = $isl['area'];
             $island['money'] = Util::aboutMoney($isl['money']);
             $island['food'] = $isl['food'];
-            $island['farm'] = (int)$isl['farm'] === 0 ? $init->notHave : $isl['farm'] . $unit;
-            $island['factory'] = (int)$isl['factory'] === 0 ? $init->notHave : $isl['factory'] . $unit;
-            $island['commerce'] = (int)$isl['commerce'] === 0 ? $init->notHave : $isl['commerce'] . $unit;
-            $island['mountain'] = (int)$isl['mountain'] === 0 ? $init->notHave : $mountain . $unit;
+            $island['farm'] = (int)$isl['farm'] === 0 ? $init->notHave : ($isl['farm'].$unit);
+            $island['factory'] = (int)$isl['factory'] === 0 ? $init->notHave : ($isl['factory'].$unit);
+            $island['commerce'] = (int)$isl['commerce'] === 0 ? $init->notHave : ($isl['commerce'].$unit);
+            $island['mountain'] = (int)$isl['mountain'] === 0 ? $init->notHave : ($mountain.$unit);
             $island['hatuden'] = (int)$isl['hatuden'] * 1000 . 'kW';
             $island['rank'] = $number + 1;
             $island['name'] = Util::islandName($isl, $hako->ally, $hako->idToAllyNumber);
             $island['absent'] = $isl['absent'];
             $island['id'] = $isl['id'];
 
-            if ($island['absent']  == 0) {
-                $name = "{$init->tagName_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}{$init->_tagName}</a>";
+            if ((int)$island['absent'] === 0) {
+                $island['name'] = "<span class=\"islName\"><a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$island['name']}</a></span>";
             } else {
-                $name = "{$init->tagName2_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}</a>({$island['absent']}){$init->_tagName2}";
+                $island['name'] = "<span class=\"islName2\"><a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$island['name']}</a>({$island['absent']})</span>";
             }
 
             $islands[] = $island;

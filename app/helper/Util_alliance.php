@@ -41,19 +41,19 @@ class Util_alliance extends \Util
          * 人口を比較、同盟一覧用
          * @return integer  $xのほうが大きければ-1、$yのほうが大きければ1
          */
-        function comparator($x, $y)
+        function comp($x, $y)
         {
-            if ($x['dead'] ?? 0 == 1) {
+            if (($x['dead'] ?? 0) == 1) {
                 return +1;
             }
-            if ($y['dead'] ?? 0 == 1) {
+            if (($y['dead'] ?? 0) == 1) {
                 return -1;
             }
             // mean ($x['score'] > $y['score']) ? -1 : 1;
             return $y['score'] <=> $x['score'];
         }
 
-        usort($hako->ally, 'comparator');
+        usort($hako->ally, 'comp');
     }
 
     //---------------------------------------------------
@@ -81,7 +81,7 @@ class Util_alliance extends \Util
     {
         // 全島から探す
         for ($i = 0; $i < $hako->allyNumber; $i++) {
-            if ($hako->ally[$i]['mark'] == $mark) {
+            if ($hako->ally[$i]['mark'] === $mark) {
                 return $hako->ally[$i]['id'];
             }
         }

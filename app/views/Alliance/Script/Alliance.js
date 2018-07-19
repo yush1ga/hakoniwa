@@ -144,7 +144,7 @@
 
     confirmBtn.addEventListener('click', confirm);
 
-    f.addEventListener('submit', _ => {
+    f.addEventListener('submit', () => {
         f.Password.value = btoa(unescape(encodeURIComponent(f.Password.value)));
         return true;
     });

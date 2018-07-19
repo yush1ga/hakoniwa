@@ -132,39 +132,53 @@ class Alliance
         $island_ID = (int)$data['Whoami'];
         $password = base64_decode($data['Password'] ?? '', true);
         $island = $game->islands[(int)$game->idToNumber[$island_ID]];
-        $alliance = [
-            'name'  => htmlspecialchars($data['AllianceName']),
-            'sign'  => (int)$data['AllianceSign'],
+        $new_alliance = [
+            'name'      => htmlspecialchars($data['AllianceName']),
+            'sign'      => (int)$data['AllianceSign'],
             'sign_str'  => $init->allyMark[(int)$data['AllianceSign']],
-            'color' => $data['AllianceColor']
+            'color'     => $data['AllianceColor']
         ];
+
+        $alliance = [
+            'id'         => -1,
+            'oName'      => '',
+            'password'   => '',
+            'number'     => 1,
+            'score'      => -1,
+            'occupation' => 0,
+            'memberId'   => [],
+            'ext'        => [0],
+            'name'       => '',
+            'mark'       => '',
+            'color'      => ''
+        ];
+
         $admin_mode = Util::checkPassword("", $password);
 
-        $alliances_int = $game->allyNumber;
-        $game->ally[$alliances_int]['id'] = $island_ID;
-        $members_ID = [];
+        $alliance_int = $game->allyNumber;
 
-        $game->ally[$alliances_int]['oName'] = $island['name'].$init->nameSuffix;
-        $game->ally[$alliances_int]['password'] = $island['password'];
-        $game->ally[$alliances_int]['number'] = 1;
-        $members_ID[0] = $island_ID;
-        $game->ally[$alliances_int]['score'] = $island['pop'];
 
-        $game->ally[$alliances_int]['occupation']   = 0;
-        $game->ally[$alliances_int]['memberId']     = $members_ID;
-        $island['allyId']               = $alliances_int;
-        $game->ally[$alliances_int]['ext'] = [0];
-        $game->idToAllyNumber[$alliances_int] = $alliances_int;
+        $alliance['id']    = $island_ID;
+        $alliance['oName'] = $island['name'].$init->nameSuffix;
+        $alliance['password'] = $island['password'];
+        $alliance['memberId'][] = $island_ID;
+        $alliance['score'] = $island['pop'];
+
+        $alliance['memberId'] = $members_ID;
+        $island['allyId']     = $alliance_int;
+
+        $game->idToAllyNumber[$alliance_int] = $alliance_int;
         $game->allyNumber++;
 
         // 同盟の各種の値を設定
-        $game->ally[$alliances_int]['name']  = $alliance['name'];
-        $game->ally[$alliances_int]['mark']  = $alliance['sign'];
-        $game->ally[$alliances_int]['color'] = $alliance['color'];
+        $alliance['name']  = $new_alliance['name'];
+        $alliance['mark']  = $new_alliance['sign_str'];
+        $alliance['color'] = $new_alliance['color'];
 
         $island['money'] -= !$admin_mode ? $init->costMakeAlly : 0;
 
         // データ書き出し
+        $game->ally[$alliance_int] = $alliance;
         $game->islands[$island_ID] = $island;
         Util::calculates_share($game);
         Util::allySort($game);

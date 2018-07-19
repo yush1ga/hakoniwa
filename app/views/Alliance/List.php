@@ -24,13 +24,19 @@
 <?php foreach ($alliances as $i => $alliance): ?>
         <tr>
             <th class="NumberCell number" rowspan=2><?=$i+1?></th>
-            <td class="NameCell lead" rowspan=2 style="vertical-align:middle"><a href="<?=$this->this_file?>?detail=<?=$alliance['id']?>" class="islName"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?></a></td>
+            <td class="NameCell lead" rowspan=2 style="vertical-align:middle">
+<?php if (is_int(filter_input(INPUT_GET, 'detail', FILTER_VALIDATE_INT, ['min_range' => 0]))):?>
+                <span class="islName"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?></span>
+<?php else:?>
+                <a href="<?=$this->this_file?>?detail=<?=$alliance['id']?>" class="islName"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?></a>
+<?php endif;?>
+            </td>
             <td class="InfoCell"><?=$alliance['members'] . $init->nameSuffix?></td>
             <td class="InfoCell"><?=$alliance['population'] . $init->unitPop?></td>
             <td class="InfoCell"><?=$alliance['occupation']?>%</td>
         </tr>
         <tr>
-            <td class="CommentCell" colspan=3><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment']?></td>
+            <td class="CommentCell" colspan=3><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment'] ?? ''?></td>
         </tr>
 <?php endforeach; ?>
     </tbody>

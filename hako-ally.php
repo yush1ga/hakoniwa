@@ -818,6 +818,10 @@ class Main
             $this->mode = "AmiOfAlly";
             $this->dataSet['ALLYID'] = $_GET['AmiOfAlly'];
         }
+        if (!empty($_GET['detail'])) {
+            $this->mode = "detail";
+            $this->dataSet['ALLYID'] = $_GET['detail'];
+        }
         if (!empty($_GET['Allypact'])) {
             $this->mode = "Allypact";
             $this->dataSet['ALLYID'] = $_GET['Allypact'];
