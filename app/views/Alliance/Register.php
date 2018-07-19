@@ -1,9 +1,9 @@
 <?php
 $estb = $init->costMakeAlly
-    ? '<span class="cash">' . $init->costMakeAlly . $init->unitMoney . '</span>必要です。'
+    ? '<span class="cash">'.$init->costMakeAlly.$init->unitMoney.'</span>必要です。'
     : '必要ありません。';
 $keep = $init->costKeepAlly
-    ? '<span class="cash">' . $init->costKeepAlly . $init->unitMoney . '</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
+    ? '<span class="cash">'.$init->costKeepAlly.$init->unitMoney.'</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
     : '必要ありません。';
 ?>
 <style>
@@ -45,8 +45,8 @@ $keep = $init->costKeepAlly
         <div class="col-sm-10">
             <div class="form-inline">
                 <select name="AllianceSign" class="form-control" aria-describedby="AllianceSignHelp">
-                <?php foreach ($init->allyMark as $key => $value): ?>
-                    <option value="<?= $key ?>"><?= $value ?></option>
+                <?php foreach ($init->allyMark as $value): ?>
+                    <option><?=$value?></option>
                 <?php endforeach ?>
                 </select>
             </div>

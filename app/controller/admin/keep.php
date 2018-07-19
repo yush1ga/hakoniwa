@@ -1,4 +1,5 @@
 <?php
+
 namespace Hakoniwa\Admin;
 
 require_once MODELPATH.'/admin.php';

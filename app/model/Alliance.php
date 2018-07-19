@@ -157,30 +157,26 @@ class Alliance
 
         $alliance_int = $game->allyNumber;
 
-
+        $alliance['oName']       = $island['name'].$init->nameSuffix;
+        $alliance['password']    = $island['password'];
+        $alliance['memberId'][0] = $island_ID;
+        $alliance['score']       = $island['pop'];
         $alliance['id']    = $island_ID;
-        $alliance['oName'] = $island['name'].$init->nameSuffix;
-        $alliance['password'] = $island['password'];
-        $alliance['memberId'][] = $island_ID;
-        $alliance['score'] = $island['pop'];
-
-        $alliance['memberId'] = $members_ID;
-        $island['allyId']     = $alliance_int;
-
-        $game->idToAllyNumber[$alliance_int] = $alliance_int;
-        $game->allyNumber++;
-
-        // 同盟の各種の値を設定
         $alliance['name']  = $new_alliance['name'];
         $alliance['mark']  = $new_alliance['sign_str'];
         $alliance['color'] = $new_alliance['color'];
 
-        $island['money'] -= !$admin_mode ? $init->costMakeAlly : 0;
+        $island['allyId']  = $alliance_int;
+        $island['money']  -= !$admin_mode ? $init->costMakeAlly : 0;
+
+        $game->idToAllyNumber[$alliance_int] = $alliance_int;
+        $game->allyNumber++;
+
 
         // データ書き出し
         $game->ally[$alliance_int] = $alliance;
         $game->islands[$island_ID] = $island;
-        Util::calculates_share($game);
+        $this->calculates_share($game);
         Util::allySort($game);
         $game->writeAllyFile();
     }
@@ -584,13 +580,15 @@ class Alliance
 
         if ($calc1 || $calc2 || $calc3) {
             // データ書き出し
-            Util::calculates_share($hako);
-            AllyUtil::allySort($hako);
-            $hako->writeAllyFile();
+            try {
+                $this->calculates_share($hako);
+                Util::allySort($hako);
+                $hako->writeAllyFile();
+            } catch (Exception $e) {
+                dump($e);
 
-            // メッセージ出力
-            // [TODO]: Viewに移す
-            Success::allyDataUp();
+                return false;
+            }
 
             return true;
         }
@@ -640,32 +638,29 @@ class Alliance
 
     /**
      * 同盟主として登録のある島が存在しないとき、当該の同盟を削除する
-     * @param       &$hako ゲーム総合データ
+     * @param       &$game ゲーム総合データ
      * @return bool        削除処理が走った場合true
      */
-    private function delete_alliance_nobody_managed(&$hako)
+    private function delete_alliance_nobody_managed(&$game)
     {
         $count = 0;
 
-        for ($i=0; $i<$hako->allyNumber; $i++) {
-            $id = $hako->ally[$i]['id'];
+        for ($i=0; $i<$game->allyNumber; $i++) {
+            $owner_id = $game->ally[$i]['id'];
 
-            if ($hako->idToNumber[$id] < 0) {
-                // 配列から削除
-                $hako->ally[$i]['dead'] = 1;
-                $hako->idToAllyNumber[$id] = '';
+            if (($game->idToNumber[$owner_id] ?? -1) < 0) {
+                unset($game->ally[$i]);
+                unset($game->idToAllyNumber[$owner_id]);
+                $game->ally[$i]['dead'] = 1;
                 $count++;
             }
         }
 
         if ($count) {
-            $hako->allyNumber -= $count;
-            if ($hako->allyNumber < 0) {
-                $hako->allyNumber = 0;
+            $game->allyNumber -= $count;
+            if ($game->allyNumber < 0) {
+                $game->allyNumber = 0;
             }
-
-            // データ格納先へ
-            $hako->islands[$current_number] = $island;
 
             return true;
         }
@@ -729,5 +724,29 @@ class Alliance
         }
 
         return $flg;
+    }
+
+    /**
+     * 同盟の占有率の計算
+     */
+    private function calculates_share(&$game)
+    {
+        $total_score = 0;
+
+        if ($game->allyNumber === 1) {
+            $game->ally[0]['occupation'] = 100;
+
+            return;
+        }
+
+        for ($i = 0; $i < $game->allyNumber; $i++) {
+            $total_score += (int)$game->ally[$i]['score'];
+        }
+
+        $total_score = $total_score !== 0 ?: 1;
+
+        for ($i = 0; $i < $game->allyNumber; $i++) {
+            $game->ally[$i]['occupation'] = intdiv((int)$game->ally[$i]['score'], $total_score * 100);
+        }
     }
 }

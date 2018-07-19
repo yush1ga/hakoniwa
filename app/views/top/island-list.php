@@ -1,4 +1,4 @@
-<div class="IslandView">
+<section class="IslandView">
 	<h2>諸島の状況</h2>
 	<p>島の名前を選択すると、<strong>観光</strong>することができます。</p>
 <?php
@@ -32,5 +32,5 @@
     $islandListStart--;
     $this->islandTable($hako, $islandListStart, $islandListSentinel);
 ?>
-</div>
+</section>
 <hr>

@@ -13,11 +13,42 @@ unset($title);
 ?>
 <div id="campInfo">
 
-<?php
-if ($alliance['number']) {
-    $this->allyInfo($hako, $num);
-}
-if ($alliance['message'] !== ''): ?>
+<p>占有率とは、同盟に加盟している<?=$init->nameSuffix?>の<strong>総人口</strong>をもとに算出された指標です。</p>
+
+<div id="IslandView" class="table-responsive">
+<table class="table table-bordered">
+    <colgroup>
+        <col style="width:4em">
+        <col style="width:auto">
+    </colgroup>
+    <colgroup span=3 style="width:10%"></colgroup>
+    <thead>
+    <tr>
+        <th class="TitleCell head"><?=$init->nameRank?></th>
+        <th class="TitleCell head">同盟</th>
+        <th class="TitleCell head">所属する<?=$init->nameSuffix?>の数</th>
+        <th class="TitleCell head">総人口</th>
+        <th class="TitleCell head">占有率</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th class="NumberCell number" rowspan=2><?=$i+1?></th>
+            <td class="NameCell lead" rowspan=2 style="vertical-align:middle">
+                <span class="islName"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?></span>
+            </td>
+            <td class="InfoCell"><?=$alliance['members'].$init->nameSuffix?></td>
+            <td class="InfoCell"><?=$alliance['population'].$init->unitPop?></td>
+            <td class="InfoCell"><?=$alliance['occupation']?>%</td>
+        </tr>
+        <tr>
+            <td class="CommentCell" colspan=3><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment'] ?? ''?></td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<?php if ($alliance['message'] !== ''): ?>
 <hr>
 <div class="row">
     <div class="col-sm-offset-2 col-sm-8">
@@ -27,8 +58,8 @@ if ($alliance['message'] !== ''): ?>
         </table>
     </div>
 </div>
-<?php endif;?>
 
+<?php endif;?>
 <hr>
 <h2>所属する<?=$init->nameSuffix?>の情報</h2>
 

@@ -280,30 +280,30 @@ class File
     {
         global $init;
 
-        $fileName = "{$init->dirName}/{$init->allyData}";
+        $fileName = $init->dirName.'/'.$init->allyData;
         if (!is_file($fileName)) {
             return false;
         }
         $fp = fopen($fileName, "r");
-        $this->allyNumber = chop(fgets($fp, READ_LINE));
-        if ($this->allyNumber == '') {
-            $this->allyNumber = 0;
-        }
+        $this->allyNumber = (int)rtrim(fgets($fp, READ_LINE));
+
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $this->ally[$i] = $this->readAlly($fp);
             $this->idToAllyNumber[$this->ally[$i]['id']] = $i;
         }
+
         // 加盟している同盟のIDを格納
         for ($i = 0; $i < $this->allyNumber; $i++) {
-            $member = $this->ally[$i]['memberId'];
-            foreach ($member as $id) {
-                $n = $this->idToNumber[$id];
-                if (!($n > -1)) {
+            $members = $this->ally[$i]['memberId'];
+            foreach ($members as $member) {
+                $ii = $this->idToNumber[$member];
+                if ($ii <= -1) {
                     continue;
                 }
-                array_push($this->islands[$n]['allyId'], $this->ally[$i]['id']);
+                array_push($this->islands[$ii]['allyId'], $this->ally[$i]['id']);
             }
         }
+
         fclose($fp);
 
         return true;

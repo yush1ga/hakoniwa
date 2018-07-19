@@ -10,6 +10,8 @@
 <table class="table table-bordered">
     <colgroup>
         <col style="width:4em">
+        <col style="width:auto">
+        <colgroup span=3 style="width:12%"></colgroup>
     </colgroup>
     <thead>
     <tr>
@@ -24,7 +26,7 @@
 <?php foreach ($alliances as $i => $alliance): ?>
         <tr>
             <th class="NumberCell number" rowspan=2><?=$i+1?></th>
-            <td class="NameCell lead" rowspan=2 style="vertical-align:middle">
+            <td class="NameCell lead" style="vertical-align:middle">
 <?php if (is_int(filter_input(INPUT_GET, 'detail', FILTER_VALIDATE_INT, ['min_range' => 0]))):?>
                 <span class="islName"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?></span>
 <?php else:?>
@@ -36,7 +38,7 @@
             <td class="InfoCell"><?=$alliance['occupation']?>%</td>
         </tr>
         <tr>
-            <td class="CommentCell" colspan=3><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment'] ?? ''?></td>
+            <td class="CommentCell" colspan=4><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment'] ?? ''?></td>
         </tr>
 <?php endforeach; ?>
     </tbody>

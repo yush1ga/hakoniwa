@@ -9,33 +9,13 @@ require_once 'util.php';
  */
 class Util_alliance extends \Util
 {
+
     /**
-     * 同盟の占有率の計算
+     * 人口順にソート（同盟バージョン）
+     * @param       &$game
+     * @return void
      */
-    public static function calculates_share(&$hako)
-    {
-        $total_score = 0;
-
-        for ($i = 0; $i < $hako->allyNumber; $i++) {
-            $total_score += $hako->ally[$i]['score'];
-        }
-
-        for ($i = 0; $i < $hako->allyNumber; $i++) {
-            if ($total_score != 0) {
-                $hako->ally[$i]['occupation'] = intdiv($hako->ally[$i]['score'], $total_score * 100);
-            } else {
-                $hako->ally[$i]['occupation'] = intdiv(100, $hako->allyNumber);
-            }
-        }
-
-        return;
-    }
-
-    //---------------------------------------------------
-    // 人口順にソート(同盟バージョン)
-    //---------------------------------------------------
-
-    public static function allySort(&$hako)
+    public static function allySort(&$game)
     {
         /**
          * 人口を比較、同盟一覧用
@@ -53,12 +33,17 @@ class Util_alliance extends \Util
             return $y['score'] <=> $x['score'];
         }
 
-        usort($hako->ally, 'comp');
+        if (count($game->ally) > 1) {
+            usort($game->ally, 'comp');
+        }
     }
 
-    //---------------------------------------------------
-    // 同盟の名前からIDを得る
-    //---------------------------------------------------
+    /**
+     * 同盟の名前からIDを得る
+     * @param  [type] $hako [description]
+     * @param  [type] $name [description]
+     * @return [type]       [description]
+     */
     public static function aNameToId($hako, $name)
     {
         // 全島から探す

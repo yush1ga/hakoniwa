@@ -17,7 +17,7 @@
                 iam = option.textContent;
         }
 
-        t.innerHTML = `<span style="color:${color.value}">${sign.options[sign.value].textContent}</span>${name.value || 'サンプル'}<br><span style="color:${color.value}">${sign.options[sign.value].textContent}</span> ${iam}`;
+        t.innerHTML = `<span style="color:${color.value}">${sign.value}</span>${name.value || 'サンプル'}<br><span style="color:${color.value}">${sign.value}</span> ${iam}`;
     };
 
     const verify = () => {
@@ -127,7 +127,7 @@
         }
         message = message === '' ? '<p>以下の内容で登録しますか？</p>' : `<ul>${message}</ul>`;
 
-        m.querySelector('.modal-body').innerHTML = message + `<table class="table table-condensed"><tbody><tr><th>記章</th><td><span style="color:${color.value}">${sign.options[sign.value].textContent}</span></td></tr><tr><th>色</th><td><span style="color:${color.value}">◆</span> ${color.value}</td></tr><tr><th>名前</th><td>${name.value}</td></tr></tbody></table>`;
+        m.querySelector('.modal-body').innerHTML = message + `<table class="table table-condensed"><tbody><tr><th>記章</th><td><span style="color:${color.value}">${sign.value}</span></td></tr><tr><th>色</th><td><span style="color:${color.value}">◆</span> ${color.value}</td></tr><tr><th>名前</th><td>${name.value}</td></tr></tbody></table>`;
         modal.open(m);
     };
 

@@ -1,0 +1,127 @@
+<?php
+    function remainTime($nextTime)
+    {
+        $remainSec = $nextTime - $_SERVER['REQUEST_TIME'];
+        $echoVal = '<small>（次のターンまで、残りおよそ';
+
+        $echoVal .= ($remainSec/86400 >= 1)? (floor($remainSec/86400).'日と'): '';
+        $remainSec %= 86400;
+        $echoVal .= ($remainSec/3600 >= 1)? (floor($remainSec/3600).'時間'): '';
+        $remainSec %= 3600;
+        $echoVal .= ceil($remainSec/60).'分）</small>';
+
+        if ($remainSec <= 0) {
+            $echoVal = '<div><button type="button" class="btn btn-danger btn-lg btn-block" onClick="location.reload()" style="white-space:normal;"><strong>ページを更新してください<br>ページが最新状態まで更新されない限り、全ての操作を行うことができません。</strong></button></div>';
+        }
+        /* "（次のターンまで、残りおよそx日とy時間z分）" or "ページを更新してください" */
+        return $echoVal;
+    }
+
+
+
+?>
+<?=$this->pageTitle($init->title, 'トップ')?>
+
+<h2 class="Turn">ターン<?=$hako->islandTurn?></h2>
+
+<?php if (($init->turnPrizeUnit - ($hako->islandTurn % $init->turnPrizeUnit)) < max(3, $init->turnPrizeUnit / 20)): ?>
+<div class="alert alert-info" role="alert">
+    <h2 class="text-primary">めざせ<?= ceil($hako->islandTurn / $init->turnPrizeUnit) * $init->turnPrizeUnit ?>ターン賞！</h2>
+</div>
+<?php endif ?>
+
+<?php if (DEBUG): ?>
+<div class="m-b-2">
+    <form action="<?=$this_file?>" method="post">
+        <input type="hidden" name="mode" value="debugTurn">
+        <button type="submit" class="btn btn-danger">ターンを進める</button>
+    </form>
+</div>
+<?php endif; ?>
+
+<div class="lastModified">
+    <p>最終更新時間： <?=date("Y年n月j日G時", $hako->islandLastTime)?><br>
+        <?=remainTime($hako->islandLastTime + $init->unitTime)?></p>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-sm-4">
+<?php if ($hako->islandList !== '' && count($hako->islandList) > 0):?>
+        <h2>自分の島へ</h2>
+
+        <form action="<?=$this_file?>" method="post">
+            <div class="form-group">
+                <label>あなたの島の名前は？</label>
+                <select name="ISLANDID" class="form-control">
+                    <?=strip_tags($hako->islandList, '<option>')?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>パスワード</label>
+                <input type="password" name="PASSWORD" class="form-control" value="<?=$defaultPassword?>" size="32" required>
+            </div>
+
+            <div class="form-group">
+                <label class="radio-inline">
+                    <input type="radio" name="DEVELOPEMODE" value="cgi" id="cgi" <?=$radio?>>
+                    通常モード
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="DEVELOPEMODE" value="javascript" id="javascript" <?=$radio2?>>
+                    JavaScript高機能モード
+                </label>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">開発しに行く</button>
+                <input type="hidden" name="mode" value="owner">
+            </div>
+        </form>
+<?php else:?>
+        <p>現在、この近辺に<?=$init->nameSuffix?>は見つかっていません</p>
+        <p><a href="<?=$this_file?>?mode=conf" class="btn btn-primary">→新しい<?=$init->nameSuffix?>を探しにいく</a></p>
+<?php endif;?>
+    </div>
+
+    <div class="col-sm-offset-1 col-sm-7">
+        <?php $this->infoPrint(); // 「お知らせ」?>
+    </div>
+</div>
+
+<hr>
+
+<?php if ($hako->islandNumber != 0) {
+    require_once VIEWS.'top/category-rank.php';
+}?>
+
+<?php if ($hako->allyNumber):?>
+<section class="IslandView">
+    <h2>同盟の状況</h2>
+    <?php
+        $alliance = new HtmlAlly;
+        $alliance->allyInfo($hako);
+    ?>
+    <p>※同盟の名前から「同盟の情報」ページへ、盟主の<?=$init->nameSuffix?>名から「コメント変更」欄へ移動できます。</p>
+</section>
+<hr>
+<?php endif;?>
+
+<?php
+if ($hako->islandNumber != 0) {
+        require_once VIEWS.'top/island-list.php';
+    }
+
+if ($hako->islandNumberBF !== 0) {
+    require_once VIEWS.'top/bf-list.php';
+}
+
+require_once VIEWS.'log/history.php';
+
+// 管理者登録モード
+if ($init->registerMode) {
+    require_once VIEWS.'top/register-mode.php';
+}
+
+println('</div>');

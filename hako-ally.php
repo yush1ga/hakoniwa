@@ -200,124 +200,6 @@ class MakeAlly
             return;
         }
     }
-
-    /**
-     * 同盟関連データの再計算
-     * @param  [type] &$hako [description]
-     * @return bool          更新があった場合true
-     */
-    public function allyReComp(&$hako)
-    {
-        /**
-         * 同盟の消失・加盟脱退・所属人口の更新など
-         */
-        $rt1 = $this->allyDelete($hako);
-        $rt2 = $this->allyMemberDel($hako);
-        $rt3 = $this->allyPopComp($hako);
-
-        if ($rt1 || $rt2 || $rt3) {
-            // データ書き出し
-            Util::calculates_share($hako);
-            Util::allySort($hako);
-            $hako->writeAllyFile();
-
-            // メッセージ出力
-            Success::allyDataUp();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 同盟主登録のある島IDが存在しないとき、登録先の同盟を消す
-     * @param  [type] &$hako [description]
-     * @return bool          削除処理が走った場合true
-     */
-    public function allyDelete(&$hako)
-    {
-        $count = 0;
-
-        for ($i=0; $i<$hako->allyNumber; $i++) {
-            $id = $hako->ally[$i]['id'];
-
-            if ($hako->idToNumber[$id] < 0) {
-                // 配列から削除
-                $hako->ally[$i]['dead'] = 1;
-                $hako->idToAllyNumber[$id] = '';
-                $count++;
-            }
-        }
-
-        if ($count) {
-            $hako->allyNumber -= $count;
-            if ($hako->allyNumber < 0) {
-                $hako->allyNumber = 0;
-            }
-            // データ格納先へ
-            $hako->islands[$currentNumber] = $island;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * 同盟在籍ユーザの更新
-     * @param  [type] &$hako [description]
-     * @return bool          更新があった場合true
-     */
-    public function allyMemberDel(&$hako)
-    {
-        $flg = false;
-
-        for ($i=0; $i<$hako->allyNumber; $i++) {
-            $count = 0;
-            $allyMembers = $hako->ally[$i]['memberId'];
-            $newAllyMembers = [];
-            foreach ($allyMembers as $id) {
-                if ($hako->idToNumber[$id] > -1) {
-                    array_push($newAllyMembers, $id);
-                    $count++;
-                }
-            }
-            if ($count != $hako->ally[$i]['number']) {
-                $hako->ally[$i]['memberId'] = $newAllyMembers;
-                $hako->ally[$i]['number'] = $count;
-                $flg = true;
-            }
-        }
-
-        return $flg;
-    }
-
-    /**
-     * 同盟ごとの所属人口集計
-     * [TODO] ターン処理にも挟む
-     * @param  [type] &$hako [description]
-     * @return bool          更新があった場合true
-     */
-    public function allyPopComp(&$hako)
-    {
-        $flg = false;
-
-        for ($i=0; $i<$hako->allyNumber; $i++) {
-            $score = 0;
-            $allyMembers = $hako->ally[$i]['memberId'];
-            foreach ($allyMembers as $id) {
-                $island = $hako->islands[$hako->idToNumber[$id]];
-                $score += $island['pop'];
-            }
-            if ($score != $hako->ally[$i]['score']) {
-                $hako->ally[$i]['score'] = $score;
-                $flg = true;
-            }
-        }
-
-        return $flg;
-    }
 }
 
 //------------------------------------------------------------
@@ -474,11 +356,9 @@ class AllyIO
     {
         global $init;
 
-        $fileName = "$init->dirName/$init->allyData";
-        if (!is_file($fileName)) {
-            touch($fileName);
-        }
+        $fileName = $init->dirName.'/'.$init->allyData;
         $fp = fopen($fileName, "w");
+        ftruncate($fp, 0);
         Util::lock_on_write($fp);
         fputs($fp, $this->allyNumber . "\n");
 
@@ -734,6 +614,21 @@ class Main
                 $html->footer();
 
                 break;
+            case 'delete':
+                $model = new Hakoniwa\Model\Alliance;
+                $progress_error = false;
+                if ($model->confirm($ally, $this->dataSet, true)) {
+                    $model->establish($ally, $this->dataSet);
+                } else {
+                    $progress_error = true;
+                }
+
+                $html->header();
+                $_ = $progress_error ? HakoError::probrem() : Success::standard();
+                $html->allyTop($ally, $this->dataSet);
+                $html->footer();
+
+                break;
 
             // 同盟の加盟・脱退
             case "inoutally":
@@ -769,12 +664,16 @@ class Main
                 break;
 
             default:
+                $model = new Hakoniwa\Model\Alliance;
                 // 箱庭データとのデータ統合処理（ターン処理に組み込んでいないため）
-                if ($com->allyReComp($ally)) {
-                    break;
-                }
                 $html->header();
-                $html->allyTop($ally, $this->dataSet);
+                if ($model->calculation($ally)) {
+                    // メッセージ出力
+                    // [TODO]: Viewに移す
+                    Success::allyDataUp();
+                } else {
+                    $html->allyTop($ally, $this->dataSet);
+                }
                 $html->footer();
 
             break;
