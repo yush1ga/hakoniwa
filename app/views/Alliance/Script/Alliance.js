@@ -91,8 +91,6 @@
         try {
             const resp = await fetch(f.action, fetchOption);
             obj = await resp.json();
-            // obj = await resp.text();
-            // console.log(obj)
         } catch (e) {
             console.error(e.stack);
             return;

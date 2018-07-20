@@ -9,19 +9,18 @@ $title = <<<LF
 LF;
 parent::pageTitle($title, '同盟情報');
 unset($title);
-
 ?>
 <div id="campInfo">
 
 <p>占有率とは、同盟に加盟している<?=$init->nameSuffix?>の<strong>総人口</strong>をもとに算出された指標です。</p>
 
-<div id="IslandView" class="table-responsive">
+<div class="table-responsive">
 <table class="table table-bordered">
     <colgroup>
         <col style="width:4em">
         <col style="width:auto">
+        <colgroup span=3 style="width:12%"></colgroup>
     </colgroup>
-    <colgroup span=3 style="width:10%"></colgroup>
     <thead>
     <tr>
         <th class="TitleCell head"><?=$init->nameRank?></th>
@@ -33,19 +32,20 @@ unset($title);
     </thead>
     <tbody>
         <tr>
-            <th class="NumberCell number" rowspan=2><?=$i+1?></th>
-            <td class="NameCell lead" rowspan=2 style="vertical-align:middle">
+            <th class="NumberCell number" rowspan=2><?=$alliance['rank']?></th>
+            <td class="NameCell lead" style="vertical-align:middle">
                 <span class="islName"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?></span>
             </td>
-            <td class="InfoCell"><?=$alliance['members'].$init->nameSuffix?></td>
-            <td class="InfoCell"><?=$alliance['population'].$init->unitPop?></td>
+            <td class="InfoCell"><?=$alliance['number'].$init->nameSuffix?></td>
+            <td class="InfoCell"><?=$alliance['score'].$init->unitPop?></td>
             <td class="InfoCell"><?=$alliance['occupation']?>%</td>
         </tr>
         <tr>
-            <td class="CommentCell" colspan=3><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment'] ?? ''?></td>
+            <td class="CommentCell" colspan=4><span class="head"><?=$alliance['oName']?>： </span><?=$alliance['comment'] ?? ''?></td>
         </tr>
     </tbody>
 </table>
+</div>
 </div>
 
 <?php if ($alliance['message'] !== ''): ?>

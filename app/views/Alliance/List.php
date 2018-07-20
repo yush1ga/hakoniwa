@@ -6,7 +6,7 @@
 
 <p>占有率とは、同盟に加盟している<?=$init->nameSuffix?>の<strong>総人口</strong>をもとに算出された指標です。</p>
 
-<div id="IslandView" class="table-responsive">
+<div class="table-responsive">
 <table class="table table-bordered">
     <colgroup>
         <col style="width:4em">

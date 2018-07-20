@@ -2428,9 +2428,9 @@ class HtmlAlly extends HTML
         require VIEWS . 'Alliance/List.php';
     }
 
-    //--------------------------------------------------
-    // 同盟の情報
-    //--------------------------------------------------
+    /**
+     * 同盟の情報
+     */
     public function detail($hako, $data)
     {
         global $init;
@@ -2438,35 +2438,43 @@ class HtmlAlly extends HTML
         $num = $data['ALLYID'];
         $alliance = $hako->ally[$hako->idToAllyNumber[$num]];
         $islands = [];
-        $unit = '0' . $init->unitPop;
+        $unit = '0'.$init->unitPop;
 
         $alliance['title'] = $alliance['title'] !== '' ? $alliance['title'] : '盟主からのメッセージ';
+
+        for ($i = 0; $i < $hako->allyNumber; $i++) {
+            if ($hako->ally[$i]['id'] === $alliance['id']) {
+                $alliance['rank'] = $i + 1;
+                break;
+            }
+        }
 
         foreach ($alliance['memberId'] as $id) {
             $number = $hako->idToNumber[$id];
             if ($number < 0) {
                 continue;
             }
+
             $island = [];
             $isl = $hako->islands[$number];
-            $island['pop'] = $isl['pop'];
-            $island['area'] = $isl['area'];
+            $island['pop']   = $isl['pop'];
+            $island['area']  = $isl['area'];
             $island['money'] = Util::aboutMoney($isl['money']);
-            $island['food'] = $isl['food'];
-            $island['farm'] = (int)$isl['farm'] === 0 ? $init->notHave : ($isl['farm'].$unit);
-            $island['factory'] = (int)$isl['factory'] === 0 ? $init->notHave : ($isl['factory'].$unit);
+            $island['food']  = $isl['food'];
+            $island['farm']  = (int)$isl['farm'] === 0 ? $init->notHave : ($isl['farm'].$unit);
+            $island['factory']  = (int)$isl['factory'] === 0 ? $init->notHave : ($isl['factory'].$unit);
             $island['commerce'] = (int)$isl['commerce'] === 0 ? $init->notHave : ($isl['commerce'].$unit);
             $island['mountain'] = (int)$isl['mountain'] === 0 ? $init->notHave : ($mountain.$unit);
-            $island['hatuden'] = (int)$isl['hatuden'] * 1000 . 'kW';
-            $island['rank'] = $number + 1;
-            $island['name'] = Util::islandName($isl, $hako->ally, $hako->idToAllyNumber);
+            $island['hatuden']  = (int)$isl['hatuden'] * 1000 . 'kW';
+            $island['rank']   = $number + 1;
+            $island['name']   = Util::islandName($isl, $hako->ally, $hako->idToAllyNumber);
             $island['absent'] = $isl['absent'];
-            $island['id'] = $isl['id'];
+            $island['id']     = $isl['id'];
 
             if ((int)$island['absent'] === 0) {
-                $island['name'] = "<span class=\"islName\"><a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$island['name']}</a></span>";
+                $island['name'] = '<span class="islName"><a href="'.$init->baseDir.'/hako-main.php?Sight='.$island['id'].'">'.$island['name'].'</a></span>';
             } else {
-                $island['name'] = "<span class=\"islName2\"><a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$island['name']}</a>({$island['absent']})</span>";
+                $island['name'] = '<span class="islName2"><a href="'.$init->baseDir.'/hako-main.php?Sight='.$island['id'].'">'.$island['name'].'</a>（'.$island['absent'].'）</span>';
             }
 
             $islands[] = $island;
