@@ -7,8 +7,15 @@
 $title = <<<LF
 <span style="color:{$alliance['color']}">{$alliance['mark']}</span> {$alliance['name']}
 LF;
-parent::pageTitle($title, '同盟情報');
+parent::pageTitle($title, '同盟情報 <a href="" id="Edit"><small class="label label-default" style="font-size:0.6em;">編集</small></a>');
 unset($title);
+
+$cost = isset($init->comCost[$init->comAlly])
+    ? '<span class="cash">'.$init->comCost[$init->comAlly].$init->unitMoney.'</span>必要です。'
+    : '必要ありません。';
+$keep = $init->costKeepAlly
+    ? '<span class="cash">'.$init->costKeepAlly.$init->unitMoney.'</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
+    : '必要ありません。';
 ?>
 <div id="campInfo">
 
@@ -58,8 +65,10 @@ unset($title);
         </table>
     </div>
 </div>
-
 <?php endif;?>
+
+<button id="JoinAlliance" type="button" class="btn btn-block btn-lg btn-primary">この同盟に参加する</button>
+
 <hr>
 <h2>所属する<?=$init->nameSuffix?>の情報</h2>
 
@@ -84,10 +93,10 @@ unset($title);
         <tr>
             <th class="NumberCell number"><?=$island['rank']?></th>
             <td class="NameCell"><?=$island['name']?></td>
-            <td class="InfoCell"><?=$island['pop'] . $init->unitPop?></td>
-            <td class="InfoCell"><?=$island['area'] . $init->unitArea?></td>
+            <td class="InfoCell"><?=$island['pop'].$init->unitPop?></td>
+            <td class="InfoCell"><?=$island['area'].$init->unitArea?></td>
             <td class="InfoCell"><?=$island['money']?></td>
-            <td class="InfoCell"><?=$island['food'] . $init->unitFood?></td>
+            <td class="InfoCell"><?=$island['food'].$init->unitFood?></td>
             <td class="InfoCell"><?=$island['farm']?></td>
             <td class="InfoCell"><?=$island['factory']?></td>
             <td class="InfoCell"><?=$island['commerce']?></td>
@@ -97,4 +106,41 @@ unset($title);
 <?php endforeach; ?>
     </tbody>
 </table>
+
+<div id="Modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <form class="modal-content" method="post">
+            <div class="modal-header">
+                <h4 id="ModalTitle" class="modal-title"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?>に参加する</h4>
+            </div>
+            <div id="ModalBody" class="modal-body">
+                <div class="alert alert-info">
+                    <p><strong class="text-danger">（注意）</strong></p>
+                    <p>同盟への参加には費用が<?=$cost?></p>
+                    <p>維持費は<?=$keep?></p>
+                </div>
+                <div class="form-group">
+                    <label for="">あなたの<?=$init->nameSuffix?>名</label>
+                    <select name="" class="form-control">
+                        <?=$hako->islandList?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>パスワード</label>
+                    <input type="password" name="" class="form-control">
+                </div>
+            </div>
+            <div id="ModalFooter" class="modal-footer">
+                <button name="cancel" type="button" class="btn btn-default" data-dismiss="modal">やめる</button>
+                <button type="submit" class="btn btn-primary" name="mode" value="establish" form="Establishment" formaction="<?=$this->this_file?>">参加する</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="ModalBackdrop" class="modal-backdrop fade" style="display:none"></div>
+
+<script>
+<?php include 'Script/Detail.js';?>
+</script>
 <?php
+unset($cost,$keep);

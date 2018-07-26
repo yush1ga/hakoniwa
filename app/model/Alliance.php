@@ -125,7 +125,7 @@ class Alliance
      * @param  [type] $data [description]
      * @return [type]       [description]
      */
-    public function establish($game, $data)
+    public function establish(&$game, $data)
     {
         global $init;
 
@@ -452,10 +452,10 @@ class Alliance
         $html->allyTop($hako, $data);
     }
 
-    //--------------------------------------------------
-    // 加盟・脱退
-    //--------------------------------------------------
-    public function joinAllyMain($hako, $data)
+    /**
+     * 加盟
+     */
+    public function join_alliance(&$hako, $data)
     {
         global $init;
 
@@ -733,7 +733,7 @@ class Alliance
     {
         $total_score = 0;
 
-        if ($game->allyNumber === 1) {
+        if ((int)$game->allyNumber === 1) {
             $game->ally[0]['occupation'] = 100;
 
             return;
