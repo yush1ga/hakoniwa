@@ -10,6 +10,9 @@ require_once MODELPATH.'hako-cgi.php';
  */
 class Main
 {
+    /**
+     * トップページ
+     */
     public function execute()
     {
         global $init;

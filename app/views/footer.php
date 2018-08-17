@@ -11,7 +11,7 @@ printf(" (CPU time: %.3fs)", $tmp4-$tmp2+$tmp3-$tmp1);
 ?></small>
 <?php endif; ?>
 
-<a href="<?= $init->baseDir ?>/hako-admin.php"><small class="label label-default">管理画面</small></a>
+<a href="<?= $init->baseDir ?>/hako-admin.php"><span class="small label label-default">管理画面</span></a>
 </p>
 <p><small class="text-muted">sources: <a href="https://www.github.com/sotalbireo/hakoniwa" target="_blank">hakoniwa - GitHub</a></small> // <small class="text-muted"><a href="<?= $init->baseDir ?>/beta/" target="_blank">開発版</a></small></p>
 </footer>

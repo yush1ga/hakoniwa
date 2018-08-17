@@ -266,37 +266,7 @@ class HtmlTop extends HTML
         // セットするパスワードのチェック
         $defaultPassword = $data['defaultPassword'] ?? '';
 
-        // set parent directory
-        $views = VIEWS.'/top/';
-
         require_once VIEWS.'Index.php';
-
-        // サイトタイトルからお知らせまで
-        // require_once($views.'main.php');
-
-        // 各部門ランキング
-        // require_once($views.'category-rank.php');
-
-        // 同盟の状況
-        // if ($hako->allyNumber) {
-        //     $alliance = new HtmlAlly;
-        //     $alliance->allyInfo($hako);
-        //     println('<hr>');
-        // }
-
-        // 各諸島の状況
-        // require_once($views.'island-list.php');
-
-        // Battle Fieldの状況
-        // require_once($views.'bf-list.php');
-
-        // 歴史
-        // require_once(VIEWS.'/log/history.php');
-
-        // 管理者登録モード
-        // if ($init->registerMode) {
-        //     require_once($views.'register-mode.php');
-        // }
     }
 
     /**
