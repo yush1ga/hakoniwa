@@ -5783,17 +5783,17 @@ class Turn
 
         // 農業要員の他に人手が余る
         if ($pop > $farm) {
-            // 停電判定（天候が「雷」かつ設定確率を満たす）
-            if ((Util::random(1000) < $init->disTenki) && ($island['tenki'] == 4)) {
-                // 全員野良仕事（ジン所持時ブースト）
-                $island['food'] += ($island['zin'][5] == 1) ? $farm * 2: $farm;
+            // 停電判定（天候が「雷」かつ確率）
+            if (Util::event_flag('blackout') && ($island['tenki'] == 4)) {
+                // 停電時は金銭収入なし
                 $this->log->Teiden($island['id'], $island['name']);
             } else {
-                // 農場フル稼働（ジン所持時ブースト）
-                $island['food'] += ($island['zin'][5] == 1) ? $farm * 2: $farm;
                 // サラマンダー所持時ブースト
                 $island['money'] += ($island['zin'][6] == 1) ? (min(round(($pop - $farm) / 10), $work)) * 2 : min(round(($pop - $farm) / 10), $work);
             }
+            // 農業（ジン所持時ブースト）
+            $island['food'] += ($island['zin'][5] == 1) ? $farm * 2: $farm;
+
         } else {
             // 農業だけで手一杯の場合
             // 全員野良仕事
@@ -5817,7 +5817,7 @@ class Turn
         // 食料消費
         $island['food'] = round($island['food'] - $pop * $init->eatenFood);
 
-        // 船
+        // 船舶の管理維持コスト
         $shipCost = 0;
         for ($i = 0, $c=$init->shipKind; $i < $c; $i++) {
             $shipCost += $init->shipCost[$i] * $island['ship'][$i];
@@ -5827,6 +5827,8 @@ class Turn
             $island['money'] += $init->shipIncom * $island['ship'][0];
             $island['food']  += $init->shipFood  * $island['ship'][1];
         }
+
+        // ゼロ以下ならゼロに
         if ($island['money'] < 0) {
             $island['money'] = 0;
         }
@@ -5862,7 +5864,7 @@ class Turn
         $landValue = $island['landValue'];
 
         // init
-        list($area, $pop, $farm, $factory, $commerce, $mountain, $hatuden, $home, $monster, $port, $oil, $soccer, $park, $stat, $train, $bank, $m23, $fire, $rena, $base) = array_pad([], 20, 0);
+        [$area, $pop, $farm, $factory, $commerce, $mountain, $hatuden, $home, $monster, $port, $oil, $soccer, $park, $stat, $train, $bank, $m23, $fire, $rena, $base] = array_pad([], 20, 0);
 
         // 数える
         for ($y = 0; $y < $init->islandSize; $y++) {
@@ -6086,14 +6088,8 @@ class Turn
         $island['rena']     = $fire + $base;
 
         // 電力消費量
-        // 「人口が農業枠未満」か「工業・商業・採掘場枠の合計がゼロ」→ 電力消費ゼロ
-        // 「工業・商業・採掘場枠の合計が正数」→
-        // 電力消費は「人口と農業枠の差の四捨五入」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
-        if (($island['pop'] - $island['farm']) <= 0 || ($island['factory'] + $island['commerce'] + $island['mountain']) <= 0) {
-            $island['enesyouhi'] = 0;
-        } elseif ($island['factory'] + $island['commerce'] + $island['mountain'] > 0) {
-            $island['enesyouhi'] = min(round($island['pop'] - $island['farm']), ($island['factory'] * 2/3 + $island['commerce'] /3 + $island['mountain'] /4));
-        }
+        $island['enesyouhi'] = Util::calc('power_consumption', $island);
+
         // 電力過不足量
         $island['enehusoku'] = $island['hatuden'] - $island['enesyouhi'];
 
@@ -6106,9 +6102,7 @@ class Turn
         $island['team'] = $island['kachi']*2 - $island['make']*2 + $island['hikiwake'] + $island['kougeki'] + $island['bougyo'] + $island['tokuten'] - $island['shitten'];
 
         // 総合ポイント計算
-        // 「人口ゼロかBF」→ 0pt
-        // ほか→ 10*(15人口 + 資金 + 食料 + 2農業 + 工業 + 1.2商業 + 2採掘 + 3発電 + サッカー + 5土地 + 5討伐 + 10装弾 + 5怪獣)
-        $island['point'] = ($island['pop'] == 0 || $island['isBF'] == 1)? 0 : ($island['pop']*15 + $island['money'] + $island['food'] + $island['farm']*2 + $island['factory'] + $island['commerce']*1.2 + $island['mountain']*2 + $island['hatuden']*3 + $island['team'] + $island['area']*5 + $island['taiji']*5 + $island['fire']*10 + $island['monster']*5)*10;
+        $island['point'] = Util::calc('gland_point', $island);
         $island['seichi'] = 0;
     }
 

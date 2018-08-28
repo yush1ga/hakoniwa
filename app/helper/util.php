@@ -41,7 +41,6 @@ class Util
                 }
             }
 
-            return 1;
         // 海底基地
         } else {
             for ($i = $init->maxSBaseLevel; $i > 1; $i--) {
@@ -49,9 +48,9 @@ class Util
                     return $i;
                 }
             }
-
-            return 1;
         }
+
+        return 1;
     }
 
     /**
@@ -459,20 +458,64 @@ class Util
     /**
      * $catに対応した計算式で数値を返す
      * [TODO] 関数を他所に切り出す
-     * @param  string $cat [description]
-     * @param  array  $isl [description]
-     * @return float       [description]
+     * @param  string $cat 計算したい対象（あらかじめ定義しておく）
+     * @param  array  $p   プレイヤーデータ
+     * @return float       計算結果
      */
-    public static function calcIslandData(string $cat, array $isl): float
+    public static function calc(string $cat, array $p): float
     {
         switch ($cat) {
             case 'unemployed':
-                return ($isl['pop'] - ($isl['farm'] + $isl['factory'] + $isl['commerce'] + $isl['mountain'] + $isl['hatuden']) * 10) / $isl['pop'] * 100;
+                return ($p['pop'] - ($p['farm'] + $p['factory'] + $p['commerce'] + $p['mountain'] + $p['hatuden']) * 10) / $p['pop'] * 100;
+
             case 'enesyouhi':
-                return round(($isl['pop']/100) + ($isl['factory']*2/3) + ($isl['commerce']/3) + ($isl['mountain']/4));
+                return round(($p['pop']/100) + ($p['factory']*2/3) + ($p['commerce']/3) + ($p['mountain']/4));
+
             case 'ene':
-                return round($isl['hatuden'] / Util::calcIslandData('enesyouhi', $isl) * 100);
+                return round($p['hatuden'] / Util::calc('enesyouhi', $p) * 100);
+
+            case 'power_consumption':
+                /**
+                 * 【電力消費】
+                 * 「人口が農業枠未満」か「Σ(工業,商業,採掘場枠)がゼロ」→ ゼロ
+                 * => 「人口-農業枠」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
+                 */
+                $civil_without_farmer = $p['pop'] - $p['farm'];
+                $civil_is_farmer_all = $civil_without_farmer <= 0;
+                $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) <= 0;
+                if ($civil_is_farmer_all || $not_have_industry) {
+                    unset($civil_without_farmer);
+                    return 0;
+                }
+                unset($civil_is_farmer_all, $not_have_industry);
+                return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerse'] /3 + $p['mountain'] /4);
+
+            case 'grand_point':
+                // 「人口ゼロかBF」→ 0pt
+                //=> 10*(15人口 + 資金 + 食料 + 2農業 + 工業 + 1.2商業 + 2採掘 + 3発電 + サッカー + 5土地 + 5討伐 + 10装弾 + 5怪獣)
+                if ($p['pop'] == 0 || $p['isBF'] == 1) {
+                    return 0;
+                }
+                return 10 * ($p['pop']*15 + $p['money'] + $p['food'] + $p['farm']*2
+                    + $p['factory'] + $p['commerce']*1.2 + $p['mountain']*2
+                    + $p['hatuden']*3 + $p['team'] + $p['area']*5 + $p['taiji']*5
+                    + $p['fire']*10 + $p['monster']*5);
         }
+        throw new InvalidArgumentExeption('Parameter ' . $cat . 'is not defined. maybe wrong.');
+    }
+
+    /**
+     * 各種イベントが発生するかどうかの判定
+     * @param  string $cat イベント名称（あらかじめ定義しておく）
+     * @return bool        発生するか（したか）
+     */
+    public static function event_flag(string $cat): bool
+    {
+        switch ($cat) {
+            case 'blackout':
+                return Util::random(1000) < $init->disTenki;
+        }
+        throw new InvalidArgumentExeption('Parameter ' . $cat . 'is not defined. maybe wrong.');
     }
 
     /**
