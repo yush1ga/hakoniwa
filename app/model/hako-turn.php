@@ -6102,7 +6102,7 @@ class Turn
         $island['team'] = $island['kachi']*2 - $island['make']*2 + $island['hikiwake'] + $island['kougeki'] + $island['bougyo'] + $island['tokuten'] - $island['shitten'];
 
         // 総合ポイント計算
-        $island['point'] = Util::calc('gland_point', $island);
+        $island['point'] = Util::calc('grand_point', $island);
         $island['seichi'] = 0;
     }
 

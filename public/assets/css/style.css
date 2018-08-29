@@ -344,3 +344,12 @@ h2 {
     color: #993;
     font-weight: 700;
 }
+
+#NoticeFromAdmin textarea {
+    overflow-y: scroll;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+#NoticeFromAdmin textarea[readonly]:focus {
+    outline: 0;
+}

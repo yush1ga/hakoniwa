@@ -212,20 +212,24 @@ class LogIO
      */
     public function infoPrint()
     {
-        if ($this->init->noticeFile == "") {
-            return;
-        }
-
         $fileName = $this->init->noticeFile;
-        if (!is_file($fileName)) {
+
+        if ($fileName === "" || !is_file($fileName)) {
             return;
         }
 
-        $fp = fopen($fileName, "r");
-        while (false !== ($line = fgets($fp, READ_LINE))) {
-            println(chop($line), '<br>');
+        $notice_file = file_get_contents($fileName, false, NULL, 0, 8 * READ_LINE);
+
+        if ($notice_file === false) {
+            return;
         }
-        fclose($fp);
+
+        $notice_file = preg_replace("/<script[\s\S]*?>[\s\S]*?<\/script>/im", "", $notice_file);
+        $notice_file = preg_replace("/<script[\s\S]*?>[\s\S]*$/im", "", $notice_file);
+        $notice_file = preg_replace("/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/im", "", $notice_file);
+        $notice_file = preg_replace("/<iframe[\s\S]*?>[\s\S]*$/im", "", $notice_file);
+
+        printf(Util::htmlEscape($notice_file));
     }
 }
 

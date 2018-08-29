@@ -488,7 +488,7 @@ class Util
                     return 0;
                 }
                 unset($civil_is_farmer_all, $not_have_industry);
-                return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerse'] /3 + $p['mountain'] /4);
+                return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerce'] /3 + $p['mountain'] /4);
 
             case 'grand_point':
                 // 「人口ゼロかBF」→ 0pt
@@ -501,7 +501,7 @@ class Util
                     + $p['hatuden']*3 + $p['team'] + $p['area']*5 + $p['taiji']*5
                     + $p['fire']*10 + $p['monster']*5);
         }
-        throw new InvalidArgumentExeption('Parameter ' . $cat . 'is not defined. maybe wrong.');
+        throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
     }
 
     /**
@@ -511,11 +511,13 @@ class Util
      */
     public static function event_flag(string $cat): bool
     {
+        global $init;
+
         switch ($cat) {
             case 'blackout':
                 return Util::random(1000) < $init->disTenki;
         }
-        throw new InvalidArgumentExeption('Parameter ' . $cat . 'is not defined. maybe wrong.');
+        throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
     }
 
     /**
