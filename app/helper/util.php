@@ -41,7 +41,7 @@ class Util
                 }
             }
 
-        // 海底基地
+            // 海底基地
         } else {
             for ($i = $init->maxSBaseLevel; $i > 1; $i--) {
                 if ($exp >= $init->sBaseLevelUp[$i - 2]) {
@@ -460,47 +460,68 @@ class Util
      * [TODO] 関数を他所に切り出す
      * @param  string $cat 計算したい対象（あらかじめ定義しておく）
      * @param  array  $p   プレイヤーデータ
+     * @param  array  $mod 変数の上書き（あれば）
      * @return float       計算結果
      */
-    public static function calc(string $cat, array $p): float
+    public static function calc(string $cat, array $p, array $mod = []): float
     {
-        switch ($cat) {
-            case 'unemployed':
-                return ($p['pop'] - ($p['farm'] + $p['factory'] + $p['commerce'] + $p['mountain'] + $p['hatuden']) * 10) / $p['pop'] * 100;
+        foreach ($mod as $k => $v) {
+            if (array_key_exists($k, $p)) {
+                $p[$k] = $v;
+            }
+        }
+        unset($mod, $k, $v);
 
+        if ($cat === 'unemployed') {
+            return ($p['pop'] - ($p['farm'] + $p['factory'] + $p['commerce'] + $p['mountain'] + $p['hatuden']) * 10) / $p['pop'] * 100;
+        }
+        /**
+         * 【電力消費量】
+         * 「人口が農業枠未満」か「Σ(工業,商業,採掘場枠)がゼロ」→ ゼロ
+         * => 「人口-農業枠」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
+         */
+        if ($cat === 'power_consumption') {
+            $civil_without_farmer = $p['pop'] - $p['farm'];
+            $is_civil_farmer_all = $civil_without_farmer <= 0;
+            $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) <= 0;
+            if ($is_civil_farmer_all || $not_have_industry) {
+                unset($civil_without_farmer);
+
+                return 0;
+            }
+            unset($is_civil_farmer_all, $not_have_industry);
+
+            return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerce'] /3 + $p['mountain'] /4);
+        }
+        /**
+         * 【電力供給率】
+         */
+        if ($cat === 'power_supply_rate') {
+        }
+        /**
+         * 【総合ポイント】
+         * 「人口ゼロかBF」→ 0
+         * => 10*(15人口 + 資金 + 食料 + 2農業 + 工業 + 1.2商業 + 2採掘 + 3発電 + サッカー + 5土地 + 5討伐 + 10装弾 + 5怪獣)
+         */
+        if ($cat === 'grand_point') {
+            if ($p['pop'] == 0 || $p['isBF'] == 1) {
+                return 0;
+            }
+
+            return 10 * ($p['pop']*15 + $p['money'] + $p['food'] + $p['farm']*2
+                + $p['factory'] + $p['commerce']*1.2 + $p['mountain']*2
+                + $p['hatuden']*3 + $p['team'] + $p['area']*5 + $p['taiji']*5
+                + $p['fire']*10 + $p['monster']*5);
+        }
+
+        switch ($cat) {
             case 'enesyouhi':
                 return round(($p['pop']/100) + ($p['factory']*2/3) + ($p['commerce']/3) + ($p['mountain']/4));
 
             case 'ene':
                 return round($p['hatuden'] / Util::calc('enesyouhi', $p) * 100);
-
-            case 'power_consumption':
-                /**
-                 * 【電力消費】
-                 * 「人口が農業枠未満」か「Σ(工業,商業,採掘場枠)がゼロ」→ ゼロ
-                 * => 「人口-農業枠」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
-                 */
-                $civil_without_farmer = $p['pop'] - $p['farm'];
-                $civil_is_farmer_all = $civil_without_farmer <= 0;
-                $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) <= 0;
-                if ($civil_is_farmer_all || $not_have_industry) {
-                    unset($civil_without_farmer);
-                    return 0;
-                }
-                unset($civil_is_farmer_all, $not_have_industry);
-                return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerce'] /3 + $p['mountain'] /4);
-
-            case 'grand_point':
-                // 「人口ゼロかBF」→ 0pt
-                //=> 10*(15人口 + 資金 + 食料 + 2農業 + 工業 + 1.2商業 + 2採掘 + 3発電 + サッカー + 5土地 + 5討伐 + 10装弾 + 5怪獣)
-                if ($p['pop'] == 0 || $p['isBF'] == 1) {
-                    return 0;
-                }
-                return 10 * ($p['pop']*15 + $p['money'] + $p['food'] + $p['farm']*2
-                    + $p['factory'] + $p['commerce']*1.2 + $p['mountain']*2
-                    + $p['hatuden']*3 + $p['team'] + $p['area']*5 + $p['taiji']*5
-                    + $p['fire']*10 + $p['monster']*5);
         }
+
         throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
     }
 
@@ -513,10 +534,10 @@ class Util
     {
         global $init;
 
-        switch ($cat) {
-            case 'blackout':
-                return Util::random(1000) < $init->disTenki;
+        if ($cat === 'blackout') {
+            return Util::random(1000) < $init->disTenki;
         }
+
         throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
     }
 

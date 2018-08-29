@@ -218,7 +218,7 @@ class LogIO
             return;
         }
 
-        $notice_file = file_get_contents($fileName, false, NULL, 0, 8 * READ_LINE);
+        $notice_file = file_get_contents($fileName, false, null, 0, 8 * READ_LINE);
 
         if ($notice_file === false) {
             return;

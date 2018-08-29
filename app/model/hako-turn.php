@@ -5761,61 +5761,78 @@ class Turn
 
     /**
      * 収入、消費フェイズ
-     * @param  [type] &$island 島データ
+     * @param  [type] &$island プレイヤーデータ
      * @return void
      */
     public function income(&$island)
     {
         global $init;
 
-        $pop      = $island['pop'];
-        $farm     = $island['farm'] * 10;
-        $factory  = $island['factory'];
-        $commerce = $island['commerce'];
-        $mountain = $island['mountain'];
-        $hatuden  = $island['hatuden'];
+        $pop      = $island['pop']/*00.*/;
+        $factory  = $island['factory']/*00.*/  / 10;
+        $commerce = $island['commerce']/*00.*/ / 10;
+        $mountain = $island['mountain']/*00.*/ / 10;
+        $power_supply = $island['hatuden'];
 
-        // 工場、採掘場、商業は発電量が関係
-        $enesyouhi = round($pop / 100 + $factory * 2/3 + $commerce * 1/3 + $mountain * 1/4);
-        $work = min(round($enesyouhi), ($factory + $commerce + $mountain));
+        /**
+         * 仕様
+         * 農場　10000人ー>10000t
+         * 工場　10000人ー>10億
+         * 採掘場　10000人ー>10億
+         * 商業ビル　10000人ー>10億
+         * 電力　1000kwー>1000人分
+         */
+        /**
+         * 現行
+         * 電力 1kw -> 100人
+         * 電力消費量
+         * (人/100 + 2工場/3 + 商業/3 + 採掘/4)四捨五入
+         */
+
 
         // 収入
+        // 農業従事者は最優先で確保。それ以外を工商業に割り当てる
+        $farmer = min($pop, $island['farm']);
+        $no_assignment = $farmer - $pop;
 
-        // 農業要員の他に人手が余る
-        if ($pop > $farm) {
-            // 停電判定（天候が「雷」かつ確率）
+        // 工商業従事可能
+        if ($no_assignment > 0) {
+            // 停電（天候が「雷」かつ確率）：金銭収入なし
             if (Util::event_flag('blackout') && ($island['tenki'] == 4)) {
-                // 停電時は金銭収入なし
                 $this->log->Teiden($island['id'], $island['name']);
             } else {
+                $maximum_employees = round($factory + $commerce + $mountain);
+                $workable_employees = min($power_supply, $maximum_employees);
                 // サラマンダー所持時ブースト
-                $island['money'] += ($island['zin'][6] == 1) ? (min(round(($pop - $farm) / 10), $work)) * 2 : min(round(($pop - $farm) / 10), $work);
+                $workable_employees *= ($island['zin'][6] == 1) ? 2 : 1;
+                $island['money'] += $workable_employees;
             }
-            // 農業（ジン所持時ブースト）
-            $island['food'] += ($island['zin'][5] == 1) ? $farm * 2: $farm;
-
-        } else {
-            // 農業だけで手一杯の場合
-            // 全員野良仕事
-            $island['food'] += $pop;
         }
+
+        // 農業（ジン所持時ブースト）
+        $farmer *= ($island['zin'][5] == 1) ? 2 : 1;
+        $island['food'] += $farmer;
+
+        // 電力使用量がゼロだった場合、工商業従事予定者もささやかに農業をする
+        if (Util::calc('power_consumption', $island) === 0) {
+            $island['food'] += round(0.2 * $no_assignment);
+        }
+
 
         // $island[present][item]が0の時、
         // [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている。
-        if (isset($island['present'])) {
-            if ($island['present']['item'] == 0) {
-                if ($island['present']['px'] != 0) {
-                    $island['money'] += $island['present']['px'];
-                    $this->log->presentMoney($island['id'], $island['name'], $island['present']['px']);
-                }
-                if ($island['present']['py'] != 0) {
-                    $island['food'] += $island['present']['py'];
-                    $this->log->presentFood($island['id'], $island['name'], $island['present']['py']);
-                }
+        if (isset($island['present']) && $island['present']['item'] == 0) {
+            if ($island['present']['px'] != 0) {
+                $island['money'] += $island['present']['px'];
+                $this->log->presentMoney($island['id'], $island['name'], $island['present']['px']);
+            }
+            if ($island['present']['py'] != 0) {
+                $island['food'] += $island['present']['py'];
+                $this->log->presentFood($island['id'], $island['name'], $island['present']['py']);
             }
         }
         // 食料消費
-        $island['food'] = round($island['food'] - $pop * $init->eatenFood);
+        $island['food'] -= round($pop * $init->eatenFood);
 
         // 船舶の管理維持コスト
         $shipCost = 0;
