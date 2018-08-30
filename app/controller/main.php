@@ -129,6 +129,16 @@ class Main
 
                 break;
 
+            case 'changeInfo':
+                if (!Util::checkPassword("", $cgi->dataSet['Pwd'] ?? "")) {
+                    echo "false";
+
+                    return;
+                }
+                require_once MODELPATH."hako-log.php";
+                (new LogIO)->write_noticefile($hako, $cgi->dataSet);
+                /*. missing_break; .*/
+                // no break
             default:
                 $html = new HtmlTop;
                 $html->header();

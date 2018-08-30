@@ -224,12 +224,38 @@ class LogIO
             return;
         }
 
+        $notice_file = preg_replace("/(?:<\/textarea>|<\?(?:php|=)|\?>)/im", "", $notice_file);
         $notice_file = preg_replace("/<script[\s\S]*?>[\s\S]*?<\/script>/im", "", $notice_file);
         $notice_file = preg_replace("/<script[\s\S]*?>[\s\S]*$/im", "", $notice_file);
         $notice_file = preg_replace("/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/im", "", $notice_file);
         $notice_file = preg_replace("/<iframe[\s\S]*?>[\s\S]*$/im", "", $notice_file);
 
         printf(Util::htmlEscape($notice_file));
+    }
+
+    public function write_noticefile($game, $data)
+    {
+        $file_name = $this->init->noticeFile;
+        if ($file_name === "" || !is_file($file_name)) {
+            return;
+        }
+
+        if (!Util::checkPassword("", $data['Pwd'] ?? "")) {
+            return;
+        }
+
+        $notice = $data["Notice"];
+        $notice = preg_replace("/(?:<\/textarea>|<\?(?:php|=)|\?>)/im", "", $notice);
+        $notice = preg_replace("/<script[\s\S]*?>[\s\S]*?<\/script>/im", "", $notice);
+        $notice = preg_replace("/<script[\s\S]*?>[\s\S]*$/im", "", $notice);
+        $notice = preg_replace("/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/im", "", $notice);
+        $notice = preg_replace("/<iframe[\s\S]*?>[\s\S]*$/im", "", $notice);
+
+        try {
+            file_put_contents($file_name, $notice, LOCK_EX);
+        } catch (\Throwable $e) {
+            throw new \Exception($e->getMessage, $e->errorInfo[1], $e);
+        }
     }
 }
 

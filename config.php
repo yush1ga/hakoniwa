@@ -47,3 +47,4 @@ if (DEBUG) {
 // Common requires.
 require_once DOCROOT.'hako-init.php';
 require_once HELPERPATH.'util.php';
+require_once HELPERPATH.'Enum.php';

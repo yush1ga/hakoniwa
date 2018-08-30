@@ -16,11 +16,18 @@
         /* "（次のターンまで、残りおよそx日とy時間z分）" or "ページを更新してください" */
         return $echoVal;
     }
-
-
-
 ?>
 <?=$this->pageTitle($init->title, 'トップ')?>
+
+<div class="alert alert-danger">
+<p>本サービスはオープンアルファ版であるため、以下をご承知おきください。</p>
+<ul>
+<li>仕様・デザイン・要求スペック・要求情報等、あらゆるものが予告なしに変更になる恐れがあります。</li>
+<li>プレイデータは必ずしも保全されるものではありません。また、仮にデータが損失した際にも、データ復旧・損失補填などの措置は基本的にとりません</li>
+<li>不具合をご報告いただいても、必ずしもすぐに修正されるとは限りません。</li>
+<li>製作者都合により、予告なくサービスが終了することもあります。</li>
+</ul>
+</div>
 
 <h2 class="Turn">ターン<?=$hako->islandTurn?></h2>
 
@@ -86,14 +93,16 @@
     </div>
 
     <div class="col-sm-offset-1 col-sm-7">
-        <?php $this->infoPrint(); // 「お知らせ」?>
+<?php // 「お知らせ」
+require_once VIEWS."/log/info.php";
+?>
     </div>
 </div>
 
 <hr>
 
 <?php if ($hako->islandNumber != 0) {
-    require_once VIEWS.'top/category-rank.php';
+    require_once VIEWS."top/category-rank.php";
 }?>
 
 <?php if ($hako->allyNumber):?>

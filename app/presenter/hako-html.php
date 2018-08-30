@@ -516,15 +516,6 @@ END;
         global $init;
         require_once(VIEWS.'/log/recent.php');
     }
-
-    /**
-     * お知らせ
-     */
-    public function infoPrint()
-    {
-        global $init;
-        require_once(VIEWS.'/log/info.php');
-    }
 }
 
 
@@ -2415,6 +2406,7 @@ class HtmlAlly extends HTML
         for ($i = 0; $i < $hako->allyNumber; $i++) {
             if ($hako->ally[$i]['id'] === $alliance['id']) {
                 $alliance['rank'] = $i + 1;
+
                 break;
             }
         }

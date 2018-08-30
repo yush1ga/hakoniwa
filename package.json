@@ -1,7 +1,7 @@
 {
   "name": "hakoniwa",
   "version": "1.0.0",
-  "author": "Sota NAKAGAMI",
+  "author": "Sota SASAKI",
   "homepage": "https://github.com/Sotalbireo/hakoniwa",
   "private": true,
   "repository": {
@@ -21,6 +21,9 @@
     "phplint": "run-os",
     "phplint:linux:darwin": "vendor/bin/parallel-lint --exclude vendor .",
     "phplint:win32": "vendor\\bin\\parallel-lint --no-colors --exclude vendor .",
+    "postinstall": "run-os",
+    "postinstall:win32": "composer install",
+    "postinstall:linux:darwin": "bin/composer install",
     "server": "php -S localhost:8000 -t ./ Router.php",
     "update": "run-os",
     "update:win32": "npm-run-all update:win:*",
