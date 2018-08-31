@@ -3,23 +3,32 @@
     const EditTrigger = document.getElementById('js_editNoticeFromAdmin');
     const SubmitTrigger = document.getElementById('js_submitNoticeFromAdmin');
 
+    const NoticeTextarea = NoticeBoard.querySelector('textarea');
     const PasswordOuterDOM = NoticeBoard.querySelector('.form-inline');
     const Password = NoticeBoard.querySelector('input');
 
     let isTextareaEditable = false;
 
+    let notifyText = NoticeTextarea.value;
+
     const editTriggered = (ev) => {
-        NoticeBoard.querySelector('textarea').readOnly = isTextareaEditable;
+        NoticeTextarea.readOnly = isTextareaEditable;
         EditTrigger.innerHTML = isTextareaEditable? '編集' : 'やめる';
         PasswordOuterDOM.style.display = isTextareaEditable? 'none' : 'block';
         Password.disabled = isTextareaEditable;
         SubmitTrigger.disabled = isTextareaEditable;
         isTextareaEditable = !isTextareaEditable;
+        if (isTextareaEditable) {
+            notifyText = NoticeTextarea.value;
+        } else {
+            NoticeTextarea.value = notifyText;
+        }
     };
 
-    const submit = async (ev) => {
+    const presubmit = async ev => {
         NoticeBoard.Pwd.value = btoa(unescape(encodeURIComponent(NoticeBoard.Pwd.value)));
-        let body = new FormData(NoticeBoard);
+
+        const body = new FormData(NoticeBoard);
         body.append('PreCheck', 'true');
         body.append('mode', 'changeInfo');
 
@@ -37,24 +46,27 @@
             if (check === 'false') {
                 NoticeBoard.Pwd.value = '';
                 ev.preventDefault();
-
+                alert('パスワードが間違っています');
                 return false;
+            } else {
+                const el = document.createElement('input');
+                el.setAttribute('type', 'hidden');
+                el.setAttribute('name', 'mode');
+                el.setAttribute('value', 'changeInfo');
+                NoticeBoard.appendChild(el);
+                NoticeBoard.submit();
             }
         } catch (e) {
             console.error(e);
             ev.preventDefault();
             return false;
-        } finally {
-            alert('パスワードが間違っています');
-            return false;
         }
 
         return true;
-
     };
 
     EditTrigger.addEventListener('click', editTriggered);
-    NoticeBoard.addEventListener('submit', submit);
+    SubmitTrigger.addEventListener('click', presubmit);
 
 
 })();

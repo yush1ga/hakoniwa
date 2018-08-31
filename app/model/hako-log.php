@@ -240,7 +240,7 @@ class LogIO
             return;
         }
 
-        if (!Util::checkPassword("", $data['Pwd'] ?? "")) {
+        if (!Util::checkPassword("", base64_decode($data['Pwd'] ?? "", true))) {
             return;
         }
 

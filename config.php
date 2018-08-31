@@ -35,15 +35,6 @@ define('VIEWS', realpath(APPPATH.'/views/').DIRECTORY_SEPARATOR);
 // Composer/Autoloader
 require_once __DIR__.'/vendor/autoload.php';
 
-if (DEBUG) {
-    ini_set('display_errors', 1);
-    set_time_limit(0);
-    error_reporting(E_ALL);
-    header("Cache-Control: no-cache, no-store, must-revalidate");
-    header("Expires: Sat, 01 Apr 2017 09:00:00 GMT");
-    require_once __DIR__.'/launchTest.php';
-}
-
 // Common requires.
 require_once DOCROOT.'hako-init.php';
 require_once HELPERPATH.'util.php';

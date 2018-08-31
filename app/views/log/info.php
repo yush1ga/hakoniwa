@@ -8,7 +8,7 @@
 <div class="form-inline" style="display:none">
     <div class="input-group">
         <input name="Pwd" type="password" class="form-control" style="width:auto" placeholder="パスワード" autocomplete="off" disabled>
-        <button type="submit" id="js_submitNoticeFromAdmin" name="mode" value="changeInfo" class="form-control input-group-addon" style="width:auto" autocomplete="off" disabled>更新</button>
+        <button type="button" id="js_submitNoticeFromAdmin" class="form-control input-group-addon" style="width:auto" disabled>更新</button>
     </div>
 </div>
 </form>
