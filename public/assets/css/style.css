@@ -346,8 +346,11 @@ h2 {
 }
 
 #NoticeFromAdmin textarea {
+    border: 0;
     overflow-y: scroll;
+    resize: none;
     white-space: pre-wrap;
+    width: 100%;
     word-break: break-all;
 }
 #NoticeFromAdmin textarea[readonly]:focus {

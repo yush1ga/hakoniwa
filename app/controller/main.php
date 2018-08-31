@@ -129,11 +129,16 @@ class Main
 
                 break;
 
-            case 'changeInfo':
-                if (!Util::checkPassword("", $cgi->dataSet['Pwd'] ?? "")) {
-                    echo "false";
+            case "changeInfo":
+                if (($cgi->dataSet["PreCheck"] ?? "") === "true") {
+                    header('Content-Type:text/plain;charset=utf-8');
+                    if (Util::checkPassword("", base64_decode($cgi->dataSet["Pwd"] ?? "", true))) {
+                        echo "true";
+                    } else {
+                        echo "false";
+                    }
 
-                    return;
+                    break;
                 }
                 require_once MODELPATH."hako-log.php";
                 (new LogIO)->write_noticefile($hako, $cgi->dataSet);
