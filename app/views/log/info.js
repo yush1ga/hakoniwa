@@ -10,6 +10,7 @@
     let isTextareaEditable = false;
 
     let notifyText = NoticeTextarea.value;
+    const notifyBgColor = NoticeTextarea.style.backgroundColor;
 
     const editTriggered = (ev) => {
         NoticeTextarea.readOnly = isTextareaEditable;
@@ -20,8 +21,10 @@
         isTextareaEditable = !isTextareaEditable;
         if (isTextareaEditable) {
             notifyText = NoticeTextarea.value;
+            NoticeTextarea.style.backgroundColor = "#fff";
         } else {
             NoticeTextarea.value = notifyText;
+            NoticeTextarea.style.backgroundColor = notifyBgColor;
         }
     };
 
@@ -67,6 +70,4 @@
 
     EditTrigger.addEventListener('click', editTriggered);
     SubmitTrigger.addEventListener('click', presubmit);
-
-
 })();

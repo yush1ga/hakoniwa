@@ -346,6 +346,7 @@ h2 {
 }
 
 #NoticeFromAdmin textarea {
+    background-color: #f6fbfd;
     border: 0;
     overflow-y: scroll;
     resize: none;
