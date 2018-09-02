@@ -10,13 +10,13 @@
             <li><a href="<?= $init->baseDir ?>/hako-ally.php">同盟管理</a></li>
             <li><a href="<?= $init->baseDir ?>/hako-main.php?mode=log">最近の出来事</a></li>
             <li><a href="https://github.com/Sotalbireo/hakoniwa/wiki" target="_blank">Wiki</a></li>
-            <li><a href="<?= $init->baseDir ?>/manual/" target="_blank">マニュアル</a></li>
+            <!-- <li><a href="<?= $init->baseDir ?>/manual/" target="_blank">マニュアル</a></li> -->
         </ul>
     </div>
 </nav>
 </header>
 <div class="container">
-    <?php if (DEBUG) {
-    var_dump($_GET);
-    var_dump($_POST);
+<?php if (DEBUG) {
+    dump($_GET);
+    dump($_POST);
 } ?>

@@ -20,7 +20,7 @@
 <?=$this->pageTitle($init->title, 'トップ')?>
 
 <div class="alert alert-danger">
-<p>本サービスはオープンアルファ版であるため、以下をご承知おきください。</p>
+<p>本サービスは<strong>オープンアルファ版</strong>であるため、以下をご承知おきください。</p>
 <ul>
 <li>仕様・デザイン・要求スペック・要求情報等、あらゆるものが予告なしに変更になる恐れがあります。</li>
 <li>プレイデータは必ずしも保全されるものではありません。また、仮にデータが損失した際にも、データ復旧・損失補填などの措置は基本的にとりません。</li>
@@ -119,18 +119,18 @@ require_once VIEWS."/log/info.php";
 
 <?php
 if ($hako->islandNumber != 0) {
-        require_once VIEWS.'top/island-list.php';
+        require_once VIEWS."top/island-list.php";
     }
 
 if ($hako->islandNumberBF !== 0) {
-    require_once VIEWS.'top/bf-list.php';
+    require_once VIEWS."top/bf-list.php";
 }
 
-require_once VIEWS.'log/history.php';
+require_once VIEWS."log/history.php";
 
 // 管理者登録モード
 if ($init->registerMode) {
-    require_once VIEWS.'top/register-mode.php';
+    require_once VIEWS."top/register-mode.php";
 }
 
-println('</div>');
+println("</div>");

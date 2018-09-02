@@ -2265,8 +2265,8 @@ END;
 <form action="$this_file" method="post" class="form-inline">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
-    <input type="date" name="date" value="$date" class="form-control">
-    <input type="time" name="time" value="$time" class="form-control">
+    <input type="date" name="date" value="$date" class="form-control" pattern="\d{4}-\d{2}-\d{2}">
+    <input type="time" name="time" value="$time" class="form-control" pattern="\d{2}:\d{2}">
     <button type="submit" class="btn btn-warning btn-sm">変更</button>
 </form>
 END;

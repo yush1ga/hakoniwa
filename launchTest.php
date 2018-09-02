@@ -34,7 +34,7 @@ class LaunchTest extends \Init
         if ($noHaveExt !== "") {
             $noHaveExt = substr($noHaveExt, 2);
 
-            throw new \Exception("動作に必要なモジュール\"$noHaveExt\"が読み込まれていません。");
+            throw new \Error("動作に必要なモジュール\"$noHaveExt\"が読み込まれていません。");
         }
     }
     public function __construct()
