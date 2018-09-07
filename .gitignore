@@ -4,11 +4,10 @@ password.php
 sftp-config.json
 /manual/*
 node_modules/
+vendor/
 /beta/**/*.js
 *.js.map
 
-composer.lock
-vendor/
 
 *.cache
 

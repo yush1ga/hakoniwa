@@ -5,7 +5,7 @@ class Zipper extends \ZipArchive
     private $zip;
     private $create_flag = self::CREATE | self::EXCL | self::CHECKCONS;
 
-    function __construct($filename)
+    public function __construct($filename)
     {
         assert(extension_loaded("zip"));
 
@@ -21,13 +21,15 @@ class Zipper extends \ZipArchive
         }
     }
 
-    function addDirectory ($dir) {
+    public function addDirectory($dir)
+    {
         if (!is_dir($dir)) {
             throw new \InvalidArgumentException("{$dir} is not directory.");
         }
     }
 
-    function download () {
+    public function download()
+    {
         header("Content-Type: application/force-download;");
         header("Content-Length: ".filesize($zip_tmp_path.$zip_name));
         header("Content-Disposition: attachment; filename=\"{$zip_name}\"");
