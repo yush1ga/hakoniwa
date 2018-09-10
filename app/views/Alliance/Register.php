@@ -35,7 +35,7 @@ $keep = $init->costKeepAlly
     </div>
     <div class="form-group">
         <label for="Password" class="col-sm-2 control-label">パスワード</label>
-        <div class="col-sm-10"><input type="text" name="Password" class="form-control" required pattern="\w+"></div>
+        <div class="col-sm-10"><input type="password" name="Password" class="form-control" required pattern="\w+"></div>
     </div>
 </div>
 <h3>新しく作る同盟の情報</h3>

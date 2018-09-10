@@ -2,12 +2,11 @@ nbproject/*
 logs/*
 password.php
 sftp-config.json
-/manual/*
+manual/
 node_modules/
 vendor/
 /beta/**/*.js
-*.js.map
-
+*.map
 
 *.cache
 

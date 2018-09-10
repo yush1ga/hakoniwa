@@ -2,7 +2,7 @@
 <h2>お知らせ <span id="js_editNoticeFromAdmin" class="label label-default" style="font-size:.4em;">編集<span class="sr-only">する</span></span></h2>
 <textarea name="Notice" style="height:<?=$init->divHeight?>px" autocomplete="off" readonly>
 <?php
-    (new Log())->infoPrint();
+    (new \Log)->infoPrint();
 ?>
 </textarea>
 <div class="form-inline" style="display:none">

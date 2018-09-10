@@ -7,7 +7,7 @@
 $title = <<<LF
 <span style="color:{$alliance['color']}">{$alliance['mark']}</span> {$alliance['name']}
 LF;
-parent::pageTitle($title, '同盟情報 <a href="" id="Edit"><small class="label label-default" style="font-size:0.6em;">編集</small></a>');
+parent::pageTitle($title, '同盟情報 <a href="" id="Edit"><span class="small label label-default" style="font-size:0.6em;color:#fff">編集</span></a>');
 unset($title);
 
 $cost = isset($init->comCost[$init->comAlly])
@@ -72,6 +72,7 @@ $keep = $init->costKeepAlly
 <hr>
 <h2>所属する<?=$init->nameSuffix?>の情報</h2>
 
+<div class="table-responsive">
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -106,10 +107,11 @@ $keep = $init->costKeepAlly
 <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 
 <div id="Modal" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
-        <form class="modal-content" method="post">
+        <form class="modal-content" method="post" action="<?=$this->this_file?>">
             <div class="modal-header">
                 <h4 id="ModalTitle" class="modal-title"><span style="color:<?=$alliance['color']?>"><?=$alliance['mark']?></span> <?=$alliance['name']?>に参加する</h4>
             </div>
@@ -132,7 +134,7 @@ $keep = $init->costKeepAlly
             </div>
             <div id="ModalFooter" class="modal-footer">
                 <button name="cancel" type="button" class="btn btn-default" data-dismiss="modal">やめる</button>
-                <button type="submit" class="btn btn-primary" name="mode" value="establish" form="Establishment" formaction="<?=$this->this_file?>">参加する</button>
+                <button type="submit" class="btn btn-primary" name="mode" value="join">参加する</button>
             </div>
         </form>
     </div>

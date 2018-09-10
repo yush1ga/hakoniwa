@@ -26,7 +26,7 @@
     "postinstall:linux:darwin": "bin/composer install",
     "server": "php -S localhost:8000 -t ./ Router.php",
     "test": "run-os",
-    "test:win32": "npm-run-all test:win:*",
+    "test:win32": "npm-run-all phplint:win32 test:win:*",
     "test:win:php": "vendor\\bin\\phpunit --bootstrap vendor\\autoload.php --testdox tests",
     "update": "run-os",
     "update:win32": "npm-run-all update:win:*",
