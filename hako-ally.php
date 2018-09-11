@@ -532,7 +532,7 @@ EOL
  */
 class Main
 {
-    public $mode;
+    public $mode = "";
     public $dataSet = [];
     private $filter_flag = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
 
@@ -554,21 +554,21 @@ class Main
             HTML::header();
             HakoError::noDataFile();
             HTML::footer();
-            exit();
+            exit;
         }
         $cgi->setCookies();
 
         $html = new HtmlAlly;
         $com = new MakeAlly;
 
+        error_log("[mode] {$this->mode}", 0);
         switch ($this->mode) {
-            // 同盟の結成・変更・解散・加盟・脱退
-            case "JoinA":
-                $html->header();
-                $html->newAllyTop($ally, $this->dataSet);
-                $html->footer();
+            // case "JoinA":
+            //     $html->header();
+            //     $html->newAllyTop($ally, $this->dataSet);
+            //     $html->footer();
 
-                break;
+            //     break;
 
             case "register":
                 $html->header();
@@ -577,13 +577,13 @@ class Main
 
                 break;
 
-            case 'confirm':
+            case "confirm":
                 $model = new Hakoniwa\Model\Alliance;
                 $model->confirm($ally, $this->dataSet);
 
                 break;
 
-            case 'establish':
+            case "establish":
                 $model = new Hakoniwa\Model\Alliance;
                 $progress_error = false;
                 if ($model->confirm($ally, $this->dataSet, true)) {
@@ -600,21 +600,21 @@ class Main
                 break;
 
             // 同盟の結成・変更
-            case "newally":
-                $html->header();
-                $com->makeAllyMain($ally, $this->dataSet);
-                $html->footer();
+            // case "newally":
+            //     $html->header();
+            //     $com->makeAllyMain($ally, $this->dataSet);
+            //     $html->footer();
 
-                break;
+            //     break;
 
             // 同盟の解散
-            case "delally":
-                $html->header();
-                $com->delete_alliance($ally, $this->dataSet);
-                $html->footer();
+            // case "delally":
+            //     $html->header();
+            //     $com->delete_alliance($ally, $this->dataSet);
+            //     $html->footer();
 
-                break;
-            case 'delete':
+                // break;
+            case "delete":
                 $model = new Hakoniwa\Model\Alliance;
                 $progress_error = false;
                 if ($model->confirm($ally, $this->dataSet, true)) {
@@ -631,39 +631,68 @@ class Main
                 break;
 
             // 同盟の加盟・脱退
-            case "inoutally":
-                $html->header();
-                $com->joinAllyMain($ally, $this->dataSet);
-                $html->footer();
+            // case "inoutally":
+            //     $html->header();
+            //     $com->joinAllyMain($ally, $this->dataSet);
+            //     $html->footer();
 
-                break;
+                // break;
 
             // コメントの変更
-            case "Allypact":
-                $html->header();
-                $html->tempAllyPactPage($ally, $this->dataSet);
-                $html->footer();
+            // case "Allypact":
+            //     $html->header();
+            //     $html->tempAllyPactPage($ally, $this->dataSet);
+            //     $html->footer();
 
-                break;
+            //     break;
 
             // コメントの更新
-            case "AllypactUp":
-                $html->header();
-                $com->allyPactMain($ally, $this->dataSet);
-                $html->footer();
+            // case "AllypactUp":
+            //     $html->header();
+            //     $com->allyPactMain($ally, $this->dataSet);
+            //     $html->footer();
 
-                break;
+            //     break;
 
             // 同盟の情報
-            case "AmiOfAlly":
-            case 'detail':
+            // case "AmiOfAlly":
+            case "detail":
                 $html->header();
                 $html->detail($ally, $this->dataSet);
                 $html->footer();
 
                 break;
 
+            case "prejoin":
+            case "join":
+                error_log("join", 0);
+                error_log(print_r($this->dataSet, true), 0);
+                $this->dataSet["mode"] = $this->mode;
+                $model = new \Hakoniwa\Model\Alliance;
+                $status = $model->join($ally, $this->dataSet);
+
+                if ($this->mode == "prejoin") {
+                    header("Content-Type:application/json;charset=utf-8");
+                    echo json_encode($status);
+
+                    break;
+                }
+
+                $html->header();
+                if ($status["status"] !== "true") {
+                    HakoError::probrem();
+
+                    throw new \Exception;
+                }
+                Success::standard();
+                $html->allyTop($ally, $this->dataSet);
+                $html->footer();
+
+                break;
+
             default:
+                error_log(print_r($this->dataSet, true), 0);
+
                 $model = new Hakoniwa\Model\Alliance;
                 // 箱庭データとのデータ統合処理（ターン処理に組み込んでいないため）
                 $html->header();
@@ -676,7 +705,7 @@ class Main
                 }
                 $html->footer();
 
-            break;
+                break;
         }
     }
     //---------------------------------------------------
@@ -686,49 +715,70 @@ class Main
     {
         global $init;
 
-        $this->mode = $_POST['mode'] ?? '';
+        $filter_flag = $this->filter_flag;
+        function get_attr($type, $key)
+        {
+            global $filter_flag;
+            switch ($type) {
+                case "post":
+                    if (!filter_has_var(INPUT_POST, $key)) {
+                        return false;
+                    }
+
+                    return filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING, $filter_flag);
+                case "get":
+                    if (!filter_has_var(INPUT_GET, $key)) {
+                        return false;
+                    }
+
+                    return filter_input(INPUT_GET, $key, FILTER_SANITIZE_STRING, $filter_flag);
+            }
+
+            throw new \InvalidArgumentException("Input type \"{$type}\" is not defined.");
+        }
+
+
+        $this->mode = get_attr("post", "mode") ?? (get_attr("get", "mode") ?? '');
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
+            while ([$name, $value] = each($_POST)) {
                 $this->dataSet[$name] = str_replace(",", "", $value);
             }
-            if (isset($this->dataSet['Allypact'])) {
+            if (isset($this->dataSet["Allypact"])) {
                 $this->mode = "AllypactUp";
             }
-            if (array_key_exists('NewAllyButton', $_POST)) {
+            if (array_key_exists("NewAllyButton", $_POST)) {
                 $this->mode = "newally";
             }
-            if (array_key_exists('DeleteAllyButton', $_POST)) {
+            if (array_key_exists("DeleteAllyButton", $_POST)) {
                 $this->mode = "delally";
             }
-            if (array_key_exists('JoinAllyButton', $_POST)) {
+            if (array_key_exists("JoinAllyButton", $_POST)) {
                 $this->mode = "inoutally";
             }
         }
-        if (filter_has_var(INPUT_GET, 'p')) {
-            $this->mode = filter_input(INPUT_GET, 'p', FILTER_SANITIZE_STRING, $this->filter_flag);
-            // $this->dataSet['ALLYID'] = ;
-        }
-        if (!empty($_GET['JoinA'])) {
-            $this->mode = "JoinA";
-            $this->dataSet['ALLYID'] = $_GET['JoinA'];
-        }
-        if (!empty($_GET['AmiOfAlly'])) {
-            $this->mode = "AmiOfAlly";
-            $this->dataSet['ALLYID'] = $_GET['AmiOfAlly'];
-        }
-        if (!empty($_GET['detail'])) {
+
+        $this->mode = get_attr("get", "p") ?? $this->mode;
+
+        // if (!empty($_GET["JoinA"])) {
+        //     $this->mode = "JoinA";
+        //     $this->dataSet["ALLYID"] = $_GET["JoinA"];
+        // }
+        // if (!empty($_GET["AmiOfAlly"])) {
+        //     $this->mode = "AmiOfAlly";
+        //     $this->dataSet["ALLYID"] = $_GET["AmiOfAlly"];
+        // }
+        if (!empty($_GET["detail"])) {
             $this->mode = "detail";
-            $this->dataSet['ALLYID'] = $_GET['detail'];
+            $this->dataSet["ALLYID"] = $_GET["detail"];
         }
-        if (!empty($_GET['Allypact'])) {
-            $this->mode = "Allypact";
-            $this->dataSet['ALLYID'] = $_GET['Allypact'];
-        }
+        // if (!empty($_GET["Allypact"])) {
+        //     $this->mode = "Allypact";
+        //     $this->dataSet["ALLYID"] = $_GET["Allypact"];
+        // }
     }
 }
 
 
 
-$start = new Main;
-$start->execute();
+$start = (new Main)->execute();

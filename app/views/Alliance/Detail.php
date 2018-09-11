@@ -7,7 +7,7 @@
 $title = <<<LF
 <span style="color:{$alliance['color']}">{$alliance['mark']}</span> {$alliance['name']}
 LF;
-parent::pageTitle($title, '同盟情報 <a href="" id="Edit"><span class="small label label-default" style="font-size:0.6em;color:#fff">編集</span></a>');
+parent::pageTitle($title, '同盟情報 <a id="Edit"><span class="small label label-default" style="font-size:0.6em;color:#fff">編集</span></a>');
 unset($title);
 
 $cost = isset($init->comCost[$init->comAlly])
@@ -122,19 +122,20 @@ $keep = $init->costKeepAlly
                     <p>維持費は<?=$keep?></p>
                 </div>
                 <div class="form-group">
-                    <label for="">あなたの<?=$init->nameSuffix?>名</label>
-                    <select name="" class="form-control">
+                    <label for="Whoami">あなたの<?=$init->nameSuffix?>名</label>
+                    <select name="Whoami" class="form-control">
                         <?=$hako->islandList?>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>パスワード</label>
-                    <input type="password" name="" class="form-control">
+                    <input type="password" name="Pwd" class="form-control" required>
                 </div>
+                <input type="number" name="JoinTo" value="<?=$data["ALLYID"]?>" hidden readonly>
             </div>
             <div id="ModalFooter" class="modal-footer">
                 <button name="cancel" type="button" class="btn btn-default" data-dismiss="modal">やめる</button>
-                <button type="submit" class="btn btn-primary" name="mode" value="join">参加する</button>
+                <button type="submit" class="btn btn-primary">参加する</button>
             </div>
         </form>
     </div>

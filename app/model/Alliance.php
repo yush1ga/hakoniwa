@@ -52,8 +52,7 @@ class Alliance
             $checked['pass']['status'] = false;
             $checked['pass']['message'] = 'no_password';
             $is_valid = false;
-        } elseif (!Util::checkPassword($island['password'], $password)) {
-            // HakoError::wrongPassword();
+        } elseif (!\Util::checkPassword($island['password'], $password)) {
             $checked['pass']['status'] = false;
             $checked['pass']['message'] = 'wrong_password';
             $is_valid = false;
@@ -368,6 +367,79 @@ class Alliance
         // トップへ
         $html = new HtmlAlly();
         $html->allyTop($hako, $data);
+    }
+
+    /**
+     * 参加する
+     * @param         $game ゲーム総合データ
+     * @param         $data プレイヤー入力
+     * @return [type]       [description]
+     */
+    public function join(&$game, $data)
+    {
+        global $init;
+        $player_ID = (int)$data["Whoami"] ?? -1;
+        $player = $game->islands[(int)$game->idToNumber[$player_ID]];
+        $password = base64_decode($data["Pwd"] ?? "", true);
+        $join_to = (int)$data["JoinTo"] ?? -1;
+
+        $alliance = $game->ally[$join_to];
+
+        $status = [
+            "status" => "true",
+            "errors" => []
+        ];
+
+        // Administrator => thru;
+        // Wrong player password => false;
+        if (\Util::checkPassword("", $password)) {
+        } elseif (!\Util::checkPassword($player["password"], $password)) {
+            $status["status"] = "false";
+            $status["errors"][] = "wrong_password";
+        }
+
+        // 複数加盟チェック
+        if ($init->allyJoinOne && count($player['allyId']) > 0) {
+            $status["status"] = "false";
+            $status["errors"][] = "you_can_only_join_alliance_only_one";
+        }
+
+        // 同盟主は他の同盟に所属できない
+        if ($game->idToAllyNumber[$player_ID]) {
+            $status["status"] = "false";
+            $status["errors"][] = "master_can_not_join_other_alliances";
+        }
+
+        // 予算不足
+        if ($player["money"] - $init->comCost[$init->comAlly] < 1) {
+            $status["status"] = "false";
+            $status["errors"][] = "budjet_shortage";
+        }
+
+        // pre-check
+        if ($data["mode"] === "prejoin") {
+            return $status;
+        } elseif ($status["status"] === "false") {
+            return $status;
+        }
+
+        $player["allyId"][] = $alliance["id"];
+        // $alliance["score"] += $player["pop"];
+        $alliance["number"]++;
+        $player["money"] -= $init->comCost[$init->comAlly];
+
+        $alliance_member = $alliance['memberId'];
+        $alliance_member[] = $player_ID;
+        $alliance["memberId"] = $alliance_member;
+
+        // データ更新
+        $game->ally[$join_to] = $alliance;
+        $game->islands[$player_ID] = $island;
+        $this->calculates_share($game);
+        \Util::allySort($game);
+        $game->writeAllyFile();
+
+        return $status;
     }
 
     /**

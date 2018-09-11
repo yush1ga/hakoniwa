@@ -5,8 +5,7 @@
  */
 class Modal
 {
-
-    function __construct(args)
+    public function __construct($args)
     {
         $id = $args["id"] ?? "Modal";
         $title = $args["title"] ?? "";
