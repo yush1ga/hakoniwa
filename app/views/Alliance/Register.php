@@ -90,7 +90,7 @@ $keep = $init->costKeepAlly
             </div>
             <div id="ModalBody" class="modal-body"></div>
             <div class="modal-footer">
-                <button name="cancel" type="button" class="btn btn-default" data-dismiss="modal">やめる</button>
+                <button name="cancel" type="button" class="btn btn-default" data-dismiss="modal">もどる</button>
                 <button type="submit" class="btn btn-primary" name="mode" value="establish" form="Establishment" formaction="<?=$this->this_file?>" disabled>登録する</button>
             </div>
         </div>

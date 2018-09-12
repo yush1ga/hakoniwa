@@ -14,6 +14,18 @@ if (php_sapi_name() === 'cli-server') {
         var_dump($var);
         echo '</pre>';
     }
+    function logging($str)
+    {
+        error_log($str, 0);
+    }
+    function dump_logging($var)
+    {
+        ob_start();
+        var_dump($var);
+        $str = ob_get_contents();
+        logging($str);
+        ob_end_clean();
+    }
 
     ini_set('display_errors', 1);
     set_time_limit(0);

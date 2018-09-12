@@ -98,16 +98,16 @@
 
         //[TODO] PHP側に用意する
         const messageTemplate = {
-            reach_join_limit: "あなたが同時に所属できる同盟の最大数を超えています",
-            wrong_password: "入力されたパスワードが間違っています",
-            no_password: "パスワードを入力してください",
-            not_enough_money: "同盟を結成するための経費が不足しています",
-            duplicate_name: "すでに使われている同盟名です",
-            duplicate_sign: "すでに使われている記章です",
-            illegal_name: "同盟名に、利用できない文字・単語が含まれています",
-            illegal_color: "色の指定が無効です"
+            master_can_not_join_other_alliances: '<strong>他の同盟に参加しているときに別の同盟を立ち上げることはできません</strong>',
+            wrong_password: '入力されたパスワードが間違っています',
+            no_password: 'パスワードを入力してください',
+            not_enough_money: '同盟を結成するための経費が不足しています',
+            duplicate_name: 'すでに使われている同盟名です',
+            duplicate_sign: 'すでに使われている記章です',
+            illegal_name: '同盟名に、利用できない文字・単語が含まれています',
+            illegal_color: '色の指定が無効です'
         };
-        let message = "";
+        let message = '';
 
         Object.keys(obj).forEach(key => {
             if(!obj[key].status)

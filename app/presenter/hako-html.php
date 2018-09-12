@@ -2347,9 +2347,9 @@ class HtmlAlly extends HTML
         $this->this_file = $init->baseDir . '/hako-ally.php';
     }
 
-    //--------------------------------------------------
-    // 初期画面
-    //--------------------------------------------------
+    /**
+     * 初期画面
+     */
     public function allyTop($hako, $data)
     {
         global $init;
@@ -2357,9 +2357,9 @@ class HtmlAlly extends HTML
         require VIEWS . 'Alliance/Index.php';
     }
 
-    //--------------------------------------------------
-    // 同盟の状況
-    //--------------------------------------------------
+    /**
+     * 同盟の状況
+     */
     public function allyInfo($hako, $view_ally_num = 0)
     {
         global $init;

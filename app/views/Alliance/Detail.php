@@ -10,8 +10,8 @@ LF;
 parent::pageTitle($title, '同盟情報 <a id="Edit"><span class="small label label-default" style="font-size:0.6em;color:#fff">編集</span></a>');
 unset($title);
 
-$cost = isset($init->comCost[$init->comAlly])
-    ? '<span class="cash">'.$init->comCost[$init->comAlly].$init->unitMoney.'</span>必要です。'
+$cost = $init->costJoinAlly
+    ? '<span class="cash">'.$init->costJoinAlly.$init->unitMoney.'</span>必要です。'
     : '必要ありません。';
 $keep = $init->costKeepAlly
     ? '<span class="cash">'.$init->costKeepAlly.$init->unitMoney.'</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'

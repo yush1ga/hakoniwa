@@ -17,24 +17,17 @@ class Util_alliance extends \Util
      */
     public static function allySort(&$game)
     {
-        /**
-         * 人口を比較、同盟一覧用
-         * @return integer  $xのほうが大きければ-1、$yのほうが大きければ1
-         */
-        function comp($x, $y)
-        {
-            if (($x['dead'] ?? 0) == 1) {
-                return +1;
-            }
-            if (($y['dead'] ?? 0) == 1) {
-                return -1;
-            }
-            // mean ($x['score'] > $y['score']) ? -1 : 1;
-            return $y['score'] <=> $x['score'];
-        }
-
         if (count($game->ally) > 1) {
-            usort($game->ally, 'comp');
+            usort($game->ally, function ($x, $y) {
+                if (($x['dead'] ?? 0) == 1) {
+                    return +1;
+                }
+                if (($y['dead'] ?? 0) == 1) {
+                    return -1;
+                }
+                // $xのほうが大きければ-1、$yのほうが大きければ1
+                return $y['score'] <=> $x['score'];
+            });
         }
     }
 

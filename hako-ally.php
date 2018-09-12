@@ -281,29 +281,27 @@ class AllyIO
     {
         global $init;
 
-        $fileName = $init->dirName.'/'.$init->allyData;
+        $fileName = $init->dirName."/".$init->allyData;
         if (!is_file($fileName)) {
             return false;
         }
         $fp = fopen($fileName, "r");
         Util::lock_on_read($fp);
-        $this->allyNumber = chop(fgets($fp, READ_LINE));
-        if ($this->allyNumber == '') {
-            $this->allyNumber = 0;
-        }
+        $this->allyNumber = intval(chop(fgets($fp, READ_LINE)), 10);
+
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $this->ally[$i] = $this->readAlly($fp);
-            $this->idToAllyNumber[$this->ally[$i]['id']] = $i;
+            $this->idToAllyNumber[$this->ally[$i]["id"]] = $i;
         }
         // 加盟している同盟のIDを格納
         for ($i = 0; $i < $this->allyNumber; $i++) {
-            $member = $this->ally[$i]['memberId'];
-            foreach ($member as $id) {
+            $members = $this->ally[$i]['memberId'];
+            foreach ($members as $id) {
                 $n = $this->idToNumber[$id];
                 if (!($n > -1)) {
                     continue;
                 }
-                array_push($this->islands[$n]['allyId'], $this->ally[$i]['id']);
+                $this->islands[$n]['allyId'][] = $this->ally[$i]['id'];
             }
         }
         Util::unlock($fp);
@@ -327,21 +325,21 @@ class AllyIO
         $tmp        = chop(fgets($fp, READ_LINE));
         $allymember = explode(",", $tmp);
         $tmp        = chop(fgets($fp, READ_LINE));
-        $ext        = explode(",", $tmp); // 拡張領域
+        $ext        = explode(",", $tmp);
         $comment    = chop(fgets($fp, READ_LINE));
         $title      = chop(fgets($fp, READ_LINE));
-        list($title, $message) = array_pad(explode("<>", $title), 2, null);
+        [$title, $message] = array_pad(explode("<>", $title), 2, null);
 
         return [
             'name'       => $name,
             'mark'       => $mark,
             'color'      => $color,
-            'id'         => $id,
+            'id'         => intval($id, 10),
             'oName'      => $ownerName,
             'password'   => $password,
-            'score'      => $score,
-            'number'     => $number,
-            'occupation' => $occupation,
+            'score'      => intval($score, 10),
+            'number'     => intval($number, 10),
+            'occupation' => intval($occupation, 10),
             'memberId'   => $allymember,
             'ext'        => $ext,
             'comment'    => $comment,
@@ -356,7 +354,7 @@ class AllyIO
     {
         global $init;
 
-        $fileName = $init->dirName.'/'.$init->allyData;
+        $fileName = $init->dirName."/".$init->allyData;
         $fp = fopen($fileName, "w");
         ftruncate($fp, 0);
         Util::lock_on_write($fp);
@@ -375,7 +373,7 @@ class AllyIO
     //--------------------------------------------------
     public function writeAlly($fp, $ally)
     {
-        $ally_members = join(",", $ally['memberId']);
+        $members = join(",", $ally['memberId']);
         $ext = join(",", $ally['ext']);
         $comment = $ally['comment'] ?? '';
         $message = (isset($ally['title']) && isset($ally['message']))
@@ -394,7 +392,7 @@ class AllyIO
 {$ally['score']}
 {$ally['number']}
 {$ally['occupation']}
-$ally_members
+$members
 $ext
 $comment
 $message
@@ -546,10 +544,8 @@ class Main
 
         $ally = new Ally;
         $cgi = new Cgi;
-
         $this->parseInputData();
         $cgi->getCookies();
-
         if (!$ally->readIslands($cgi)) {
             HTML::header();
             HakoError::noDataFile();
@@ -557,63 +553,53 @@ class Main
             exit;
         }
         $cgi->setCookies();
-
         $html = new HtmlAlly;
         $com = new MakeAlly;
 
-        error_log("[mode] {$this->mode}", 0);
         switch ($this->mode) {
             // case "JoinA":
             //     $html->header();
             //     $html->newAllyTop($ally, $this->dataSet);
             //     $html->footer();
 
-            //     break;
-
-            case "register":
+            // break;
+            case "register": // 新規登録
                 $html->header();
                 $html->register($ally, $this->dataSet);
                 $html->footer();
 
-                break;
-
-            case "confirm":
-                $model = new Hakoniwa\Model\Alliance;
+            break;
+            case "confirm": // 登録の確認（POST）
+                $model = new \Hakoniwa\Model\Alliance;
                 $model->confirm($ally, $this->dataSet);
 
-                break;
-
-            case "establish":
-                $model = new Hakoniwa\Model\Alliance;
+            break;
+            case "establish": // 登録
+                $model = new \Hakoniwa\Model\Alliance;
                 $progress_error = false;
                 if ($model->confirm($ally, $this->dataSet, true)) {
                     $model->establish($ally, $this->dataSet);
                 } else {
                     $progress_error = true;
                 }
-
                 $html->header();
                 $_ = $progress_error ? HakoError::probrem() : Success::standard();
                 $html->allyTop($ally, $this->dataSet);
                 $html->footer();
 
-                break;
-
-            // 同盟の結成・変更
-            // case "newally":
+            break;
+            // case "newally": // 同盟の結成・変更
             //     $html->header();
             //     $com->makeAllyMain($ally, $this->dataSet);
             //     $html->footer();
 
-            //     break;
-
-            // 同盟の解散
-            // case "delally":
+            // break;
+            // case "delally": // 同盟の解散
             //     $html->header();
             //     $com->delete_alliance($ally, $this->dataSet);
             //     $html->footer();
 
-                // break;
+            // break;
             case "delete":
                 $model = new Hakoniwa\Model\Alliance;
                 $progress_error = false;
@@ -628,45 +614,38 @@ class Main
                 $html->allyTop($ally, $this->dataSet);
                 $html->footer();
 
-                break;
-
+            break;
             // 同盟の加盟・脱退
             // case "inoutally":
             //     $html->header();
             //     $com->joinAllyMain($ally, $this->dataSet);
             //     $html->footer();
 
-                // break;
-
+            // break;
             // コメントの変更
             // case "Allypact":
             //     $html->header();
             //     $html->tempAllyPactPage($ally, $this->dataSet);
             //     $html->footer();
 
-            //     break;
-
+            // break;
             // コメントの更新
             // case "AllypactUp":
             //     $html->header();
             //     $com->allyPactMain($ally, $this->dataSet);
             //     $html->footer();
 
-            //     break;
-
-            // 同盟の情報
+            // break;
             // case "AmiOfAlly":
-            case "detail":
+            case "detail": // 同盟の情報
                 $html->header();
                 $html->detail($ally, $this->dataSet);
                 $html->footer();
 
                 break;
 
-            case "prejoin":
+            case "prejoin": // 同盟への参加
             case "join":
-                error_log("join", 0);
-                error_log(print_r($this->dataSet, true), 0);
                 $this->dataSet["mode"] = $this->mode;
                 $model = new \Hakoniwa\Model\Alliance;
                 $status = $model->join($ally, $this->dataSet);
@@ -685,31 +664,28 @@ class Main
                     throw new \Exception;
                 }
                 Success::standard();
+                $model->calculation($ally);
                 $html->allyTop($ally, $this->dataSet);
                 $html->footer();
 
-                break;
-
+            break;
             default:
-                error_log(print_r($this->dataSet, true), 0);
-
-                $model = new Hakoniwa\Model\Alliance;
-                // 箱庭データとのデータ統合処理（ターン処理に組み込んでいないため）
+                $model = new \Hakoniwa\Model\Alliance;
                 $html->header();
+                // 箱庭データとのデータ統合処理（ターン処理に組み込んでいないため）
                 if ($model->calculation($ally)) {
-                    // メッセージ出力
-                    // [TODO]: Viewに移す
+                    // メッセージ出力[TODO]: Viewに移す
                     Success::allyDataUp();
                 } else {
                     $html->allyTop($ally, $this->dataSet);
                 }
                 $html->footer();
 
-                break;
+            break;
         }
     }
     //---------------------------------------------------
-    // POST、GETのデータを取得
+    // POST,GETのデータを取得
     //---------------------------------------------------
     private function parseInputData()
     {
@@ -722,13 +698,13 @@ class Main
             switch ($type) {
                 case "post":
                     if (!filter_has_var(INPUT_POST, $key)) {
-                        return false;
+                        return;
                     }
 
                     return filter_input(INPUT_POST, $key, FILTER_SANITIZE_STRING, $filter_flag);
                 case "get":
                     if (!filter_has_var(INPUT_GET, $key)) {
-                        return false;
+                        return;
                     }
 
                     return filter_input(INPUT_GET, $key, FILTER_SANITIZE_STRING, $filter_flag);
@@ -738,24 +714,24 @@ class Main
         }
 
 
-        $this->mode = get_attr("post", "mode") ?? (get_attr("get", "mode") ?? '');
+        $this->mode = get_attr("post", "mode") ?? (get_attr("get", "mode") ?? "");
 
         if (!empty($_POST)) {
             while ([$name, $value] = each($_POST)) {
                 $this->dataSet[$name] = str_replace(",", "", $value);
             }
-            if (isset($this->dataSet["Allypact"])) {
-                $this->mode = "AllypactUp";
-            }
-            if (array_key_exists("NewAllyButton", $_POST)) {
-                $this->mode = "newally";
-            }
-            if (array_key_exists("DeleteAllyButton", $_POST)) {
-                $this->mode = "delally";
-            }
-            if (array_key_exists("JoinAllyButton", $_POST)) {
-                $this->mode = "inoutally";
-            }
+            // if (isset($this->dataSet["Allypact"])) {
+            //     $this->mode = "AllypactUp";
+            // }
+            // if (array_key_exists("NewAllyButton", $_POST)) {
+            //     $this->mode = "newally";
+            // }
+            // if (array_key_exists("DeleteAllyButton", $_POST)) {
+            //     $this->mode = "delally";
+            // }
+            // if (array_key_exists("JoinAllyButton", $_POST)) {
+            //     $this->mode = "inoutally";
+            // }
         }
 
         $this->mode = get_attr("get", "p") ?? $this->mode;
@@ -768,7 +744,7 @@ class Main
         //     $this->mode = "AmiOfAlly";
         //     $this->dataSet["ALLYID"] = $_GET["AmiOfAlly"];
         // }
-        if (!empty($_GET["detail"])) {
+        if ($this->mode === "" && !empty($_GET["detail"])) {
             $this->mode = "detail";
             $this->dataSet["ALLYID"] = $_GET["detail"];
         }

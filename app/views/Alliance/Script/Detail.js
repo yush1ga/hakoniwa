@@ -55,14 +55,10 @@
             body
         });
 
-        console.log('fetch');
         (new Promise(r => r()))
         .then(() => fetch(request))
-        .then(resp => resp.text())
+        .then(resp => resp.json())
         .then(check => {
-            console.log('fetched');
-            console.log(check);
-
             if (check.status !== 'true') {
                 pwd.value = '';
                 const str = check.errors.map(e => {
@@ -76,8 +72,8 @@
                         case 'budjet_shortage':
                             return '・資金が不足しています'
                     }
-                }).join(`\r\n`);
-                alert(`同盟への参加に失敗しました。\r\n${str}`);
+                }).join(`\n`);
+                alert(`同盟への参加に失敗しました。\n${str}`);
                 return false;
             } else {
                 const el = document.createElement('input');

@@ -27,46 +27,46 @@ class Alliance
     {
         global $init;
 
-        $island_ID = (int)$data['Whoami'];
-        $password = base64_decode($data['Password'] ?? '', true);
-        $island = $game->islands[(int)$game->idToNumber[$island_ID]];
+        $player_ID = (int)$data["Whoami"];
+        $password = base64_decode($data["Password"] ?? "", true);
+        $island = $game->islands[(int)$game->idToNumber[$player_ID]];
         $candidate = [
-            'name'  => htmlspecialchars($data['AllianceName']),
-            'sign'  => (int)$data['AllianceSign'],
-            'color' => $data['AllianceColor']
+            "name"  => htmlspecialchars($data["AllianceName"]),
+            "sign"  => $data["AllianceSign"],
+            "color" => $data["AllianceColor"]
         ];
 
-        $admin_mode = Util::checkPassword("", $password);
+        $admin_mode = \Util::checkPassword("", $password);
         $checked = [
-            'id' =>    ['status' => true, 'message' => ''],
-            'pass' =>  ['status' => true, 'message' => ''],
-            'name' =>  ['status' => true, 'message' => ''],
-            'sign' =>  ['status' => true, 'message' => ''],
-            'color' => ['status' => true, 'message' => ''],
-            'other' => ['status' => true, 'messages' => []]
+            "id" =>    ["status" => true, "message" => ""],
+            "pass" =>  ["status" => true, "message" => ""],
+            "name" =>  ["status" => true, "message" => ""],
+            "sign" =>  ["status" => true, "message" => ""],
+            "color" => ["status" => true, "message" => ""],
+            "other" => ["status" => true, "messages" => []]
         ];
         $is_valid = true;
 
         if ($admin_mode) {/* thru */
-        } elseif ($password === '') {
-            $checked['pass']['status'] = false;
-            $checked['pass']['message'] = 'no_password';
+        } elseif ($password === "") {
+            $checked["pass"]["status"] = false;
+            $checked["pass"]["message"] = "no_password";
             $is_valid = false;
-        } elseif (!\Util::checkPassword($island['password'], $password)) {
-            $checked['pass']['status'] = false;
-            $checked['pass']['message'] = 'wrong_password';
-            $is_valid = false;
-        }
-
-        if ($this->is_duplicate_name($game, $candidate['name'])) {
-            $checked['name']['status'] = false;
-            $checked['name']['message'] = 'duplicate_name';
+        } elseif (!\Util::checkPassword($island["password"], $password)) {
+            $checked["pass"]["status"] = false;
+            $checked["pass"]["message"] = "wrong_password";
             $is_valid = false;
         }
 
-        if ($this->is_duplicate_sign($game, $init->allyMark[$candidate['sign']])) {
-            $checked['sign']['status'] = false;
-            $checked['sign']['message'] = 'duplicate_sign';
+        if ($this->is_duplicate_name($game, $candidate["name"])) {
+            $checked["name"]["status"] = false;
+            $checked["name"]["message"] = "duplicate_name";
+            $is_valid = false;
+        }
+
+        if ($this->is_duplicate_sign($game, $candidate["sign"])) {
+            $checked["sign"]["status"] = false;
+            $checked["sign"]["message"] = "duplicate_sign";
             $is_valid = false;
         }
 
@@ -80,36 +80,36 @@ class Alliance
 
             return false;
         }
-        if ($candidate['name'] === ''
-            || preg_match($init->regex_denying_name_words, $candidate['name'])
-            || is_match_in_array($candidate['name'], $init->denying_name_words)) {
-            $checked['name']['status'] = false;
-            $checked['name']['message'] = 'illegal_name';
+        if ($candidate["name"] === ""
+            || preg_match($init->regex_denying_name_words, $candidate["name"])
+            || is_match_in_array($candidate["name"], $init->denying_name_words)) {
+            $checked["name"]["status"] = false;
+            $checked["name"]["message"] = "illegal_name";
             $is_valid = false;
         }
 
-        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $candidate['color'])) {
-            $checked['color']['status'] = false;
-            $checked['color']['message'] = 'illegal_color';
+        if (!preg_match("/^#[0-9a-fA-F]{6}$/", $candidate["color"])) {
+            $checked["color"]["status"] = false;
+            $checked["color"]["message"] = "illegal_color";
             $is_valid = false;
         }
 
-        if ($init->allyJoinOne && count($island['allyId']) > 0) {
-            $checked['other']['status'] = false;
-            $checked['other']['messages'][] = 'reach_join_limit';
+        // [NOTE] 同盟主は他の同盟に参加できない仕様のため、すでに別の同盟に参加している時点で偽
+        if (count($island["allyId"]) > 0) {
+            $checked["other"]["status"] = false;
+            $checked["other"]["messages"][] = "master_can_not_join_other_alliances";
             $is_valid = false;
         }
-
 
         if ($admin_mode) {/* thru */
-        } elseif ($island['money'] < $init->costMakeAlly) {
-            $checked['other']['status'] = false;
-            $checked['other']['messages'][] = 'not_enough_money';
+        } elseif ($island["money"] < $init->costMakeAlly) {
+            $checked["other"]["status"] = false;
+            $checked["other"]["messages"][] = "not_enough_money";
             $is_valid = false;
         }
 
         if (!$dry_run) {
-            header('Content-Type:application/json;charset=utf-8');
+            header("Content-Type:application/json;charset=utf-8");
             echo json_encode($checked);
         } else {
             return $is_valid;
@@ -128,9 +128,9 @@ class Alliance
     {
         global $init;
 
-        $island_ID = (int)$data['Whoami'];
+        $player_ID = (int)$data['Whoami'];
         $password = base64_decode($data['Password'] ?? '', true);
-        $island = $game->islands[(int)$game->idToNumber[$island_ID]];
+        $island = $game->islands[(int)$game->idToNumber[$player_ID]];
         $new_alliance = [
             'name'      => htmlspecialchars($data['AllianceName']),
             'sign'      => (int)$data['AllianceSign'],
@@ -152,15 +152,15 @@ class Alliance
             'color'      => ''
         ];
 
-        $admin_mode = Util::checkPassword("", $password);
+        $admin_mode = \Util::checkPassword("", $password);
 
         $alliance_int = $game->allyNumber;
 
         $alliance['oName']       = $island['name'].$init->nameSuffix;
         $alliance['password']    = $island['password'];
-        $alliance['memberId'][0] = $island_ID;
+        $alliance['memberId'][0] = $player_ID;
         $alliance['score']       = $island['pop'];
-        $alliance['id']    = $island_ID;
+        $alliance['id']    = $player_ID;
         $alliance['name']  = $new_alliance['name'];
         $alliance['mark']  = $new_alliance['sign_str'];
         $alliance['color'] = $new_alliance['color'];
@@ -174,7 +174,7 @@ class Alliance
 
         // データ書き出し
         $game->ally[$alliance_int] = $alliance;
-        $game->islands[$island_ID] = $island;
+        $game->islands[$player_ID] = $island;
         $this->calculates_share($game);
         Util::allySort($game);
         $game->writeAllyFile();
@@ -217,19 +217,19 @@ class Alliance
             }
         }
         if (!$init->allyUse && !$admin_mode) {
-            HakoError::newAllyForbbiden();
+            \HakoError::newAllyForbbiden();
 
             return;
         }
         // 同盟名があるかチェック
         if ($allyName == '') {
-            HakoError::newAllyNoName();
+            \HakoError::newAllyNoName();
 
             return;
         }
         // 同盟名が正当かチェック
         if (preg_match("/[,\?\(\)\<\>\$]|^無人|^沈没$/", $allyName)) {
-            HakoError::newIslandBadName();
+            \HakoError::newIslandBadName();
 
             return;
         }
@@ -382,8 +382,8 @@ class Alliance
         $player = $game->islands[(int)$game->idToNumber[$player_ID]];
         $password = base64_decode($data["Pwd"] ?? "", true);
         $join_to = (int)$data["JoinTo"] ?? -1;
-
-        $alliance = $game->ally[$join_to];
+        assert($join_to !== -1);
+        $alliance = $game->ally[$game->idToAllyNumber[$join_to]];
 
         $status = [
             "status" => "true",
@@ -405,19 +405,22 @@ class Alliance
         }
 
         // 同盟主は他の同盟に所属できない
-        if ($game->idToAllyNumber[$player_ID]) {
+        if (array_key_exists($player_ID, $game->idToAllyNumber)) {
             $status["status"] = "false";
             $status["errors"][] = "master_can_not_join_other_alliances";
         }
 
         // 予算不足
-        if ($player["money"] - $init->comCost[$init->comAlly] < 1) {
+        assert($init->costJoinAlly >= 0);
+        if ((int)$player["money"] < $init->costJoinAlly) {
             $status["status"] = "false";
             $status["errors"][] = "budjet_shortage";
         }
 
         // pre-check
         if ($data["mode"] === "prejoin") {
+            dump_logging($status);
+
             return $status;
         } elseif ($status["status"] === "false") {
             return $status;
@@ -426,20 +429,30 @@ class Alliance
         $player["allyId"][] = $alliance["id"];
         // $alliance["score"] += $player["pop"];
         $alliance["number"]++;
-        $player["money"] -= $init->comCost[$init->comAlly];
+        $player["money"] -= $init->costJoinAlly;
 
         $alliance_member = $alliance['memberId'];
         $alliance_member[] = $player_ID;
         $alliance["memberId"] = $alliance_member;
 
         // データ更新
-        $game->ally[$join_to] = $alliance;
-        $game->islands[$player_ID] = $island;
+        $game->ally[$game->idToAllyNumber[$join_to]] = $alliance;
+        $game->islands[(int)$game->idToNumber[$player_ID]] = $player;
         $this->calculates_share($game);
-        \Util::allySort($game);
+        Util::allySort($game);
         $game->writeAllyFile();
 
         return $status;
+    }
+
+    /**
+     * 脱退
+     * @param         $game ゲーム総合データ
+     * @param         $data プレイヤー入力
+     * @return [type]       [description]
+     */
+    public function withdrawal(&$game, $data)
+    {
     }
 
     /**
@@ -525,89 +538,6 @@ class Alliance
     }
 
     /**
-     * 加盟
-     */
-    public function join_alliance(&$hako, $data)
-    {
-        global $init;
-
-        $current_ID = $data['ISLANDID'];
-        $current_alliance_number = $data['ALLYNUMBER'];
-        $current_number = $hako->idToNumber[$current_ID];
-        $island = $hako->islands[$current_number];
-
-        // パスワードチェック
-        if (!(AllyUtil::checkPassword($island['password'], $data['PASSWORD']))) {
-            // password間違い
-            HakoError::wrongPassword();
-
-            return;
-        }
-
-        // 盟主チェック
-        if ($hako->idToAllyNumber[$current_ID]) {
-            HakoError::leaderAlready();
-
-            return;
-        }
-        // 複数加盟チェック
-        $ally = $hako->ally[$current_alliance_number];
-        if ($init->allyJoinOne && ($island['allyId'][0] != '') && ($island['allyId'][0] != $ally['id'])) {
-            HakoError::otherAlready();
-
-            return;
-        }
-
-        $alliance_member = $ally['memberId'];
-        $newAllyMember = [];
-        $flag = 0;
-
-        foreach ($alliance_member as $id) {
-            if (!($hako->idToNumber[$id] > -1)) {
-            } elseif ($id == $current_ID) {
-                $flag = 1;
-            } else {
-                array_push($newAllyMember, $id);
-            }
-        }
-
-        if ($flag) {
-            // 脱退
-            $newAlly = [];
-            foreach ($island['allyId'] as $id) {
-                if ($id != $ally['id']) {
-                    array_push($newAlly, $id);
-                }
-            }
-            $island['allyId'] = $newAlly;
-            $ally['score'] -= $island['pop'];
-            $ally['number']--;
-        } else {
-            // 加盟
-            array_push($newAllyMember, $current_ID);
-            array_push($island['allyId'], $ally['id']);
-            $ally['score'] += $island['pop'];
-            $ally['number']++;
-        }
-        $island['money'] -= $init->comCost[$init->comAlly];
-        $ally['memberId'] = $newAllyMember;
-
-        // データ格納先へ
-        $hako->islands[$current_number] = $island;
-        $hako->ally[$current_alliance_number] = $ally;
-
-        // データ更新
-        Util::calculates_share($hako);
-        Util::allySort($hako);
-        // データ書き出し
-        $hako->writeAllyFile();
-
-        // トップへ
-        $html = new HtmlAlly;
-        $html->allyTop($hako, $data);
-    }
-
-    /**
      * 同盟主コメント更新
      * @param       $hako ゲーム総合データ
      * @param       $data プレイヤー入力
@@ -641,21 +571,21 @@ class Alliance
 
     /**
      * 同盟関連データの再計算
-     * @param  [type] &$hako [description]
+     * @param  [type] &$game ゲーム総合データ
      * @return bool          更新があった場合true
      */
-    public function calculation(&$hako)
+    public function calculation(&$game)
     {
-        $calc1 = $this->delete_alliance_nobody_managed($hako);
-        $calc2 = $this->update_members($hako);
-        $calc3 = $this->update_alliances_score($hako);
+        $calc1 = $this->delete_alliance_nobody_managed($game);
+        $calc2 = $this->update_members($game);
+        $calc3 = $this->update_alliances_score($game);
 
         if ($calc1 || $calc2 || $calc3) {
             // データ書き出し
             try {
-                $this->calculates_share($hako);
-                Util::allySort($hako);
-                $hako->writeAllyFile();
+                $this->calculates_share($game);
+                Util::allySort($game);
+                $game->writeAllyFile();
             } catch (Exception $e) {
                 dump($e);
 
@@ -742,28 +672,28 @@ class Alliance
 
     /**
      * 同盟在籍ユーザの更新
-     * @param       &$hako ゲーム総合データ
+     * @param       &$game ゲーム総合データ
      * @return bool        更新があった場合true
      */
-    private function update_members(&$hako)
+    private function update_members(&$game)
     {
         $flg = false;
 
-        for ($i=0; $i<$hako->allyNumber; $i++) {
+        for ($i=0; $i<$game->allyNumber; $i++) {
             $count = 0;
-            $members = $hako->ally[$i]['memberId'];
+            $members = $game->ally[$i]['memberId'];
             $new_members = [];
 
             foreach ($members as $id) {
-                if ($hako->idToNumber[$id] > -1) {
+                if ($game->idToNumber[$id] > -1) {
                     array_push($new_members, $id);
                     $count++;
                 }
             }
 
-            if ($count != $hako->ally[$i]['number']) {
-                $hako->ally[$i]['memberId'] = $new_members;
-                $hako->ally[$i]['number'] = $count;
+            if ($count != $game->ally[$i]['number']) {
+                $game->ally[$i]['memberId'] = $new_members;
+                $game->ally[$i]['number'] = $count;
                 $flg = true;
             }
         }
@@ -773,24 +703,24 @@ class Alliance
 
     /**
      * 同盟ごとの所属人口（スコア）更新
-     * @param       &$hako ゲーム総合データ
+     * @param       &$game ゲーム総合データ
      * @return bool        更新があった場合true
      */
-    private function update_alliances_score(&$hako)
+    private function update_alliances_score(&$game)
     {
         $flg = false;
 
-        for ($i = 0; $i < $hako->allyNumber; $i++) {
+        for ($i = 0; $i < $game->allyNumber; $i++) {
             $score = 0;
-            $members = $hako->ally[$i]['memberId'];
+            $members = $game->ally[$i]['memberId'];
 
             foreach ($members as $id) {
-                $member_island = $hako->islands[$hako->idToNumber[$id]];
+                $member_island = $game->islands[$game->idToNumber[$id]];
                 $score += $member_island['pop'];
             }
 
-            if ($score != $hako->ally[$i]['score']) {
-                $hako->ally[$i]['score'] = $score;
+            if ($score != $game->ally[$i]['score']) {
+                $game->ally[$i]['score'] = $score;
                 $flg = true;
             }
         }
