@@ -28,6 +28,8 @@
     "test": "run-os",
     "test:win32": "npm-run-all phplint:win32 test:win:*",
     "test:win:php": "vendor\\bin\\phpunit --bootstrap vendor\\autoload.php --testdox tests",
+    "test:linux:darwin": "npm-run-all phplint:linux:darwin test:nix:*",
+    "test:nix:php": "vendor/bin/phpunit --bootstrap vendor/autoload.php --testdox tests",
     "update": "run-os",
     "update:win32": "npm-run-all update:win:*",
     "update:win:autoload": "composer dump-autoload",
