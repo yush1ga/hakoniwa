@@ -14,5 +14,5 @@ require_once MODELPATH.'/hako-cgi.php';
 require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/mente.php';
 
-$init  = new \Init;
+$init  = new \Hakoniwa\Init;
 $start = new Maintenance\Mente;

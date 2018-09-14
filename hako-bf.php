@@ -15,6 +15,6 @@ require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 require_once CONTROLLERPATH.'/admin/bf.php';
 
-$init  = new \Init;
+$init  = new \Hakoniwa\Init;
 $start = new Admin\BF;
 $start->execute();

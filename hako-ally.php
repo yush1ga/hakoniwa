@@ -6,15 +6,14 @@
  * @author hiro <@hiro0218>
  */
 
-require_once 'config.php';
-require_once MODELPATH.'/hako-cgi.php';
-require_once PRESENTER.'/hako-html.php';
-require_once MODELPATH.'/Alliance.php';
-require_once HELPERPATH.'Util_alliance.php';
+require_once __DIR__."/config.php";
+require_once MODELPATH."/hako-cgi.php";
+require_once PRESENTER."/hako-html.php";
+require_once MODELPATH."/Alliance.php";
 
 use \Hakoniwa\Helper\Util_alliance as Util;
 
-$init = new Init;
+$init = new \Hakoniwa\Init;
 
 class MakeAlly
 {
@@ -151,12 +150,6 @@ class MakeAlly
             $island['allyId'] = $newAlly;
             $ally['score'] -= $island['pop'];
             $ally['number']--;
-        } else {
-            // 加盟
-            array_push($newAllyMember, $current_ID);
-            array_push($island['allyId'], $ally['id']);
-            $ally['score'] += $island['pop'];
-            $ally['number']++;
         }
         $island['money'] -= $init->comCost[$init->comAlly];
         $ally['memberId'] = $newAllyMember;

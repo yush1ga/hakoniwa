@@ -10,7 +10,7 @@ require_once 'config.php';
 require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 
-$init = new Init();
+$init = new \Hakoniwa\Init();
 
 $THIS_FILE = $init->baseDir . '/hako-edit.php';
 

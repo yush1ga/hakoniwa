@@ -9,7 +9,7 @@ header('X-Content-Type-Options: nosniff');
 
 require_once realpath(dirname(__FILE__, 3)).DIRECTORY_SEPARATOR.'config.php';
 
-$init = new Init();
+$init = new \Hakoniwa\Init();
 
 $filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init->logname;
 

@@ -9,7 +9,7 @@ parent::pageTitle($init->title, '同盟管理ページ');
 <?php if ($hako->allyNumber > 0):?>
 <a id="Withdrawal" href="<?=$this->this_file?>?p=withdrawal" class="btn btn-danger">同盟の脱退</a>
 <?php
-dump($hako);
+// dump($hako);
 $modal_body = <<<EOF
                 <form action="">
                     <div class="form-group">

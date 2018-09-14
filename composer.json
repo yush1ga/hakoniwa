@@ -10,7 +10,7 @@
         "psr-4": {
             "load\\": "./"
         },
-        "classmap": ["src/"]
+        "classmap": ["./"]
     },
     "require": {
         "php": "~7.1.0",

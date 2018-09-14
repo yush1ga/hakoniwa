@@ -1,21 +1,22 @@
 <?php
 
-namespace Hakoniwa\Test;
+namespace Hakoniwa;
 
-require_once 'ChromePhp.php';// ChromeLogger
+require_once __DIR__."/config.php";
+require_once "ChromePhp.php";// ChromeLogger
 // ChromePhp::log($hoge);
-require_once 'hako-init.php';
 
 use \ChromePhp as Console;
+use \Hakoniwa\Init;
 
 /**
-*
+* LaunchTest (Assert)
 */
-class LaunchTest extends \Init
+class LaunchTest extends \Hakoniwa\Init
 {
     private $needExts = [
-        'mbstring',
-        'zip'
+        "mbstring",
+        "zip"
     ];
     private function HasExtension(string $extName): bool
     {
@@ -24,7 +25,7 @@ class LaunchTest extends \Init
 
     private function chkExtensionLoaded()
     {
-        $noHaveExt = '';
+        $noHaveExt = "";
         foreach ($this->needExts as $ext) {
             if (!$this->HasExtension($ext)) {
                 $noHaveExt .= ", $ext";
@@ -41,7 +42,6 @@ class LaunchTest extends \Init
     {
         try {
             $this->chkExtensionLoaded();
-            random_int(0, 1);
         } catch (\Throwable $e) {
             $this->view_head();
             $this->print_nl2br($e->getMessage());
@@ -91,12 +91,12 @@ END;
 
     public function print_nl2br($str)
     {
-        echo '<div class="ui stacked left aligned segment">', $str, "</div>\n";
+        echo "<div class=\"ui stacked left aligned segment\">", $str, "</div>\n";
     }
 
     public function print_debug(...$args)
     {
-        $f = $this->HasExtension('Xdebug');
+        $f = $this->HasExtension("Xdebug");
         foreach ($args as $arg) {
             if (!$f) {
                 echo "<pre>";

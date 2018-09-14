@@ -1,4 +1,7 @@
 <?php
+
+namespace Hakoniwa;
+
 /**
  * Re:箱庭諸島 S.E.
  * @copyright 箱庭諸島 ver2.30
@@ -6,7 +9,10 @@
  * @author sota_n <@sota_n>
  */
 
-require_once 'hako-init-default.php'; // InitDefault
+require_once __DIR__."/config.php";
+use \Hakoniwa\InitDefault;
+
+// require_once 'hako-init-default.php'; // InitDefault
 
 class Init extends InitDefault
 {
