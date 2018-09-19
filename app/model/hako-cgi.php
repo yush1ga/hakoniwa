@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 箱庭諸島 S.E - Cookie定義用ファイル -
  * @copyright 箱庭諸島 ver2.30
@@ -18,10 +19,10 @@ class Cgi
     {
         global $init;
 
-        $this->mode = $_POST['mode'] ?? '';
+        $this->mode = $_POST["mode"] ?? "";
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
+            while ([$name, $value] = each($_POST)) {
                 $this->dataSet[$name] = str_replace(",", "", $value);
             }
         }

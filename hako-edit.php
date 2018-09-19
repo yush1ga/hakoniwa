@@ -43,7 +43,7 @@ class CgiImitation
     public function getCookies()
     {
         if (!empty($_COOKIE)) {
-            while (list($name, $value) = each($_COOKIE)) {
+            while ([$name, $value] = each($_COOKIE)) {
                 switch ($name) {
                     case "POINTX":
                         $this->dataSet['defaultX'] = $value;

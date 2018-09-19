@@ -1532,11 +1532,10 @@ class HakoEdit extends File
 
             case $init->landNewtown:
                 // ニュータウン
-                // $level = Util::expToLevel($l, $lv); //memo: 未使用コード おそらくコピペミス
-                $nwork = (int)($lv/15);
+                $nwork = intdiv($lv, 15) * 10;
                 $image = 'new.gif';
                 $naviTitle = 'ニュータウン';
-                $naviText = "{$lv}{$init->unitPop}/職場{$nwork}0{$init->unitPop}";
+                $naviText = "{$lv}{$init->unitPop}/職場{$nwork}{$init->unitPop}";
 
                 break;
 
