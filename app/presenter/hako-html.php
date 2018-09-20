@@ -60,9 +60,9 @@ class HTML
     public function pageTitle(string $title, string $subtitle = '')
     {
         if ($subtitle=='') {
-            println('<h1 class="title">', $title, '</h1>');
+            echo '<h1 class="title">', $title, '</h1>', "\n";
         } else {
-            println('<h1 class="title">', $title, ' <small>', $subtitle, '</small></h1>');
+            echo '<h1 class="title">', $title, ' <small>', $subtitle, '</small></h1>', "\n";
         }
     }
 

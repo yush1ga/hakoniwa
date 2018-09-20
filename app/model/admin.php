@@ -45,8 +45,8 @@ class Admin
         $this->mode = filter_input(INPUT_POST, 'mode') ?? "";
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
         }
     }

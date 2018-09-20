@@ -8,7 +8,7 @@
  */
 class Cgi
 {
-    public $mode = '';
+    public $mode = "";
     public $dataSet = [];
 
     /**
@@ -22,8 +22,8 @@ class Cgi
         $this->mode = $_POST["mode"] ?? "";
 
         if (!empty($_POST)) {
-            while ([$name, $value] = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
         }
 
@@ -68,7 +68,7 @@ class Cgi
     public function getCookies()
     {
         if (!empty($_COOKIE)) {
-            while (list($name, $value) = each($_COOKIE)) {
+            foreach ($_COOKIE as $name => $value) {
                 switch ($name) {
                     case "OWNISLANDID":
                         $this->dataSet['defaultID'] = $value;

@@ -10,7 +10,7 @@ require_once 'config.php';
 require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 
-$init = new \Hakoniwa\Init();
+$init = new \Hakoniwa\Init;
 
 $THIS_FILE = $init->baseDir . '/hako-edit.php';
 
@@ -28,8 +28,8 @@ class CgiImitation
         $this->mode = $_POST['mode'] ?? "";
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
             if (!empty($_POST['Sight'])) {
                 $this->dataSet['ISLANDID'] = $_POST['Sight'];
@@ -43,7 +43,7 @@ class CgiImitation
     public function getCookies()
     {
         if (!empty($_COOKIE)) {
-            while ([$name, $value] = each($_COOKIE)) {
+            foreach ($_COOKIE as $name => $value) {
                 switch ($name) {
                     case "POINTX":
                         $this->dataSet['defaultX'] = $value;

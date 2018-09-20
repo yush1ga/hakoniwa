@@ -710,8 +710,8 @@ class Main
         $this->mode = get_attr("post", "mode") ?? (get_attr("get", "mode") ?? "");
 
         if (!empty($_POST)) {
-            while ([$name, $value] = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
             // if (isset($this->dataSet["Allypact"])) {
             //     $this->mode = "AllypactUp";

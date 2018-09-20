@@ -6141,7 +6141,7 @@ class Turn
         $list = [];
         reset($kind);
 
-        while (list(, $value) = each($kind)) {
+        foreach ($kind as $value) {
             $list[$value] = 1;
         }
         for ($i = 0; $i < $range; $i++) {
