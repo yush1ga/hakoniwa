@@ -3,16 +3,33 @@
 declare(strict_types=1);
 
 use \PHPUnit\Framework\TestCase;
+use \Hakoniwa\Model\Alliance;
+
+$init = new \Hakoniwa\Init;
 
 final class AllianceTest extends TestCase
 {
-    public function testTestAlliance(): void
+    public static function setUpBeforeClass(): void
     {
-        $this->Alliance = new \Hakoniwa\Model\Alliance;
+        global $init;
+        require_once __DIR__."/../config.php";
     }
 
-    public function testWithdrawalAlliance(): void
+    public function setUp(): void
     {
+        $this->Alliance = new Alliance;
+        // $this->game     =
+    }
+
+    /**
+     * @dataProvider dataForWithdrawalAlliance
+     */
+    public function testWithdrawalAlliance($expected, $stdin): void
+    {
+        $game = 1;
+        // $this->assertSame($game, $stdin);
+        $this->assertSame($expected, $stdin);
+
         /**
          * ** 同盟の脱退に必要な入力
          * ・whoami
@@ -37,8 +54,8 @@ final class AllianceTest extends TestCase
          */
     }
 
-    public function testUserValidation($game = [], $data = ["Whoami" => 2]): void
+    public function dataForWithdrawalAlliance()
     {
-        $this->assertEquals("1", $data["Whoami"]);
+        yield "test" => [1, 1];
     }
 }
