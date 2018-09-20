@@ -2,7 +2,11 @@
 
 namespace Hakoniwa\Admin\Maintenance;
 
+require_once __DIR__."/../../../config.php";
+
 require_once MODELPATH.'/admin.php';
+
+use \HakoError;
 
 /**
  * 箱庭諸島 S.E
@@ -81,9 +85,6 @@ class Mente extends \Admin
                 break;
         }
 
-        if (!\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
-            \HakoError::wrongPassword();
-        }
         $html->footer();
     }
 
@@ -194,21 +195,28 @@ EOM;
     {
         global $init;
 
-        function isValidPasswd($passwd1='', $passwd2='')
-        {
-            return $passwd1!=='' && $passwd2!=='' && strcmp($passwd1, $passwd2)===0;
+        function is_same_string(string $s1, string $s2): bool {
+            return $s1 !== "" && $s2 !== "" && strcmp($s1, $s2) === 0;
         }
 
-        if (!isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['MPASS2'])) {
-            HakoError::wrongMasterPassword();
+        $invalid = false;
 
-            return;
-        } elseif (!isValidPasswd($this->dataSet['SPASS1'], $this->dataSet['SPASS2'])) {
-            HakoError::wrongSpecialPassword();
+        if (!is_same_string($this->dataSet['MPASS1'], $this->dataSet['MPASS2'])) {
+            \HakoError::wrongMasterPassword();
 
+            $invalid = true;
+        }
+        if (!is_same_string($this->dataSet['SPASS1'], $this->dataSet['SPASS2'])) {
+            \HakoError::wrongSpecialPassword();
+
+            $invalid = true;
+        }
+
+        if ($invalid) {
             return;
         }
-        if (isValidPasswd($this->dataSet['MPASS1'], $this->dataSet['SPASS1'])) {
+
+        if (is_same_string($this->dataSet['MPASS1'], $this->dataSet['SPASS1'])) {
             \HakoError::necessaryBeSetAnotherPassword();
 
             return;

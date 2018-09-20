@@ -18,9 +18,9 @@ class Util
         global $init;
         $digit = (int)$init->moneyMode;
 
-        return ($digit <= 0)? $money .$init->unitMoney
-                : ($money < $digit)? "推定{$digit}{$init->unitMoney}未満"
-                : '推定'. round($money / $digit) * $digit . $init->unitMoney;
+        return ($digit <= 0)? $money.$init->unitMoney
+                : (($money < $digit)? "推定{$digit}{$init->unitMoney}未満"
+                : '推定'.round($money / $digit) * $digit . $init->unitMoney);
     }
 
     /**
@@ -149,6 +149,20 @@ class Util
         return false;
     }
 
+    public static function checkAdminPassword(string $p): bool
+    {
+        if (!file_exists($init->passwordFile)) {
+            \HakoError::probrem();
+
+            return false;
+        }
+        $fp = fopen($init->passwordFile, "r");
+        $AdminPassword = chop(fgets($fp, READ_LINE));
+        fclose($fp);
+
+        return password_verify($p, $AdminPassword);
+    }
+
     /**
      * 特殊パスワードチェック
      * @param  string $p 入力パスワード
@@ -158,12 +172,11 @@ class Util
     {
         global $init;
 
-        // nullチェック
         if (empty($p)) {
             return false;
         }
         if (!file_exists($init->passwordFile)) {
-            HakoError::probrem();
+            \HakoError::probrem();
 
             return false;
         }

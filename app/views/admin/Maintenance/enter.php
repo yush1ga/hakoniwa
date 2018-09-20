@@ -39,10 +39,10 @@
                 <label>(2) <input type="password" name="SPASS2" value="" size=32 class="form-control"></label>
         </div>
 
-    <hr style="margin:16px;border:0;padding:0;">
+    <hr style="margin:2em;border:0;padding:0">
 
     <input type="hidden" name="mode" value="setup">
-    <input type="submit" value="パスワードを設定する" class="btn btn-primary">
+    <button type="submit" class="btn btn-primary">パスワードを設定する</button>
 </form>
 
-<?php endif;?>
+<?php endif;
