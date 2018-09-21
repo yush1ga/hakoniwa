@@ -7,6 +7,5 @@
 		verbose="true"
 		stopOnFailure="true"
 		backupGlobals="false"
-		syntaxCheck="true"
 	>
 </phpunit>
