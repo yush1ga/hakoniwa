@@ -23,14 +23,15 @@ $ISLAND_TURN;
 define("LOCK_RETRY_COUNT", 10);
 define("LOCK_RETRY_INTERVAL", 1000);
 define("READ_LINE", 1024);
+define("DS", DIRECTORY_SEPARATOR);
 // [Common directories]
-define("DOCROOT", __DIR__.DIRECTORY_SEPARATOR);
-define("APPPATH", realpath(__DIR__."/app/").DIRECTORY_SEPARATOR);
-define("CONTROLLERPATH", realpath(APPPATH."/controller/").DIRECTORY_SEPARATOR);
-define("HELPERPATH", realpath(APPPATH."/helper/").DIRECTORY_SEPARATOR);
-define("MODELPATH", realpath(APPPATH."/model/").DIRECTORY_SEPARATOR);
-define("PRESENTER", realpath(APPPATH."/presenter/").DIRECTORY_SEPARATOR);
-define("VIEWS", realpath(APPPATH."/views/").DIRECTORY_SEPARATOR);
+define("DOCROOT", __DIR__.DS);
+define("APPPATH", realpath(__DIR__.DS."app".DS).DS);
+define("CONTROLLERPATH", realpath(APPPATH.DS."controller".DS).DS);
+define("HELPERPATH", realpath(APPPATH.DS."helper".DS).DS);
+define("MODELPATH", realpath(APPPATH.DS."model".DS).DS);
+define("PRESENTER", realpath(APPPATH.DS."presenter".DS).DS);
+define("VIEWS", realpath(APPPATH.DS."views".DS).DS);
 
 // Composer/Autoloader
 require_once __DIR__."/vendor/autoload.php";

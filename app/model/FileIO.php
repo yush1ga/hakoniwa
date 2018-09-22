@@ -71,7 +71,9 @@ trait FileIO
         $segments = preg_split("/(\/|\\\\)/", $path);
         $parsed_path = [];
 
-        $is_absolute_path = $segments[0] === "" || preg_match("/[a-zA-Z]:/", $segments[0]);
+        $is_absolute_path = $segments[0] === "" || 1 === preg_match("/[a-zA-Z]:/", $segments[0]);
+        $is_windows_os = defined("PHP_WINDOWS_VERSION_MAJOR");
+        // $is_windows_path = ;
 
         if (!$is_absolute_path) {
             $i = 1;
@@ -106,7 +108,9 @@ trait FileIO
             array_splice($parsed_path, $depth);
         }
 
-        return "/".implode("/", $parsed_path);
+        $is_windows = false;
+        $s = DIRECTORY_SEPARATOR;
+        return ($is_windows ? "" : $s).implode($s, $parsed_path);
     }
 
     final private function is_usable_path(string $path, bool $verbose = false): array

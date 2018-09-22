@@ -1,8 +1,8 @@
 <?php
 
 declare(strict_types=1);
-error_reporting(E_ALL);
-setlocale(LC_ALL, "ja_JP.UTF-8");
+// error_reporting(E_ALL);
+// setlocale(LC_ALL, "ja_JP.UTF-8");
 
 require_once __DIR__."/../config.php";
 
@@ -55,12 +55,18 @@ final class FileIOTest extends TestCase
 
     public function asset4ParsePath()
     {
+        yield __DIR__ => [__DIR__, __DIR__];
         yield "/foo/bar/baz" => ["/foo/bar/baz", "/foo/bar/baz"];
         yield "/foo/bar//baz" => ["/foo/bar/baz", "/foo/bar//baz"];
-        yield "/hoge/fuga/xxxx/../piyo" => ["/hoge/fuga/piyo", "/hoge/fuga/xxxx/../piyo"];
-        yield "/hoge/xxxx/xxxx/../../piyo" => ["/hoge/piyo", "/hoge/xxxx/xxxx/../../piyo"];
+        yield "/hoge/xxxx/../fuga" => ["/hoge/fuga", "/hoge/xxxx/../fuga"];
         yield "/xxxx/../../hoge" => ["/hoge", "/xxxx/../../hoge"];
         yield "/qwerty/asdfgh/./zxcvbn" => ["/qwerty/asdfgh/zxcvbn", "/qwerty/asdfgh/./zxcvbn"];
+        yield "/hoge/ＦＵＧＡ" => ["/hoge/ＦＵＧＡ", "/hoge/ＦＵＧＡ"];
+        yield "/cn_simplified/这是一份非常简单的说明书….ext" => ["/cn_simplified/这是一份非常简单的说明书….ext", "/cn_simplified/这是一份非常简单的说明书….ext"];
+        yield "/cn_tradition/這是一份/非常簡單的/說明書….ext" => ["/cn_tradition/這是一份/非常簡單的/說明書….ext", "/cn_tradition/這是一份/非常簡單的/說明書….ext"];
+        yield "/hoge/with space/fuga.ext" => ["/hoge/with space/fuga.ext", "/hoge/with space/fuga.ext"];
+        yield "c://foo/bar" => ["c:/foo/bar", "c:\\\\foo\\\\bar"];
+        // yield "c:\\\\foo\\\\bar" => ["c:\\\\foo\\\\bar", "c:\\\\foo\\\\bar"];
     }
 
     // /**
