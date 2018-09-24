@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 $estb = $init->costMakeAlly
     ? '<span class="cash">'.$init->costMakeAlly.$init->unitMoney.'</span>必要です。'
     : '必要ありません。';

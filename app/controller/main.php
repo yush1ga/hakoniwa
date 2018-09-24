@@ -13,7 +13,7 @@ class Main
     /**
      * トップページ
      */
-    public function execute()
+    public function execute(): void
     {
         global $init;
 
@@ -39,7 +39,7 @@ class Main
 
         $cgi->setCookies();
 
-        if (strtolower($cgi->dataSet['DEVELOPEMODE'] ?? '') == 'javascript') {
+        if (mb_strtolower($cgi->dataSet['DEVELOPEMODE'] ?? '') == 'javascript') {
             $html = new HtmlMapJS;
             $com  = new MakeJS;
         } else {

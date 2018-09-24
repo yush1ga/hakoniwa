@@ -27,7 +27,7 @@ class Turn
      * @param  [type] $data  [description]
      * @return void
      */
-    public function turnMain(&$hako, $data)
+    public function turnMain(&$hako, $data): void
     {
         global $init;
 
@@ -55,7 +55,7 @@ class Turn
         $hako->readPresentFile(true);
 
         // 座標のランダム配列を作る
-        list($this->rpx, $this->rpy) = Util::makeRandomPointArray();
+        [$this->rpx, $this->rpy] = Util::makeRandomPointArray();
 
         // 島更新の順番決め
         $order = Util::randomArray($hako->islandNumber);
@@ -95,7 +95,7 @@ class Turn
             }
             // 戻り値1になるまで繰り返し
             while ($this->doCommand($hako, $hako->islands[$i]) == 0) {
-            };
+            }
             // 整地ログ（出力をまとめる場合）
             if ($init->logOmit) {
                 $this->logMatome($hako->islands[$i]);
@@ -186,7 +186,7 @@ class Turn
      * @param  [type] $island [description]
      * @return void
      */
-    public function logMatome($island)
+    public function logMatome($island): void
     {
         global $init;
 
@@ -2557,7 +2557,7 @@ class Turn
 
                                             // 賞関係
                                             // $prize = $island['prize'];
-                                            list($flags, $monsters, $turns) = explode(",", $prize, 3);
+                                            [$flags, $monsters, $turns] = explode(",", $prize, 3);
                                             $v = 1 << $monsSpec['kind'];
                                             $monsters |= $v;
 
@@ -2791,7 +2791,7 @@ class Turn
                             } elseif ($land[$bx][$by] == $init->landPlains) {
                                 // 平地の場合
                                 $land[$bx][$by] = $init->landTown;
-                                ;
+
                                 if ($boat > 10) {
                                     $landValue[$bx][$by] = 5;
                                     $boat -= 10;
@@ -2813,7 +2813,7 @@ class Turn
                             // 難民の数が一定数以上なら、平和賞の可能性あり
                             if ($achive >= 200) {
                                 $prize = $island['prize'];
-                                list($flags, $monsters, $turns) = explode(",", $prize, 3);
+                                [$flags, $monsters, $turns] = explode(",", $prize, 3);
                                 if ((!($flags & 8)) && $achive >= 200) {
                                     $flags |= 8;
                                     $this->log->prize($id, $name, $init->prizeName[4]);
@@ -3558,10 +3558,10 @@ class Turn
         // 変更された可能性のある変数を書き戻す
         // $hako->islands[$hako->idToNumber[$id]] = $island;
         // 事後処理
-        unset($island['prize']);
-        unset($island['land']);
-        unset($island['landValue']);
-        unset($island['command']);
+        unset($island['prize'], $island['land'], $island['landValue'], $island['command']);
+
+
+
         $island['prize'] = $prize;
         $island['land'] = $land;
         $island['landValue'] = $landValue;
@@ -4309,11 +4309,11 @@ class Turn
                     }
                     // ワープする
                     if ($special & 0x40) {
-                        if (mt_rand(0, 100) < 20) { // 20%
+                        if (random_int(0, 100) < 20) { // 20%
                             // ワープ実行
                             $tg;
                             $tIsland = $island;
-                            if (mt_rand(0, 100) < 50) { // 50%
+                            if (random_int(0, 100) < 50) { // 50%
                                 // ワープする島を決める
                                 $tg = Util::random($hako->islandNumber);
                                 $tIsland = $hako->islands[$tg];
@@ -5593,7 +5593,7 @@ class Turn
         $pop = $island['pop'];
         $damage = $island['oldPop'] - $pop;
         $prize = $island['prize'];
-        list($flags, $monsters, $turns) = explode(",", $prize, 3);
+        [$flags, $monsters, $turns] = explode(",", $prize, 3);
         $island['peop'] = $island['pop'] - $island['oldPop'];
         $island['pots'] = $island['point'] - $island['oldPoint'];
 
@@ -5753,7 +5753,7 @@ class Turn
      * @param  [type] &$hako [description]
      * @return void
      */
-    public static function islandSort(&$hako)
+    public static function islandSort(&$hako): void
     {
         global $init;
         usort($hako->islands, 'popComp');
@@ -5764,7 +5764,7 @@ class Turn
      * @param  [type] &$island プレイヤーデータ
      * @return void
      */
-    public function income(&$island)
+    public function income(&$island): void
     {
         global $init;
 
@@ -5850,7 +5850,7 @@ class Turn
             $island['money'] = 0;
         }
         if ($island['food'] < 0) {
-            $island['food'] = 0 ;
+            $island['food'] = 0;
         }
     }
 
@@ -5859,7 +5859,7 @@ class Turn
      * @param  [type] &$island [description]
      * @return void
      */
-    public function shipcounter(&$island)
+    public function shipcounter(&$island): void
     {
         global $init;
         for ($i = 0, $c=count($init->shipName); $i < $c; $i++) {

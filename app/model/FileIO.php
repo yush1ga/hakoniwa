@@ -8,48 +8,47 @@ require_once __DIR__."/../../config.php";
 
 trait FileIO
 {
-    final protected function read_gameboard_file()
+    final protected function read_gameboard_file(): void
     {
     }
 
-    final protected function read_players_data()
+    final protected function read_players_data(): void
     {
     }
 
-    final protected function read_alliances_file()
+    final protected function read_alliances_file(): void
     {
     }
 
-    final protected function read_present_file()
+    final protected function read_present_file(): void
     {
     }
 
-    final protected function pick_player_data()
+    final protected function pick_player_data(): void
     {
     }
 
-    final protected function pick_alliance_data()
+    final protected function pick_alliance_data(): void
     {
     }
 
-    final protected function write_gameboard_file()
+    final protected function write_gameboard_file(): void
     {
     }
 
-    final protected function write_players_file()
+    final protected function write_players_file(): void
     {
     }
 
-    final protected function write_alliances_file()
+    final protected function write_alliances_file(): void
     {
     }
 
-    final private function mkfile (string $filepath): bool
+    final private function mkfile(string $filepath): bool
     {
-        $info = pathinfo($filepath);
-        $info["dirname"] = realpath((preg_match("/^([a-zA-Z]:[\/\\]|\/)/", $info["dirname"]) ? "" : __DIR__).DS.$info["dirname"]);
+        $info = pathinfo($this->parse_path($filepath));
 
-        $filepath = $info["dirname"].DS.$info["filename"];
+        $filepath = $info["dirname"].DS.$info["basename"];
         $file_stat = $this->is_usable_path($filepath, true)["file"];
         $dir_stat = $this->is_usable_path($info["dirname"], true);
 
@@ -58,7 +57,7 @@ trait FileIO
         }
 
         if (!$dir_stat["dir"]) {
-            if(!mkdir($info["dirname"], 0755, true)) {
+            if (!mkdir($info["dirname"], 0755, true)) {
                 return false;
             }
         }
@@ -66,40 +65,51 @@ trait FileIO
         return file_put_contents($filepath, "", LOCK_EX) !== false;
     }
 
+
+
     final private function parse_path(string $path): string
     {
         $segments = preg_split("/(\/|\\\\)/", $path);
         $parsed_path = [];
+        $s = DIRECTORY_SEPARATOR;
+        $cwd = getcwd();
 
-        $is_absolute_path = $segments[0] === "" || 1 === preg_match("/[a-zA-Z]:/", $segments[0]);
+        $has_driveletter = 1 === preg_match("/[a-zA-Z]:\.?/", $segments[0]);
         $is_windows_os = defined("PHP_WINDOWS_VERSION_MAJOR");
-        // $is_windows_path = ;
+        $is_absolute_path = $segments[0] === "" || $has_driveletter;
 
-        if (!$is_absolute_path) {
-            $i = 1;
-            $depth = 1;
-            $parsed_path[0] = __DIR__;
-        } else {
-            $i = 0;
-            $depth = 0;
+        if (!$is_windows_os && $has_driveletter) {
+            throw new \InvalidArgumentException("Failed parse: `{$path}`");
         }
 
-        for (; $i < count($segments); $i++) {
-            $seg = $segments[$i];
-            switch($seg) {
-                case ".":
+        if ($segments[0] === "~") {
+            if ($is_windows_os) {
+                throw new \InvalidArgumentException("Failed parse: `{$path}`");
+            } else {
+                return posix_getpwuid(posix_geteuid())["dir"].mb_substr($path, 1);
+            }
+        }
 
+        if (!$is_absolute_path) {
+            return $this->parse_path($cwd.$s.$path);
+        }
+
+        for ($i = 0, $depth = 0; $i < count($segments); $i++) {
+            $seg = $segments[$i];
+            switch ($seg) {
+                case ".":
+                case "":
+                    // noop
                 break;
                 case "..":
                     $depth -= ($depth === 0) ? 0 : 1;
+                    $depth = ($is_windows_os && $has_driveletter) ? max($depth, 1) : $depth;
 
-                break;
-                case "":
-                    // noop
                 break;
                 default:
                     $parsed_path[$depth] = $seg;
                     $depth += 1;
+
                 break;
             }
         }
@@ -108,10 +118,22 @@ trait FileIO
             array_splice($parsed_path, $depth);
         }
 
-        $is_windows = false;
-        $s = DIRECTORY_SEPARATOR;
-        return ($is_windows ? "" : $s).implode($s, $parsed_path);
+
+        if ($is_windows_os) {
+            if ($has_driveletter) {
+                $path_prefix = "";
+                $parsed_path[0] = mb_strtoupper($parsed_path[0]);
+            } else {
+                $path_prefix = mb_substr($cwd, 0, mb_strpos($cwd, ":") + 1).$s;
+            }
+        } else {
+            $path_prefix = $s;
+        }
+
+        return $path_prefix.implode($s, $parsed_path);
     }
+
+
 
     final private function is_usable_path(string $path, bool $verbose = false): array
     {
@@ -145,23 +167,27 @@ trait FileIO
         }
     }
 
+
+
     final private function rimraf(string $path): bool
     {
-        if (is_dir($path)) {
+        if (!is_dir($this->parse_path($path))) {
             return false;
         }
+
         $ls = array_diff(scandir($path), [".", ".."]);
         foreach ($ls as $file) {
-            $p = $path.DS.$file;
+            $p = $path.DIRECTORY_SEPARATOR.$file;
             is_dir($p) ? $this->rimraf($p) : unlink($p);
-            unset($p);
         }
-        unset($ls);
+        unset($p, $ls);
 
         return rmdir($path);
     }
 
-    final protected function backup()
+
+
+    final protected function backup(): void
     {
     }
 }

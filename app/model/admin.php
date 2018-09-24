@@ -40,7 +40,7 @@ class Admin
         'IMG'
     ];
 
-    public function parseInputData()
+    public function parseInputData(): void
     {
         $this->mode = filter_input(INPUT_POST, 'mode') ?? "";
 
@@ -50,7 +50,7 @@ class Admin
             }
         }
     }
-    public function d_parseInputData()
+    public function d_parseInputData(): void
     {
         $this->d_dataSet = filter_input_array(INPUT_POST, array_merge($this::ARGS, $this->vargs));
     }

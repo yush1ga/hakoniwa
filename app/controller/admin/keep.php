@@ -10,7 +10,7 @@ require_once MODELPATH.'/admin.php';
  */
 class Keep extends \Admin
 {
-    public function execute()
+    public function execute(): void
     {
         $html = new \HTMLKeep();
         $cgi = new \Cgi();
@@ -41,7 +41,7 @@ class Keep extends \Admin
         $html->footer();
     }
 
-    public function toMode($id, &$hako)
+    public function toMode($id, &$hako): void
     {
         global $init;
 
@@ -57,7 +57,7 @@ class Keep extends \Admin
         }
     }
 
-    public function fromMode($id, &$hako)
+    public function fromMode($id, &$hako): void
     {
         global $init;
 

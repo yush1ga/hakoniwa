@@ -88,7 +88,7 @@ class Mente extends \Admin
         $html->footer();
     }
 
-    public function newMode()
+    public function newMode(): void
     {
         global $init;
 
@@ -115,14 +115,14 @@ EOM;
         // .htaccess生成
         $fileName = $init->dirName.'/.htaccess';
         $fp = fopen($fileName, "w");
-        fputs($fp, "Options -Indexes\n");
+        fwrite($fp, "Options -Indexes\n");
         fclose($fp);
         chmod($fileName, 0644);
     }
 
 
 
-    public function delMode($id)
+    public function delMode($id): void
     {
         global $init;
 
@@ -130,7 +130,7 @@ EOM;
         $this->rmTree($dirName);
     }
 
-    public function timeMode()
+    public function timeMode(): void
     {
         $date = $this->dataSet['date'].' '.$this->dataSet['time'];
         $date = date_parse_from_format('Y-m-d H:i', $date);
@@ -141,7 +141,7 @@ EOM;
         $this->stimeMode($toSetDate);
     }
 
-    public function stimeMode($sec)
+    public function stimeMode($sec): void
     {
         global $init;
 
@@ -154,12 +154,12 @@ EOM;
         $buffer[1] = "$sec\n";
         fseek($fp, 0);
         while (null !== ($line = array_shift($buffer))) {
-            fputs($fp, $line);
+            fwrite($fp, $line);
         }
         fclose($fp);
     }
 
-    public function currentMode($id)
+    public function currentMode($id): void
     {
         global $init;
 
@@ -178,7 +178,7 @@ EOM;
      * @param  string $dirName 子ファイルを削除したいディレクトリ
      * @return void
      */
-    public function rmTree($dirName)
+    public function rmTree($dirName): void
     {
         if (is_dir($dirName)) {
             $dir = opendir($dirName.'/');
@@ -195,7 +195,8 @@ EOM;
     {
         global $init;
 
-        function is_same_string(string $s1, string $s2): bool {
+        function is_same_string(string $s1, string $s2): bool
+        {
             return $s1 !== "" && $s2 !== "" && strcmp($s1, $s2) === 0;
         }
 
@@ -225,8 +226,8 @@ EOM;
         $masterPasswd  = \Util::encode($this->dataSet['MPASS1'], false);
         $specialPasswd = \Util::encode($this->dataSet['SPASS1'], false);
         $fp = fopen($init->passwordFile, "w");
-        fputs($fp, "$masterPasswd\n");
-        fputs($fp, "$specialPasswd\n");
+        fwrite($fp, "$masterPasswd\n");
+        fwrite($fp, "$specialPasswd\n");
         fclose($fp);
     }
 }

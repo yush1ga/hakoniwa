@@ -12,17 +12,17 @@ require_once APPPATH.'/model/hako-log.php';
 
 class HTML
 {
-    public static function header()
+    public static function header(): void
     {
         global $init;
-        require_once(VIEWS.'/header.php');
-        require_once(VIEWS.'/body.php');
+        require_once VIEWS.'/header.php';
+        require_once VIEWS.'/body.php';
     }
 
-    public static function head()
+    public static function head(): void
     {
         global $init;
-        require_once(VIEWS.'/header.php');
+        require_once VIEWS.'/header.php';
     }
 
 
@@ -30,10 +30,10 @@ class HTML
      * HTML <footer />
      * @return void
      */
-    public static function footer()
+    public static function footer(): void
     {
         global $init;
-        require_once(VIEWS.'/footer.php');
+        require_once VIEWS.'/footer.php';
     }
 
     /**
@@ -41,10 +41,10 @@ class HTML
      * @param  [type] $hako [description]
      * @return void
      */
-    public function lastModified($hako)
+    public function lastModified($hako): void
     {
         global $init;
-        require_once(VIEWS.'/lastModified.php');
+        require_once VIEWS.'/lastModified.php';
     }
 
     /**
@@ -57,7 +57,7 @@ class HTML
         return date("Y年n月j日 G時i分s秒", $t);
     }
 
-    public function pageTitle(string $title, string $subtitle = '')
+    public function pageTitle(string $title, string $subtitle = ''): void
     {
         if ($subtitle=='') {
             echo '<h1 class="title">', $title, '</h1>', "\n";
@@ -66,7 +66,7 @@ class HTML
         }
     }
 
-    public function print_islandInfoTable($info, int $rank)
+    public function print_islandInfoTable($info, int $rank): void
     {
         global $init;
 
@@ -249,7 +249,7 @@ END;
 
 class HtmlTop extends HTML
 {
-    public function main($hako, $data)
+    public function main($hako, $data): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-main.php';
@@ -258,7 +258,7 @@ class HtmlTop extends HTML
         // 開発モードのラジオボタンのチェックフラグ
         $radio  = '';
         $radio2 = 'checked';
-        if (strtolower($data['defaultDevelopeMode'] ?? "") !== 'javascript') {
+        if (mb_strtolower($data['defaultDevelopeMode'] ?? "") !== 'javascript') {
             $radio  = 'checked';
             $radio2 = '';
         }
@@ -466,11 +466,11 @@ END;
      * @param type $hako
      * @param type $data
      */
-    public function register(&$hako, $data = '')
+    public function register(&$hako, $data = ''): void
     {
         global $init;
 
-        require_once(VIEWS.'/conf/register.php');
+        require_once VIEWS.'/conf/register.php';
     }
 
     /**
@@ -483,38 +483,38 @@ END;
         global $init;
         $this_file = $init->baseDir . '/hako-main.php';
 
-        require_once(VIEWS.'/conf/discovery.php');
+        require_once VIEWS.'/conf/discovery.php';
     }
 
     /**
      * 島の名前とパスワードの変更
      */
-    public function changeIslandInfo($islandList = "")
+    public function changeIslandInfo($islandList = ""): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-main.php";
 
-        require_once(VIEWS.'/conf/change/island-info.php');
+        require_once VIEWS.'/conf/change/island-info.php';
     }
 
     /**
      * オーナー名の変更
      */
-    public function changeOwnerName($islandList = "")
+    public function changeOwnerName($islandList = ""): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-main.php";
 
-        require_once(VIEWS.'/conf/change/owner-name.php');
+        require_once VIEWS.'/conf/change/owner-name.php';
     }
 
     /**
      * 最近の出来事
      */
-    public function log()
+    public function log(): void
     {
         global $init;
-        require_once(VIEWS.'/log/recent.php');
+        require_once VIEWS.'/log/recent.php';
     }
 }
 
@@ -559,10 +559,10 @@ class HtmlMap extends HTML
         }
 
         // ファイル頭に追記して最大容量超過分を切り捨て
-        fputs($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
+        fwrite($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
         for ($i=0,$ax=$init->axesmax-1; $i<$ax; $i++) {
             if (isset($log[$i])) {
-                fputs($fp, $log[$i]);
+                fwrite($fp, $log[$i]);
             }
         }
         fclose($fp);
@@ -600,13 +600,13 @@ class HtmlMap extends HTML
         $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
 
         // 読み込み
-        require_once(VIEWS.'/map/main.php');
+        require_once VIEWS.'/map/main.php';
     }
 
     //---------------------------------------------------
     // 島の情報
     //---------------------------------------------------
-    public function islandInfo($island, $number = 0, $mode = 0)
+    public function islandInfo($island, $number = 0, $mode = 0): void
     {
         global $init;
         $island['pop'] = max(1, $island['pop']);
@@ -707,7 +707,7 @@ class HtmlMap extends HTML
         }
 
         // 島の情報
-        require_once(VIEWS.'/map/island-info.php');
+        require_once VIEWS.'/map/island-info.php';
     }
 
     /**
@@ -757,7 +757,7 @@ class HtmlMap extends HTML
             }
         }
 
-        require_once(VIEWS.'/map/development/map.php');
+        require_once VIEWS.'/map/development/map.php';
 
         println('<p class="text-center">開始ターン：', $island['starturn'], '</p>');
 
@@ -816,7 +816,7 @@ END;
     //---------------------------------------------------
     // 開発画面
     //---------------------------------------------------
-    public function tempOwer($hako, $data, $number = 0)
+    public function tempOwer($hako, $data, $number = 0): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-main.php';
@@ -827,13 +827,13 @@ END;
         $height = $init->islandSize * 32 + 100;
         $defaultTarget = $init->targetIsland == 1 ? $island['id'] : $hako->defaultTarget;
 
-        require_once(VIEWS.'/map/development/basic.php');
+        require_once VIEWS.'/map/development/basic.php';
     }
 
     //---------------------------------------------------
     // 入力済みコマンド表示
     //---------------------------------------------------
-    public function tempCommand($number, $command, $hako)
+    public function tempCommand($number, $command, $hako): void
     {
         global $init;
 
@@ -1074,7 +1074,7 @@ END;
     //---------------------------------------------------
     // 新しく発見した島
     //---------------------------------------------------
-    public function newIslandHead($name)
+    public function newIslandHead($name): void
     {
         global $init;
 
@@ -1085,7 +1085,7 @@ END;
     //---------------------------------------------------
     // 目標捕捉モード
     //---------------------------------------------------
-    public function printTarget($hako, $data)
+    public function printTarget($hako, $data): void
     {
         global $init;
 
@@ -1124,7 +1124,7 @@ class HtmlMapJS extends HtmlMap
     //---------------------------------------------------
     // 開発画面
     //---------------------------------------------------
-    public function tempOwer($hako, $data, $number = 0)
+    public function tempOwer($hako, $data, $number = 0): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-main.php";
@@ -1163,7 +1163,7 @@ class HtmlMapJS extends HtmlMap
         $All_listCom = 0;
         $com_count = count($init->commandDivido);
         for ($m = 0; $m < $com_count; $m++) {
-            list($aa, $dd, $ff) = explode(",", $init->commandDivido[$m]);
+            [$aa, $dd, $ff] = explode(",", $init->commandDivido[$m]);
             $set_listcom .= "[ ";
             for ($i = 0; $i < $init->commandTotal; $i++) {
                 $l_kind = $init->comList[$i];
@@ -1191,12 +1191,12 @@ class HtmlMapJS extends HtmlMap
                 //	next;
                 //}
             }
-            $bai = strlen($set_listcom);
-            $set_listcom = substr($set_listcom, 0, $bai - 2);
+            $bai = mb_strlen($set_listcom);
+            $set_listcom = mb_substr($set_listcom, 0, $bai - 2);
             $set_listcom .= " ],\n";
         }
-        $bai = strlen($set_listcom);
-        $set_listcom = substr($set_listcom, 0, $bai - 2);
+        $bai = mb_strlen($set_listcom);
+        $set_listcom = mb_substr($set_listcom, 0, $bai - 2);
         if (empty($data['defaultKind'])) {
             $default_Kind = 1;
         } else {
@@ -1213,7 +1213,7 @@ class HtmlMapJS extends HtmlMap
         for ($i = 0; $i < count($init->EiseiName); $i++) {
             $set_eisei .= "'".$init->EiseiName[$i]."',";
         }
-        $set_eisei = substr($set_eisei, 0, -1);  // ケツカンマを削除
+        $set_eisei = mb_substr($set_eisei, 0, -1);  // ケツカンマを削除
 
         // 島リストセット
         $set_island = "";
@@ -1227,12 +1227,12 @@ class HtmlMapJS extends HtmlMap
                 $set_island .= "[$l_id, '$l_name'],\n";
             }
         }
-        $set_island = substr($set_island, 0, -1);  // ケツカンマを削除
+        $set_island = mb_substr($set_island, 0, -1);  // ケツカンマを削除
 
 
         $defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
 
-        require_once(VIEWS.'/map/development/js.php');
+        require_once VIEWS.'/map/development/js.php';
 
         echo <<<END
 <script type="text/javascript">
@@ -1997,7 +1997,7 @@ END;
 	<option value="">全種類</option>
 END;
         for ($i = 0; $i < $com_count; $i++) {
-            list($aa, $tmp) = explode(",", $init->commandDivido[$i], 2);
+            [$aa, $tmp] = explode(",", $init->commandDivido[$i], 2);
             echo "<option value=\"$i\">{$aa}</option>\n";
         }
         echo <<<END
@@ -2135,7 +2135,7 @@ END;
 
 class HtmlAdmin extends HTML
 {
-    public function render()
+    public function render(): void
     {
         global $init;
 
@@ -2147,13 +2147,13 @@ class HtmlAdmin extends HTML
             'BF管理'           => '/hako-bf.php',
             '島預かり管理'     => '/hako-keep.php'
         ];
-        require_once(VIEWS.'/admin/top.php');
+        require_once VIEWS.'/admin/top.php';
     }
 }
 
 class HtmlPresent extends HTML
 {
-    public function main($data, $hako)
+    public function main($data, $hako): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-present.php";
@@ -2163,7 +2163,7 @@ class HtmlPresent extends HTML
         $height = $init->islandSize * 32 + 100;
         $defaultTarget = '';
 
-        require_once(VIEWS.'/admin/present/main.php');
+        require_once VIEWS.'/admin/present/main.php';
     }
 }
 
@@ -2171,7 +2171,7 @@ class HtmlPresent extends HTML
 
 class HtmlMente extends HTML
 {
-    public function enter()
+    public function enter(): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-mente.php';
@@ -2180,7 +2180,7 @@ class HtmlMente extends HTML
         require_once VIEWS.'/admin/Maintenance/enter.php';
     }
 
-    public function main($data)
+    public function main($data): void
     {
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";
@@ -2196,7 +2196,7 @@ class HtmlMente extends HTML
             }
         }
         // データ保存用ディレクトリのパーミッションチェック
-        if (!is_writeable($dirName) || !is_readable($dirName)) {
+        if (!is_writable($dirName) || !is_readable($dirName)) {
             \Util::makeTagMessage("データ保存用ディレクトリに対する適切な操作権限を所持していません。\nサーバー管理者にお問合せください。", 'danger');
             \HTML::footer();
             exit;
@@ -2216,7 +2216,7 @@ EOT;
         }
         // バックアップデータがあれば表示
         $dir = opendir(dirname($dirName));
-        $dirCld = false !== strpos($dirName, "/") ? substr(strrchr($dirName, "/"), 1) : $dirName;
+        $dirCld = false !== mb_strpos($dirName, "/") ? mb_substr(mb_strrchr($dirName, "/"), 1) : $dirName;
         while (false !== ($dn = readdir($dir))) {
             $_dirName = preg_quote($dirCld);
             if (preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
@@ -2229,7 +2229,7 @@ EOT;
     }
 
     // 表示モード
-    public function dataPrint($data, $suf = "")
+    public function dataPrint($data, $suf = ""): void
     {
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";
@@ -2242,8 +2242,8 @@ EOT;
             $fp = fopen($init->dirName.".bak{$suf}/hakojima.dat", "r");
             println('<h2>バックアップ <small>（bak', $suf, '）</small></h2>');
         }
-        $lastTurn = chop(fgets($fp, READ_LINE));
-        $lastTime = chop(fgets($fp, READ_LINE));
+        $lastTurn = rtrim(fgets($fp, READ_LINE));
+        $lastTime = rtrim(fgets($fp, READ_LINE));
         fclose($fp);
         $timeString = self::timeToString($lastTime);
 
@@ -2286,7 +2286,7 @@ END;
 
 class HtmlAxes extends HTML
 {
-    public function passwdChk()
+    public function passwdChk(): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-axes.php';
@@ -2302,7 +2302,7 @@ class HtmlAxes extends HTML
 END;
     }
 
-    public function main($data)
+    public function main($data): void
     {
         global $init;
         parent::pageTitle($init->title, 'アクセスログ');
@@ -2315,11 +2315,11 @@ END;
 
 class HtmlBF extends HTML
 {
-    public function main($data, $hako)
+    public function main($data, $hako): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-bf.php';
-        require_once(VIEWS.'/admin/bf.php');
+        require_once VIEWS.'/admin/bf.php';
     }
 }
 
@@ -2327,11 +2327,11 @@ class HtmlBF extends HTML
 
 class HTMLKeep extends HTML
 {
-    public function main($data, $hako)
+    public function main($data, $hako): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-keep.php';
-        require_once(VIEWS.'/admin/keep.php');
+        require_once VIEWS.'/admin/keep.php';
     }
 }
 
@@ -2350,7 +2350,7 @@ class HtmlAlly extends HTML
     /**
      * 初期画面
      */
-    public function allyTop($hako, $data)
+    public function allyTop($hako, $data): void
     {
         global $init;
 
@@ -2360,7 +2360,7 @@ class HtmlAlly extends HTML
     /**
      * 同盟の状況
      */
-    public function allyInfo($hako, $view_ally_num = 0)
+    public function allyInfo($hako, $view_ally_num = 0): void
     {
         global $init;
 
@@ -2392,7 +2392,7 @@ class HtmlAlly extends HTML
     /**
      * 同盟の情報
      */
-    public function detail($hako, $data)
+    public function detail($hako, $data): void
     {
         global $init;
 
@@ -2448,7 +2448,7 @@ class HtmlAlly extends HTML
     //--------------------------------------------------
     // 同盟コメントの変更
     //--------------------------------------------------
-    public function tempAllyPactPage($hako, $data)
+    public function tempAllyPactPage($hako, $data): void
     {
         global $init;
         $this_file  = $init->baseDir . "/hako-ally.php";
@@ -2516,7 +2516,7 @@ END;
         require VIEWS . 'Alliance/Register.php';
     }
 
-    public function newAllyTop($hako, $data)
+    public function newAllyTop($hako, $data): void
     {
         global $init;
         $this_file  = $init->baseDir . "/hako-ally.php";
@@ -2582,7 +2582,7 @@ END;
                 $jsAllyMarkList .= "'{$hako->ally[$i]['mark']}'";
                 $jsAllyColorList .= "[";
                 for ($j=0; $j<6; $j++) {
-                    $jsAllyColorList .= '\'' . substr($hako->ally[$i]['color'], $j, 1) . '\'';
+                    $jsAllyColorList .= '\'' . mb_substr($hako->ally[$i]['color'], $j, 1) . '\'';
                     if ($j < 5) {
                         $jsAllyColorList .= ',';
                     }

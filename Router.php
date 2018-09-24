@@ -1,24 +1,26 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Router.php
  *
  * 開発中(PHPのビルトインCLIサーバーから読込が発生した場合)は常時DEBUG=trueになる。
  */
-if (php_sapi_name() === 'cli-server') {
-    if (!defined('DEBUG')) {
-        define('DEBUG', true);
+if (php_sapi_name() === "cli-server") {
+    if (!defined("DEBUG")) {
+        define("DEBUG", true);
     }
-    function dump($var)
+    function dump($var): void
     {
-        echo '<pre>';
+        echo "<pre>";
         var_dump($var);
-        echo '</pre>';
+        echo "</pre>";
     }
-    function logging($str)
+    function logging($str): void
     {
         error_log($str, 0);
     }
-    function dump_logging($var)
+    function dump_logging($var): void
     {
         ob_start();
         var_dump($var);
@@ -27,12 +29,12 @@ if (php_sapi_name() === 'cli-server') {
         ob_end_clean();
     }
 
-    ini_set('display_errors', 1);
+    ini_set("display_errors", "1");
     set_time_limit(0);
     error_reporting(E_ALL);
     header("Cache-Control: no-cache, no-store, must-revalidate");
     header("Expires: Sat, 01 Apr 2017 09:00:00 GMT");
-    require_once __DIR__.'/LaunchTest.php';
+    require_once __DIR__."/LaunchTest.php";
 
     return false;
 }

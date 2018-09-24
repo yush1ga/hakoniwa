@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * 箱庭諸島 S.E - 各種ユーティリティ定義用ファイル -
  * @copyright 箱庭諸島 ver2.30
@@ -129,7 +131,7 @@ class Util
             return false;
         }
         $fp = fopen($init->passwordFile, "r");
-        $masterPasswd = chop(fgets($fp, READ_LINE));
+        $masterPasswd = rtrim(fgets($fp, READ_LINE));
         fclose($fp);
 
         // マスターパスワードチェック
@@ -138,7 +140,7 @@ class Util
         }
 
         // 通常のパスワードチェック
-        $isLegacyHash = '$2y$10$' !== substr($p1, 0, 7);
+        $isLegacyHash = '$2y$10$' !== mb_substr($p1, 0, 7);
         if (!$isLegacyHash) {
             return password_verify($p2, $p1);
         }
@@ -157,7 +159,7 @@ class Util
             return false;
         }
         $fp = fopen($init->passwordFile, "r");
-        $AdminPassword = chop(fgets($fp, READ_LINE));
+        $AdminPassword = rtrim(fgets($fp, READ_LINE));
         fclose($fp);
 
         return password_verify($p, $AdminPassword);
@@ -181,8 +183,8 @@ class Util
             return false;
         }
         $fp = fopen($init->passwordFile, "r");
-        $specialPasswd = chop(fgets($fp, READ_LINE));//1行目を破棄
-        $specialPasswd = chop(fgets($fp, READ_LINE));
+        $specialPasswd = rtrim(fgets($fp, READ_LINE));//1行目を破棄
+        $specialPasswd = rtrim(fgets($fp, READ_LINE));
         fclose($fp);
 
         return password_verify($p, $specialPasswd);
@@ -270,7 +272,7 @@ class Util
     //---------------------------------------------------
     // コマンドを前にずらす
     //---------------------------------------------------
-    public static function slideFront(&$command, $number = 0)
+    public static function slideFront(&$command, $number = 0): void
     {
         global $init;
 
@@ -290,7 +292,7 @@ class Util
     //---------------------------------------------------
     // コマンドを後にずらす
     //---------------------------------------------------
-    public static function slideBack(&$command, $number = 0)
+    public static function slideBack(&$command, $number = 0): void
     {
         global $init;
 
@@ -411,7 +413,7 @@ class Util
             }
             // 一定時間sleepし、ロックが解除されるのを待つ
             // 乱数時間sleepすることで、ロックが何度も衝突しないようにする
-            usleep((LOCK_RETRY_INTERVAL - mt_rand(0, 300)) * 1000);
+            usleep(random_int(0, 100) * 1000);
         }
         // ロック失敗
         fclose($fp);
@@ -425,7 +427,7 @@ class Util
      * @param  [type] $fp file pointer
      * @return void
      */
-    public static function unlock($fp)
+    public static function unlock($fp): void
     {
         fflush($fp);
         flock($fp, LOCK_UN);
@@ -438,7 +440,7 @@ class Util
      * @param  string $status  アラート種類："success","info","warning","danger".
      * @return void
      */
-    public static function makeTagMessage($message, $status = 'success')
+    public static function makeTagMessage($message, $status = 'success'): void
     {
         echo '<div class="alert alert-'.$status.'" role="alert">';
         echo nl2br($message, false);
@@ -452,7 +454,7 @@ class Util
      */
     public static function rand_string(int $max = 32): string
     {
-        return substr(md5(uniqid(rand_number(), true)), 0, $max);
+        return mb_substr(md5(uniqid(rand_number(), true)), 0, $max);
     }
 
     /**
@@ -587,7 +589,7 @@ class Util
 
 
 
-function println(...$strs)
+function println(...$strs): void
 {
     foreach ($strs as $str) {
         echo $str;

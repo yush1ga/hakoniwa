@@ -20,7 +20,7 @@ class MakeAlly
     //--------------------------------------------------
     // 解散
     //--------------------------------------------------
-    public function delete_alliance($hako, $data)
+    public function delete_alliance($hako, $data): void
     {
         global $init;
 
@@ -95,7 +95,7 @@ class MakeAlly
     //--------------------------------------------------
     // 加盟・脱退
     //--------------------------------------------------
-    public function joinAllyMain($hako, $data)
+    public function joinAllyMain($hako, $data): void
     {
         global $init;
 
@@ -171,7 +171,7 @@ class MakeAlly
     //--------------------------------------------------
     // 盟主コメントモード
     //--------------------------------------------------
-    public function allyPactMain($hako, $data)
+    public function allyPactMain($hako, $data): void
     {
         $ally = $hako->ally[$hako->idToAllyNumber[$data['ALLYID']]];
 
@@ -280,7 +280,7 @@ class AllyIO
         }
         $fp = fopen($fileName, "r");
         Util::lock_on_read($fp);
-        $this->allyNumber = intval(chop(fgets($fp, READ_LINE)), 10);
+        $this->allyNumber = intval(rtrim(fgets($fp, READ_LINE)), 10);
 
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $this->ally[$i] = $this->readAlly($fp);
@@ -306,21 +306,21 @@ class AllyIO
     //--------------------------------------------------
     public function readAlly($fp)
     {
-        $name       = chop(fgets($fp, READ_LINE));
-        $mark       = chop(fgets($fp, READ_LINE));
-        $color      = chop(fgets($fp, READ_LINE));
-        $id         = chop(fgets($fp, READ_LINE));
-        $ownerName  = chop(fgets($fp, READ_LINE));
-        $password   = chop(fgets($fp, READ_LINE));
-        $score      = chop(fgets($fp, READ_LINE));
-        $number     = chop(fgets($fp, READ_LINE));
-        $occupation = chop(fgets($fp, READ_LINE));
-        $tmp        = chop(fgets($fp, READ_LINE));
+        $name       = rtrim(fgets($fp, READ_LINE));
+        $mark       = rtrim(fgets($fp, READ_LINE));
+        $color      = rtrim(fgets($fp, READ_LINE));
+        $id         = rtrim(fgets($fp, READ_LINE));
+        $ownerName  = rtrim(fgets($fp, READ_LINE));
+        $password   = rtrim(fgets($fp, READ_LINE));
+        $score      = rtrim(fgets($fp, READ_LINE));
+        $number     = rtrim(fgets($fp, READ_LINE));
+        $occupation = rtrim(fgets($fp, READ_LINE));
+        $tmp        = rtrim(fgets($fp, READ_LINE));
         $allymember = explode(",", $tmp);
-        $tmp        = chop(fgets($fp, READ_LINE));
+        $tmp        = rtrim(fgets($fp, READ_LINE));
         $ext        = explode(",", $tmp);
-        $comment    = chop(fgets($fp, READ_LINE));
-        $title      = chop(fgets($fp, READ_LINE));
+        $comment    = rtrim(fgets($fp, READ_LINE));
+        $title      = rtrim(fgets($fp, READ_LINE));
         [$title, $message] = array_pad(explode("<>", $title), 2, null);
 
         return [
@@ -351,7 +351,7 @@ class AllyIO
         $fp = fopen($fileName, "w");
         ftruncate($fp, 0);
         Util::lock_on_write($fp);
-        fputs($fp, $this->allyNumber . "\n");
+        fwrite($fp, $this->allyNumber . "\n");
 
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $this->writeAlly($fp, $this->ally[$i]);
@@ -364,12 +364,12 @@ class AllyIO
     //--------------------------------------------------
     // 同盟ひとつ書き込み
     //--------------------------------------------------
-    public function writeAlly($fp, $ally)
+    public function writeAlly($fp, $ally): void
     {
-        $members = join(",", $ally['memberId']);
-        $ext = join(",", $ally['ext']);
+        $members = implode(",", $ally['memberId']);
+        $ext = implode(",", $ally['ext']);
         $comment = $ally['comment'] ?? '';
-        $message = (isset($ally['title']) && isset($ally['message']))
+        $message = (isset($ally['title'], $ally['message']))
             ? $ally['title'] . '<>' . $ally['message']
             : '<>';
 
@@ -407,10 +407,10 @@ EOL
         }
         $fp = fopen($fileName, "r");
         Util::lock_on_read($fp);
-        $this->islandTurn     = chop(fgets($fp, READ_LINE));
-        $this->islandLastTime = chop(fgets($fp, READ_LINE));
-        $this->islandNumber   = chop(fgets($fp, READ_LINE));
-        $this->islandNextID   = chop(fgets($fp, READ_LINE));
+        $this->islandTurn     = rtrim(fgets($fp, READ_LINE));
+        $this->islandLastTime = rtrim(fgets($fp, READ_LINE));
+        $this->islandNumber   = rtrim(fgets($fp, READ_LINE));
+        $this->islandNextID   = rtrim(fgets($fp, READ_LINE));
 
         for ($i = 0; $i < $this->islandNumber; $i++) {
             $this->islands[$i] = $this->readIsland($fp);
@@ -431,38 +431,38 @@ EOL
     //---------------------------------------------------
     public function readIsland($fp)
     {
-        $name     = chop(fgets($fp, READ_LINE));
+        $name     = rtrim(fgets($fp, READ_LINE));
 
-        list($name, $owner, $monster, $port, $passenger, $fishingboat, $tansaku, $senkan, $viking) = array_pad(explode(",", $name), 10, null);
-        $id       = chop(fgets($fp, READ_LINE));
-        list($id, $starturn) = explode(",", $id);
-        $prize    = chop(fgets($fp, READ_LINE));
-        $absent   = chop(fgets($fp, READ_LINE));
-        $comment  = chop(fgets($fp, READ_LINE));
-        list($comment, $comment_turn) = explode(",", $comment);
-        $password = chop(fgets($fp, READ_LINE));
-        $point    = chop(fgets($fp, READ_LINE));
-        list($point, $pots) = explode(",", $point);
-        $eisei    = chop(fgets($fp, READ_LINE));
-        list($eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5) = array_pad(explode(",", $eisei), 6, null);
-        $zin      = chop(fgets($fp, READ_LINE));
-        list($zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6) = array_pad(explode(",", $zin), 7, null);
-        $item     = chop(fgets($fp, READ_LINE));
-        list($item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19) = array_pad(explode(",", $item), 20, null);
-        $money    = chop(fgets($fp, READ_LINE));
-        list($money, $lot, $gold) = array_pad(explode(",", $money), 3, null);
-        $food     = chop(fgets($fp, READ_LINE));
-        list($food, $rice) = explode(",", $food);
-        $pop      = chop(fgets($fp, READ_LINE));
-        list($pop, $peop) = explode(",", $pop);
-        $area     = chop(fgets($fp, READ_LINE));
-        $job      = chop(fgets($fp, READ_LINE));
-        list($farm, $factory, $commerce, $mountain, $hatuden) = explode(",", $job);
-        $power    = chop(fgets($fp, READ_LINE));
-        list($taiji, $rena, $fire) = explode(",", $power);
-        $tenki    = chop(fgets($fp, READ_LINE));
-        $soccer   = chop(fgets($fp, READ_LINE));
-        list($soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten) = array_pad(explode(",", $soccer), 10, null);
+        [$name, $owner, $monster, $port, $passenger, $fishingboat, $tansaku, $senkan, $viking] = array_pad(explode(",", $name), 10, null);
+        $id       = rtrim(fgets($fp, READ_LINE));
+        [$id, $starturn] = explode(",", $id);
+        $prize    = rtrim(fgets($fp, READ_LINE));
+        $absent   = rtrim(fgets($fp, READ_LINE));
+        $comment  = rtrim(fgets($fp, READ_LINE));
+        [$comment, $comment_turn] = explode(",", $comment);
+        $password = rtrim(fgets($fp, READ_LINE));
+        $point    = rtrim(fgets($fp, READ_LINE));
+        [$point, $pots] = explode(",", $point);
+        $eisei    = rtrim(fgets($fp, READ_LINE));
+        [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5] = array_pad(explode(",", $eisei), 6, null);
+        $zin      = rtrim(fgets($fp, READ_LINE));
+        [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6] = array_pad(explode(",", $zin), 7, null);
+        $item     = rtrim(fgets($fp, READ_LINE));
+        [$item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19] = array_pad(explode(",", $item), 20, null);
+        $money    = rtrim(fgets($fp, READ_LINE));
+        [$money, $lot, $gold] = array_pad(explode(",", $money), 3, null);
+        $food     = rtrim(fgets($fp, READ_LINE));
+        [$food, $rice] = explode(",", $food);
+        $pop      = rtrim(fgets($fp, READ_LINE));
+        [$pop, $peop] = explode(",", $pop);
+        $area     = rtrim(fgets($fp, READ_LINE));
+        $job      = rtrim(fgets($fp, READ_LINE));
+        [$farm, $factory, $commerce, $mountain, $hatuden] = explode(",", $job);
+        $power    = rtrim(fgets($fp, READ_LINE));
+        [$taiji, $rena, $fire] = explode(",", $power);
+        $tenki    = rtrim(fgets($fp, READ_LINE));
+        $soccer   = rtrim(fgets($fp, READ_LINE));
+        [$soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten] = array_pad(explode(",", $soccer), 10, null);
 
         return [
             'name'         => $name,

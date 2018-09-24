@@ -34,7 +34,7 @@ trait Enum
         return new self($method);
     }
 
-    final public function __set($k, $v)
+    final public function __set($k, $v): void
     {
         throw new \BadMethodCallException('All setter is forbbiden');
     }

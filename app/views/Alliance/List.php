@@ -1,4 +1,5 @@
-<?php if ($alliances_number === 0): ?>
+<?php declare(strict_types=1);
+if ($alliances_number === 0): ?>
 
 <p>現在、同盟はありません。</p>
 

@@ -1,4 +1,5 @@
-<?php if (file_exists($init->passwordFile)):?>
+<?php declare(strict_types=1);
+if (file_exists($init->passwordFile)):?>
 
 <form action="<?=$this_file?>" method="post">
     <div class="form-group"><div class="form-inline">

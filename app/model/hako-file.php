@@ -38,12 +38,12 @@ class File
             return false;
         }
         $fp = fopen($fileName, "r");
-        $this->islandTurn = chop(fgets($fp, READ_LINE));
-        $this->islandLastTime = chop(fgets($fp, READ_LINE));
-        $str = chop(fgets($fp, READ_LINE));
-        list($this->islandNumber, $this->islandNumberBF, $this->islandNumberKP) = array_pad(explode(",", $str), 3, 0);
+        $this->islandTurn = rtrim(fgets($fp, READ_LINE));
+        $this->islandLastTime = rtrim(fgets($fp, READ_LINE));
+        $str = rtrim(fgets($fp, READ_LINE));
+        [$this->islandNumber, $this->islandNumberBF, $this->islandNumberKP] = array_pad(explode(",", $str), 3, 0);
 
-        $this->islandNextID = chop(fgets($fp, READ_LINE));
+        $this->islandNextID = rtrim(fgets($fp, READ_LINE));
 
         $GLOBALS['ISLAND_TURN'] = $this->islandTurn;
 
@@ -91,43 +91,43 @@ class File
     {
         global $init;
 
-        $name = chop(fgets($fp, READ_LINE));
-        list($name, $owner, $monster, $port, $ship0, $ship1, $ship2, $ship3, $ship4, $ship5, $ship6, $ship7, $ship8, $ship9, $ship10, $ship11, $ship12, $ship13, $ship14) = array_pad(explode(",", $name), 20, 0);
-        $id = chop(fgets($fp, READ_LINE));
-        list($id, $starturn, $isBF, $keep) = array_pad(explode(",", $id), 4, 0);
+        $name = rtrim(fgets($fp, READ_LINE));
+        [$name, $owner, $monster, $port, $ship0, $ship1, $ship2, $ship3, $ship4, $ship5, $ship6, $ship7, $ship8, $ship9, $ship10, $ship11, $ship12, $ship13, $ship14] = array_pad(explode(",", $name), 20, 0);
+        $id = rtrim(fgets($fp, READ_LINE));
+        [$id, $starturn, $isBF, $keep] = array_pad(explode(",", $id), 4, 0);
         if ($isBF) {
             $isBF = 1;
         }
         if ($keep) {
             $keep = 1;
         }
-        $prize = chop(fgets($fp, READ_LINE));
-        $absent = chop(fgets($fp, READ_LINE));
-        $comment = chop(fgets($fp, READ_LINE));
-        list($comment, $comment_turn) = array_pad(explode(",", $comment), 2, 0);
-        $password = chop(fgets($fp, READ_LINE));
-        $point = chop(fgets($fp, READ_LINE));
-        list($point, $pots) = array_pad(explode(",", $point), 2, null);
-        $eisei = chop(fgets($fp, READ_LINE));
-        list($eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5) = array_pad(explode(",", $eisei), 6, 0);
-        $zin = chop(fgets($fp, READ_LINE));
-        list($zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6) = array_pad(explode(",", $zin), 7, 0);
-        $item = chop(fgets($fp, READ_LINE));
-        list($item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19, $item20) = array_pad(explode(",", $item), 21, null);
-        $money = chop(fgets($fp, READ_LINE));
-        list($money, $lot, $gold) = array_pad(explode(",", $money), 3, 0);
-        $food = chop(fgets($fp, READ_LINE));
-        list($food, $rice) = array_pad(explode(",", $food), 2, 0);
-        $pop = chop(fgets($fp, READ_LINE));
-        list($pop, $peop) = array_pad(explode(",", $pop), 2, 0);
-        $area = chop(fgets($fp, READ_LINE));
-        $job = chop(fgets($fp, READ_LINE));
-        list($farm, $factory, $commerce, $mountain, $hatuden) = array_pad(explode(",", $job), 5, 0);
-        $power = chop(fgets($fp, READ_LINE));
-        list($taiji, $rena, $fire) = array_pad(explode(",", $power), 3, 0);
-        $tenki = chop(fgets($fp, READ_LINE));
-        $soccer = chop(fgets($fp, READ_LINE));
-        list($soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten) = array_pad(explode(",", $soccer), 10, 0);
+        $prize = rtrim(fgets($fp, READ_LINE));
+        $absent = rtrim(fgets($fp, READ_LINE));
+        $comment = rtrim(fgets($fp, READ_LINE));
+        [$comment, $comment_turn] = array_pad(explode(",", $comment), 2, 0);
+        $password = rtrim(fgets($fp, READ_LINE));
+        $point = rtrim(fgets($fp, READ_LINE));
+        [$point, $pots] = array_pad(explode(",", $point), 2, null);
+        $eisei = rtrim(fgets($fp, READ_LINE));
+        [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5] = array_pad(explode(",", $eisei), 6, 0);
+        $zin = rtrim(fgets($fp, READ_LINE));
+        [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6] = array_pad(explode(",", $zin), 7, 0);
+        $item = rtrim(fgets($fp, READ_LINE));
+        [$item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19, $item20] = array_pad(explode(",", $item), 21, null);
+        $money = rtrim(fgets($fp, READ_LINE));
+        [$money, $lot, $gold] = array_pad(explode(",", $money), 3, 0);
+        $food = rtrim(fgets($fp, READ_LINE));
+        [$food, $rice] = array_pad(explode(",", $food), 2, 0);
+        $pop = rtrim(fgets($fp, READ_LINE));
+        [$pop, $peop] = array_pad(explode(",", $pop), 2, 0);
+        $area = rtrim(fgets($fp, READ_LINE));
+        $job = rtrim(fgets($fp, READ_LINE));
+        [$farm, $factory, $commerce, $mountain, $hatuden] = array_pad(explode(",", $job), 5, 0);
+        $power = rtrim(fgets($fp, READ_LINE));
+        [$taiji, $rena, $fire] = array_pad(explode(",", $power), 3, 0);
+        $tenki = rtrim(fgets($fp, READ_LINE));
+        $soccer = rtrim(fgets($fp, READ_LINE));
+        [$soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten] = array_pad(explode(",", $soccer), 10, 0);
 
         $this->idToName[$id] = $name;
 
@@ -144,10 +144,10 @@ class File
             // 地形
             $offset = 7; // 一対のデータが何文字か
             for ($y = 0; $y < $init->islandSize; $y++) {
-                $line = chop(fgets($fp_i, READ_LINE));
+                $line = rtrim(fgets($fp_i, READ_LINE));
                 for ($x = 0; $x < $init->islandSize; $x++) {
-                    $l = substr($line, $x * $offset, 2);
-                    $v = substr($line, $x * $offset + 2, 5);
+                    $l = mb_substr($line, $x * $offset, 2);
+                    $v = mb_substr($line, $x * $offset + 2, 5);
                     $land[$x][$y] = hexdec($l);
                     $landValue[$x][$y] = hexdec($v);
                 }
@@ -155,8 +155,8 @@ class File
 
             // コマンド
             for ($i = 0; $i < $init->commandMax; $i++) {
-                $line = chop(fgets($fp_i, READ_LINE));
-                list($kind, $target, $x, $y, $arg) = explode(",", $line);
+                $line = rtrim(fgets($fp_i, READ_LINE));
+                [$kind, $target, $x, $y, $arg] = explode(",", $line);
                 $command[$i] = [
                     'kind' => $kind,
                     'target' => $target,
@@ -251,9 +251,9 @@ class File
                 $land[$x][$y] %= 256;// 0-FF
                 $landValue[$x][$y] %= 1048576;// 0-FFFFF
                 $l = sprintf("%02x%05x", $land[$x][$y], $landValue[$x][$y]);
-                fputs($fp_i, $l);
+                fwrite($fp_i, $l);
             }
-            fputs($fp_i, "\n");
+            fwrite($fp_i, "\n");
         }
         // コマンド
         $commands = $island['command'];
@@ -266,7 +266,7 @@ class File
                 $commands[$i]['y'],
                 $commands[$i]['arg']
             );
-            fputs($fp_i, $com);
+            fwrite($fp_i, $com);
         }
 
         fclose($fp_i);
@@ -313,22 +313,22 @@ class File
     //--------------------------------------------------
     public function readAlly($fp)
     {
-        $name = chop(fgets($fp, READ_LINE));
-        $mark = chop(fgets($fp, READ_LINE));
-        $color = chop(fgets($fp, READ_LINE));
-        $id = chop(fgets($fp, READ_LINE));
-        $ownerName = chop(fgets($fp, READ_LINE));
-        $password = chop(fgets($fp, READ_LINE));
-        $score = chop(fgets($fp, READ_LINE));
-        $number = chop(fgets($fp, READ_LINE));
-        $occupation = chop(fgets($fp, READ_LINE));
-        $tmp = chop(fgets($fp, READ_LINE));
+        $name = rtrim(fgets($fp, READ_LINE));
+        $mark = rtrim(fgets($fp, READ_LINE));
+        $color = rtrim(fgets($fp, READ_LINE));
+        $id = rtrim(fgets($fp, READ_LINE));
+        $ownerName = rtrim(fgets($fp, READ_LINE));
+        $password = rtrim(fgets($fp, READ_LINE));
+        $score = rtrim(fgets($fp, READ_LINE));
+        $number = rtrim(fgets($fp, READ_LINE));
+        $occupation = rtrim(fgets($fp, READ_LINE));
+        $tmp = rtrim(fgets($fp, READ_LINE));
         $allymember = explode(",", $tmp);
-        $tmp = chop(fgets($fp, READ_LINE));
+        $tmp = rtrim(fgets($fp, READ_LINE));
         $ext = explode(",", $tmp); // 拡張領域
-        $comment = chop(fgets($fp, READ_LINE));
-        $title = chop(fgets($fp, READ_LINE));
-        list($title, $message) = array_pad(explode("<>", $title), 2, 0);
+        $comment = rtrim(fgets($fp, READ_LINE));
+        $title = rtrim(fgets($fp, READ_LINE));
+        [$title, $message] = array_pad(explode("<>", $title), 2, 0);
 
         return [
             'name'       => $name,
@@ -364,10 +364,10 @@ class File
         $fp = fopen($fileName, "w");
 
         // グローバルデータ
-        fputs($fp, $this->islandTurn . "\n");
-        fputs($fp, $this->islandLastTime . "\n");
-        fputs($fp, $this->islandNumber . "," . $this->islandNumberBF . "," . $this->islandNumberKP . "\n");
-        fputs($fp, $this->islandNextID . "\n");
+        fwrite($fp, $this->islandTurn . "\n");
+        fwrite($fp, $this->islandLastTime . "\n");
+        fwrite($fp, $this->islandNumber . "," . $this->islandNumberBF . "," . $this->islandNumberKP . "\n");
+        fwrite($fp, $this->islandNextID . "\n");
 
         // 各島データ
         for ($i = 0; $i < $this->islandNumber; $i++) {
@@ -423,12 +423,12 @@ class File
         $zins   = $island['zin'][0].",".$island['zin'][1].",".$island['zin'][2].",".$island['zin'][3].",".$island['zin'][4].",".$island['zin'][5].",".$island['zin'][6];
         $items  = $island['item'][0].",".$island['item'][1].",".$island['item'][2].",".$island['item'][3].",".$island['item'][4].",".$island['item'][5].",".$island['item'][6].",".$island['item'][7].",".$island['item'][8].",".$island['item'][9].",".$island['item'][10].",".$island['item'][11].",".$island['item'][12].",".$island['item'][13].",".$island['item'][14].",".$island['item'][15].",".$island['item'][16].",".$island['item'][17].",".$island['item'][18].",".$island['item'][19].",".$island['item'][20];
 
-        fputs($fp, $island['name'] . "," . $island['owner'] . "," . $island['monster'] . "," . $island['port'] . "," . $ships . "\n");
-        fputs($fp, $island['id'] . "," . $island['starturn'] . "," . $island['isBF'] . "," . $island['keep'] . "\n");
-        fputs($fp, $island['prize'] . "\n");
-        fputs($fp, $island['absent'] . "\n");
-        fputs($fp, $island['comment'] . "," . $island['comment_turn'] . "\n");
-        fputs($fp, $island['password'] . "\n");
+        fwrite($fp, $island['name'] . "," . $island['owner'] . "," . $island['monster'] . "," . $island['port'] . "," . $ships . "\n");
+        fwrite($fp, $island['id'] . "," . $island['starturn'] . "," . $island['isBF'] . "," . $island['keep'] . "\n");
+        fwrite($fp, $island['prize'] . "\n");
+        fwrite($fp, $island['absent'] . "\n");
+        fwrite($fp, $island['comment'] . "," . $island['comment_turn'] . "\n");
+        fwrite($fp, $island['password'] . "\n");
 
         if (!isset($island['pots'])) {
             $island['pots'] = 0;
@@ -446,19 +446,19 @@ class File
             $island['peop'] = 0;
         }
 
-        fputs($fp, $island['point'] . "," . $island['pots'] . "\n");
-        fputs($fp, $eiseis . "\n");
-        fputs($fp, $zins . "\n");
-        fputs($fp, $items . "\n");
-        fputs($fp, $island['money'] . "," . $island['lot'] . "," . $island['gold'] . "\n");
-        fputs($fp, $island['food'] . "," . $island['rice'] . "\n");
-        fputs($fp, $island['pop'] . "," . $island['peop'] . "\n");
+        fwrite($fp, $island['point'] . "," . $island['pots'] . "\n");
+        fwrite($fp, $eiseis . "\n");
+        fwrite($fp, $zins . "\n");
+        fwrite($fp, $items . "\n");
+        fwrite($fp, $island['money'] . "," . $island['lot'] . "," . $island['gold'] . "\n");
+        fwrite($fp, $island['food'] . "," . $island['rice'] . "\n");
+        fwrite($fp, $island['pop'] . "," . $island['peop'] . "\n");
 
-        fputs($fp, $island['area'] . "\n");
-        fputs($fp, $island['farm'] . "," . $island['factory'] . "," . $island['commerce'] . "," . $island['mountain'] ."," . $island['hatuden'] . "\n");
-        fputs($fp, $island['taiji'] . "," . $island['rena'] . "," . $island['fire'] . "\n");
-        fputs($fp, $island['tenki'] . "\n");
-        fputs($fp, $island['soccer'].",".$island['team'].",".$island['shiai'].",".$island['kachi'].",".$island['make'].",".$island['hikiwake'].",".$island['kougeki'].",".$island['bougyo'].",".$island['tokuten'].",".$island['shitten']."\n");
+        fwrite($fp, $island['area'] . "\n");
+        fwrite($fp, $island['farm'] . "," . $island['factory'] . "," . $island['commerce'] . "," . $island['mountain'] ."," . $island['hatuden'] . "\n");
+        fwrite($fp, $island['taiji'] . "," . $island['rena'] . "," . $island['fire'] . "\n");
+        fwrite($fp, $island['tenki'] . "\n");
+        fwrite($fp, $island['soccer'].",".$island['team'].",".$island['shiai'].",".$island['kachi'].",".$island['make'].",".$island['hikiwake'].",".$island['kougeki'].",".$island['bougyo'].",".$island['tokuten'].",".$island['shitten']."\n");
 
         // 地形
         if (($num <= -1) || ($num == $island['id'])) {
@@ -474,9 +474,9 @@ class File
             for ($y = 0; $y < $init->islandSize; $y++) {
                 for ($x = 0; $x < $init->islandSize; $x++) {
                     $l = sprintf("%02x%05x", $land[$x][$y], $landValue[$x][$y]);
-                    fputs($fp_i, $l);
+                    fwrite($fp_i, $l);
                 }
-                fputs($fp_i, "\n");
+                fwrite($fp_i, "\n");
             }
             // コマンド
             $command = $island['command'];
@@ -489,7 +489,7 @@ class File
                     $command[$i]['y'],
                     $command[$i]['arg']
                 );
-                fputs($fp_i, $com);
+                fwrite($fp_i, $com);
             }
 
             fclose($fp_i);
@@ -503,7 +503,7 @@ class File
      * バックアップ
      * @return void
      */
-    public function backup()
+    public function backup(): void
     {
         global $init;
 
@@ -562,7 +562,7 @@ class File
      * @param  string $dirName Directory that to delete.
      * @return void
      */
-    public function rmTree(string $dirName)
+    public function rmTree(string $dirName): void
     {
         if (is_dir("{$dirName}")) {
             $dir = opendir("{$dirName}/");
@@ -581,7 +581,7 @@ class File
      * @param  boolean $erase 読込み後にファイルを削除するか
      * @return void
      */
-    public function readPresentFile(bool $erase = false)
+    public function readPresentFile(bool $erase = false): void
     {
         global $init;
 
@@ -589,7 +589,7 @@ class File
         if (is_file($fileName)) {
             $presents = file($fileName);
             foreach ($presents as $present) {
-                list($id, $item, $px, $py) = explode(",", chop($present));
+                [$id, $item, $px, $py] = explode(",", rtrim($present));
                 $num = $this->idToNumber[$id];
                 $this->islands[$num]['present']['item'] = $item;
                 $this->islands[$num]['present']['px'] = $px;
@@ -605,7 +605,7 @@ class File
      * プレゼント管理ファイル書込み
      * @return void
      */
-    public function writePresentFile()
+    public function writePresentFile(): void
     {
         global $init;
 
@@ -621,8 +621,8 @@ class File
         $num = count($presents);
         $fp = fopen($fileName, "w");
         if ($num > 0) {
-            for ($i = 0; $i < $num ; $i++) {
-                fputs($fp, $presents[$i]);
+            for ($i = 0; $i < $num; $i++) {
+                fwrite($fp, $presents[$i]);
             }
         }
         fclose($fp);
@@ -696,7 +696,7 @@ class Hako extends File
     public function getPrizeList($prize)
     {
         global $init;
-        list($flags, $monsters, $turns) = explode(",", $prize, 3);
+        [$flags, $monsters, $turns] = explode(",", $prize, 3);
 
         $turns = explode(",", $turns);
         $prizeList = "";
@@ -740,7 +740,7 @@ class Hako extends File
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr = '')
+    public function landString($l, $lv, $x, $y, $mode, $comStr = ''): void
     {
         global $init;
 
@@ -1243,7 +1243,7 @@ class HakoBF extends File
     public $islandListBF;   // BFな島リスト
     private $nil_list = '<option disabled>（変更可能な島はありません）</option>';
 
-    public function init($cgi)
+    public function init($cgi): void
     {
         global $init;
         $this->islandListNoBF = '';
@@ -1281,7 +1281,7 @@ class HakoEdit extends File
     //---------------------------------------------------
     // 地形に関するデータ生成
     //---------------------------------------------------
-    public function landString($l, $lv, $x, $y, $mode, $comStr)
+    public function landString($l, $lv, $x, $y, $mode, $comStr): void
     {
         global $init;
         $point = "($x,$y)";
@@ -1789,7 +1789,7 @@ class HakoPresent extends File
 {
     public $islandList; // 島リスト
 
-    public function init($cgi)
+    public function init($cgi): void
     {
         global $init;
         $this->readIslandsFile($cgi);
@@ -1810,7 +1810,7 @@ class HakoKP extends File
     public $islandListKP;   // 預かり島リスト
     private $nil_list = '<option disabled>（変更可能な島はありません）</option>';
 
-    public function init($cgi)
+    public function init($cgi): void
     {
         global $init;
         $this->readIslandsFile($cgi);

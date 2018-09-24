@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 $elements = [
     'point', 'money', 'food', 'pop', 'area', 'fire',
     'pots', 'gold', 'rice', 'peop', 'monster', 'taiji',

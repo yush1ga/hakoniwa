@@ -6,6 +6,9 @@ use \PHPUnit\Framework\TestCase;
 
 final class SavedataTest extends TestCase
 {
+    /**
+     * @todo skip
+     */
     public function testCorrectSavedataTypes(): void
     {
         $this->assertTrue(true);

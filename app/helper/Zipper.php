@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 class Zipper extends \ZipArchive
 {
     private $zip;
@@ -21,14 +23,14 @@ class Zipper extends \ZipArchive
         }
     }
 
-    public function addDirectory($dir)
+    public function addDirectory($dir): void
     {
         if (!is_dir($dir)) {
             throw new \InvalidArgumentException("{$dir} is not directory.");
         }
     }
 
-    public function download()
+    public function download(): void
     {
         header("Content-Type: application/force-download;");
         header("Content-Length: ".filesize($zip_tmp_path.$zip_name));

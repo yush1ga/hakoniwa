@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hakoniwa\Model;
 
 require_once __DIR__."/../../config.php";
@@ -71,7 +73,7 @@ class Alliance
         function is_match_in_array($string, $array)
         {
             foreach ($array as $v) {
-                if (strpos($string, $v) !== false) {
+                if (mb_strpos($string, $v) !== false) {
                     return true;
                 }
             }
@@ -649,8 +651,8 @@ class Alliance
             $owner_id = $game->ally[$i]['id'];
 
             if (($game->idToNumber[$owner_id] ?? -1) < 0) {
-                unset($game->ally[$i]);
-                unset($game->idToAllyNumber[$owner_id]);
+                unset($game->ally[$i], $game->idToAllyNumber[$owner_id]);
+
                 $game->ally[$i]['dead'] = 1;
                 $count++;
             }
@@ -729,7 +731,7 @@ class Alliance
     /**
      * 同盟の占有率の計算
      */
-    private function calculates_share(&$game)
+    private function calculates_share(&$game): void
     {
         $total_score = 0;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hakoniwa;
 
 require_once __DIR__."/config.php";
@@ -23,7 +25,7 @@ class LaunchTest extends \Hakoniwa\Init
         return extension_loaded($extName);
     }
 
-    private function chkExtensionLoaded()
+    private function chkExtensionLoaded(): void
     {
         $noHaveExt = "";
         foreach ($this->needExts as $ext) {
@@ -33,7 +35,7 @@ class LaunchTest extends \Hakoniwa\Init
             }
         }
         if ($noHaveExt !== "") {
-            $noHaveExt = substr($noHaveExt, 2);
+            $noHaveExt = mb_substr($noHaveExt, 2);
 
             throw new \Error("動作に必要なモジュール\"$noHaveExt\"が読み込まれていません。");
         }
@@ -50,7 +52,7 @@ class LaunchTest extends \Hakoniwa\Init
         }
     }
 
-    private function view_head()
+    private function view_head(): void
     {
         echo <<<END
 <!doctype html>
@@ -78,7 +80,7 @@ class LaunchTest extends \Hakoniwa\Init
 
 END;
     }
-    private function view_foot()
+    private function view_foot(): void
     {
         echo <<<END
     </div>
@@ -89,12 +91,12 @@ END;
 END;
     }
 
-    public function print_nl2br($str)
+    public function print_nl2br($str): void
     {
         echo "<div class=\"ui stacked left aligned segment\">", $str, "</div>\n";
     }
 
-    public function print_debug(...$args)
+    public function print_debug(...$args): void
     {
         $f = $this->HasExtension("Xdebug");
         foreach ($args as $arg) {

@@ -10,7 +10,7 @@ class Cgi
 
     private $filter_flag = FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK;
 
-    public function parse_input_data()
+    public function parse_input_data(): void
     {
         if (!empty($_GET)) {
         }
@@ -21,7 +21,7 @@ class Cgi
         }
     }
 
-    private function dataset_optimization()
+    private function dataset_optimization(): void
     {
         if ($this->dataset) {
         }

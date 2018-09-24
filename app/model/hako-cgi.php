@@ -15,7 +15,7 @@ class Cgi
      * POST、GETのデータを取得
      * @return void
      */
-    public function parseInputData()
+    public function parseInputData(): void
     {
         global $init;
 
@@ -65,7 +65,7 @@ class Cgi
      * COOKIEを取得
      * @return void
      */
-    public function getCookies()
+    public function getCookies(): void
     {
         if (!empty($_COOKIE)) {
             foreach ($_COOKIE as $name => $value) {
@@ -117,7 +117,7 @@ class Cgi
     /**
      * COOKIEを生成
      */
-    public function setCookies()
+    public function setCookies(): void
     {
         $time = $_SERVER['REQUEST_TIME'] + 14 * 86400; // 現在から14日間有効
 

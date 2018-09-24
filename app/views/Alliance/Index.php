@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 parent::pageTitle($init->title, '同盟管理ページ');
 ?>
 

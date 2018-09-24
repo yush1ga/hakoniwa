@@ -10,7 +10,7 @@ class Setup
 {
     use \Hakoniwa\Model\FileIO;
 
-    function __construct($argument)
+    public function __construct($argument)
     {
         # code...
     }

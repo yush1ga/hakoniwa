@@ -718,7 +718,7 @@ class InitDefault
 
     //////////////////////////////////////////////////
 
-    private function setpubliciable()
+    private function setpubliciable(): void
     {
         $this->pointNumber = $this->islandSize * $this->islandSize;
         $this->comList = [

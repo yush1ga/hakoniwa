@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 header('Content-Type: application/octet-stream');
 header('X-Content-Type-Options: nosniff');
 // ini_set('display_errors', 1);
@@ -32,4 +34,4 @@ if ($file !== false) {
     ];
 }
 
-echo(json_encode($return));
+echo json_encode($return);

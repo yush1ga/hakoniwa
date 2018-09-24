@@ -21,7 +21,7 @@
 
     if (($islandListStart != 1) || ($islandListSentinel != $hako->islandNumberNoBF)) {
         println('<nav aria-label="Page navigation"><ul class="pagination">');
-        for ($i = 1; $i <= $hako->islandNumberNoBF ; $i += $init->islandListRange) {
+        for ($i = 1; $i <= $hako->islandNumberNoBF; $i += $init->islandListRange) {
             $j = min($i + $init->islandListRange - 1, $hako->islandNumberNoBF);
 
             $active = $i == $islandListStart ? ' class="active"' : '';

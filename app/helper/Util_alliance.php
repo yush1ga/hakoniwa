@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hakoniwa\Helper;
 
 require_once 'util.php';
 // use Util;
-/**
- *
- */
+
 class Util_alliance extends \Util
 {
 
@@ -15,7 +15,7 @@ class Util_alliance extends \Util
      * @param       &$game
      * @return void
      */
-    public static function allySort(&$game)
+    public static function allySort(&$game): void
     {
         if (count($game->ally) > 1) {
             usort($game->ally, function ($x, $y) {
@@ -70,7 +70,7 @@ class Util_alliance extends \Util
     /**
      * ファイルをロックする（書き込み時）
      */
-    public static function lock_on_write($fp)
+    public static function lock_on_write($fp): void
     {
         set_file_buffer($fp, 0);
         if (!flock($fp, LOCK_EX)) {
@@ -82,7 +82,7 @@ class Util_alliance extends \Util
     /**
      * ファイルをロックする（読み込み時）
      */
-    public static function lock_on_read($fp)
+    public static function lock_on_read($fp): void
     {
         set_file_buffer($fp, 0);
         if (!flock($fp, LOCK_SH)) {

@@ -21,7 +21,7 @@ class CgiImitation
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
-    public function parseInputData()
+    public function parseInputData(): void
     {
         global $init;
 
@@ -40,7 +40,7 @@ class CgiImitation
     //---------------------------------------------------
     // COOKIEを取得
     //---------------------------------------------------
-    public function getCookies()
+    public function getCookies(): void
     {
         if (!empty($_COOKIE)) {
             foreach ($_COOKIE as $name => $value) {
@@ -81,7 +81,7 @@ class CgiImitation
     //---------------------------------------------------
     // COOKIEを生成
     //---------------------------------------------------
-    public function setCookies()
+    public function setCookies(): void
     {
         $time = $_SERVER['REQUEST_TIME'] + 90; // 90秒間有効
 
@@ -123,7 +123,7 @@ class Edit
     //---------------------------------------------------
     // TOP 表示（パスワード入力）
     //---------------------------------------------------
-    public function enter()
+    public function enter(): void
     {
         global $init;
 
@@ -143,7 +143,7 @@ END;
     //---------------------------------------------------
     // 島の一覧を表示
     //---------------------------------------------------
-    public function main($hako, $data)
+    public function main($hako, $data): void
     {
         global $init;
 
@@ -556,7 +556,7 @@ END;
 
 class EditMain
 {
-    public function execute()
+    public function execute(): void
     {
         $hako = new HakoEdit;
         $cgi = new CgiImitation;

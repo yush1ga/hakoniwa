@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__."/../config.php";
+
 use \PHPUnit\Framework\TestCase;
 use \Hakoniwa\Model\Alliance;
 
@@ -9,19 +11,13 @@ $init = new \Hakoniwa\Init;
 
 final class AllianceTest extends TestCase
 {
-    public static function setUpBeforeClass(): void
-    {
-        global $init;
-        require_once __DIR__."/../config.php";
-    }
-
     public function setUp(): void
     {
         $this->Alliance = new Alliance;
-        // $this->game     =
     }
 
     /**
+     * @todo skip
      * @dataProvider dataForWithdrawalAlliance
      */
     public function testWithdrawalAlliance($expected, $stdin): void

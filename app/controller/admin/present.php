@@ -9,7 +9,7 @@ namespace Hakoniwa\Admin;
 
 class Present extends \Admin
 {
-    public function execute()
+    public function execute(): void
     {
         $html = new \HtmlPresent;
         $hako = new \HakoPresent;
@@ -35,7 +35,7 @@ class Present extends \Admin
         $html->footer();
     }
 
-    public function presents($data, &$hako)
+    public function presents($data, &$hako): void
     {
         if ($data['ISLANDID']) {
             $num = $hako->idToNumber[$data['ISLANDID']];
@@ -46,7 +46,7 @@ class Present extends \Admin
         }
     }
 
-    public function punish($data, &$hako)
+    public function punish($data, &$hako): void
     {
         if ($data['ISLANDID']) {
             $punish = &$data['PUNISH'];

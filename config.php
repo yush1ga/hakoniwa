@@ -1,7 +1,9 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Re:箱庭諸島SE
- * @copyright 2017 Re:箱庭諸島SE
+ * Re:箱庭諸島
+ * @copyright 2017 Re:箱庭諸島
  */
 define("VERSION", "0.0.1");
 
@@ -21,7 +23,6 @@ date_default_timezone_set("Asia/Tokyo");
 ini_set("default_charset", "UTF-8");
 $ISLAND_TURN;
 define("LOCK_RETRY_COUNT", 10);
-define("LOCK_RETRY_INTERVAL", 1000);
 define("READ_LINE", 1024);
 define("DS", DIRECTORY_SEPARATOR);
 // [Common directories]
