@@ -22,6 +22,7 @@ final class AllianceTest extends TestCase
      */
     public function testWithdrawalAlliance($expected, $stdin): void
     {
+        $this->markTestIncomplete();
         $game = 1;
         // $this->assertSame($game, $stdin);
         $this->assertSame($expected, $stdin);

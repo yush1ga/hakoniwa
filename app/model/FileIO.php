@@ -48,7 +48,7 @@ trait FileIO
     {
         $info = pathinfo($this->parse_path($filepath));
 
-        $filepath = $info["dirname"].DS.$info["basename"];
+        $filepath = $info["dirname"].DIRECTORY_SEPARATOR.$info["basename"];
         $file_stat = $this->is_usable_path($filepath, true)["file"];
         $dir_stat = $this->is_usable_path($info["dirname"], true);
 
@@ -74,7 +74,7 @@ trait FileIO
         $s = DIRECTORY_SEPARATOR;
         $cwd = getcwd();
 
-        $has_driveletter = 1 === preg_match("/[a-zA-Z]:\.?/", $segments[0]);
+        $has_driveletter = 1 === preg_match("/^[a-zA-Z]:\.?$/", $segments[0]);
         $is_windows_os = defined("PHP_WINDOWS_VERSION_MAJOR");
         $is_absolute_path = $segments[0] === "" || $has_driveletter;
 
@@ -83,10 +83,12 @@ trait FileIO
         }
 
         if ($segments[0] === "~") {
-            if ($is_windows_os) {
-                throw new \InvalidArgumentException("Failed parse: `{$path}`");
+            $home = $is_windows_os ? getenv("USERPROFILE") : (getenv("PATH") ?? posix_getpwuid(posix_geteuid())["dir"]);
+
+            if (false !== $home) {
+                return $this->parse_path($home.mb_substr($path, 1));
             } else {
-                return posix_getpwuid(posix_geteuid())["dir"].mb_substr($path, 1);
+                throw new \RuntimeException("Failed parse: `{$path}`");
             }
         }
 
@@ -94,8 +96,11 @@ trait FileIO
             return $this->parse_path($cwd.$s.$path);
         }
 
-        for ($i = 0, $depth = 0; $i < count($segments); $i++) {
-            $seg = $segments[$i];
+        $depth = 0;
+        foreach ($segments as $seg) {
+            if ($depth !== 0 && 1 === preg_match("/^[a-zA-Z]:\.?$/", $seg)) {
+                throw new \RuntimeException("Failed parse: `{$path}`");
+            }
             switch ($seg) {
                 case ".":
                 case "":

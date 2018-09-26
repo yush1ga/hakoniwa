@@ -1,8 +1,6 @@
 <?php
 
 declare(strict_types=1);
-// error_reporting(E_ALL);
-// setlocale(LC_ALL, "ja_JP.UTF-8");
 
 require_once __DIR__."/../config.php";
 
@@ -30,7 +28,7 @@ final class FileIOTest extends TestCase
     /**
      * @dataProvider asset4ParsePath
      */
-    public function testParsePath(string $expected, string $var_path): void
+    public function testParsePathForSuccess(string $expected, string $var_path): void
     {
         $method = self::$class->getMethod("parse_path");
         $method->setAccessible(true);
@@ -42,30 +40,50 @@ final class FileIOTest extends TestCase
 
         if ($this->run_on_windows()) {
             $driveletter = mb_substr(getcwd(), 0, 1);
-            yield "C:\\foo\\bar\\baz" => ["C:\\foo\\bar\\baz", "C:\\foo\\bar\\baz"];
-            yield "C:\\foo\\bar\\\\baz" => ["C:\\foo\\bar\\baz", "C:\\foo\\bar\\\\baz"];
-            yield "\\foo\\bar\\baz" => [$driveletter.":\\foo\\bar\\baz", "\\foo\\bar\\baz"];
-            yield "/foo/bar/baz" => [$driveletter.":\\foo\\bar\\baz", "/foo/bar/baz"];
-            yield "C:\\foo\\xxxx\\..\\fuga" => ["C:\\foo\\fuga", "C:\\foo\\xxxx\\..\\fuga"];
-            yield "C:\\xxxx\\..\\..\\foo" => ["C:\\foo", "C:\\xxxx\\..\\..\\foo"];
-            yield "C:\\qwerty\\.\\asdfgh" => ["C:\\qwerty\\asdfgh", "C:\\qwerty\\.\\asdfgh"];
-            yield "C:\\foo\\ＢＡＲ" => ["C:\\foo\\ＢＡＲ", "C:\\foo\\ＢＡＲ"];
-            yield "C:\\cn_simplified\\春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext" => ["C:\\cn_simplified\\春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext", "C:\\cn_simplified\\春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext"];
-            yield "C:\\cn_tradition\\春眠不覺曉\\處處聞啼鳥\\夜來風雨聲.花落知多少" => ["C:\\cn_tradition\\春眠不覺曉\\處處聞啼鳥\\夜來風雨聲.花落知多少", "C:\\cn_tradition\\春眠不覺曉\\處處聞啼鳥\\夜來風雨聲.花落知多少"];
-            yield "C:/foo/with space/fuga.ext" => ["C:\\foo\\with space\\fuga.ext", "C:/foo/with space/fuga.ext"];
-            yield "./foo/fuga.ext" => [getcwd()."\\foo\\fuga.ext", "./foo/fuga.ext"];
-            yield "./../foo.ext" => [mb_substr(getcwd(), 0, mb_strrpos(getcwd(), "\\"))."\\foo.ext", "./../foo.ext"];
+            yield "for Windows #1" => ["C:\\foo\\bar\\baz", "C:\\foo\\bar\\baz"];
+            yield "for Windows #2" => ["C:\\foo\\bar\\baz", "C:\\foo\\bar\\\\baz"];
+            yield "for Windows #3" => [$driveletter.":\\foo\\bar\\baz", "\\foo\\bar\\baz"];
+            yield "for Windows #4" => [$driveletter.":\\foo\\bar\\baz", "/foo/bar/baz"];
+            yield "for Windows #5" => ["C:\\foo\\bar", "C:\\foo\\xxxx\\..\\bar"];
+            yield "for Windows #6" => ["C:\\foo", "C:\\xxxx\\..\\..\\foo"];
+            yield "for Windows #7" => ["C:\\foo\\bar", "C:\\foo\\.\\bar"];
+            yield "for Windows #8" => ["C:\\foo\\ＢＡＲ", "C:\\foo\\ＢＡＲ"];
+            yield "for Windows #9" => ["C:\\cn_simplified\\春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext", "C:\\cn_simplified\\春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext"];
+            yield "for Windows #10" => ["C:\\cn_tradition\\春眠不覺曉\\處處聞啼鳥\\夜來風雨聲.花落知多少", "C:\\cn_tradition\\春眠不覺曉\\處處聞啼鳥\\夜來風雨聲.花落知多少"];
+            yield "for Windows #11" => ["C:\\foo\\with space\\bar.ext", "C:/foo/with space/bar.ext"];
+            yield "for Windows #12" => [getcwd()."\\foo\\bar.ext", "./foo/bar.ext"];
+            yield "for Windows #13" => [mb_substr(getcwd(), 0, mb_strrpos(getcwd(), "\\"))."\\foo.ext", "./../foo.ext"];
+            yield "for Windows #14" => [getenv("USERPROFILE", true)."\\foo.ext", "~/foo.ext"];
         } else {
             yield "/foo/bar/baz" => ["/foo/bar/baz", "/foo/bar/baz"];
             yield "/foo/bar//baz" => ["/foo/bar/baz", "/foo/bar//baz"];
-            yield "/foo/xxxx/../fuga" => ["/foo/fuga", "/foo/xxxx/../fuga"];
+            yield "/foo/xxxx/../bar" => ["/foo/bar", "/foo/xxxx/../bar"];
             yield "/xxxx/../../foo" => ["/foo", "/xxxx/../../foo"];
             yield "/foo/ＦＵＧＡ" => ["/foo/ＦＵＧＡ", "/foo/ＦＵＧＡ"];
             yield "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext" => ["/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext", "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext"];
             yield "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少" => ["/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少", "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少"];
-            yield "/foo/with space/fuga.ext" => ["/foo/with space/fuga.ext", "/foo/with space/fuga.ext"];
+            yield "/foo/with space/bar.ext" => ["/foo/with space/bar.ext", "/foo/with space/bar.ext"];
             yield "c://foo/bar" => ["c:/foo/bar", "c:\\\\foo\\\\bar"];
         }
+    }
+
+    /**
+     * @backupStaticAttributes
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     * @dataProvider asset4ParsePathForThrowError
+     */
+    public function testParsePathForThrowError(string $path): void
+    {
+        $this->markTestIncomplete();
+        \unset(PHP_WINDOWS_VERSION_MAJOR);
+        $method = self::$class->getMethod("parse_path");
+        $method->setAccessible(true);
+        $this->exceptException($method->invoke(self::$mock, $path));
+    }
+    public function asset4ParsePathForThrowError()
+    {
+        yield "test #1" => ["C:\\foo\\D:\\bar"];
     }
 
     /**
@@ -89,7 +107,7 @@ final class FileIOTest extends TestCase
             yield "tmpdir #2" => [$path."/test2.dat"];
             yield "tmpdir #3" => [$path."/test3/test3.log"];
         } else {
-            throw new \Exception("Failed `mkdir` to ".$path);
+            throw new \RuntimeException("Failed `mkdir` to ".$path);
         }
 
         $path = $this->parse_path(getcwd()."/{$init->dirName}".$test_dir);
@@ -98,7 +116,7 @@ final class FileIOTest extends TestCase
             yield "save_dir #2" => [$path."/test2.dat"];
             yield "save_dir #3" => [$path."/test3/test3.log"];
         } else {
-            throw new \Exception("Failed `mkdir` to ".$path);
+            throw new \RuntimeException("Failed `mkdir` to ".$path);
         }
     }
 
