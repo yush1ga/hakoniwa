@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hakoniwa;
 
 /**
@@ -25,8 +27,6 @@ class InitDefault
 
     // データディレクトリの名前（必ず変更してください）
     public $dirName = "logs/data";
-    // ディレクトリ作成時のパーミション（8進数4桁）
-    public $dirMode = 0775;
 
     // 管理者パスワード保存先ファイル名
     public $passwordFile = "password.php";
@@ -41,7 +41,6 @@ class InitDefault
     //---------------------------------------------------
     // ゲームタイトル
     public $title      = "Re:箱庭諸島";
-    public $urlTopPage = "http://www.example.com/";
 
     // 管理人の名前と連絡先
     public $admin_name  = "管理人";
@@ -79,11 +78,12 @@ class InitDefault
     // 新規島の登録モード
     // (0:開放、1:管理パスワード要求)
     public $registerMode = 0;
-    // 管理人モード（触れないこと）
-    public $adminMode;
 
     // 負荷計測するか？(0:しない、1:する)
     public $performance = 1;
+
+    // ゲームシステム用変数（編集しないこと）
+    public $adminMode;
     public $CPU_start = 0;
 
     //---------------------------------------------------
@@ -97,7 +97,7 @@ class InitDefault
     //---------------------------------------------------
     // 表示に関する設定
     //---------------------------------------------------
-    // TOPページに一度に表示する島の数(0なら全島表示)
+    // TOPページに一度に表示する島の数（0なら全島表示）
     public $islandListRange = 10;
 
     /**

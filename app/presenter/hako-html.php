@@ -303,7 +303,7 @@ class HtmlTop extends HTML
             $eisei         = $island['eisei'];
             $zin           = $island['zin'];
             $item          = $island['item'];
-            $money         = Util::aboutMoney($island['money']);
+            $money         = Util::aboutMoney((int)$island['money']);
             $lot           = $island['lot'];
             $food          = $island['food'] . $init->unitFood;
             $unemployed    = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
@@ -2189,7 +2189,7 @@ class HtmlMente extends HTML
 
         // データ保存用ディレクトリの存在チェック
         if (!is_dir($dirName)) {
-            if (!@mkdir($dirName, $init->dirMode, true)) {
+            if (!@mkdir($dirName, 0775, true)) {
                 \Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\nゲーム設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
                 \HTML::footer();
                 exit;
@@ -2242,8 +2242,8 @@ EOT;
             $fp = fopen($init->dirName.".bak{$suf}/hakojima.dat", "r");
             println('<h2>バックアップ <small>（bak', $suf, '）</small></h2>');
         }
-        $lastTurn = rtrim(fgets($fp, READ_LINE));
-        $lastTime = rtrim(fgets($fp, READ_LINE));
+        $lastTurn = (int)rtrim(fgets($fp, READ_LINE));
+        $lastTime = (int)rtrim(fgets($fp, READ_LINE));
         fclose($fp);
         $timeString = self::timeToString($lastTime);
 

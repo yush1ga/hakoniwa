@@ -7,6 +7,8 @@
  */
 class File
 {
+    use \Hakoniwa\Model\FileIO;
+
     public $islandTurn;      // 現在ターン数
     public $islandLastTime;  // 最終更新時刻
     public $islandNumber;    // 島の総数
@@ -23,6 +25,17 @@ class File
     public $idToAllyNumber;
 
     /**
+     * String csv to integers array
+     * @param  string $csv
+     */
+    protected function csv2ia(string $csv): array
+    {
+        $str_arr = explode(",", $csv);
+
+        return array_map("intval", $str_arr);
+    }
+
+    /**
      * 全島データを読み込む
      * 'mode'が変わる可能性があるので$cgiを参照で受け取る
      * @param  [type] &$cgi [description]
@@ -32,18 +45,18 @@ class File
     {
         global $init;
 
-        $num = $cgi->dataSet['ISLANDID'] ?? '';
+        $num = intval($cgi->dataSet['ISLANDID'] ?? -111);
         $fileName = $init->dirName.'/hakojima.dat';
         if (!is_file($fileName)) {
             return false;
         }
         $fp = fopen($fileName, "r");
-        $this->islandTurn = rtrim(fgets($fp, READ_LINE));
-        $this->islandLastTime = rtrim(fgets($fp, READ_LINE));
+        $this->islandTurn = (int)rtrim(fgets($fp, READ_LINE));
+        $this->islandLastTime = (int)rtrim(fgets($fp, READ_LINE));
         $str = rtrim(fgets($fp, READ_LINE));
         [$this->islandNumber, $this->islandNumberBF, $this->islandNumberKP] = array_pad(explode(",", $str), 3, 0);
 
-        $this->islandNextID = rtrim(fgets($fp, READ_LINE));
+        $this->islandNextID = (int)rtrim(fgets($fp, READ_LINE));
 
         $GLOBALS['ISLAND_TURN'] = $this->islandTurn;
 
@@ -107,27 +120,27 @@ class File
         [$comment, $comment_turn] = array_pad(explode(",", $comment), 2, 0);
         $password = rtrim(fgets($fp, READ_LINE));
         $point = rtrim(fgets($fp, READ_LINE));
-        [$point, $pots] = array_pad(explode(",", $point), 2, null);
+        [$point, $pots] = array_pad($this->csv2ia($point), 2, null);
         $eisei = rtrim(fgets($fp, READ_LINE));
-        [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5] = array_pad(explode(",", $eisei), 6, 0);
+        [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5] = array_pad($this->csv2ia($eisei), 6, 0);
         $zin = rtrim(fgets($fp, READ_LINE));
-        [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6] = array_pad(explode(",", $zin), 7, 0);
+        [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6] = array_pad($this->csv2ia($zin), 7, 0);
         $item = rtrim(fgets($fp, READ_LINE));
         [$item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19, $item20] = array_pad(explode(",", $item), 21, null);
         $money = rtrim(fgets($fp, READ_LINE));
-        [$money, $lot, $gold] = array_pad(explode(",", $money), 3, 0);
+        [$money, $lot, $gold] = array_pad($this->csv2ia($money), 3, 0);
         $food = rtrim(fgets($fp, READ_LINE));
-        [$food, $rice] = array_pad(explode(",", $food), 2, 0);
+        [$food, $rice] = array_pad($this->csv2ia($food), 2, 0);
         $pop = rtrim(fgets($fp, READ_LINE));
-        [$pop, $peop] = array_pad(explode(",", $pop), 2, 0);
+        [$pop, $peop] = array_pad($this->csv2ia($pop), 2, 0);
         $area = rtrim(fgets($fp, READ_LINE));
         $job = rtrim(fgets($fp, READ_LINE));
-        [$farm, $factory, $commerce, $mountain, $hatuden] = array_pad(explode(",", $job), 5, 0);
+        [$farm, $factory, $commerce, $mountain, $hatuden] = array_pad($this->csv2ia($job), 5, 0);
         $power = rtrim(fgets($fp, READ_LINE));
-        [$taiji, $rena, $fire] = array_pad(explode(",", $power), 3, 0);
+        [$taiji, $rena, $fire] = array_pad($this->csv2ia($power), 3, 0);
         $tenki = rtrim(fgets($fp, READ_LINE));
         $soccer = rtrim(fgets($fp, READ_LINE));
-        [$soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten] = array_pad(explode(",", $soccer), 10, 0);
+        [$soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten] = array_pad($this->csv2ia($soccer), 10, 0);
 
         $this->idToName[$id] = $name;
 
@@ -285,7 +298,8 @@ class File
             return false;
         }
         $fp = fopen($fileName, "r");
-        $this->allyNumber = (int)rtrim(fgets($fp, READ_LINE));
+        $this->allyNumber = fgets($fp, READ_LINE);
+        $this->allyNumber = $this->allyNumber !== false ? (int)rtrim($this->allyNumber) : 0;
 
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $this->ally[$i] = $this->readAlly($fp);
@@ -531,11 +545,11 @@ class File
 
                 // データディレクトリを開く（なければ作る）：コピー元
                 if (!file_exists($dir_from)) {
-                    mkdir($dir_from, $init->dirMode, true);
+                    mkdir($dir_from, 0775, true);
                 }
                 // ：コピー先
                 if (!file_exists($dir_to)) {
-                    mkdir($dir_to, $init->dirMode, true);
+                    mkdir($dir_to, 0775, true);
                 }
 
                 // コピー実行
@@ -564,16 +578,7 @@ class File
      */
     public function rmTree(string $dirName): void
     {
-        if (is_dir("{$dirName}")) {
-            $dir = opendir("{$dirName}/");
-            while (false !== ($fileName = readdir($dir))) {
-                if ($fileName != "." && $fileName != "..") {
-                    unlink("{$dirName}/{$fileName}");
-                }
-            }
-            closedir($dir);
-            rmdir($dirName);
-        }
+        $this->rimraf($dirName);
     }
 
     /**

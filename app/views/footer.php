@@ -1,7 +1,7 @@
 <hr>
 
 <footer class="container">
-<p>"<?= $init->title ?>" managed by <a href="<?= $init->admin_address ?>" target="_blank"><?= $init->admin_name ?></a> （<a href="<?= $init->urlTopPage ?>" target="_blank"><?= $init->urlTopPage ?></a>）
+<p>"<?= $init->title ?>" managed by <a href="<?= $init->admin_address ?>" target="_blank"><?= $init->admin_name ?>（<?= $init->admin_address ?>）</a>
 
 <?php if ($init->performance): ?>
 <span class="small text-muted"><?php

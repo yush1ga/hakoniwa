@@ -15,7 +15,7 @@ class Util
      * @param  integer $money 資金額
      * @return string         丸めた文字列
      */
-    public static function aboutMoney(int $money = 0):string
+    public static function aboutMoney(int $money = 0): string
     {
         global $init;
         $digit = (int)$init->moneyMode;
@@ -31,7 +31,7 @@ class Util
      * @param  integer $exp  経験値
      * @return integer       対応した基地レベル値
      */
-    public static function expToLevel(int $kind, int $exp):int
+    public static function expToLevel(int $kind, int $exp): int
     {
         global $init;
 

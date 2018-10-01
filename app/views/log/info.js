@@ -24,6 +24,7 @@
             NoticeTextarea.style.backgroundColor = "#fff";
         } else {
             NoticeTextarea.value = notifyText;
+            Password.value = "";
             NoticeTextarea.style.backgroundColor = notifyBgColor;
         }
     };

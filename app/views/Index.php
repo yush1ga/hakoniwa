@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-function remainTime($nextTime)
+function remainTime(int $nextTime): string
 {
     $remainSec = $nextTime - $_SERVER['REQUEST_TIME'];
     $echoVal = '<small>（次のターンまで、残りおよそ';
@@ -47,7 +47,7 @@ function remainTime($nextTime)
 <?php endif; ?>
 
 <div class="lastModified">
-    <p>最終更新時間： <?=date("Y年n月j日G時", $hako->islandLastTime)?><br>
+    <p>最終更新時間： <?=date("Y年n月j日G時", (int)$hako->islandLastTime)?><br>
         <?=remainTime($hako->islandLastTime + $init->unitTime)?></p>
 </div>
 

@@ -31,7 +31,7 @@ for ($i = 0, $elements_length = count($elements); $i < $elements_length; $i++) {
         if ($island[$elements[$i]] >= $max) {
             $max = $island[$elements[$i]];
             $category_1st[$i] = [
-                'id'    => $ii,
+                'id'    => $island["id"],
                 'name'  => Util::islandName($island, $hako->ally, $hako->idToAllyNumber),
                 'value' => $i !== 5 ? $max : ''// 軍事力は機密情報のため
             ];

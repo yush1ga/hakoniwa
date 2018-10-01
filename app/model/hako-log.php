@@ -64,8 +64,8 @@ class LogIO
         $row = 1;
 
         println('<div>');
-        while ($line = rtrim(fgets($fp, READ_LINE))) {
-            [$isSecret, $turn, $id1, $id2, $message] = explode(",", $line, 5);
+        while (false !== ($line = fgets($fp, READ_LINE))) {
+            [$isSecret, $turn, $id1, $id2, $message] = explode(",", rtrim($line), 5);
             if ($isSecret == 1) {
                 if (($mode == 0) || ($id1 != $id)) {
                     continue;
@@ -98,8 +98,8 @@ class LogIO
         $fp = fopen($fileName, "r");
         $history = [];
         $k = 0;
-        while (false != ($line = trim(fgets($fp, READ_LINE)))) {
-            $history[] = $line;
+        while (false !== ($line = fgets($fp, READ_LINE))) {
+            $history[] = trim($line);
             $k++;
         }
 
@@ -128,8 +128,8 @@ class LogIO
             $fp = fopen($fileName, "r");
 
             $line = [];
-            while (false != ($l = rtrim(fgets($fp, READ_LINE)))) {
-                $line[] =  $l;
+            while (false !== ($l = fgets($fp, READ_LINE))) {
+                $line[] =  rtrim($l);
                 $count++;
             }
             fclose($fp);

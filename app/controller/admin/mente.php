@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Hakoniwa\Admin\Maintenance;
 
 require_once __DIR__."/../../../config.php";
@@ -15,6 +17,8 @@ use \HakoError;
 
 class Mente extends \Admin
 {
+    use \Hakoniwa\Model\FileIO;
+
     public function __construct()
     {
         $html = new \HtmlMente;
@@ -114,9 +118,7 @@ EOM;
 
         // .htaccess生成
         $fileName = $init->dirName.'/.htaccess';
-        $fp = fopen($fileName, "w");
-        fwrite($fp, "Options -Indexes\n");
-        fclose($fp);
+        file_put_contents($fileName, "Options -Indexes\n", LOCK_EX);
         chmod($fileName, 0644);
     }
 
@@ -135,7 +137,7 @@ EOM;
         $date = $this->dataSet['date'].' '.$this->dataSet['time'];
         $date = date_parse_from_format('Y-m-d H:i', $date);
         if (!checkdate($date['month'], $date['day'], $date['year'])) {
-            throw new Exception("指定された日付が不正", 1);
+            throw new \InvalidArgumentException("指定された日付が不正", 1);
         }
         $toSetDate = mktime($date['hour'], $date['minute'], 0, $date['month'], $date['day'], $date['year']);
         $this->stimeMode($toSetDate);
@@ -180,15 +182,7 @@ EOM;
      */
     public function rmTree($dirName): void
     {
-        if (is_dir($dirName)) {
-            $dir = opendir($dirName.'/');
-            while (false !== ($fileName = readdir($dir))) {
-                if ($fileName != "." && $fileName != "..") {
-                    unlink($dirName.'/'.$fileName);
-                }
-            }
-            closedir($dir);
-        }
+        $this->rimraf($dirName);
     }
 
     public function setupMode()

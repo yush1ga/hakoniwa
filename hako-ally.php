@@ -280,7 +280,8 @@ class AllyIO
         }
         $fp = fopen($fileName, "r");
         Util::lock_on_read($fp);
-        $this->allyNumber = intval(rtrim(fgets($fp, READ_LINE)), 10);
+        $this->allyNumber = fgets($fp, READ_LINE);
+        $this->allyNumber = false !== $this->allyNumber ? (int)rtrim($this->allyNumber) : 0;
 
         for ($i = 0; $i < $this->allyNumber; $i++) {
             $this->ally[$i] = $this->readAlly($fp);

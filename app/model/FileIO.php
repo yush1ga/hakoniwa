@@ -57,7 +57,7 @@ trait FileIO
         }
 
         if (!$dir_stat["dir"]) {
-            if (!mkdir($info["dirname"], 0755, true)) {
+            if (!mkdir($info["dirname"], 0775, true)) {
                 return false;
             }
         }
@@ -174,7 +174,7 @@ trait FileIO
 
 
 
-    final private function rimraf(string $path): bool
+    final protected function rimraf(string $path): bool
     {
         if (!is_dir($this->parse_path($path))) {
             return false;

@@ -14,8 +14,6 @@ namespace Hakoniwa;
 require_once __DIR__."/config.php";
 use \Hakoniwa\InitDefault;
 
-// require_once 'hako-init-default.php'; // InitDefault
-
 class Init extends InitDefault
 {
     // 各種設定値

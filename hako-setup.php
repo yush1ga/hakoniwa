@@ -12,6 +12,10 @@ class Setup
 
     public function __construct($argument)
     {
-        # code...
+        $this->init = new \Hakoniwa\Init;
+    }
+
+    private function check_version(): void
+    {
     }
 }
