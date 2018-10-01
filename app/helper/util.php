@@ -125,8 +125,9 @@ class Util
         if (empty($p2)) {
             return false;
         }
+
         if (!file_exists($init->passwordFile)) {
-            HakoError::probrem();
+            \HakoError::probrem();
 
             return false;
         }

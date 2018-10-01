@@ -63,27 +63,26 @@ final class FileIOTest extends TestCase
             yield "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext" => ["/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext", "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext"];
             yield "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少" => ["/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少", "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少"];
             yield "/foo/with space/bar.ext" => ["/foo/with space/bar.ext", "/foo/with space/bar.ext"];
-            yield "c://foo/bar" => ["c:/foo/bar", "c:\\\\foo\\\\bar"];
         }
     }
 
     /**
-     * @backupStaticAttributes
-     * @runInSeparateProcess
-     * @preserveGlobalState disabled
+     * @requires PHP 7.2.0
+     * @requires OSFAMILY Linux
      * @dataProvider asset4ParsePathForThrowError
      */
-    public function testParsePathForThrowError(string $path): void
+    public function testParsePathForThrowError(string $path, string $errorClass): void
     {
-        $this->markTestIncomplete();
-        \unset(PHP_WINDOWS_VERSION_MAJOR);
         $method = self::$class->getMethod("parse_path");
         $method->setAccessible(true);
-        $this->exceptException($method->invoke(self::$mock, $path));
+
+        $this->expectException($errorClass);
+        $method->invoke(self::$mock, $path);
     }
     public function asset4ParsePathForThrowError()
     {
-        yield "test #1" => ["C:\\foo\\D:\\bar"];
+        yield "test #1" => ["/foo/C:/bar", \RuntimeException::class];
+        yield "test #2" => ["C:\\foo", \InvalidArgumentException::class];
     }
 
     /**
