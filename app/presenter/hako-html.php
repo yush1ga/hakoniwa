@@ -2360,7 +2360,7 @@ class HtmlAlly extends HTML
     /**
      * 同盟の状況
      */
-    public function allyInfo($hako, $view_ally_num = 0): void
+    public function allyInfo($hako, $view_ally_num = 0)
     {
         global $init;
 
@@ -2386,7 +2386,7 @@ class HtmlAlly extends HTML
             $alliances[] = $alliance;
         }
 
-        require VIEWS . 'Alliance/List.php';
+        return [$alliances_number, $alliances];
     }
 
     /**
