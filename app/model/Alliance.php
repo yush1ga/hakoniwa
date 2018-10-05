@@ -453,6 +453,50 @@ class Alliance
      */
     public function withdrawal(&$game, $data)
     {
+        /**
+         * -[x] 入力バリデーション
+         * -[] 脱退可能か検証
+         *   +[] 同盟に所属しているか
+         *   +[] 同盟主じゃないか
+         * -[] 脱退処理
+         * -[] DB書き戻し
+         */
+        function get_player_data(array $game, int $id) {
+            if (!array_key_exists($id, $game->idToNumber)) {
+                return false;
+            }
+            $num = (int)$game->idToNumber[$id];
+            if (!array_key_exists($num, $game->islands)) {
+                return false;
+            }
+
+            return $game->islands[$num];
+        }
+
+        function get_alliance_data(array $game, int $id) {
+            if (!array_key_exists($id, $game->idToAllyNumber)) {
+                return false;
+            }
+            $num = (int)$game->idToAllyNumber[$id];
+            if (!array_key_exists($num, $game->ally)) {
+                return false;
+            }
+
+            return $game->ally[$num];
+        }
+
+        global $init;
+        $player_ID = (int)$data["Whoami"] ?? -1;
+        $player = get_player_data($game, $player_ID);
+        $password = base64_decode($data["Pwd"] ?? "", true);
+        $withdrawal_from = (int)$data["Alliance"] ?? -1;
+        $alliance = get_alliance_data($game, $withdrawal_from);
+
+        if (!$player || !$alliance) {
+            return false;
+        }
+
+
     }
 
     /**

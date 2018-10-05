@@ -391,7 +391,7 @@ $ext
 $comment
 $message
 
-EOL;
+EOL
         );
     }
 
