@@ -37,6 +37,7 @@
 	* PHPが動作すること（バージョン7以降が必須）
 	* "Composer"がインストール済みであること（PHPのパッケージマネージャ）
 	* "Nodejs"、"npm"がインストール済みであること（タスクランナーとして使っています）
+	* "git"がインストール済みであること（use as update function）
 1. 任意のディレクトリ（`/var/www/html`とか）にclone
 1. コンソールから`npm install`
 1. `/hako-init-default.php`を参考にして、`/hako-init.php`をお好みに設定

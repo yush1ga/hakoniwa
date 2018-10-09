@@ -6,6 +6,7 @@ declare(strict_types=1);
  * @copyright 2017 Re:箱庭諸島
  */
 define("VERSION", "0.0.1");
+define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
 
 /**
  * Debug mode:

@@ -75,15 +75,14 @@ trait FileIO
         $cwd = getcwd();
 
         $has_driveletter = 1 === preg_match("/^[a-zA-Z]:\.?$/", $segments[0]);
-        $is_windows_os = defined("PHP_WINDOWS_VERSION_MAJOR");
         $is_absolute_path = $segments[0] === "" || $has_driveletter;
 
-        if (!$is_windows_os && $has_driveletter) {
+        if (!WINDOWS && $has_driveletter) {
             throw new \InvalidArgumentException("Failed parse: `{$path}`");
         }
 
         if ($segments[0] === "~") {
-            $home = $is_windows_os ? getenv("USERPROFILE") : (getenv("PATH") ?? posix_getpwuid(posix_geteuid())["dir"]);
+            $home = WINDOWS ? getenv("USERPROFILE") : (getenv("PATH") ?? posix_getpwuid(posix_geteuid())["dir"]);
 
             if (false !== $home) {
                 return $this->parse_path($home.mb_substr($path, 1));
@@ -108,7 +107,7 @@ trait FileIO
                 break;
                 case "..":
                     $depth -= ($depth === 0) ? 0 : 1;
-                    $depth = ($is_windows_os && $has_driveletter) ? max($depth, 1) : $depth;
+                    $depth = (WINDOWS && $has_driveletter) ? max($depth, 1) : $depth;
 
                 break;
                 default:
@@ -124,7 +123,7 @@ trait FileIO
         }
 
 
-        if ($is_windows_os) {
+        if (WINDOWS) {
             if ($has_driveletter) {
                 $path_prefix = "";
                 $parsed_path[0] = mb_strtoupper($parsed_path[0]);
@@ -192,7 +191,62 @@ trait FileIO
 
 
 
-    final protected function backup(): void
+    final protected function cp_a(string $from, string $to, bool $recursion = false): void
     {
+        $from = $this->parse_path($from);
+        $to = $this->parse_path($to);
+
+        if(!$recursion) {
+            if(!$this->is_usable_path($from)["dir"]) {
+                throw new \ErrorException("No have permission to Read/Write: `{$from}`.");
+            }
+            if(!$this->is_usable_path($to)["dir"]) {
+                throw new \ErrorException("No have permission to Read/Write: `{$to}`.");
+            }
+        }
+
+        $ls = array_diff(scandir($from), [".", "..", ".git", "vendor"]);
+        foreach ($ls as $file) {
+            $f = $from.DIRECTORY_SEPARATOR.$file;
+            $t = $to.DIRECTORY_SEPARATOR.$file;
+            if(is_dir($f)) {
+                mkdir($t);
+                $this->cp_a($f, $t, true);
+            } else {
+            copy($f, $t);
+            }
+        }
+        unset($f, $t, $ls);
+
+        return;
+    }
+
+
+
+    final protected function mkdir_tmp()
+    {
+        $tmp_dir = $this->parse_path(sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->random_str());
+        if(mkdir($tmp_dir, 0777, true)) {
+            return $tmp_dir;
+        }
+
+        return false;
+    }
+
+
+    // [TODO] move to \Util
+    final private function random_str($length = 8): string
+    {
+        static $seeds;
+
+        if (!$seeds) {
+            $seeds = array_flip(array_merge(range("a", "z"), range("A", "Z"), range("0", "9")));
+        }
+        $str = "";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= array_rand($seeds);
+        }
+
+        return $str;
     }
 }

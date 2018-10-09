@@ -35,7 +35,9 @@
     "update:win32": "npm-run-all update:win:*",
     "update:win:autoload": "composer dump-autoload",
     "update:linux:darwin": "npm-run-all update:nix:*",
-    "update:nix:autoload": "bin/composer dump-autoload"
+    "update:nix:autoload": "bin/composer dump-autoload",
+    "updatephp": "run-os",
+    "updatephp:linux:darwin": "composer selfupdate && composer update"
   },
   "dependencies": {},
   "devDependencies": {
@@ -46,7 +48,7 @@
     "@types/react": "^15.6.19",
     "@types/react-dom": "^0.14.23",
     "@types/underscore": "^1.8.9",
-    "@types/webpack": "^3.8.14",
+    "@types/webpack": "^3.8.15",
     "apply-loader": "^2.0.0",
     "autoprefixer": "^9.1.5",
     "awesome-typescript-loader": "^5.2.1",
