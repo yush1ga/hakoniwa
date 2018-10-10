@@ -461,7 +461,8 @@ class Alliance
          * -[] 脱退処理
          * -[] DB書き戻し
          */
-        function get_player_data(array $game, int $id) {
+        function get_player_data(array $game, int $id)
+        {
             if (!array_key_exists($id, $game->idToNumber)) {
                 return false;
             }
@@ -473,7 +474,8 @@ class Alliance
             return $game->islands[$num];
         }
 
-        function get_alliance_data(array $game, int $id) {
+        function get_alliance_data(array $game, int $id)
+        {
             if (!array_key_exists($id, $game->idToAllyNumber)) {
                 return false;
             }
@@ -495,8 +497,6 @@ class Alliance
         if (!$player || !$alliance) {
             return false;
         }
-
-
     }
 
     /**

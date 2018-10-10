@@ -22,7 +22,7 @@ return PhpCsFixer\Config::create()
 		'combine_consecutive_issets' => true,
 		'combine_consecutive_unsets' => true,
 		'compact_nullable_typehint' => true,
-		// 'declare_strict_types' => true,
+		'declare_strict_types' => false,
 		'include' => true,
 		'is_null' => true,
 		'line_ending' => true,

@@ -1,5 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Hakoniwa;
+
+// if (php_sapi_name() !== 'cli') {
+//     header('HTTP/1.0 403 Forbidden', true, 403);
+//     exit;
+// }
 
 require_once "config.php";
 
@@ -18,25 +26,7 @@ final class Setup
         $this->init = new \Hakoniwa\Init;
     }
 
-    public function backup($veryfy = false): void
-    {
-        /**
-         * -[x] mkdir_tmp
-         * -[x] copy
-         * -[] verify
-         */
 
-        // mkdir_tmp
-        $this->current_tmp = $this->mkdir_tmp();
-        if ($this->head_tmp === false) {
-            throw new \RuntimeException("[Err] You didn't mkdir on System Tempolary Directory.");
-        }
-
-        // copy
-        $this->cp_a(DOCROOT, $this->current_tmp);
-
-        // verify
-    }
 
     public function update(): void
     {
@@ -44,6 +34,9 @@ final class Setup
          * -[x] mkdir(tmp)
          * -[x] git clone HEAD /tmp
          * -[] backup
+         *   +[] mkdir_tmp
+         *   +[] copy
+         *   +[] verify
          * -[] compare
          * -[] flush
          * -[] copy
@@ -68,8 +61,24 @@ final class Setup
         exec("git clone --quiet --depth 1 --branch {$clone_branch} https://github.com/Sotalbireo/hakoniwa.git {$this->head_tmp}");
 
         // backup
+        // - mkdir_tmp
         $this->current_tmp = $this->mkdir_tmp();
-        $this->backup(true);
+        if ($this->head_tmp === false) {
+            throw new \RuntimeException("[Err] You didn't mkdir on System Tempolary Directory.");
+        }
+
+        // - copy
+        $this->cp_a(DOCROOT, $this->current_tmp);
+
+        // - verify
+        if (!$this->is_same(DOCROOT, $this->current_tmp)) {
+            throw new \RuntimeException(<<<EOL
+                [Err] Copy files failed, please check below.
+                - File/Directory Permissions
+                - Arguments
+EOL
+            );
+        }
 
 
         // rimraf(tmp)

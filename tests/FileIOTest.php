@@ -23,6 +23,16 @@ final class FileIOTest extends TestCase
         self::$class = new \ReflectionClass(self::$mock);
     }
 
+    public static function tearDownAfterClass(): void
+    {
+        global $test_dir;
+        $fn = self::$class->getMethod("rimraf");
+        $fn->setAccessible(true);
+        $fn->invoke(self::$mock, $test_dir);
+        $fn->invoke(self::$mock, $test_dir."from");
+        $fn->invoke(self::$mock, $test_dir."to");
+    }
+
 
 
     /**
@@ -38,7 +48,7 @@ final class FileIOTest extends TestCase
     {
         yield __DIR__ => [__DIR__, __DIR__];
 
-        if ($this->run_on_windows()) {
+        if (WINDOWS) {
             $driveletter = mb_substr(getcwd(), 0, 1);
             yield "for Windows #1" => ["C:\\foo\\bar\\baz", "C:\\foo\\bar\\baz"];
             yield "for Windows #2" => ["C:\\foo\\bar\\baz", "C:\\foo\\bar\\\\baz"];
@@ -55,19 +65,23 @@ final class FileIOTest extends TestCase
             yield "for Windows #13" => [mb_substr(getcwd(), 0, mb_strrpos(getcwd(), "\\"))."\\foo.ext", "./../foo.ext"];
             yield "for Windows #14" => [getenv("USERPROFILE", true)."\\foo.ext", "~/foo.ext"];
         } else {
-            yield "/foo/bar/baz" => ["/foo/bar/baz", "/foo/bar/baz"];
-            yield "/foo/bar//baz" => ["/foo/bar/baz", "/foo/bar//baz"];
-            yield "/foo/xxxx/../bar" => ["/foo/bar", "/foo/xxxx/../bar"];
-            yield "/xxxx/../../foo" => ["/foo", "/xxxx/../../foo"];
-            yield "/foo/ＦＵＧＡ" => ["/foo/ＦＵＧＡ", "/foo/ＦＵＧＡ"];
-            yield "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext" => ["/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext", "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext"];
-            yield "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少" => ["/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少", "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少"];
-            yield "/foo/with space/bar.ext" => ["/foo/with space/bar.ext", "/foo/with space/bar.ext"];
+            yield "for Linux... #1" => ["/foo/bar/baz", "/foo/bar/baz"];
+            yield "for Linux... #2" => ["/foo/bar/baz", "/foo/bar//baz"];
+            yield "for Linux... #3" => ["/foo/bar", "/foo/xxxx/../bar"];
+            yield "for Linux... #4" => ["/foo", "/xxxx/../../foo"];
+            yield "for Linux... #5" => ["/foo/ＦＵＧＡ", "/foo/ＦＵＧＡ"];
+            yield "for Linux... #6" => ["/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext", "/cn_simplified/春眠不觉晓处处闻啼鸟夜来风雨声花落知多少.ext"];
+            yield "for Linux... #7" => ["/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少", "/cn_tradition/春眠不覺曉/處處聞啼鳥/夜來風雨聲.花落知多少"];
+            yield "for Linux... #8" => ["/foo/with space/bar.ext", "/foo/with space/bar.ext"];
+            yield "for Linux... #9" => [getcwd()."/foo/bar.ext", "./foo/bar.ext"];
+            yield "for Linux... #10" => [mb_substr(getcwd(), 0, mb_strrpos(getcwd(), "/"))."/foo.ext", "./../foo.ext"];
+            yield "for Linux... #11" => [getenv("USERPROFILE", true)."/foo.ext", "~/foo.ext"];
         }
     }
 
+
+
     /**
-     * @requires PHP 7.2.0
      * @requires OSFAMILY Linux
      * @dataProvider asset4ParsePathForThrowError
      */
@@ -84,6 +98,8 @@ final class FileIOTest extends TestCase
         yield "test #1" => ["/foo/C:/bar", \RuntimeException::class];
         yield "test #2" => ["C:\\foo", \InvalidArgumentException::class];
     }
+
+
 
     /**
      * @dataProvider asset4Mkfile
@@ -144,14 +160,49 @@ final class FileIOTest extends TestCase
 
 
 
-    final private function run_on_windows(): bool
+    public function testCp_a(): void
     {
-        return defined("PHP_WINDOWS_VERSION_MAJOR");
+        global $test_dir;
+
+        $mkfile = self::$class->getMethod("mkfile");
+        $mkfile->setAccessible(true);
+
+        $from = $this->parse_path(sys_get_temp_dir().$test_dir."from");
+        $to = $this->parse_path(sys_get_temp_dir().$test_dir."to");
+
+        $mkfile->invoke(self::$mock, $from."/test1.txt");
+        $mkfile->invoke(self::$mock, $from."/test2.dat");
+        $mkfile->invoke(self::$mock, $from."/test3/test3.log");
+        $this->assertFileExists($from."/test1.txt");
+        $this->assertFileExists($from."/test2.dat");
+        $this->assertFileExists($from."/test3/test3.log");
+
+        $cp_a = self::$class->getMethod("cp_a");
+        $cp_a->setAccessible(true);
+        $cp_a->invoke(self::$mock, $from, $to);
+        $this->assertFileExists($to."/test1.txt");
+        $this->assertFileExists($to."/test2.dat");
+        $this->assertFileExists($to."/test3/test3.log");
     }
 
 
 
-    final private function parse_path(string $path): string
+    public function testIs_same(): void
+    {
+        global $init, $test_dir;
+
+        $from = $this->parse_path(sys_get_temp_dir().$test_dir."from");
+        $to = $this->parse_path(sys_get_temp_dir().$test_dir."to");
+
+        $method = self::$class->getMethod("is_same");
+        $method->setAccessible(true);
+        $this->assertTrue($method->invoke(self::$mock, $from, $to));
+    }
+
+
+
+
+    private function parse_path(string $path): string
     {
         $mock = (new class extends TestCase {
         })->getMockForTrait(FileIO::class);

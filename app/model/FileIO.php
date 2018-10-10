@@ -8,8 +8,13 @@ require_once __DIR__."/../../config.php";
 
 trait FileIO
 {
-    final protected function read_gameboard_file(): void
+    // abstract private $file_path;
+
+    final protected function read_gameboard_file(): bool
     {
+        // if (!isset($file_path["gameboard"] || realpath())
+        // {}
+        return true;
     }
 
     final protected function read_players_data(): void
@@ -196,11 +201,14 @@ trait FileIO
         $from = $this->parse_path($from);
         $to = $this->parse_path($to);
 
-        if(!$recursion) {
-            if(!$this->is_usable_path($from)["dir"]) {
+        if (!$recursion) {
+            if (!is_dir($from)) {
+                throw new \InvalidArgumentException("Arguments must directory.");
+            }
+            if (!$this->is_usable_path($from)["dir"]) {
                 throw new \ErrorException("No have permission to Read/Write: `{$from}`.");
             }
-            if(!$this->is_usable_path($to)["dir"]) {
+            if (!mkdir($to, 0775, true)) {
                 throw new \ErrorException("No have permission to Read/Write: `{$to}`.");
             }
         }
@@ -209,11 +217,11 @@ trait FileIO
         foreach ($ls as $file) {
             $f = $from.DIRECTORY_SEPARATOR.$file;
             $t = $to.DIRECTORY_SEPARATOR.$file;
-            if(is_dir($f)) {
+            if (is_dir($f)) {
                 mkdir($t);
                 $this->cp_a($f, $t, true);
             } else {
-            copy($f, $t);
+                copy($f, $t);
             }
         }
         unset($f, $t, $ls);
@@ -223,10 +231,63 @@ trait FileIO
 
 
 
-    final protected function mkdir_tmp()
+    final private function filelist(string $dir): array
     {
-        $tmp_dir = $this->parse_path(sys_get_temp_dir().DIRECTORY_SEPARATOR.$this->random_str());
-        if(mkdir($tmp_dir, 0777, true)) {
+        $rii =  new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $dir,
+                \FilesystemIterator::SKIP_DOTS
+                | \FilesystemIterator::KEY_AS_PATHNAME
+                | \FilesystemIterator::CURRENT_AS_PATHNAME
+                | \FilesystemIterator::UNIX_PATHS
+            ),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        $filelist = [];
+        foreach ($rii as $key => $value) {
+            $k = mb_substr($key, mb_strlen($dir));
+            $filelist[$k] = $value;
+        }
+
+        return $filelist;
+    }
+
+
+
+    final protected function is_same(string $orig, string $targ): bool
+    {
+        if (is_dir($orig) && is_dir($targ)) {
+            $orig_files = $this->filelist($orig);
+            $targ_files = $this->filelist($targ);
+
+            foreach ($orig_files as $rel => $orig_path) {
+                if (array_key_exists($rel, $targ_files)) {
+                    if (!hash_equals(hash_file("sha256", $orig_path), hash_file("sha256", $targ_files[$rel]))) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        if (is_file($orig) && is_file($targ)) {
+            return hash_equals(hash_file("sha256", $orig), hash_file("sha256", $targ));
+        }
+
+        throw new \InvalidArgumentException("You have to choose arguments pair either \"Directory-Directory\" or \"File-File\".");
+    }
+
+
+
+    final protected function mkdir_tmp(string $suffix = "")
+    {
+        $suffix = $suffix !== "" ?: $this->random_str();
+        $tmp_dir = $this->parse_path(sys_get_temp_dir().DIRECTORY_SEPARATOR.$suffix);
+        if (mkdir($tmp_dir, 0777, true)) {
             return $tmp_dir;
         }
 
@@ -235,7 +296,7 @@ trait FileIO
 
 
     // [TODO] move to \Util
-    final private function random_str($length = 8): string
+    final private function random_str(int $length = 8): string
     {
         static $seeds;
 
