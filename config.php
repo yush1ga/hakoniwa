@@ -22,6 +22,7 @@ if (!defined("DEBUG")) {
  */
 date_default_timezone_set("Asia/Tokyo");
 ini_set("default_charset", "UTF-8");
+ini_set("mbstring.language", "Japanese");
 $ISLAND_TURN;
 define("LOCK_RETRY_COUNT", 10);
 define("READ_LINE", 1024);
