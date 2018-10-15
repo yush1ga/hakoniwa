@@ -208,12 +208,23 @@ trait FileIO
             if (!$this->is_usable_path($from)["dir"]) {
                 throw new \ErrorException("No have permission to Read/Write: `{$from}`.");
             }
-            if (!mkdir($to, 0775, true)) {
-                throw new \ErrorException("No have permission to Read/Write: `{$to}`.");
+            if (!is_dir($to)) {
+                if (!mkdir($to, 0775, true)) {
+                    throw new \ErrorException("No have permission to Read/Write: `{$to}`.");
+                }
+            } else {
+                $t[0] = $this->is_usable_path($to)["dir"];
+                $t[1] = $this->filelist($to);
+                if (!$t[0]) {
+                    throw new \ErrorException("Already exists, but not be allow read/write: `{$to}`.");
+                }
+                if ($t[1] !== []) {
+                    throw new \ErrorException("Already exists and not empty directory: `{$to}`.");
+                }
             }
         }
 
-        $ls = array_diff(scandir($from), [".", "..", ".git", "vendor"]);
+        $ls = array_diff(scandir($from), [".", "..", ".git", "vendor", "node_modules"]);
         foreach ($ls as $file) {
             $f = $from.DIRECTORY_SEPARATOR.$file;
             $t = $to.DIRECTORY_SEPARATOR.$file;
@@ -231,7 +242,7 @@ trait FileIO
 
 
 
-    final private function filelist(string $dir): array
+    final private function filelist(string $dir, array $exclude_prefix = []): array
     {
         $rii =  new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(
@@ -239,15 +250,17 @@ trait FileIO
                 \FilesystemIterator::SKIP_DOTS
                 | \FilesystemIterator::KEY_AS_PATHNAME
                 | \FilesystemIterator::CURRENT_AS_PATHNAME
-                | \FilesystemIterator::UNIX_PATHS
             ),
             \RecursiveIteratorIterator::LEAVES_ONLY
         );
+        $dir = realpath($dir);
 
         $filelist = [];
         foreach ($rii as $key => $value) {
-            $k = mb_substr($key, mb_strlen($dir));
-            $filelist[$k] = $value;
+            $rel = mb_substr(realpath($key), mb_strlen($dir));
+            if (!$this->starts_with($rel, $exclude_prefix)) {
+                $filelist[$rel] = $value;
+            }
         }
 
         return $filelist;
@@ -255,18 +268,22 @@ trait FileIO
 
 
 
-    final protected function is_same(string $orig, string $targ): bool
+    final protected function is_same(string $orig, string $targ, array $exclude = []): bool
     {
+        $exclude = array_unique(array_merge($exclude, [".git", "vendor", "node_modules"]));
+
         if (is_dir($orig) && is_dir($targ)) {
-            $orig_files = $this->filelist($orig);
-            $targ_files = $this->filelist($targ);
+            $orig_files = $this->filelist($orig, $exclude);
+            $targ_files = $this->filelist($targ, $exclude);
 
             foreach ($orig_files as $rel => $orig_path) {
                 if (array_key_exists($rel, $targ_files)) {
                     if (!hash_equals(hash_file("sha256", $orig_path), hash_file("sha256", $targ_files[$rel]))) {
+
                         return false;
                     }
                 } else {
+
                     return false;
                 }
             }
@@ -309,5 +326,28 @@ trait FileIO
         }
 
         return $str;
+    }
+
+    // [TODO] move to \
+    final private function starts_with(string $str, $prefix): bool
+    {
+        $type = gettype($prefix);
+        switch ($type) {
+            case "string":
+                $prefix = $prefix[0] === DIRECTORY_SEPARATOR ?: DIRECTORY_SEPARATOR.$prefix;
+
+                return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
+            case "array":
+                foreach ($prefix as $p) {
+                    $p = $p[0] === DIRECTORY_SEPARATOR ?: DIRECTORY_SEPARATOR.$p;
+                    if (mb_substr($str, 0, mb_strlen($p)) === $p) {
+                        return true;
+                    }
+                }
+
+                return false;
+        }
+
+        throw new \InvalidArgumentException("Arguments #1 require type of `String[] | String` (Actual `{$type}`)");
     }
 }

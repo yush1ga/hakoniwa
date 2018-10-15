@@ -166,6 +166,7 @@ final class FileIOTest extends TestCase
 
         $from = $this->parse_path(sys_get_temp_dir().$test_dir."from");
         $to = $this->parse_path(sys_get_temp_dir().$test_dir."to");
+        $to2 = $this->parse_path(sys_get_temp_dir().$test_dir."日本語フォルダ（long_dir_name）");
 
         $mkfile = self::$class->getMethod("mkfile");
         $mkfile->setAccessible(true);
@@ -183,6 +184,10 @@ final class FileIOTest extends TestCase
         $this->assertFileExists($to."/test1.txt");
         $this->assertFileExists($to."/test2.dat");
         $this->assertFileExists($to."/test3/test3.log");
+        $cp_a->invoke(self::$mock, $from, $to2);
+        $this->assertFileExists($to2."/test1.txt");
+        $this->assertFileExists($to2."/test2.dat");
+        $this->assertFileExists($to2."/test3/test3.log");
         unset($cp_a);
     }
 
@@ -194,16 +199,20 @@ final class FileIOTest extends TestCase
 
         $from = $this->parse_path(sys_get_temp_dir().$test_dir."from");
         $to = $this->parse_path(sys_get_temp_dir().$test_dir."to");
+        $to2 = $this->parse_path(sys_get_temp_dir().$test_dir."日本語フォルダ（long_dir_name）");
 
         $method = self::$class->getMethod("is_same");
         $method->setAccessible(true);
         $this->assertTrue($method->invoke(self::$mock, $from, $to));
         $this->assertTrue($method->invoke(self::$mock, $from."/test1.txt", $to."/test1.txt"));
+        $this->assertTrue($method->invoke(self::$mock, $from, $to2));
+        $this->assertTrue($method->invoke(self::$mock, $from."/test1.txt", $to2."/test1.txt"));
 
         $rimraf = self::$class->getMethod("rimraf");
         $rimraf->setAccessible(true);
         $rimraf->invoke(self::$mock, $from);
         $rimraf->invoke(self::$mock, $to);
+        $rimraf->invoke(self::$mock, $to2);
         unset($rimraf);
     }
 
