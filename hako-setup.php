@@ -1,14 +1,29 @@
 <?php
-
+/**
+ * Re:箱庭諸島
+ * @copyright 2017 Re:箱庭諸島, CGIゲーム保存会
+ */
 declare(strict_types=1);
-
-namespace Hakoniwa;
 
 if (php_sapi_name() !== "cli") {
     exit;
 }
+date_default_timezone_set("Asia/Tokyo");
+ini_set("default_charset", "UTF-8");
+ini_set("mbstring.language", "Japanese");
 
-require_once "config.php";
+if (!defined("WINDOWS")) {
+    define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
+}
+if (!defined("DEBUG")) {
+    define("DEBUG", true);
+}
+
+require "app/model/FileIO.php";
+
+use \Hakoniwa\InitDefault as iniD;
+
+
 
 /**
  * Setup
@@ -17,23 +32,16 @@ final class Setup
 {
     use \Hakoniwa\Model\FileIO;
 
+    const DOCROOT = __DIR__;
     private $head_tmp;
     private $current_tmp;
 
     public function __construct()
     {
-        $this->init = new \Hakoniwa\Init;
+        $this->head_tmp = $this->mkdir_tmp();
+        $this->current_tmp = $this->mkdir_tmp();
     }
 
-
-
-    private function update_main(...$argv): void
-    {
-        echo "[UPDATE_MAIN]\n";
-        print_r($argv);
-        file_put_contents("test.txt", implode("\r\n", $argv));
-        sleep(20);
-    }
 
 
     public function update(): void
@@ -45,17 +53,19 @@ final class Setup
          *   +[] mkdir_tmp
          *   +[] copy
          *   +[] verify
-         * -[] fork process (and change cwd)
          * -[] compare
-         * -[] flush
-         * -[] copy
-         * -[] velify (=compare?)
+         *   +[] get new config list
+         *   +[] get current config list
+         *   +[] compare
+         * -[] overwrite
+         *   +[] flush
+         *   +[] copy
+         *   +[] velify
          * -[x] rimraf(tmp)
          */
 
         // mkdir(tmp)
         echo "MKDIR...";
-        $this->head_tmp = $this->mkdir_tmp();
         if ($this->head_tmp === false) {
             throw new \RuntimeException("[Err] You didn't mkdir on System Tempolary Directory.");
         }
@@ -75,19 +85,18 @@ final class Setup
 
         // backup
         // - mkdir_tmp
-        echo "backup...";
-        $this->current_tmp = $this->mkdir_tmp();
+        echo "backup..";
         if ($this->head_tmp === false) {
             throw new \RuntimeException("[Err] You didn't mkdir on System Tempolary Directory.");
         }
 
         // - copy
         echo "copy..";
-        $this->cp_a(DOCROOT, $this->current_tmp);
+        $this->cp_a(self::DOCROOT, $this->current_tmp);
 
         // - verify
         echo "verify...";
-        if (!$this->is_same(DOCROOT, $this->current_tmp)) {
+        if (!$this->is_same(self::DOCROOT, $this->current_tmp)) {
             throw new \RuntimeException(
                 <<<EOL
 
@@ -100,26 +109,22 @@ EOL
         }
         echo "done.\n";
 
-        // fork
-        $d = DOCROOT;
-        if (WINDOWS) {
-            chdir($this->head_tmp);
-            // $p = popen("start \"\" php hako-setup.php \"{$d}\" \"{$this->current_tmp}\" \"{$this->head_tmp}\"", "r");
-            $p = popen('start "" php -r \'$argv = ["main", "'.$d.'", "'.$this->current_tmp.'", "'.$this->head_tmp.'"]; require hako-setup.php;\'', "r");
-            pclose($p);
-        } else {
-            try {
-                exec("nohup php hako-setup.php \"{$d}\" \"{$this->current_tmp}\" \"{$this->head_tmp}\" >/dev/null 2>&1 &");
-            } catch (\Throwable $e) {
-                error_log($e->getMessage(), 0);
-                die;
-            }
-        }
+        // compare
+        // - get new config list
+        $version_new = file_get_contents($this->parse_path($this->head_tmp."/config.php"));
+        require $this->parse_path($this->head_tmp."/hako-init-default.php");
+        $confs_new = (new \ReflectionClass(iniD::class))->getDefaultProperties();
 
+        // - get current config list
+        $version_current = file_get_contents($this->parse_path($this->current_tmp."/config.php"));
+        require $this->parse_path($this->current_tmp."/hako-init.php");
+        $confs_current = (new \ReflectionClass(\Hakoniwa\init::class))->getDefaultProperties();
+
+        // - compare
 
         // rimraf(tmp)
-        // $this->rimraf($this->head_tmp);
-        // $this->rimraf($this->current_tmp);
+        $this->rimraf($this->head_tmp);
+        $this->rimraf($this->current_tmp);
     }
 
     private function check_version(): void
@@ -127,23 +132,8 @@ EOL
     }
 }
 
-$setup = new Setup();
 
-if ($argv[1] === "main") {
-    $setup->update_main($argv);
-} elseif ($argv[0] === "hako-setup.php") {
-    $setup->update();
-}
 
-// if (isset($argc, $argv)) {
-//     print_r($argv);
-//     if (@$argv[1] !== DOCROOT) {
-//         (new Setup)->update();
-//     } else if ($argc !== 4) {
-//         print_r($argv);
-//         throw new \InvalidArgumentException("You must be set 4 arguments, but you actual set {$argc} arguments.");
-//     } else {
-//         print_r($argv);
-//         (new Setup)->update_main($argv);
-//     }
-// }
+
+
+(new Setup)->update();
