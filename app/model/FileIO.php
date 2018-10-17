@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Hakoniwa\Model;
 
-require_once __DIR__."/../../config.php";
+if (!defined("WINDOWS")){
+    throw new \ErrorException("Not defined: `WINDOWS`.");
+}
 
 trait FileIO
 {

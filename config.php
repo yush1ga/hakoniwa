@@ -6,7 +6,10 @@ declare(strict_types=1);
  * @copyright 2017 Re:箱庭諸島
  */
 define("VERSION", "0.0.1");
-define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
+
+if (!defined("WINDOWS")) {
+    define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
+}
 
 /**
  * Debug mode:
@@ -37,10 +40,11 @@ define("PRESENTER", realpath(APPPATH.DS."presenter".DS).DS);
 define("VIEWS", realpath(APPPATH.DS."views".DS).DS);
 
 // Composer/Autoloader
-require_once __DIR__."/vendor/autoload.php";
+if (mb_substr(__DIR__, 0, mb_strlen(sys_get_temp_dir())) !== sys_get_temp_dir() && is_file("vendor/autoload.php")) {
+    require_once "vendor/autoload.php";
+}
 
 // Common requires.
-use \Hakoniwa\Init;
 use \Hakoniwa\Helper\Util;
 
 // require_once HELPERPATH."Enum.php";

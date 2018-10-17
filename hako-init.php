@@ -11,7 +11,8 @@ namespace Hakoniwa;
  * @author sota_n <@sota_n>
  */
 
-require_once __DIR__."/config.php";
+require_once "config.php";
+require_once "hako-init-default.php";
 use \Hakoniwa\InitDefault;
 
 class Init extends InitDefault
