@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Hakoniwa\Model;
 
-if (!defined("WINDOWS")){
+if (!defined("WINDOWS")) {
     throw new \ErrorException("Not defined: `WINDOWS`.");
 }
 
@@ -51,7 +51,7 @@ trait FileIO
     {
     }
 
-    final private function mkfile(string $filepath): bool
+    final private function mkfile(string $filepath, string $content = ""): bool
     {
         $info = pathinfo($this->parse_path($filepath));
 
@@ -69,7 +69,7 @@ trait FileIO
             }
         }
 
-        return file_put_contents($filepath, "", LOCK_EX) !== false;
+        return file_put_contents($filepath, $content, LOCK_EX) !== false;
     }
 
 
@@ -182,13 +182,14 @@ trait FileIO
 
     final protected function rimraf(string $path): bool
     {
-        if (!is_dir($this->parse_path($path))) {
-            return false;
+        if (is_file($this->parse_path($path))) {
+            return unlink(realpath($this->parse_path($path)));
         }
 
         $ls = array_diff(scandir($path), [".", ".."]);
         foreach ($ls as $file) {
-            $p = $path.DIRECTORY_SEPARATOR.$file;
+            $p = realpath($path.DIRECTORY_SEPARATOR.$file);
+            chmod($p, 0777);
             is_dir($p) ? $this->rimraf($p) : unlink($p);
         }
         unset($p, $ls);
@@ -281,11 +282,9 @@ trait FileIO
             foreach ($orig_files as $rel => $orig_path) {
                 if (array_key_exists($rel, $targ_files)) {
                     if (!hash_equals(hash_file("sha256", $orig_path), hash_file("sha256", $targ_files[$rel]))) {
-
                         return false;
                     }
                 } else {
-
                     return false;
                 }
             }

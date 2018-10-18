@@ -40,16 +40,16 @@ class Turn
         // ログファイルを後ろにずらす
         $this->log->slideBackLogFile();
 
-        // ターン数更新
-        $hako->islandTurn++;
-        $GLOBALS['ISLAND_TURN'] = $hako->islandTurn;
-
         // 島がなければターン数を保存して以降の処理は省く
         if ($hako->islandNumber == 0) {
             $hako->writeIslandsFile();
 
             return;
         }
+
+        // ターン数更新
+        $hako->islandTurn++;
+        $GLOBALS['ISLAND_TURN'] = $hako->islandTurn;
 
         // プレゼントファイルを読み込む
         $hako->readPresentFile(true);
