@@ -55,7 +55,7 @@ function remainTime(int $nextTime): string
 
 <div class="row">
     <div class="col-sm-4">
-<?php if ($hako->islandList !== '' && count($hako->islandList) > 0):?>
+<?php if ($hako->islandNumber - $hako->islandNumberBF > 0):?>
         <h2>自分の島へ</h2>
 
         <form action="<?=$this_file?>" method="post">
@@ -101,7 +101,7 @@ require_once VIEWS."/log/info.php";
 
 <hr>
 
-<?php if ($hako->islandNumber != 0) {
+<?php if ($hako->islandNumber - $hako->islandNumberBF > 0) {
     require_once VIEWS."top/category-rank.php";
 }?>
 
@@ -118,7 +118,7 @@ require_once VIEWS."/log/info.php";
 <?php endif;?>
 
 <?php
-if ($hako->islandNumber != 0) {
+if ($hako->islandNumber - $hako->islandNumberBF > 0) {
         require_once VIEWS."top/island-list.php";
     }
 

@@ -48,8 +48,11 @@ class Turn
         }
 
         // ターン数更新
-        $hako->islandTurn++;
-        $GLOBALS['ISLAND_TURN'] = $hako->islandTurn;
+        // プレイアブル島がなければターン数増やさない雑仕様を組んでみる
+        if ($hako->islandNumber - $hako->islandNumberKP - $hako->islandNumberBF > 0) {
+            $hako->islandTurn++;
+            $GLOBALS['ISLAND_TURN'] = $hako->islandTurn;
+        }
 
         // プレゼントファイルを読み込む
         $hako->readPresentFile(true);

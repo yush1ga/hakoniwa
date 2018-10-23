@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 if (php_sapi_name() !== "cli") {
+    header("HTTP/1.0 404 Not Found");
     exit;
 }
 date_default_timezone_set("Asia/Tokyo");
@@ -60,6 +61,7 @@ final class Setup
          *   +[] flush
          *   +[] copy
          *   +[] velify
+         * -[] install
          * -[x] rimraf(tmp)
          */
 
@@ -182,6 +184,40 @@ EOT;
             exit;
         }
         echo "done.\n";
+
+
+
+        // overwrite
+        echo "Overwrite...";
+
+        // - flush
+        if (!$this->rimraf(self::DOCROOT)) {
+            echo "\nERR! Abort system and Rollback...\n";
+            $this->cp_a($this->current_tmp, self::DOCROOT, true);
+        }
+        // - copy
+        echo "..";
+        $this->cp_a($this->head_tmp, self::DOCROOT);
+        // - velify
+        echo "...";
+        if (!$this->is_same($this->current_tmp, self::DOCROOT)) {
+            throw new \RuntimeException(
+                <<<EOL
+
+                [Err] Copy files failed, please check below.
+                - File/Directory Permissions
+                - Arguments
+
+EOL
+            );
+        }
+        echo "done.\n";
+
+
+
+
+        // install
+        exec("npm install");
     }
 
     public function __destruct()
@@ -190,7 +226,7 @@ EOT;
         echo "\n--\nremove tempolary files..\n1/3..\n";
         $this->rimraf($this->head_tmp);
         echo "2/3..\n";
-        $this->rimraf($this->current_tmp);
+        // $this->rimraf($this->current_tmp);
         echo "3/3...";
         if (is_file($this->parse_path(sys_get_temp_dir()."/{$this->rnd}"))) {
             $this->rimraf(sys_get_temp_dir()."/{$this->rnd}");

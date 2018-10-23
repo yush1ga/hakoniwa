@@ -23,16 +23,6 @@ final class FileIOTest extends TestCase
         self::$class = new \ReflectionClass(self::$mock);
     }
 
-    public static function tearDownAfterClass(): void
-    {
-        global $test_dir;
-        $fn = self::$class->getMethod("rimraf");
-        $fn->setAccessible(true);
-        $fn->invoke(self::$mock, $test_dir);
-        $fn->invoke(self::$mock, $test_dir."from");
-        $fn->invoke(self::$mock, $test_dir."to");
-    }
-
 
 
     /**

@@ -1,5 +1,7 @@
 # Re:箱庭諸島
 
+**[テストプレイできます](https://hakoniwa.cgi-game-preservations.org/)**
+
 ## 概要
 
 「[箱庭諸島 S.E ver23_r09](http://hakoniwa.symphonic-net.com/)」、および「[Hakoniwa R.A.](http://www5b.biglobe.ne.jp/~k-e-i/)」、「箱庭諸島 海戦」のいいとこどりをしようという小学生じみた発想をそのままやってしまおうという魂胆のなんか面倒なやつ

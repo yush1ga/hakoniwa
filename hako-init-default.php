@@ -19,7 +19,7 @@ class InitDefault
      * プログラムファイルに関する設定
      */
 
-    // プログラムを置くディレクトリ
+    // サイトのURL
     public $baseDir = "http://localhost:8000";
 
     // 画像を置くディレクトリ

@@ -17,5 +17,13 @@ use \Hakoniwa\InitDefault;
 
 class Init extends InitDefault
 {
-    // 各種設定値
+    // サイトのURL
+    public $baseDir = "http://localhost:8000";
+
+    // ゲームタイトル
+    public $title      = "Re:箱庭諸島";
+
+    // 管理人の名前と連絡先
+    public $admin_name  = "管理人";
+    public $admin_address  = 'https://twitter.com/twitter';
 }
