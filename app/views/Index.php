@@ -47,7 +47,7 @@ function remainTime(int $nextTime): string
 <?php endif; ?>
 
 <div class="lastModified">
-    <p>最終更新時間： <?=date("Y年n月j日G時", (int)$hako->islandLastTime)?><br>
+    <p>最終更新時間： <?=date("Y年n月j日G時i分 (T)", (int)$hako->islandLastTime)?><br>
         <?=remainTime($hako->islandLastTime + $init->unitTime)?></p>
 </div>
 
@@ -55,7 +55,7 @@ function remainTime(int $nextTime): string
 
 <div class="row">
     <div class="col-sm-4">
-<?php if ($hako->islandNumber - $hako->islandNumberBF > 0):?>
+<?php if ($hako->islandNumber > 0):?>
         <h2>自分の島へ</h2>
 
         <form action="<?=$this_file?>" method="post">
@@ -103,6 +103,13 @@ require_once VIEWS."/log/info.php";
 
 <?php if ($hako->islandNumber - $hako->islandNumberBF > 0) {
     require_once VIEWS."top/category-rank.php";
+} else {
+    echo <<<EOT
+
+    <p class="alert alert-info">現在、この海域に{$init->nameSuffix}は見つかっていません</p>
+    <p><a href="{$this_file}?mode=conf" class="btn btn-primary">→新しい{$init->nameSuffix}を探しにいく</a></p>
+
+EOT;
 }?>
 
 <?php if ($hako->allyNumber):?>
