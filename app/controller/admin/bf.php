@@ -1,4 +1,5 @@
 <?php
+
 namespace Hakoniwa\Admin;
 
 require_once MODELPATH.'/admin.php';
@@ -10,7 +11,7 @@ require_once MODELPATH.'/admin.php';
 
 class BF extends \Admin
 {
-    public function execute()
+    public function execute(): void
     {
         $html = new \HtmlBF();
         $hako = new \HakoBF();
@@ -39,7 +40,7 @@ class BF extends \Admin
         $html->footer();
     }
 
-    public function toMode($id, &$hako)
+    public function toMode($id, &$hako): void
     {
         global $init;
 
@@ -55,7 +56,7 @@ class BF extends \Admin
         }
     }
 
-    public function fromMode($id, &$hako)
+    public function fromMode($id, &$hako): void
     {
         global $init;
 

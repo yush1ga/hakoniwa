@@ -74,16 +74,16 @@ class Make
 
         // 各種の値を設定
         $DAY = 86400; // the seconds of a day.
-        $island['name'] = h($data['ISLANDNAME']);
-        $island['owner'] = h($data['OWNERNAME']);
+        $island['name'] = Util::htmlEscape($data['ISLANDNAME']);
+        $island['owner'] = Util::htmlEscape($data['OWNERNAME']);
         $island['id'] = $hako->islandNextID;
         $hako->islandNextID++;
         $island['starturn'] = $hako->islandTurn;
         $island['isBF'] = $island['keep'] = 0;
-        $island['absent'] = $init->giveupTurn - (max($DAY / $init->unitTime, $init->unitTime / $DAY));
+        $island['absent'] = 0;
         $island['comment'] = '（未登録）';
         $island['comment_turn'] = $hako->islandTurn;
-        $island['password'] = Util::encode($data['PASSWORD']);
+        $island['password'] = Util::encode($data['PASSWORD'], false);
         $island['tenki'] = 1;
         $island['team'] = $island['shiai'] = $island['kachi'] = $island['make'] = $island['hikiwake'] = $island['kougeki'] = $island['bougyo'] = $island['tokuten'] = $island['shitten'] = 0;
 
@@ -131,10 +131,10 @@ class Make
             $fp_i = fopen($init->initialLand, "r");
             $offset = 7; // 一対のデータが何文字か
             for ($y = 0; $y < $init->islandSize; $y++) {
-                $line = chop(fgets($fp_i, READ_LINE));
+                $line = rtrim(fgets($fp_i, READ_LINE));
                 for ($x = 0; $x < $init->islandSize; $x++) {
-                    $l = substr($line, $x * $offset, 2);
-                    $v = substr($line, $x * $offset + 2, 5);
+                    $l = mb_substr($line, $x * $offset, 2);
+                    $v = mb_substr($line, $x * $offset + 2, 5);
                     $land[$x][$y] = hexdec($l);
                     $landValue[$x][$y] = hexdec($v);
                 }
@@ -360,7 +360,7 @@ class Make
     //---------------------------------------------------
     // コメント更新
     //---------------------------------------------------
-    public function commentMain($hako, $data)
+    public function commentMain($hako, $data): void
     {
         $id = $data['ISLANDID'];
         $num = $hako->idToNumber[$id];
@@ -399,7 +399,7 @@ class Make
     //---------------------------------------------------
     // 情報変更モード
     //---------------------------------------------------
-    public function changeMain($hako, $data)
+    public function changeMain($hako, $data): void
     {
         global $init;
         $log = new Log();
@@ -436,7 +436,7 @@ class Make
 
             return;
         }
-        if (!empty($data['ISLANDNAME']) && (strlen($data['ISLANDNAME']) != 0)) {
+        if (!empty($data['ISLANDNAME']) && (mb_strlen($data['ISLANDNAME']) != 0)) {
             // 名前変更の場合
             // 名前が正当かチェック
             if (preg_match("/[,?()<>$]/", $data['ISLANDNAME']) || strcmp($data['ISLANDNAME'], "無人") == 0) {
@@ -489,7 +489,7 @@ class Make
     //---------------------------------------------------
     // オーナ名変更モード
     //---------------------------------------------------
-    public function changeOwnerName($hako, $data)
+    public function changeOwnerName($hako, $data): void
     {
         global $init;
 
@@ -520,7 +520,7 @@ class Make
     //---------------------------------------------------
     // コマンドモード
     //---------------------------------------------------
-    public function commandMain($hako, $data)
+    public function commandMain($hako, $data): void
     {
         global $init;
 
@@ -743,7 +743,7 @@ class Make
     //---------------------------------------------------
     // 島の強制削除
     //---------------------------------------------------
-    public function deleteIsland($hako, $data)
+    public function deleteIsland($hako, $data): void
     {
         global $init;
 
@@ -778,7 +778,7 @@ class MakeJS extends Make
     //---------------------------------------------------
     // コマンドモード
     //---------------------------------------------------
-    public function commandMain($hako, $data)
+    public function commandMain($hako, $data): void
     {
         global $init;
 

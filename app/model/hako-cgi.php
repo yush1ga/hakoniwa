@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 箱庭諸島 S.E - Cookie定義用ファイル -
  * @copyright 箱庭諸島 ver2.30
@@ -7,22 +8,22 @@
  */
 class Cgi
 {
-    public $mode = '';
+    public $mode = "";
     public $dataSet = [];
 
     /**
      * POST、GETのデータを取得
      * @return void
      */
-    public function parseInputData()
+    public function parseInputData(): void
     {
         global $init;
 
-        $this->mode = $_POST['mode'] ?? '';
+        $this->mode = $_POST["mode"] ?? "";
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
         }
 
@@ -64,10 +65,10 @@ class Cgi
      * COOKIEを取得
      * @return void
      */
-    public function getCookies()
+    public function getCookies(): void
     {
         if (!empty($_COOKIE)) {
-            while (list($name, $value) = each($_COOKIE)) {
+            foreach ($_COOKIE as $name => $value) {
                 switch ($name) {
                     case "OWNISLANDID":
                         $this->dataSet['defaultID'] = $value;
@@ -116,7 +117,7 @@ class Cgi
     /**
      * COOKIEを生成
      */
-    public function setCookies()
+    public function setCookies(): void
     {
         $time = $_SERVER['REQUEST_TIME'] + 14 * 86400; // 現在から14日間有効
 

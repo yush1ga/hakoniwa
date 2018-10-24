@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * Copyright 2010-2013 Craig Campbell
  *
@@ -256,7 +258,7 @@ class ChromePhp
      * @param string $type
      * @return void
      */
-    protected static function _log($type, array $args)
+    protected static function _log($type, array $args): void
     {
         // nothing passed in, don't do anything
         if (count($args) == 0 && $type != self::GROUP_END) {
@@ -276,7 +278,7 @@ class ChromePhp
         $level = $logger->getSetting(self::BACKTRACE_LEVEL);
 
         $backtrace_message = 'unknown';
-        if (isset($backtrace[$level]['file']) && isset($backtrace[$level]['line'])) {
+        if (isset($backtrace[$level]['file'], $backtrace[$level]['line'])) {
             $backtrace_message = $backtrace[$level]['file'] . ' : ' . $backtrace[$level]['line'];
         }
 
@@ -376,7 +378,7 @@ class ChromePhp
      * @var mixed
      * @return void
      */
-    protected function _addRow(array $logs, $backtrace, $type)
+    protected function _addRow(array $logs, $backtrace, $type): void
     {
         // if this is logged on the same line for example in a loop, set it to null to save space
         if (in_array($backtrace, $this->_backtraces)) {
@@ -399,7 +401,7 @@ class ChromePhp
         $this->_writeHeader($this->_json);
     }
 
-    protected function _writeHeader($data)
+    protected function _writeHeader($data): void
     {
         header(self::HEADER_NAME . ': ' . $this->_encode($data));
     }
@@ -422,7 +424,7 @@ class ChromePhp
      * @param mixed value
      * @return void
      */
-    public function addSetting($key, $value)
+    public function addSetting($key, $value): void
     {
         $this->_settings[$key] = $value;
     }
@@ -433,7 +435,7 @@ class ChromePhp
      * @param array $settings
      * @return void
      */
-    public function addSettings(array $settings)
+    public function addSettings(array $settings): void
     {
         foreach ($settings as $key => $value) {
             $this->addSetting($key, $value);

@@ -10,7 +10,10 @@ require_once MODELPATH.'hako-cgi.php';
  */
 class Main
 {
-    public function execute()
+    /**
+     * トップページ
+     */
+    public function execute(): void
     {
         global $init;
 
@@ -36,7 +39,7 @@ class Main
 
         $cgi->setCookies();
 
-        if (strtolower($cgi->dataSet['DEVELOPEMODE'] ?? '') == 'javascript') {
+        if (mb_strtolower($cgi->dataSet['DEVELOPEMODE'] ?? '') == 'javascript') {
             $html = new HtmlMapJS;
             $com  = new MakeJS;
         } else {
@@ -58,6 +61,7 @@ class Main
                 $html->header();
                 // ターン処理後、通常トップページ描画
                 $turn->turnMain($hako, $cgi->dataSet);
+                $hako->readIslands($cgi);
                 $html->main($hako, $cgi->dataSet);
                 $html->footer();
 
@@ -126,6 +130,21 @@ class Main
 
                 break;
 
+            case "changeInfo":
+                if (($cgi->dataSet["PreCheck"] ?? "") === "true") {
+                    header('Content-Type:text/plain;charset=utf-8');
+                    if (Util::checkPassword("", base64_decode($cgi->dataSet["Pwd"] ?? "", true))) {
+                        echo "true";
+                    } else {
+                        echo "false";
+                    }
+
+                    break;
+                }
+                require_once MODELPATH."hako-log.php";
+                (new LogIO)->write_noticefile($hako, $cgi->dataSet);
+                /*. missing_break; .*/
+                // no break
             default:
                 $html = new HtmlTop;
                 $html->header();

@@ -2,7 +2,7 @@
 	<h2>History</h2>
 	<ul class="list-unstyled">
 	<?php
-        $log = new Log();
+        $log = new Log;
         $log->historyPrint();
     ?>
 	</ul>

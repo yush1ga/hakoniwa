@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 header('Content-Type: application/octet-stream');
 header('X-Content-Type-Options: nosniff');
 // ini_set('display_errors', 1);
@@ -8,7 +11,7 @@ header('X-Content-Type-Options: nosniff');
 
 require_once realpath(dirname(__FILE__, 3)).DIRECTORY_SEPARATOR.'config.php';
 
-$init = new Init();
+$init = new \Hakoniwa\Init();
 
 $filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init->logname;
 
@@ -31,4 +34,4 @@ if ($file !== false) {
     ];
 }
 
-echo(json_encode($return));
+echo json_encode($return);

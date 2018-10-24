@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * 箱庭諸島 S.E - 各種ユーティリティ定義用ファイル -
  * @copyright 箱庭諸島 ver2.30
@@ -13,14 +15,14 @@ class Util
      * @param  integer $money 資金額
      * @return string         丸めた文字列
      */
-    public static function aboutMoney(int $money = 0):string
+    public static function aboutMoney(int $money = 0): string
     {
         global $init;
         $digit = (int)$init->moneyMode;
 
-        return ($digit <= 0)? $money .$init->unitMoney
-                : ($money < $digit)? "推定{$digit}{$init->unitMoney}未満"
-                : '推定'. round($money / $digit) * $digit . $init->unitMoney;
+        return ($digit <= 0)? $money.$init->unitMoney
+                : (($money < $digit)? "推定{$digit}{$init->unitMoney}未満"
+                : '推定'.round($money / $digit) * $digit . $init->unitMoney);
     }
 
     /**
@@ -29,7 +31,7 @@ class Util
      * @param  integer $exp  経験値
      * @return integer       対応した基地レベル値
      */
-    public static function expToLevel(int $kind, int $exp):int
+    public static function expToLevel(int $kind, int $exp): int
     {
         global $init;
 
@@ -41,17 +43,16 @@ class Util
                 }
             }
 
-            return 1;
-        // 海底基地
+            // 海底基地
         } else {
             for ($i = $init->maxSBaseLevel; $i > 1; $i--) {
                 if ($exp >= $init->sBaseLevelUp[$i - 2]) {
                     return $i;
                 }
             }
-
-            return 1;
         }
+
+        return 1;
     }
 
     /**
@@ -74,20 +75,19 @@ class Util
     }
 
     /**
-     * 島の名前から番号を算出
-     * @param  [type] $hako [description]
-     * @param  [type] $name [description]
-     * @return [type]       [description]
+     * 島の名前からIDを逆引き
+     * @param          $hako ゲーム総合データ
+     * @param  string  $name 島の名前
+     * @return integer       該当の島ID（>=0）、なければ-1
      */
     public static function nameToNumber($hako, $name)
     {
-        // 全島から探す
         for ($i = 0; $i < $hako->islandNumber; $i++) {
             if (strcmp($name, $hako->islands[$i]['name']) == 0) {
                 return $i;
             }
         }
-        // 見つからなかった場合
+
         return -1;
     }
 
@@ -105,9 +105,9 @@ class Util
             $i = $idToAllyNumber[$id];
             $mark  = $ally[$i]['mark'];
             $color = $ally[$i]['color'];
-            $name .= '<span style="color:'.$color.'";font-weight:bold;>' . $mark . '</span> ';
+            $name .= '<span style="color:'.$color.'";>'.$mark.'</span> ';
         }
-        $name .= $island['name'] . "島";
+        $name .= $island['name'].'島';
 
         return $name;
     }
@@ -122,17 +122,17 @@ class Util
     {
         global $init;
 
-        // nullチェック
         if (empty($p2)) {
             return false;
         }
+
         if (!file_exists($init->passwordFile)) {
-            HakoError::probrem();
+            \HakoError::probrem();
 
             return false;
         }
         $fp = fopen($init->passwordFile, "r");
-        $masterPasswd = chop(fgets($fp, READ_LINE));
+        $masterPasswd = rtrim(fgets($fp, READ_LINE));
         fclose($fp);
 
         // マスターパスワードチェック
@@ -141,7 +141,7 @@ class Util
         }
 
         // 通常のパスワードチェック
-        $isLegacyHash = '$2y$10$' !== substr($p1, 0, 7);
+        $isLegacyHash = '$2y$10$' !== mb_substr($p1, 0, 7);
         if (!$isLegacyHash) {
             return password_verify($p2, $p1);
         }
@@ -150,6 +150,20 @@ class Util
         }
 
         return false;
+    }
+
+    public static function checkAdminPassword(string $p): bool
+    {
+        if (!file_exists($init->passwordFile)) {
+            \HakoError::probrem();
+
+            return false;
+        }
+        $fp = fopen($init->passwordFile, "r");
+        $AdminPassword = rtrim(fgets($fp, READ_LINE));
+        fclose($fp);
+
+        return password_verify($p, $AdminPassword);
     }
 
     /**
@@ -161,18 +175,17 @@ class Util
     {
         global $init;
 
-        // nullチェック
         if (empty($p)) {
             return false;
         }
         if (!file_exists($init->passwordFile)) {
-            HakoError::probrem();
+            \HakoError::probrem();
 
             return false;
         }
         $fp = fopen($init->passwordFile, "r");
-        $specialPasswd = chop(fgets($fp, READ_LINE));//1行目を破棄
-        $specialPasswd = chop(fgets($fp, READ_LINE));
+        $specialPasswd = rtrim(fgets($fp, READ_LINE));//1行目を破棄
+        $specialPasswd = rtrim(fgets($fp, READ_LINE));
         fclose($fp);
 
         return password_verify($p, $specialPasswd);
@@ -191,9 +204,13 @@ class Util
      * @param  int $num 正の整数（通例2以上）
      * @return int      [0, $num-1]の範囲の整数
      */
-    public static function random(int $num = 0): int
+    public static function random(int $num = 0, int $max = PHP_INT_MIN): int
     {
-        return $num > 1 ? mt_rand(0, $num - 1) : 0;
+        if ($max !== PHP_INT_MIN) {
+            return random_int($num, $max);
+        } else {
+            return $num > 1 ? random_int(0, $num - 1) : 0;
+        }
     }
 
     /**
@@ -256,7 +273,7 @@ class Util
     //---------------------------------------------------
     // コマンドを前にずらす
     //---------------------------------------------------
-    public static function slideFront(&$command, $number = 0)
+    public static function slideFront(&$command, $number = 0): void
     {
         global $init;
 
@@ -276,7 +293,7 @@ class Util
     //---------------------------------------------------
     // コマンドを後にずらす
     //---------------------------------------------------
-    public static function slideBack(&$command, $number = 0)
+    public static function slideBack(&$command, $number = 0): void
     {
         global $init;
 
@@ -397,7 +414,7 @@ class Util
             }
             // 一定時間sleepし、ロックが解除されるのを待つ
             // 乱数時間sleepすることで、ロックが何度も衝突しないようにする
-            usleep((LOCK_RETRY_INTERVAL - mt_rand(0, 300)) * 1000);
+            usleep(random_int(0, 100) * 1000);
         }
         // ロック失敗
         fclose($fp);
@@ -411,7 +428,7 @@ class Util
      * @param  [type] $fp file pointer
      * @return void
      */
-    public static function unlock($fp)
+    public static function unlock($fp): void
     {
         fflush($fp);
         flock($fp, LOCK_UN);
@@ -424,7 +441,7 @@ class Util
      * @param  string $status  アラート種類："success","info","warning","danger".
      * @return void
      */
-    public static function makeTagMessage($message, $status = 'success')
+    public static function makeTagMessage($message, $status = 'success'): void
     {
         echo '<div class="alert alert-'.$status.'" role="alert">';
         echo nl2br($message, false);
@@ -438,7 +455,7 @@ class Util
      */
     public static function rand_string(int $max = 32): string
     {
-        return substr(md5(uniqid(rand_number(), true)), 0, $max);
+        return mb_substr(md5(uniqid(rand_number(), true)), 0, $max);
     }
 
     /**
@@ -457,20 +474,87 @@ class Util
     /**
      * $catに対応した計算式で数値を返す
      * [TODO] 関数を他所に切り出す
-     * @param  string $cat [description]
-     * @param  array  $isl [description]
-     * @return float       [description]
+     * @param  string $cat 計算したい対象（あらかじめ定義しておく）
+     * @param  array  $p   プレイヤーデータ
+     * @param  array  $mod 変数の上書き（あれば）
+     * @return float       計算結果
      */
-    public static function calcIslandData(string $cat, array $isl): float
+    public static function calc(string $cat, array $p, array $mod = []): float
     {
-        switch ($cat) {
-            case 'unemployed':
-                return ($isl['pop'] - ($isl['farm'] + $isl['factory'] + $isl['commerce'] + $isl['mountain'] + $isl['hatuden']) * 10) / $isl['pop'] * 100;
-            case 'enesyouhi':
-                return round(($isl['pop']/100) + ($isl['factory']*2/3) + ($isl['commerce']/3) + ($isl['mountain']/4));
-            case 'ene':
-                return round($isl['hatuden'] / Util::calcIslandData('enesyouhi', $isl) * 100);
+        foreach ($mod as $k => $v) {
+            if (array_key_exists($k, $p)) {
+                $p[$k] = $v;
+            }
         }
+        unset($mod, $k, $v);
+
+        if ($cat === 'unemployed') {
+            return ($p['pop'] - ($p['farm'] + $p['factory'] + $p['commerce'] + $p['mountain'] + $p['hatuden']) * 10) / $p['pop'] * 100;
+        }
+        /**
+         * 【電力消費量】
+         * 「人口が農業枠未満」か「Σ(工業,商業,採掘場枠)がゼロ」→ ゼロ
+         * => 「人口-農業枠」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
+         */
+        if ($cat === 'power_consumption') {
+            $civil_without_farmer = $p['pop'] - $p['farm'];
+            $is_civil_farmer_all = $civil_without_farmer <= 0;
+            $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) <= 0;
+            if ($is_civil_farmer_all || $not_have_industry) {
+                unset($civil_without_farmer);
+
+                return 0;
+            }
+            unset($is_civil_farmer_all, $not_have_industry);
+
+            return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerce'] /3 + $p['mountain'] /4);
+        }
+        /**
+         * 【電力供給率】
+         */
+        if ($cat === 'power_supply_rate') {
+        }
+        /**
+         * 【総合ポイント】
+         * 「人口ゼロかBF」→ 0
+         * => 10*(15人口 + 資金 + 食料 + 2農業 + 工業 + 1.2商業 + 2採掘 + 3発電 + サッカー + 5土地 + 5討伐 + 10装弾 + 5怪獣)
+         */
+        if ($cat === 'grand_point') {
+            if ($p['pop'] == 0 || $p['isBF'] == 1) {
+                return 0;
+            }
+
+            return 10 * ($p['pop']*15 + $p['money'] + $p['food'] + $p['farm']*2
+                + $p['factory'] + $p['commerce']*1.2 + $p['mountain']*2
+                + $p['hatuden']*3 + $p['team'] + $p['area']*5 + $p['taiji']*5
+                + $p['fire']*10 + $p['monster']*5);
+        }
+
+        switch ($cat) {
+            case 'enesyouhi':
+                return round(($p['pop']/100) + ($p['factory']*2/3) + ($p['commerce']/3) + ($p['mountain']/4));
+
+            case 'ene':
+                return round($p['hatuden'] / Util::calc('enesyouhi', $p) * 100);
+        }
+
+        throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
+    }
+
+    /**
+     * 各種イベントが発生するかどうかの判定
+     * @param  string $cat イベント名称（あらかじめ定義しておく）
+     * @return bool        発生するか（したか）
+     */
+    public static function event_flag(string $cat): bool
+    {
+        global $init;
+
+        if ($cat === 'blackout') {
+            return Util::random(1000) < $init->disTenki;
+        }
+
+        throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
     }
 
     /**
@@ -484,19 +568,32 @@ class Util
 
         $mode = $_POST['mode'] ?? '';
     }
+
+    /**
+     * 文字のエスケープ処理
+     * @param  string  $s    任意の入力文字列
+     * @param  integer $mode boolキャスト：nl2brの有無（複数改行の圧縮機能あり）
+     * @return string        キャスト済み文字列
+     */
+    public static function htmlEscape($s, $mode = 0): string
+    {
+        $s = preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($s, ENT_QUOTES, 'UTF-8'));
+
+        if ($mode) {
+            $s = strtr($s, array_fill_keys(["\r\n", "\r", "\n"], '<br>'));
+            $s = preg_replace('/(<br>){3,}/g', '<br><br>', $s); // 大量改行対策
+        }
+
+        return $s;
+    }
 }
 
 
 
-function println(...$strs)
+function println(...$strs): void
 {
     foreach ($strs as $str) {
         echo $str;
     }
     echo PHP_EOL;
-}
-
-function h(string $str): string
-{
-    return preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($str, ENT_QUOTES, 'UTF-8'));
 }

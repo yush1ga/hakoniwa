@@ -12,17 +12,17 @@ require_once APPPATH.'/model/hako-log.php';
 
 class HTML
 {
-    public static function header()
+    public static function header(): void
     {
         global $init;
-        require_once(VIEWS.'/header.php');
-        require_once(VIEWS.'/body.php');
+        require_once VIEWS.'/header.php';
+        require_once VIEWS.'/body.php';
     }
 
-    public static function head()
+    public static function head(): void
     {
         global $init;
-        require_once(VIEWS.'/header.php');
+        require_once VIEWS.'/header.php';
     }
 
 
@@ -30,10 +30,10 @@ class HTML
      * HTML <footer />
      * @return void
      */
-    public static function footer()
+    public static function footer(): void
     {
         global $init;
-        require_once(VIEWS.'/footer.php');
+        require_once VIEWS.'/footer.php';
     }
 
     /**
@@ -41,10 +41,10 @@ class HTML
      * @param  [type] $hako [description]
      * @return void
      */
-    public function lastModified($hako)
+    public function lastModified($hako): void
     {
         global $init;
-        require_once(VIEWS.'/lastModified.php');
+        require_once VIEWS.'/lastModified.php';
     }
 
     /**
@@ -57,21 +57,21 @@ class HTML
         return date("Y年n月j日 G時i分s秒", $t);
     }
 
-    public function pageTitle(string $title, string $subtitle = '')
+    public function pageTitle(string $title, string $subtitle = ''): void
     {
         if ($subtitle=='') {
-            println('<h1 class="title">', $title, '</h1>');
+            echo '<h1 class="title">', $title, '</h1>', "\n";
         } else {
-            println('<h1 class="title">', $title, ' <small>', $subtitle, '</small></h1>');
+            echo '<h1 class="title">', $title, ' <small>', $subtitle, '</small></h1>', "\n";
         }
     }
 
-    public function print_islandInfoTable($info, int $rank)
+    public function print_islandInfoTable($info, int $rank): void
     {
         global $init;
 
-        $rank       = $info['isBF'] ? '★' : $rank;
-        $population = $info['pop'] > 1 ? $info['pop'] : 1;
+        $rank       = $info['isBF'] ? '<i class="glyphicon glyphicon-asterisk" aria-hidden="true"></i>' : $rank;
+        $population = $info['pop'];
         $id         = $info['id'];
         $area       = $info['area'];
         $point      = $info['point'];
@@ -81,29 +81,29 @@ class HTML
         $money      = Util::aboutMoney($info['money']);
         $lottery    = $info['lot'];
         $food       = $info['food'] . $init->unitFood;
-        $unemployed = ($population - ($info['farm'] + $info['factory'] + $info['commerce'] + $info['mountain'] + $info['hatuden']) * 10) / $population * 100;
-        $unemployed = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
+        $unemployed = $this->calculations('unemployed', $info);
+        // $unemployed = '<span style="color:' .(($unemployed<0)? '#000': '#c7243a'). ';">'. sprintf("%-3d%%", $unemployed). '</span>';
         $farm       = max($info['farm'] * 10, 0);
         $factory    = max($info['factory'] * 10, 0);
         $commerce   = max($info['commerce'] * 10, 0);
         $mountain   = max($info['mountain'] * 10, 0);
         $hatuden    = max($info['hatuden'] * 10, 0);
         $taiji      = $info['taiji'];
-        $peop          = ($info['peop'] < 0) ? $info['peop'].$init->unitPop : '+'.$info['peop'].$init->unitPop;
-        $okane         = ($info['gold'] < 0) ? $info['gold'].$init->unitMoney : '+'.$info['gold'].$init->unitMoney;
-        $gohan         = ($info['rice'] < 0) ? $info['rice'].$init->unitFood : '+'.$info['rice'].$init->unitFood;
-        $poin          = ($info['pots'] < 0) ? $info['pots'].'pts' : '+'.$info['pots'].'pts';
+        $peop       = sprintf('%+d', $info['peop']).$init->unitPop;
+        $okane      = sprintf('%+d', $info['gold']).$init->unitMoney;
+        $gohan      = sprintf('%+d', $info['rice']).$init->unitFood;
+        $poin       = sprintf('%+d', $info['pots']).'pts';
         $tenki      = $info['tenki'];
         $team       = $info['team'];
         $sport      = [
-            'matches' => $info['shiai'],
-            'won'     => $info['kachi'],
-            'lose'    => $info['make'],
-            'draw'    => $info['hikiwake'],
-            'attack'  => $info['kougeki'],
-            'defence' => $info['bougyo'],
-            'point'   => $info['tokuten'],
-            'lpoint'  => $info['shitten']
+            'matches'     => $info['shiai'],
+            'won'         => $info['kachi'],
+            'lose'        => $info['make'],
+            'draw'        => $info['hikiwake'],
+            'attack'      => $info['kougeki'],
+            'defence'     => $info['bougyo'],
+            'got_point'   => $info['tokuten'],
+            'lose_point'  => $info['shitten']
         ];
         $shiai         = $info['shiai'];
         $kachi         = $info['kachi'];
@@ -186,12 +186,12 @@ class HTML
         }
         echo <<<END
     <tr>
-        <th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
-        <td class="NameCell" rowspan="5" valign="top">
-            <h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
-            {$prize}{$viking}<br>
-            {$zins}<br>
-            <small>({$peop} {$okane} {$gohan} {$poin})</small>
+        <th class="NumberCell number" rowspan=5>$j</th>
+        <td class="NameCell" rowspan=4>
+            <h3><a href="$this_file?Sight=$id">$name</a>$keep$start</h3>
+            <div>$monster $soccer</div>
+            <div>$prize $viking</div>
+            <div>$zins</div>
         </td>
         <td class="InfoCell">$point</td>
         <td class="InfoCell">$pop</td>
@@ -202,13 +202,13 @@ class HTML
         <td class="InfoCell">$unemployed</td>
     </tr>
     <tr>
-        <th class="TitleCell head">{$init->nameFarmSize}</th>
-        <th class="TitleCell head">{$init->nameFactoryScale}</th>
-        <th class="TitleCell head">{$init->nameCommercialScale}</th>
-        <th class="TitleCell head">{$init->nameMineScale}</th>
-        <th class="TitleCell head">{$init->namePowerPlantScale}</th>
-        <th class="TitleCell head">{$init->namePowerSupplyRate}</th>
-        <th class="TitleCell head">{$init->nameSatellite}</th>
+        <th class="TitleCell head">$init->nameFarmSize</th>
+        <th class="TitleCell head">$init->nameFactoryScale</th>
+        <th class="TitleCell head">$init->nameCommercialScale</th>
+        <th class="TitleCell head">$init->nameMineScale</th>
+        <th class="TitleCell head">$init->namePowerPlantScale</th>
+        <th class="TitleCell head">$init->namePowerSupplyRate</th>
+        <th class="TitleCell head">$init->nameSatellite</th>
     </tr>
     <tr>
         <td class="InfoCell">$farm</td>
@@ -221,12 +221,25 @@ class HTML
     </tr>
     <tr>
         <th class="TitleCell head">取得アイテム</th>
-        <td class="ItemCell" colspan="6">$items</td>
+        <td class="ItemCell" colspan=6>$items</td>
     </tr>
     <tr>
-        <td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
+        <td class="NameCell"><small>前ターン比： $poin / $peop / $okane / $gohan</small></td>
+        <td class="CommentCell" colspan=7><span class="head">{$owner}：</span> $comment</td>
     </tr>
 END;
+    }
+
+    private function calculations(string $cat, array $island) :float
+    {
+        switch ($cat) {
+            case 'unemployed':
+                return ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
+
+            default:
+                # code...
+                break;
+        }
     }
 }
 
@@ -236,7 +249,7 @@ END;
 
 class HtmlTop extends HTML
 {
-    public function main($hako, $data)
+    public function main($hako, $data): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-main.php';
@@ -245,7 +258,7 @@ class HtmlTop extends HTML
         // 開発モードのラジオボタンのチェックフラグ
         $radio  = '';
         $radio2 = 'checked';
-        if (strtolower($data['defaultDevelopeMode'] ?? "") != 'javascript') {
+        if (mb_strtolower($data['defaultDevelopeMode'] ?? "") !== 'javascript') {
             $radio  = 'checked';
             $radio2 = '';
         }
@@ -253,33 +266,7 @@ class HtmlTop extends HTML
         // セットするパスワードのチェック
         $defaultPassword = $data['defaultPassword'] ?? '';
 
-        // set parent directory
-        $views = VIEWS.'/top/';
-
-        // サイトタイトルからお知らせまで
-        require_once($views.'main.php');
-
-        // 各部門ランキング
-        require_once($views.'category-rank.php');
-
-        // 同盟の状況
-        if ($hako->allyNumber) {
-            require_once($views.'ally-list.php');
-        }
-
-        // 各諸島の状況
-        require_once($views.'island-list.php');
-
-        // Battle Fieldの状況
-        require_once($views.'bf-list.php');
-
-        // 歴史
-        require_once(VIEWS.'/log/history.php');
-
-        // 管理者登録モード
-        if ($init->registerMode) {
-            require_once($views.'register-mode.php');
-        }
+        require_once VIEWS.'Index.php';
     }
 
     /**
@@ -301,14 +288,14 @@ class HtmlTop extends HTML
         println('<div class="table-responsive">');
         println('<table class="table table-bordered table-condensed">');
 
-        for ($i = $start; $i < $sentinel ; $i++) {
-            $island        = $hako->islands[$i];
+        for ($i = $start; $i < $sentinel; $i++) {
+            $island = $hako->islands[$i];
             if ($island['isDead'] ?? false) {
                 continue;
             }
 
-            $island['pop'] = ($island['pop'] > 1) ? $island['pop'] : 1;
-            $j             = ($island['isBF']) ? '★' : $i + 1;
+            // $island['pop'] = $island['pop'] > 1 ? $island['pop'] : 1;
+            $j             = $island['isBF'] ? '-' : $i + 1;
             $id            = $island['id'];
             $pop           = $island['pop'].$init->unitPop;
             $area          = $island['area'].$init->unitArea;
@@ -316,7 +303,7 @@ class HtmlTop extends HTML
             $eisei         = $island['eisei'];
             $zin           = $island['zin'];
             $item          = $island['item'];
-            $money         = Util::aboutMoney($island['money']);
+            $money         = Util::aboutMoney((int)$island['money']);
             $lot           = $island['lot'];
             $food          = $island['food'] . $init->unitFood;
             $unemployed    = ($island['pop'] - ($island['farm'] + $island['factory'] + $island['commerce'] + $island['mountain'] + $island['hatuden']) * 10) / $island['pop'] * 100;
@@ -327,10 +314,10 @@ class HtmlTop extends HTML
             $mountain      = ($island['mountain'] <= 0)? $init->notHave: $island['mountain']*10 . $init->unitPop;
             $hatuden       = ($island['hatuden']  <= 0)? $init->notHave: $island['hatuden'] *10 . 'kW';
             $taiji         = ($island['taiji']    <= 0)? "0".$init->unitMonster: $island['taiji'].$init->unitMonster;
-            $peop          = ($island['peop'] < 0) ? $island['peop'].$init->unitPop : '+'.$island['peop'].$init->unitPop;
-            $okane         = ($island['gold'] < 0) ? $island['gold'].$init->unitMoney : '+'.$island['gold'].$init->unitMoney;
-            $gohan         = ($island['rice'] < 0) ? $island['rice'].$init->unitFood : '+'.$island['rice'].$init->unitFood;
-            $poin          = ($island['pots'] < 0) ? $island['pots'].'pts' : '+'.$island['pots'].'pts';
+            $peop          = sprintf('%+d', $island['peop']).$init->unitPop;
+            $okane         = sprintf('%+d', $island['gold']).$init->unitMoney;
+            $gohan         = sprintf('%+d', $island['rice']).$init->unitFood;
+            $poin          = sprintf('%+d', $island['pots']).'pts';
             $tenki         = $island['tenki'];
             $team          = $island['team'];
             $shiai         = $island['shiai'];
@@ -342,11 +329,10 @@ class HtmlTop extends HTML
             $tokuten       = $island['tokuten'];
             $shitten       = $island['shitten'];
             $comment       = $island['comment'];
-            $comment_turn  = $island['comment_turn'];
-            //$starturn     = $island['starturn'];
+            $starturn      = $island['starturn'];
             $keep = '';
 
-            $monster       = ($island['monster'] > 0)? '<strong class="monster">[怪獣'.$island['monster'].'体出現中]</strong>' :'';
+            $monster       = ($island['monster'] > 0)? '<strong class="text-danger">[怪獣'.$island['monster'].'体出現中]</strong>' :'';
 
             if ($island['keep'] == 1) {
                 $comment = '<span class="attention">この島は管理人預かり中です</span>';
@@ -354,60 +340,41 @@ class HtmlTop extends HTML
             }
 
             $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
-            $name = $island['absent'] == 0 ? $init->tagName_.$name.$init->_tagName : $init->tagName2_.$name.'('.$island['absent'].')'.$init->_tagName2;
+            $name = $island['absent'] == 0 ? '<span class="islName">'.$name.'</span>' : $init->tagName2_.$name.'('.$island['absent'].')'.$init->_tagName2;
 
             $owner = (!empty($island['owner']))? $island['owner']: 'annonymous';
 
             $prize = $hako->getPrizeList($island['prize']);
 
-            $point = $island['point'];
+            // $point = $island['point'];
 
-            $sora = "";
-            switch ($tenki) {
-                case 1:
-                    $sora = "<img src=\"{$init->imgDir}/tenki1.gif\" alt=\"晴れ\" title=\"晴れ\" width=\"19\" height=\"19\">";//"☀";
-                    break;
-                case 2:
-                    $sora = "<img src=\"{$init->imgDir}/tenki2.gif\" alt=\"曇り\" title=\"曇り\" width=\"19\" height=\"19\">";//"☁";
-                    break;
-                case 3:
-                    $sora = "<img src=\"{$init->imgDir}/tenki3.gif\" alt=\"雨\" title=\"雨\" width=\"19\" height=\"19\">";//"☂";
-                    break;
-                case 4:
-                    $sora = "<img src=\"{$init->imgDir}/tenki4.gif\" alt=\"雷\" title=\"雷\" width=\"19\" height=\"19\">";//"⛈";
-                    break;
-                default:
-                    $sora = "<img src=\"{$init->imgDir}/tenki5.gif\" alt=\"雪\" title=\"雪\" width=\"19\" height=\"19\">";//"☃";
-            }
+            $_ = ['', '晴れ☀', '曇り☁', '雨☂', '雷⛈', '雪☃'];
+            $sora  = "<img src=\"{$init->imgDir}/tenki{$tenki}.gif\" alt=\"{$_[$tenki]}\" title=\"{$_[$tenki]}\"". ' width="19" height="19">';
 
             $eiseis = "";
             for ($e = 0; $e < $init->EiseiNumber; $e++) {
-                if (isset($eisei[$e])) {
-                    if ($eisei[$e] > 0) {
-                        $eiseis .= "<img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"{$init->EiseiName[$e]} {$eisei[$e]}%\" title=\"{$init->EiseiName[$e]} {$eisei[$e]}%\"> ";
-                    }
+                if (isset($eisei[$e]) && $eisei[$e] > 0) {
+                    $_ = $init->EiseiName[$e].' '.$eisei[$e].'%';
+                    $eiseis .= " <img src=\"{$init->imgDir}/eisei{$e}.gif\" alt=\"$_\" title=\"$_\">";
                 }
             }
 
             $zins = "";
             for ($z = 0; $z < $init->ZinNumber; $z++) {
-                if (isset($zin[$z])) {
-                    if ($zin[$z] > 0) {
-                        $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
-                    }
+                if (isset($zin[$z]) && $zin[$z] > 0) {
+                    $zins .= "<img src=\"{$init->imgDir}/zin{$z}.gif\" alt=\"{$init->ZinName[$z]}\" title=\"{$init->ZinName[$z]}\"> ";
                 }
             }
 
             $items = "";
             for ($t = 0; $t < $init->ItemNumber; $t++) {
-                if (isset($item[$t])) {
-                    if ($item[$t] > 0) {
-                        if ($t == 20) {
-                            $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"  title=\"{$init->ItemName[$t]} {$item[$t]}{$init->unitTree}\"> ";
-                        } else {
-                            $items .= "<img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"{$init->ItemName[$t]}\" title=\"{$init->ItemName[$t]}\"> ";
-                        }
+                if (isset($item[$t]) && $item[$t] > 0) {
+                    if ($t == 20) {
+                        $_ = $init->ItemName[$t].' '.$item[$t].$init->unitTree;
+                    } else {
+                        $_ = $init->ItemName[$t];
                     }
+                    $items .= " <img src=\"{$init->imgDir}/item{$t}.gif\" alt=\"$_\" title=\"$_\">";
                 }
             }
 
@@ -420,7 +387,7 @@ class HtmlTop extends HTML
                 }
             }
 
-            $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist)? " 🔰":"";
+            $start = (($hako->islandTurn - $island['starturn']) < $init->noAssist) ? '<sup title="開始ターン：'.$island['starturn'].'">🔰</sup>':'';
 
             $soccer = ($island['soccer'] > 0)?" <span title=\"総合ポイント：{$team}　{$shiai}戦{$kachi}勝{$make}敗{$hikiwake}分　攻撃力：{$kougeki}　守備力：{$bougyo}　得点：{$tokuten}　失点：{$shitten}\">⚽</span>":"";
 
@@ -436,26 +403,24 @@ class HtmlTop extends HTML
                 $ene = ($ene < 100) ? '<span style="color:#c7243a;">'.$ene.'%</span>' : $ene.'%';
             }
             echo <<<END
-	<thead>
-		<tr>
-			<th class="TitleCell head">{$init->nameRank}</th>
-			<th class="TitleCell head">島</th>
-			<th class="TitleCell head">得点</th>
-			<th class="TitleCell head">{$init->namePopulation}</th>
-			<th class="TitleCell head">{$init->nameArea}</th>
-			<th class="TitleCell head">{$init->nameWeather}</th>
-			<th class="TitleCell head">{$init->nameFunds} {$lots}</th>
-			<th class="TitleCell head">{$init->nameFood}</th>
-			<th class="TitleCell head">{$init->nameUnemploymentRate}</th>
-		</tr>
-	</thead>
 	<tr>
-		<th class="NumberCell" rowspan="5">{$init->tagNumber_}$j{$init->_tagNumber}</th>
-		<td class="NameCell" rowspan="5" valign="top">
-			<h3><a href="{$this_file}?Sight={$id}">{$name}</a>$keep <small>{$start}{$monster}{$soccer}</small></h3>
-			{$prize}{$viking}<br>
-			{$zins}<br>
-			<small>({$peop} {$okane} {$gohan} {$poin})</small>
+		<th class="TitleCell head">$init->nameRank</th>
+		<th class="TitleCell head">$init->nameSuffix</th>
+		<th class="TitleCell head">得点</th>
+		<th class="TitleCell head">$init->namePopulation</th>
+		<th class="TitleCell head">$init->nameArea</th>
+		<th class="TitleCell head">$init->nameWeather</th>
+		<th class="TitleCell head">$init->nameFunds $lots</th>
+		<th class="TitleCell head">$init->nameFood</th>
+		<th class="TitleCell head">$init->nameUnemploymentRate</th>
+	</tr>
+	<tr>
+		<th class="NumberCell number" rowspan=5>$j</th>
+		<td class="NameCell" rowspan=4>
+			<h3><a href="$this_file?Sight=$id">$name</a>$keep$start</h3>
+            <div>$monster $soccer</div>
+			<div>$prize $viking</div>
+            <div>$zins</div>
 		</td>
 		<td class="InfoCell">$point</td>
 		<td class="InfoCell">$pop</td>
@@ -466,13 +431,13 @@ class HtmlTop extends HTML
 		<td class="InfoCell">$unemployed</td>
 	</tr>
 	<tr>
-		<th class="TitleCell head">{$init->nameFarmSize}</th>
-		<th class="TitleCell head">{$init->nameFactoryScale}</th>
-		<th class="TitleCell head">{$init->nameCommercialScale}</th>
-		<th class="TitleCell head">{$init->nameMineScale}</th>
-		<th class="TitleCell head">{$init->namePowerPlantScale}</th>
-		<th class="TitleCell head">{$init->namePowerSupplyRate}</th>
-		<th class="TitleCell head">{$init->nameSatellite}</th>
+		<th class="TitleCell head">$init->nameFarmSize</th>
+		<th class="TitleCell head">$init->nameFactoryScale</th>
+		<th class="TitleCell head">$init->nameCommercialScale</th>
+		<th class="TitleCell head">$init->nameMineScale</th>
+		<th class="TitleCell head">$init->namePowerPlantScale</th>
+		<th class="TitleCell head">$init->namePowerSupplyRate</th>
+		<th class="TitleCell head">$init->nameSatellite</th>
 	</tr>
 	<tr>
 		<td class="InfoCell">$farm</td>
@@ -485,14 +450,15 @@ class HtmlTop extends HTML
 	</tr>
 	<tr>
 		<th class="TitleCell head">取得アイテム</th>
-		<td class="ItemCell" colspan="6">$items</td>
+		<td class="ItemCell" colspan=6>$items</td>
 	</tr>
 	<tr>
-		<td class="CommentCell" colspan="7"><span class="head">{$owner}：</span> $comment</td>
+        <td class="NameCell"><small>前ターン比： $poin / $peop / $okane / $gohan</small></td>
+		<td class="CommentCell" colspan=7><span class="head">{$owner}：</span> $comment</td>
 	</tr>
 END;
         }
-        echo "</table></div>";
+        println('</table></div>');
     }
 
     /**
@@ -500,11 +466,11 @@ END;
      * @param type $hako
      * @param type $data
      */
-    public function register(&$hako, $data = '')
+    public function register(&$hako, $data = ''): void
     {
         global $init;
 
-        require_once(VIEWS.'/conf/register.php');
+        require_once VIEWS.'/conf/register.php';
     }
 
     /**
@@ -517,47 +483,38 @@ END;
         global $init;
         $this_file = $init->baseDir . '/hako-main.php';
 
-        require_once(VIEWS.'/conf/discovery.php');
+        require_once VIEWS.'/conf/discovery.php';
     }
 
     /**
      * 島の名前とパスワードの変更
      */
-    public function changeIslandInfo($islandList = "")
+    public function changeIslandInfo($islandList = ""): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-main.php";
 
-        require_once(VIEWS.'/conf/change/island-info.php');
+        require_once VIEWS.'/conf/change/island-info.php';
     }
 
     /**
      * オーナー名の変更
      */
-    public function changeOwnerName($islandList = "")
+    public function changeOwnerName($islandList = ""): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-main.php";
 
-        require_once(VIEWS.'/conf/change/owner-name.php');
+        require_once VIEWS.'/conf/change/owner-name.php';
     }
 
     /**
      * 最近の出来事
      */
-    public function log()
+    public function log(): void
     {
         global $init;
-        require_once(VIEWS.'/log/recent.php');
-    }
-
-    /**
-     * お知らせ
-     */
-    public function infoPrint()
-    {
-        global $init;
-        require_once(VIEWS.'/log/info.php');
+        require_once VIEWS.'/log/recent.php';
     }
 }
 
@@ -594,19 +551,18 @@ class HtmlMap extends HTML
         $islandID = $data['ISLANDID'];
         $name = $island['name'].$init->nameSuffix;
         $ip = getenv('REMOTE_ADDR', true);
-        if ($ip){
+        if ($ip) {
             $host = gethostbyaddr($ip);
-        }
-        else {
+        } else {
             $ip = '192.0.2.0';
             $host = 'unknown';
         }
 
         // ファイル頭に追記して最大容量超過分を切り捨て
-        fputs($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
+        fwrite($fp, $timedata.','.$islandID.','.$name.','.$ip.','.$host.PHP_EOL);
         for ($i=0,$ax=$init->axesmax-1; $i<$ax; $i++) {
             if (isset($log[$i])) {
-                fputs($fp, $log[$i]);
+                fwrite($fp, $log[$i]);
             }
         }
         fclose($fp);
@@ -644,16 +600,16 @@ class HtmlMap extends HTML
         $name = Util::islandName($island, $hako->ally, $hako->idToAllyNumber);
 
         // 読み込み
-        require_once(VIEWS.'/map/main.php');
+        require_once VIEWS.'/map/main.php';
     }
 
     //---------------------------------------------------
     // 島の情報
     //---------------------------------------------------
-    public function islandInfo($island, $number = 0, $mode = 0)
+    public function islandInfo($island, $number = 0, $mode = 0): void
     {
         global $init;
-        $island['pop'] = ($island['pop'] <= 0) ? 1 : $island['pop'];
+        $island['pop'] = max(1, $island['pop']);
 
         $rank       = $island['isBF'] ? '★' : $number + 1;
         $pop        = $island['pop'].$init->unitPop;
@@ -751,7 +707,7 @@ class HtmlMap extends HTML
         }
 
         // 島の情報
-        require_once(VIEWS.'/map/island-info.php');
+        require_once VIEWS.'/map/island-info.php';
     }
 
     /**
@@ -777,16 +733,16 @@ class HtmlMap extends HTML
         $poin  = "";
 
         if (isset($island['peop'])) {
-            $peop = ($island['peop'] < 0 ? '' : '+') . $island['peop'] . $init->unitPop;
+            $peop = sprintf("%+d", $island['peop']) . $init->unitPop;
         }
         if (isset($island['gold'])) {
-            $okane = ($island['gold'] < 0 ? '' : '+') . $island['gold'] . $init->unitMoney;
+            $okane = sprintf("%+d", $island['gold']) . $init->unitMoney;
         }
         if (isset($island['rice'])) {
-            $gohan = ($island['rice'] < 0 ? '' : '+') . $island['rice'] . $init->unitFood;
+            $gohan = sprintf("%+d", $island['rice']) . $init->unitFood;
         }
         if (isset($island['pots'])) {
-            $poin = ($island['pots'] < 0 ? '' : '+') . $island['pots'] . 'pts';
+            $poin = sprintf("%+d", $island['pots']) . 'pts';
         }
 
         if ($mode == 1) {
@@ -801,7 +757,7 @@ class HtmlMap extends HTML
             }
         }
 
-        require_once(VIEWS.'/map/development/map.php');
+        require_once VIEWS.'/map/development/map.php';
 
         println('<p class="text-center">開始ターン：', $island['starturn'], '</p>');
 
@@ -810,12 +766,12 @@ class HtmlMap extends HTML
 <table class="table table-bordered">
 	<thead>
 		<tr>
-			<th class="TitleCell">{$init->tagTH_}総合得点{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}成績{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}攻撃力{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}守備力{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}得点{$init->_tagTH}</th>
-			<th class="TitleCell">{$init->tagTH_}失点{$init->_tagTH}</th>
+			<th class="TitleCell head">総合得点</th>
+			<th class="TitleCell head">成績</th>
+			<th class="TitleCell head">攻撃力</th>
+			<th class="TitleCell head">守備力</th>
+			<th class="TitleCell head">得点</th>
+			<th class="TitleCell head">失点</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -850,7 +806,7 @@ END;
 <h2>{$island['name']}{$init->nameSuffix}の近況</h2>
 END;
 
-        $log = new Log();
+        $log = new Log;
         for ($i = 0; $i < $init->logMax; $i++) {
             $log->logFilePrint($i, $island['id'], $mode);
         }
@@ -860,7 +816,7 @@ END;
     //---------------------------------------------------
     // 開発画面
     //---------------------------------------------------
-    public function tempOwer($hako, $data, $number = 0)
+    public function tempOwer($hako, $data, $number = 0): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-main.php';
@@ -871,13 +827,13 @@ END;
         $height = $init->islandSize * 32 + 100;
         $defaultTarget = $init->targetIsland == 1 ? $island['id'] : $hako->defaultTarget;
 
-        require_once(VIEWS.'/map/development/basic.php');
+        require_once VIEWS.'/map/development/basic.php';
     }
 
     //---------------------------------------------------
     // 入力済みコマンド表示
     //---------------------------------------------------
-    public function tempCommand($number, $command, $hako)
+    public function tempCommand($number, $command, $hako): void
     {
         global $init;
 
@@ -925,8 +881,8 @@ END;
             case $init->comMissileLD:
             case $init->comMissileLU:
                 // ミサイル系
-                $n = ($arg == 0) ? '無制限' : $arg . '発';
-                $str = "{$target}{$point}へ{$comName}（{$init->tagName_}{$n}{$init->_tagName}）";
+                $n = $arg == 0 ? '無制限' : ($arg . '発');
+                $str = "$target{$point}へ$comName（<span class=\"islName\">$n</span>）";
 
                 break;
 
@@ -1113,22 +1069,23 @@ END;
                 // 座標付き
                 $str = "{$point}で{$comName}";
         }
-        echo "{$str}</a><br>";
+        echo "$str</a><br>";
     }
     //---------------------------------------------------
     // 新しく発見した島
     //---------------------------------------------------
-    public function newIslandHead($name)
+    public function newIslandHead($name): void
     {
         global $init;
 
-        println('<h1 class="text-center">', $init->nameSuffix, 'を発見しました！ <br><small><span class="big islName">「', $name, $init->nameSuffix, '」</span>と命名しました。</small></h1>');
+        println('<h1 class="text-center">', $init->nameSuffix, 'を発見しました！</h1>');
+        println('<p class="lead"><span class="big islName">「', $name, $init->nameSuffix, '」</span>と命名しました。</p>');
     }
 
     //---------------------------------------------------
     // 目標捕捉モード
     //---------------------------------------------------
-    public function printTarget($hako, $data)
+    public function printTarget($hako, $data): void
     {
         global $init;
 
@@ -1167,7 +1124,7 @@ class HtmlMapJS extends HtmlMap
     //---------------------------------------------------
     // 開発画面
     //---------------------------------------------------
-    public function tempOwer($hako, $data, $number = 0)
+    public function tempOwer($hako, $data, $number = 0): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-main.php";
@@ -1206,7 +1163,7 @@ class HtmlMapJS extends HtmlMap
         $All_listCom = 0;
         $com_count = count($init->commandDivido);
         for ($m = 0; $m < $com_count; $m++) {
-            list($aa, $dd, $ff) = explode(",", $init->commandDivido[$m]);
+            [$aa, $dd, $ff] = explode(",", $init->commandDivido[$m]);
             $set_listcom .= "[ ";
             for ($i = 0; $i < $init->commandTotal; $i++) {
                 $l_kind = $init->comList[$i];
@@ -1234,12 +1191,12 @@ class HtmlMapJS extends HtmlMap
                 //	next;
                 //}
             }
-            $bai = strlen($set_listcom);
-            $set_listcom = substr($set_listcom, 0, $bai - 2);
+            $bai = mb_strlen($set_listcom);
+            $set_listcom = mb_substr($set_listcom, 0, $bai - 2);
             $set_listcom .= " ],\n";
         }
-        $bai = strlen($set_listcom);
-        $set_listcom = substr($set_listcom, 0, $bai - 2);
+        $bai = mb_strlen($set_listcom);
+        $set_listcom = mb_substr($set_listcom, 0, $bai - 2);
         if (empty($data['defaultKind'])) {
             $default_Kind = 1;
         } else {
@@ -1256,7 +1213,7 @@ class HtmlMapJS extends HtmlMap
         for ($i = 0; $i < count($init->EiseiName); $i++) {
             $set_eisei .= "'".$init->EiseiName[$i]."',";
         }
-        $set_eisei = substr($set_eisei, 0, -1);  // ケツカンマを削除
+        $set_eisei = mb_substr($set_eisei, 0, -1);  // ケツカンマを削除
 
         // 島リストセット
         $set_island = "";
@@ -1270,12 +1227,12 @@ class HtmlMapJS extends HtmlMap
                 $set_island .= "[$l_id, '$l_name'],\n";
             }
         }
-        $set_island = substr($set_island, 0, -1);  // ケツカンマを削除
+        $set_island = mb_substr($set_island, 0, -1);  // ケツカンマを削除
 
 
         $defaultTarget = ($init->targetIsland == 1) ? $island['id'] : $hako->defaultTarget;
 
-        require_once(VIEWS.'/map/development/js.php');
+        require_once VIEWS.'/map/development/js.php';
 
         echo <<<END
 <script type="text/javascript">
@@ -2040,7 +1997,7 @@ END;
 	<option value="">全種類</option>
 END;
         for ($i = 0; $i < $com_count; $i++) {
-            list($aa, $tmp) = explode(",", $init->commandDivido[$i], 2);
+            [$aa, $tmp] = explode(",", $init->commandDivido[$i], 2);
             echo "<option value=\"$i\">{$aa}</option>\n";
         }
         echo <<<END
@@ -2178,7 +2135,7 @@ END;
 
 class HtmlAdmin extends HTML
 {
-    public function render()
+    public function render(): void
     {
         global $init;
 
@@ -2190,13 +2147,13 @@ class HtmlAdmin extends HTML
             'BF管理'           => '/hako-bf.php',
             '島預かり管理'     => '/hako-keep.php'
         ];
-        require_once(VIEWS.'/admin/top.php');
+        require_once VIEWS.'/admin/top.php';
     }
 }
 
 class HtmlPresent extends HTML
 {
-    public function main($data, $hako)
+    public function main($data, $hako): void
     {
         global $init;
         $this_file = $init->baseDir . "/hako-present.php";
@@ -2206,7 +2163,7 @@ class HtmlPresent extends HTML
         $height = $init->islandSize * 32 + 100;
         $defaultTarget = '';
 
-        require_once(VIEWS.'/admin/present/main.php');
+        require_once VIEWS.'/admin/present/main.php';
     }
 }
 
@@ -2214,7 +2171,7 @@ class HtmlPresent extends HTML
 
 class HtmlMente extends HTML
 {
-    public function enter()
+    public function enter(): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-mente.php';
@@ -2223,7 +2180,7 @@ class HtmlMente extends HTML
         require_once VIEWS.'/admin/Maintenance/enter.php';
     }
 
-    public function main($data)
+    public function main($data): void
     {
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";
@@ -2232,17 +2189,17 @@ class HtmlMente extends HTML
 
         // データ保存用ディレクトリの存在チェック
         if (!is_dir($dirName)) {
-            if (!@mkdir($dirName, $init->dirMode, true)) {
+            if (!@mkdir($dirName, 0775, true)) {
                 \Util::makeTagMessage("データ保存用ディレクトリが存在せず、また何らかの理由で作成に失敗しました。\nゲーム設定を再度確認した上で、サーバー管理者にお問合せください。", 'danger');
                 \HTML::footer();
-                exit();
+                exit;
             }
         }
         // データ保存用ディレクトリのパーミッションチェック
-        if (!is_writeable($dirName) || !is_readable($dirName)) {
+        if (!is_writable($dirName) || !is_readable($dirName)) {
             \Util::makeTagMessage("データ保存用ディレクトリに対する適切な操作権限を所持していません。\nサーバー管理者にお問合せください。", 'danger');
             \HTML::footer();
-            exit();
+            exit;
         }
 
         if (is_file($dirName.'/hakojima.dat')) {
@@ -2259,11 +2216,11 @@ EOT;
         }
         // バックアップデータがあれば表示
         $dir = opendir(dirname($dirName));
-        $dirCld = false !== strpos($dirName, "/") ? substr(strrchr($dirName, "/"), 1) : $dirName;
+        $dirCld = false !== mb_strpos($dirName, "/") ? mb_substr(mb_strrchr($dirName, "/"), 1) : $dirName;
         while (false !== ($dn = readdir($dir))) {
             $_dirName = preg_quote($dirCld);
             if (preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
-                if (is_file("{$dirName}.bak{$matches[1]}/hakojima.dat")) {
+                if (is_file("$dirName.bak{$matches[1]}/hakojima.dat")) {
                     $this->dataPrint($data, $matches[1]);
                 }
             }
@@ -2272,7 +2229,7 @@ EOT;
     }
 
     // 表示モード
-    public function dataPrint($data, $suf = "")
+    public function dataPrint($data, $suf = ""): void
     {
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";
@@ -2285,8 +2242,8 @@ EOT;
             $fp = fopen($init->dirName.".bak{$suf}/hakojima.dat", "r");
             println('<h2>バックアップ <small>（bak', $suf, '）</small></h2>');
         }
-        $lastTurn = chop(fgets($fp, READ_LINE));
-        $lastTime = chop(fgets($fp, READ_LINE));
+        $lastTurn = (int)rtrim(fgets($fp, READ_LINE));
+        $lastTime = (int)rtrim(fgets($fp, READ_LINE));
         fclose($fp);
         $timeString = self::timeToString($lastTime);
 
@@ -2301,22 +2258,16 @@ EOT;
 </form>
 END;
         if (strcmp($suf, "") == 0) {
-            $time = localtime($lastTime, true);
-            $time['tm_year'] += 1900;
-            $time['tm_mon']++;
+            $date = date('Y-m-d', $lastTime);
+            $time = date('H:i', $lastTime);
             echo <<<END
 <h4>最終更新時刻の変更</h4>
-<form action="$this_file" method="post">
+<form action="$this_file" method="post" class="form-inline">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
-	<input type="hidden" name="NUMBER" value="$suf">
-	<input type="text" size="4" maxlength="4"name="YEAR" value="{$time['tm_year']}">年
-	<input type="text" size="2" maxlength="2"name="MON" value="{$time['tm_mon']}">月
-	<input type="text" size="2" maxlength="2"name="DATE" value="{$time['tm_mday']}">日
-	<input type="text" size="2" maxlength="2"name="HOUR" value="{$time['tm_hour']}">時
-	<input type="text" size="2" maxlength="2"name="MIN" value="{$time['tm_min']}">分
-	<input type="text" size="2" maxlength="2"name="NSEC" value="{$time['tm_sec']}">秒
-	<input type="submit" class="btn btn-warning btn-sm" value="変更">
+    <input type="date" name="date" value="$date" class="form-control" pattern="\d{4}-\d{2}-\d{2}">
+    <input type="time" name="time" value="$time" class="form-control" pattern="\d{2}:\d{2}">
+    <button type="submit" class="btn btn-warning btn-sm">変更</button>
 </form>
 END;
         } else {
@@ -2335,7 +2286,7 @@ END;
 
 class HtmlAxes extends HTML
 {
-    public function passwdChk()
+    public function passwdChk(): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-axes.php';
@@ -2351,7 +2302,7 @@ class HtmlAxes extends HTML
 END;
     }
 
-    public function main($data)
+    public function main($data): void
     {
         global $init;
         parent::pageTitle($init->title, 'アクセスログ');
@@ -2364,11 +2315,11 @@ END;
 
 class HtmlBF extends HTML
 {
-    public function main($data, $hako)
+    public function main($data, $hako): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-bf.php';
-        require_once(VIEWS.'/admin/bf.php');
+        require_once VIEWS.'/admin/bf.php';
     }
 }
 
@@ -2376,11 +2327,11 @@ class HtmlBF extends HTML
 
 class HTMLKeep extends HTML
 {
-    public function main($data, $hako)
+    public function main($data, $hako): void
     {
         global $init;
         $this_file = $init->baseDir.'/hako-keep.php';
-        require_once(VIEWS.'/admin/keep.php');
+        require_once VIEWS.'/admin/keep.php';
     }
 }
 
@@ -2388,230 +2339,116 @@ class HTMLKeep extends HTML
 
 class HtmlAlly extends HTML
 {
-    //--------------------------------------------------
-    // 初期画面
-    //--------------------------------------------------
-    public function allyTop($hako, $data)
+    private $this_file;
+
+    public function __construct()
     {
         global $init;
-        $this_file  = $init->baseDir . "/hako-ally.php";
-
-        echo "<div class='row'>";
-        echo "<div class='col-xs-12'>";
-        echo "<h1>同盟管理ツール</h1>\n";
-
-        if ($init->allyUse) {
-            echo <<<END
-<input type="button" class="btn btn-default" value="同盟の結成・変更・解散・加盟・脱退はこちらから" onClick="JavaScript:location.replace('{$this_file}?JoinA=1')">
-<h2>各同盟の状況</h2>
-END;
-        }
-        $this->allyInfo($hako);
-
-        echo "</div>",PHP_EOL,"</div>";
+        $this->this_file = $init->baseDir . '/hako-ally.php';
     }
 
-    //--------------------------------------------------
-    // 同盟の状況
-    //--------------------------------------------------
+    /**
+     * 初期画面
+     */
+    public function allyTop($hako, $data): void
+    {
+        global $init;
+
+        require VIEWS . 'Alliance/Index.php';
+    }
+
+    /**
+     * 同盟の状況
+     */
     public function allyInfo($hako, $view_ally_num = 0)
     {
         global $init;
-        $this_file  = $init->baseDir . "/hako-ally.php";
 
-        $tag = "";
-        $allyNumber = (int)$hako->allyNumber;
-        if ($allyNumber <= 0) {
-            echo "同盟がありません。";
-
-            return;
-        }
-
-        echo <<<END
-占有率は、同盟に加盟している{$init->nameSuffix}の<strong>総人口</strong>により算出されたものです。
-<div id="IslandView" class="table-responsive">
-<table class="table table-bordered">
-<thead>
-<tr>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}同盟{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}マーク{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}島の数{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}総人口{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}占有率{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-	<th class="TitleCell">{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
-</tr>
-</thead>
-END;
-
-        for ($i=0; $i<$allyNumber; $i++) {
+        $alliances_number = (int)$hako->allyNumber;
+        $alliances = [];
+        for ($i = 0; $i < $alliances_number; $i++) {
             if ($view_ally_num && ($i != $hako->idToAllyNumber[$view_ally_num])) {
                 continue;
             }
-            $ally = $hako->ally[$i];
-            $j = $i + 1;
-            $pop = $farm = $factory = $commerce = $mountain = $hatuden = $missiles = 0;
+            $alliance = $hako->ally[$i];
 
-            $num = (int)$ally['number'];
-            for ($k=0; $k<$num; $k++) {
-                $id = $ally['memberId'][$k];
-                $island = $hako->islands[$hako->idToNumber[$id]];
-                $pop      += $island['pop'];
-                $farm     += $island['farm'];
-                $factory  += $island['factory'];
-                $commerce += $island['commerce'];
-                $mountain += $island['mountain'];
-                $hatuden  += $island['hatuden'];
+            $alliance['members'] = (int)$alliance['number'];
+            $alliance['owner']   = $alliance['oName'];
+            $alliance['population'] = 0;
+
+            for ($ii = 0; $ii < $alliance['members']; $ii++) {
+                $member_id = $alliance['memberId'][$ii];
+                $member_island = $hako->islands[$hako->idToNumber[$member_id]];
+                $alliance['population'] += $member_island['pop'];
             }
+            unset($ii);
 
-            $name      = ($num) ? "{$init->tagName_}{$ally['name']}{$init->_tagName}" : "<a href=\"{$this_file}?AmiOfAlly={$ally['id']}\">{$ally['name']}</a>";
-            $pop       = $pop . $init->unitPop;
-            $farm      = ($farm <= 0)     ? $init->notHave : $farm * 10 . $init->unitPop;
-            $factory   = ($factory <= 0)  ? $init->notHave : $factory * 10 . $init->unitPop;
-            $commerce  = ($commerce <= 0) ? $init->notHave : $commerce * 10 . $init->unitPop;
-            $mountain  = ($mountain <= 0) ? $init->notHave : $mountain * 10 . $init->unitPop;
-            $hatuden   = ($hatuden <= 0)  ? '0kW' : ($hatuden*1000).'kW';
-
-            $ally['comment'] = isset($ally['comment']) ? $ally['comment'] : "";
-
-
-            echo <<<END
-<tbody>
-	<tr>
-		<th class="NumberCell" rowspan=2>{$init->tagNumber_}$j{$init->_tagNumber}</th>
-		<td class="NameCell" rowspan=2>{$name}</td>
-		<td class="MarkCell"><b><span style="color:{$ally['color']}">{$ally['mark']}</span></b></td>
-		<td class="InfoCell">{$ally['number']}島</td>
-		<td class="InfoCell">{$pop}</td>
-		<td class="InfoCell">{$ally['occupation']}%</td>
-		<td class="InfoCell">{$farm}</td>
-		<td class="InfoCell">{$factory}</td>
-		<td class="InfoCell">{$commerce}</td>
-		<td class="InfoCell">{$mountain}</td>
-		<td class="InfoCell">{$hatuden}</td>
-	</tr>
-	<tr>
-		<td class="CommentCell" colspan=9>{$init->tagTH_}<a href="{$this_file}?Allypact={$ally['id']}">{$ally['oName']}</a>：{$init->_tagTH}{$ally['comment']}</td>
-	</tr>
-<tbody>
-END;
+            $alliances[] = $alliance;
         }
-        echo <<<END
-</table>
-</div>
-<p>※ 同盟の名前をクリックすると「同盟の情報」欄へ、盟主の島名をクリックすると「コメント変更」欄へ移動します。</p>
-END;
+
+        return [$alliances_number, $alliances];
     }
 
-    //--------------------------------------------------
-    // 同盟の情報
-    //--------------------------------------------------
-    public function amityOfAlly($hako, $data)
+    /**
+     * 同盟の情報
+     */
+    public function detail($hako, $data): void
     {
         global $init;
-        $this_file  = $init->baseDir . "/hako-ally.php";
 
         $num = $data['ALLYID'];
-        $ally = $hako->ally[$hako->idToAllyNumber[$num]];
-        $allyName = "<span style=\"color:{$ally['color']};font-weight:bold;\">{$ally['mark']}</span>{$ally['name']}";
+        $alliance = $hako->ally[$hako->idToAllyNumber[$num]];
+        $islands = [];
+        $unit = '0'.$init->unitPop;
 
-        echo <<<END
-<div class='text-center'>
-	{$init->tagBig_}{$init->tagName_}{$allyName}{$init->_tagName}の情報{$init->_tagBig}<br>
-</div>
+        $alliance['title'] = $alliance['title'] !== '' ? $alliance['title'] : '盟主からのメッセージ';
 
-<div ID='campInfo'>
-END;
-        // 同盟状況の表示
-        if ($ally['number']) {
-            $this->allyInfo($hako, $num);
-        }
-        // メッセージ・盟約の表示
-        if ($ally['message'] != '') {
-            $allyTitle   = ($allyTitle != '')? $ally['title']: '盟主からのメッセージ';
-            $allyMessage = $ally['message'];
-            echo <<<END
-<hr>
+        for ($i = 0; $i < $hako->allyNumber; $i++) {
+            if ($hako->ally[$i]['id'] === $alliance['id']) {
+                $alliance['rank'] = $i + 1;
 
-<table class="table table-bordered" width="80%">
-	<tr><th class="TitleCell">{$init->tagTH_}$allyTitle{$init->_tagTH}</th></tr>
-	<tr><td class="CommentCell"><blockquote>$allyMessage</blockquote></td></tr>
-</table>
-END;
+                break;
+            }
         }
-        // メンバー一覧の表示
-        echo <<<END
-<HR>
-<TABLE class="table table-bordered">
-	<TR>
-		<TH class="TitleCell">{$init->tagTH_}{$init->nameRank}{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}島{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}{$init->namePopulation}{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}{$init->nameArea}{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}{$init->nameFunds}{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}{$init->nameFood}{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}{$init->nameFarmSize}{$init->_tagTH}</TH>
-		<TH class="TitleCell">{$init->tagTH_}{$init->nameFactoryScale}{$init->_tagTH}</TH>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameCommercialScale}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->nameMineScale}{$init->_tagTH}</th>
-		<th class="TitleCell">{$init->tagTH_}{$init->namePowerPlantScale}{$init->_tagTH}</th>
-	</TR>
-END;
-        if (!$ally['number']) {
-            echo "<TR><TH colspan=12>所属している島がありません！</TH></TR>";
-        }
-        foreach ($ally['memberId'] as $id) {
+
+        foreach ($alliance['memberId'] as $id) {
             $number = $hako->idToNumber[$id];
-            if (!($number > -1)) {
+            if ($number < 0) {
                 continue;
             }
-            $island = $hako->islands[$number];
-            $money = AllyUtil::aboutMoney($island['money']);
-            $farm = $island['farm'];
-            $factory = $island['factory'];
-            $commerce = $island['commerce'];
-            $mountain = $island['mountain'];
-            $hatuden = $island['hatuden'];
-            $ranking = $number + 1;
-            $name = AllyUtil::islandName($island, $hako->ally, $hako->idToAllyNumber);
-            if ($island['absent']  == 0) {
-                $name = "{$init->tagName_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}{$init->_tagName}</a>";
-            } else {
-                $name = "{$init->tagName2_}<a href=\"{$init->baseDir}/hako-main.php?Sight={$island['id']}\">{$name}</a>({$island['absent']}){$init->_tagName2}";
-            }
-            $farm = ($farm == 0) ? $init->notHave : "{$farm}0$init->unitPop";
-            $factory = ($factory == 0) ? $init->notHave : "{$factory}0$init->unitPop";
-            $commerce  = ($commerce == 0) ? $init->notHave : "{$commerce}0$init->unitPop";
-            $mountain = ($mountain == 0) ? $init->notHave : "{$mountain}0$init->unitPop";
-            $hatuden  = ($hatuden == 0) ? "0kw" : "{$hatuden}000kw";
 
-            echo <<<END
-<TR>
-	<TH class="NumberCell">{$init->tagNumber_}$ranking{$init->_tagNumber}</TH>
-	<TD class="NameCell">$name</TD>
-	<TD class="InfoCell">{$island['pop']}$init->unitPop</TD>
-	<TD class="InfoCell">{$island['area']}$init->unitArea</TD>
-	<TD class="InfoCell">$money</TD>
-	<TD class="InfoCell">{$island['food']}$init->unitFood</TD>
-	<TD class="InfoCell">$farm</TD>
-	<TD class="InfoCell">$factory</TD>
-	<TD class="InfoCell">$commerce</TD>
-	<TD class="InfoCell">$mountain</TD>
-	<TD class="InfoCell">$hatuden</TD>
-</TR>
-END;
+            $island = [];
+            $isl = $hako->islands[$number];
+            $island['pop']   = $isl['pop'];
+            $island['area']  = $isl['area'];
+            $island['money'] = Util::aboutMoney($isl['money']);
+            $island['food']  = $isl['food'];
+            $island['farm']  = (int)$isl['farm'] === 0 ? $init->notHave : ($isl['farm'].$unit);
+            $island['factory']  = (int)$isl['factory'] === 0 ? $init->notHave : ($isl['factory'].$unit);
+            $island['commerce'] = (int)$isl['commerce'] === 0 ? $init->notHave : ($isl['commerce'].$unit);
+            $island['mountain'] = (int)$isl['mountain'] === 0 ? $init->notHave : ($mountain.$unit);
+            $island['hatuden']  = (int)$isl['hatuden'] * 1000 . 'kW';
+            $island['rank']   = $number + 1;
+            $island['name']   = Util::islandName($isl, $hako->ally, $hako->idToAllyNumber);
+            $island['absent'] = $isl['absent'];
+            $island['id']     = $isl['id'];
+
+            if ((int)$island['absent'] === 0) {
+                $island['name'] = '<span class="islName"><a href="'.$init->baseDir.'/hako-main.php?Sight='.$island['id'].'">'.$island['name'].'</a></span>';
+            } else {
+                $island['name'] = '<span class="islName2"><a href="'.$init->baseDir.'/hako-main.php?Sight='.$island['id'].'">'.$island['name'].'</a>（'.$island['absent'].'）</span>';
+            }
+
+            $islands[] = $island;
         }
-        echo "</TABLE>\n";
+        unset($island);
+        require VIEWS . 'Alliance/Detail.php';
     }
 
     //--------------------------------------------------
     // 同盟コメントの変更
     //--------------------------------------------------
-    public function tempAllyPactPage($hako, $data)
+    public function tempAllyPactPage($hako, $data): void
     {
         global $init;
         $this_file  = $init->baseDir . "/hako-ally.php";
@@ -2627,14 +2464,12 @@ END;
         $allyMessage = str_replace("&quot;", "\"", $allyMessage);
         $allyMessage = str_replace("&#039;", "'", $allyMessage);
 
-        $data['defaultPassword'] = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
+        $data['defaultPassword'] = $data['defaultPassword'] ?? "";
         echo <<<END
-<div class='text-center'>
-	{$init->tagBig_}コメント変更（{$init->tagName_}{$ally['name']}{$init->_tagName}）{$init->_tagBig}<br>
-</div>
+<p class='text-center big'>コメント変更（<span class="islName">{$ally['name']}</span>）</p>
 
-<DIV ID='changeInfo'>
-<table border=0 width=50%>
+<div id='changeInfo'>
+<table>
 <tr>
 	<td class="M">
 		<FORM action="{$this_file}" method="POST">
@@ -2666,22 +2501,37 @@ END;
     //--------------------------------------------------
     // 同盟の結成・変更・解散・加盟・脱退
     //--------------------------------------------------
-    public function newAllyTop($hako, $data)
+    public function register($hako, $data)
+    {
+        global $init;
+
+        function hsc($str)
+        {
+            return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
+        }
+
+        $denying_name_words = '["' . implode('","', $init->denying_name_words) . '"]';
+        $regex_denying_name_words = $init->regex_denying_name_words;
+
+        require VIEWS . 'Alliance/Register.php';
+    }
+
+    public function newAllyTop($hako, $data): void
     {
         global $init;
         $this_file  = $init->baseDir . "/hako-ally.php";
 
-        $adminMode = 0;
+        $adminMode = false;
 
         $jsAllyList      = "";
         $jsAllyIdList    = "";
         $jsAllyMarkList  = "";
         $jsAllyColorList = "";
 
-        $data['defaultPassword'] = isset($data['defaultPassword']) ? $data['defaultPassword'] : "";
+        $data['defaultPassword'] = $data['defaultPassword'] ?? "";
         if (AllyUtil::checkPassword("", $data['defaultPassword'])) {
             // 管理者の判定は、お菓子のパスワード、盟主の変更可
-            $adminMode = 1;
+            $adminMode = true;
         } elseif (!$init->allyUse) {
             $this->allyTop($hako, $data);
         }
@@ -2694,9 +2544,8 @@ END;
             $id = $hako->islands[$i]['id'];
             $jsIslandList .= "island[$id] = '$name';\n";
         }
-        $data['defaultID'] = isset($data['defaultID']) ? $data['defaultID'] : "";
-        $n = '';
-        $n = isset($hako->idToAllyNumber[$data['defaultID']]) ? $hako->idToAllyNumber[$data['defaultID']] : "";
+        $data['defaultID'] = $data['defaultID'] ?? '';
+        $n = $hako->idToAllyNumber[$data['defaultID']] ?? '';
 
         if ($n == '') {
             $allyname = '';
@@ -2711,28 +2560,8 @@ END;
         $defaultMark = '';
         $markList = "";
         foreach ($init->allyMark as $aMark) {
-            $s = '';
-            if ($aMark == $defaultMark) {
-                $s = ' selected';
-            }
+            $s = $aMark == $defaultMark ? ' selected' : '';
             $markList .= "<option value=\"$aMark\"$s>$aMark</option>\n";
-        }
-
-        $hx = [0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F'];
-        $colorList = ['','','','','','',''];
-        for ($i=1; $i<7; $i++) {
-            if ($n == '') {
-                $allycolor[$i] = '0';
-            } else {
-                $allycolor[$i] = substr($hako->ally[$n]['color'], $i, 1);
-            }
-            for ($j=0; $j<count($hx); $j++) {
-                $s = '';
-                if ($hx[$j] == $allycolor[$i]) {
-                    $s = ' selected';
-                }
-                $colorList[$i] .= "<option value=\"{$hx[$j]}\"$s>{$hx[$j]}</option>\n";
-            }
         }
 
         $max = 201;
@@ -2753,7 +2582,7 @@ END;
                 $jsAllyMarkList .= "'{$hako->ally[$i]['mark']}'";
                 $jsAllyColorList .= "[";
                 for ($j=0; $j<6; $j++) {
-                    $jsAllyColorList .= '\'' . substr($hako->ally[$i]['color'], $j, 1) . '\'';
+                    $jsAllyColorList .= '\'' . mb_substr($hako->ally[$i]['color'], $j, 1) . '\'';
                     if ($j < 5) {
                         $jsAllyColorList .= ',';
                     }
@@ -2775,27 +2604,38 @@ END;
             $jsAllyColorList .= "];\n";
         }
         $str1 = $adminMode ? '（メンテナンス）' : $init->allyJoinComUse ? '' : '・加盟・脱退';
-        $str2 = $adminMode ? '' : 'onChange="colorPack()" onClick="colorPack()"';
+
         $makeCost = $init->costMakeAlly ? "{$init->costMakeAlly}{$init->unitMoney}" : '無料';
+
         $keepCost = $init->costKeepAlly ? "{$init->costKeepAlly}{$init->unitMoney}" : '無料';
+
         $joinCost = isset($init->comCost[$init->comAlly]) ? "{$init->comCost[$init->comAlly]}{$init->unitMoney}" : '無料';
+
         $joinStr = $init->allyJoinComUse ? '' : '加盟・脱退の際の費用は、<span class="cash">' . $joinCost . '</span>です。<br>';
-        $str3 = $adminMode ? "特殊パスワードは？（必須）<br>
-<input type=\"password\" name=\"OLDPASS\" value=\"{$data['defaultPassword']}\" size=32 maxlength=32 class=f><br>同盟" : '<div class="alert alert-info"><span class="attention">（注意）</span><br>
-同盟の結成・変更の費用は、<span class="cash">' . $makeCost . '</span>です。<br>
-また、毎ターン必要とされる維持費は<span class="cash">' . $keepCost . '</span>です。<br>
-（維持費は同盟に所属する島で均等に負担することになります）<br>
-' . $joinStr . "</div>
+
+        $str3 = $adminMode ? <<<END
+特殊パスワードは？（必須）<br>
+<input type="password" name="OLDPASS" value="{$data['defaultPassword']}" size=32 class=f><br>
+同盟
+END
+: <<<END
+<div class="alert alert-info">
+  <span class="attention">（注意）</span><br>
+  同盟の結成・変更の費用は、<span class="cash">$makeCost</span>です。<br>
+  また、毎ターン必要とされる維持費は<span class="cash">$keepCost</span>です。<br>
+  （維持費は同盟に所属する島で均等に負担することになります）<br>
+  $joinStr
+</div>
+
 
 あなたの島は？（必須）<BR>
-<SELECT NAME=\"ISLANDID\" {$str2}>
+<select name="ISLANDID" onChange="colorPack()" onClick="colorPack()">
 {$hako->islandList}
-</SELECT><BR>あなた";
+</select><BR>あなた
+END;
         $str0 = ($adminMode || ($init->allyUse == 1)) ? '結成・' : '';
         echo <<<END
-<div class='text-center'>
-{$init->tagBig_}同盟の{$str0}変更・解散{$str1}{$init->_tagBig}<br>
-</div>
+<p class="text-center big">同盟の{$str0}変更・解散$str1</p>
 
 <DIV ID='changeInfo'>
 <table border=0 width=50%><tr><td class="M"><P>
@@ -2828,55 +2668,26 @@ END;
 マーク（変更）<BR>
 <SELECT NAME="MARK" onChange="colorPack()" onClick="colorPack()">{$markList}</SELECT>
 <br>
-<ilayer name="PARENT_CTBL" width="100%" height="100%">
-   <layer name="CTBL" width="200"></layer>
-   <span id="CTBL"></span>
-</ilayer>
 マークの色コード（変更）<BR>
-<TABLE class="table table-bordered table-condensed">
-<TR>
-	<TD align='center'>RED</TD>
-	<TD align='center'>GREEN</TD>
-	<TD align='center'>BLUE</TD>
-</TR>
-<TR>
-	<TD>
-		<SELECT name="COLOR1" onChange="colorPack()" onClick="colorPack()">{$colorList[1]}</SELECT>
-		<SELECT name="COLOR2" onChange="colorPack()" onClick="colorPack()">{$colorList[2]}</SELECT>
-	</TD>
-	<TD>
-		<SELECT name="COLOR3" onChange="colorPack()" onClick="colorPack()">{$colorList[3]}</SELECT>
-		<SELECT name="COLOR4" onChange="colorPack()" onClick="colorPack()">{$colorList[4]}</SELECT>
-	</TD>
-	<TD>
-		<SELECT name="COLOR5" onChange="colorPack()" onClick="colorPack()">{$colorList[5]}</SELECT>
-		<SELECT name="COLOR6" onChange="colorPack()" onClick="colorPack()">{$colorList[6]}</SELECT>
-	</TD>
-</TR>
-</TABLE>
+
+<p>表示サンプル：『<span class="number"><span id="SampleSign" style="font-weight:bold;"></span> <span name="sampleName">●●●</span>{$init->nameSuffix}</span>』</p>
+<input type="color" name="colorCode" onChange="colorPack()" onClick="colorPack()" class="form-control" value="$">
 
 <input type="submit" value="結成 （変更）" name="NewAllyButton" class="btn btn-primary">
-END;
-        if (!$adminMode) {
-            echo <<<END
 <script>
 function colorPack() {
-	var island = new Array(128);
+	let island = new Array(128);
 	{$jsIslandList}
-	var a = document.AcForm.COLOR1.value;
-	var b = document.AcForm.COLOR2.value;
-	var c = document.AcForm.COLOR3.value;
-	var d = document.AcForm.COLOR4.value;
-	var e = document.AcForm.COLOR5.value;
-	var f = document.AcForm.COLOR6.value;
-	var mark = document.AcForm.MARK.value;
-	var number = document.AcForm.ISLANDID.value;
 
-	str = "#" + a + b + c + d + e + f;
+    let color = document.forms.AcForm.colorCode.value;
+	let mark = document.forms.AcForm.MARK.value;
+	let number = document.forms.AcForm.ISLANDID.value;
+    const sampleSign = document.querySelector('form[name="AcForm"] #SampleSign');
 
-	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span>' + island[number] + '島</span>』';
+    sampleSign.textContent = mark;
+    sampleSign.style.color = color;
 
-	document.getElementById("CTBL").innerHTML = str;
+	// var str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span> ' + island[number] + '{$init->nameSuffix}</span>』';
 
 	return true;
 }
@@ -2884,63 +2695,13 @@ function allyPack() {
 	{$jsAllyList}
 	{$jsAllyMarkList}
 	{$jsAllyColorList}
-	document.AcForm.ALLYNAME.value = ally[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.MARK.value     = allyMark[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.COLOR1.value   = allyColor[document.AcForm.ALLYNUMBER.value][0];
-	document.AcForm.COLOR2.value   = allyColor[document.AcForm.ALLYNUMBER.value][1];
-	document.AcForm.COLOR3.value   = allyColor[document.AcForm.ALLYNUMBER.value][2];
-	document.AcForm.COLOR4.value   = allyColor[document.AcForm.ALLYNUMBER.value][3];
-	document.AcForm.COLOR5.value   = allyColor[document.AcForm.ALLYNUMBER.value][4];
-	document.AcForm.COLOR6.value   = allyColor[document.AcForm.ALLYNUMBER.value][5];
+	document.forms.AcForm.ALLYNAME.value = ally[document.forms.AcForm.ALLYNUMBER.value];
+	document.forms.AcForm.MARK.value = allyMark[document.forms.AcForm.ALLYNUMBER.value];
+	document.forms.AcForm.colorCode.value = allyColor[document.forms.AcForm.ALLYNUMBER.value];
+
 	colorPack();
 	return true;
 }
-END;
-        } else {
-            echo <<<END
-
-function colorPack() {
-	var island = new Array(128);
-	{$jsIslandList}
-	var a = document.AcForm.COLOR1.value;
-	var b = document.AcForm.COLOR2.value;
-	var c = document.AcForm.COLOR3.value;
-	var d = document.AcForm.COLOR4.value;
-	var e = document.AcForm.COLOR5.value;
-	var f = document.AcForm.COLOR6.value;
-	var mark = document.AcForm.MARK.value;
-
-	var str = "#" + a + b + c + d + e + f;
-
-	str = '表示サンプル：『<span class="number"><span style="font-weight:bold;color:'+ str +'">' + mark + '</span> ●●●島</span>』';
-
-	document.getElementById("CTBL").innerHTML = str;
-
-	return true;
-}
-
-function allyPack() {
-	{$jsAllyList}
-	{$jsAllyIdList}
-	{$jsAllyMarkList}
-	{$jsAllyColorList}
-	document.AcForm.ALLYID.value   = allyID[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.ALLYNAME.value = ally[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.MARK.value     = allyMark[document.AcForm.ALLYNUMBER.value];
-	document.AcForm.COLOR1.value   = allyColor[document.AcForm.ALLYNUMBER.value][0];
-	document.AcForm.COLOR2.value   = allyColor[document.AcForm.ALLYNUMBER.value][1];
-	document.AcForm.COLOR3.value   = allyColor[document.AcForm.ALLYNUMBER.value][2];
-	document.AcForm.COLOR4.value   = allyColor[document.AcForm.ALLYNUMBER.value][3];
-	document.AcForm.COLOR5.value   = allyColor[document.AcForm.ALLYNUMBER.value][4];
-	document.AcForm.COLOR6.value   = allyColor[document.AcForm.ALLYNUMBER.value][5];
-	colorPack();
-	return true;
-}
-END;
-        }
-        echo <<<END
-colorPack();
-</script>
 </form>
 
 </td>

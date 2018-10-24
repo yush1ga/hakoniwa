@@ -334,6 +334,7 @@ h2 {
     padding: 0.25rem 1rem;
 }
 
+.m-b-0 { margin-bottom: 0 !important;}
 
 .p-t-harf { padding-top: 0.5rem !important;}
 .p-b-harf { padding-bottom: 0.5rem !important;}
@@ -342,4 +343,17 @@ h2 {
 .cash {
     color: #993;
     font-weight: 700;
+}
+
+#NoticeFromAdmin textarea {
+    background-color: #f6fbfd;
+    border: 0;
+    overflow-y: scroll;
+    resize: none;
+    white-space: pre-wrap;
+    width: 100%;
+    word-break: break-all;
+}
+#NoticeFromAdmin textarea[readonly]:focus {
+    outline: 0;
 }

@@ -5,40 +5,53 @@
  */
 class Admin
 {
-    public $mode;
-    public $dataSet = [];
+    protected $mode;
+    protected $dataSet = [];
+    protected $d_dataSet = [];
+    private const POINTER = [
+        'filter' => FILTER_VALIDATE_INT,
+        'options' => [
+            'min_range' => 0,
+            'max_range' => 10
+        ]
+    ];
+    private const ARGS = [
+        'mode',
+        'DEVELOPEMODE',
+        'ISLANDID',
+        'PASSWORD',
 
-    public function parseInputData()
+        'defaultID' => FILTER_VALIDATE_INT,
+        'defaultTarget' => FILTER_VALIDATE_INT,
+        'defaultX',
+        'defaultY',
+        'defaultLAND',
+        'defaultMONSTER',
+        'defaultSHIP',
+        'defaultLEVEL',
+        'defaultImg',
+
+        'POINTX',
+        'POINTY',
+        'LAND',
+        'MONSTER',
+        'SHIP',
+        'LEVEL',
+        'IMG'
+    ];
+
+    public function parseInputData(): void
     {
         $this->mode = filter_input(INPUT_POST, 'mode') ?? "";
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
         }
     }
-
-    public function passCheck(): bool
+    public function d_parseInputData(): void
     {
-        global $init;
-
-        if (!file_exists($init->passwordFile)) {
-            HakoError::problem();
-
-            return false;
-        }
-
-        $fp = fopen($init->passwordFile, "r");
-        $masterPassword = chop(fgets($fp, READ_LINE));
-        fclose($fp);
-
-        if (isset($this->dataSet['PASSWORD']) && password_verify($this->dataSet['PASSWORD'], $masterPassword)) {
-            return true;
-        } else {
-            HakoError::wrongPassword();
-
-            return false;
-        }
+        $this->d_dataSet = filter_input_array(INPUT_POST, array_merge($this::ARGS, $this->vargs));
     }
 }

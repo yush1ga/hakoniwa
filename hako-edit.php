@@ -10,7 +10,7 @@ require_once 'config.php';
 require_once MODELPATH.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 
-$init = new Init();
+$init = new \Hakoniwa\Init;
 
 $THIS_FILE = $init->baseDir . '/hako-edit.php';
 
@@ -21,15 +21,15 @@ class CgiImitation
     //---------------------------------------------------
     // POST、GETのデータを取得
     //---------------------------------------------------
-    public function parseInputData()
+    public function parseInputData(): void
     {
         global $init;
 
         $this->mode = $_POST['mode'] ?? "";
 
         if (!empty($_POST)) {
-            while (list($name, $value) = each($_POST)) {
-                $this->dataSet[$name] = str_replace(",", "", $value);
+            foreach ($_POST as $key => $value) {
+                $this->dataSet[$key] = str_replace(",", "", $value);
             }
             if (!empty($_POST['Sight'])) {
                 $this->dataSet['ISLANDID'] = $_POST['Sight'];
@@ -40,10 +40,10 @@ class CgiImitation
     //---------------------------------------------------
     // COOKIEを取得
     //---------------------------------------------------
-    public function getCookies()
+    public function getCookies(): void
     {
         if (!empty($_COOKIE)) {
-            while (list($name, $value) = each($_COOKIE)) {
+            foreach ($_COOKIE as $name => $value) {
                 switch ($name) {
                     case "POINTX":
                         $this->dataSet['defaultX'] = $value;
@@ -81,7 +81,7 @@ class CgiImitation
     //---------------------------------------------------
     // COOKIEを生成
     //---------------------------------------------------
-    public function setCookies()
+    public function setCookies(): void
     {
         $time = $_SERVER['REQUEST_TIME'] + 90; // 90秒間有効
 
@@ -123,7 +123,7 @@ class Edit
     //---------------------------------------------------
     // TOP 表示（パスワード入力）
     //---------------------------------------------------
-    public function enter()
+    public function enter(): void
     {
         global $init;
 
@@ -143,7 +143,7 @@ END;
     //---------------------------------------------------
     // 島の一覧を表示
     //---------------------------------------------------
-    public function main($hako, $data)
+    public function main($hako, $data): void
     {
         global $init;
 
@@ -556,7 +556,7 @@ END;
 
 class EditMain
 {
-    public function execute()
+    public function execute(): void
     {
         $hako = new HakoEdit;
         $cgi = new CgiImitation;

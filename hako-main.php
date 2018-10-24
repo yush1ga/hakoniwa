@@ -6,13 +6,13 @@
  * @author hiro <@hiro0218>
  */
 
-require_once 'config.php';
-require_once MODELPATH.'/hako-cgi.php';
-require_once MODELPATH.'/hako-file.php';
-require_once MODELPATH.'/hako-turn.php';
-require_once PRESENTER.'/hako-html.php';
-require_once CONTROLLERPATH.'/main.php';
+require_once __DIR__."/config.php";
+require_once MODELPATH."/hako-cgi.php";
+require_once MODELPATH."/hako-file.php";
+require_once MODELPATH."/hako-turn.php";
+require_once PRESENTER."/hako-html.php";
+require_once CONTROLLERPATH."/main.php";
 
-$init  = new Init;
+$init  = new \Hakoniwa\Init;
 $start = new Main;
 $start->execute();
