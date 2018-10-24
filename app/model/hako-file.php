@@ -151,6 +151,7 @@ class File
             if ($fp_i === false) {
                 HTML::header();
                 HakoError::problem();
+                exit;
             }
 
 

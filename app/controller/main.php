@@ -61,6 +61,7 @@ class Main
                 $html->header();
                 // ターン処理後、通常トップページ描画
                 $turn->turnMain($hako, $cgi->dataSet);
+                $hako->readIslands($cgi);
                 $html->main($hako, $cgi->dataSet);
                 $html->footer();
 

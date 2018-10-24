@@ -24,7 +24,7 @@ function remainTime(int $nextTime): string
 <ul>
 <li>仕様・デザイン・要求スペック・要求情報等、あらゆるものが予告なしに変更になる恐れがあります。</li>
 <li>プレイデータは必ずしも保全されるものではありません。また、仮にデータが損失した際にも、データ復旧・損失補填などの措置は基本的にとりません。</li>
-<li>不具合をご報告いただいても、必ずしもすぐに修正されるとは限りません。</li>
+<li>不具合をご報告いただいても、必ずしもすぐに修正されるとは限りません。<br>不具合報告は <a href="https://github.com/Sotalbireo/hakoniwa/issues" target="_blank">こちらから (GitHub Issues)。</a></li>
 <li>製作者都合により、予告なくサービスが終了することもあります。</li>
 </ul>
 </div>
@@ -48,7 +48,7 @@ function remainTime(int $nextTime): string
 
 <div class="lastModified">
     <p>最終更新時間： <?=date("Y年n月j日G時i分 (T)", (int)$hako->islandLastTime)?><br>
-        <?=remainTime($hako->islandLastTime + $init->unitTime)?></p>
+        <?=remainTime($hako->islandLastTime + $init->unitTime)?> <a class="btn btn-xs btn-default" href="reload" onclick="window.location.reload()">ページ更新</a></p>
 </div>
 
 <hr>
@@ -87,7 +87,7 @@ function remainTime(int $nextTime): string
             </div>
         </form>
 <?php else:?>
-        <p>現在、この近辺に<?=$init->nameSuffix?>は見つかっていません</p>
+        <p>現在、この海域に<?=$init->nameSuffix?>は見つかっていません</p>
         <p><a href="<?=$this_file?>?mode=conf" class="btn btn-primary">→新しい<?=$init->nameSuffix?>を探しにいく</a></p>
 <?php endif;?>
     </div>
@@ -103,6 +103,8 @@ require_once VIEWS."/log/info.php";
 
 <?php if ($hako->islandNumber - $hako->islandNumberBF > 0) {
     require_once VIEWS."top/category-rank.php";
+} else if ($hako->islandNumber === 0) {
+    // noop
 } else {
     echo <<<EOT
 

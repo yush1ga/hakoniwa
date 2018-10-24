@@ -165,14 +165,8 @@ EOM;
     {
         global $init;
 
-        $this->rmTree($init->dirName);
-        $dir = opendir($init->dirName.".bak{$id}/");
-        while (false !== ($fileName = readdir($dir))) {
-            if ($fileName != "." && $fileName != "..") {
-                copy($init->dirName.".bak{$id}/".$fileName, $init->dirName.'/'.$fileName);
-            }
-        }
-        closedir($dir);
+        $this->rimraf($init->dirName);
+        $this->cp_a($init->dirName.".bak{$id}/", $init->dirName);
     }
 
     /**

@@ -10,17 +10,37 @@ if (php_sapi_name() === "cli-server") {
     if (!defined("DEBUG")) {
         define("DEBUG", true);
     }
-    function dump($var): void
+    function dump(...$var): void
     {
-        ob_start();
-        var_dump($var);
-        $str = ob_get_contents();
-        ob_end_clean();
+        $str = "";
+        foreach ($var as $v) {
+            ob_start();
+            var_dump($v);
+            $str .= ob_get_contents();
+            ob_end_clean();
+        }
         echo "<pre>".PHP_EOL;
         echo htmlspecialchars($str, ENT_QUOTES | ENT_HTML5);
         echo "</pre>".PHP_EOL;
     }
-    function logging($str): void
+    function dump_r(...$var): void
+    {
+        $str = "";
+        foreach ($var as $v) {
+            ob_start();
+            if (is_array($v) || is_object($v)) {
+                print_r($v);
+            } else {
+                echo $v."\n";
+            }
+            $str .= ob_get_contents();
+            ob_end_clean();
+        }
+        echo "<pre>".PHP_EOL;
+        echo htmlspecialchars($str, ENT_QUOTES | ENT_HTML5);
+        echo "</pre>".PHP_EOL;
+    }
+    function logging(string $str): void
     {
         error_log($str, 0);
     }

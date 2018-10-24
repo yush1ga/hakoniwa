@@ -206,7 +206,7 @@ trait FileIO
 
         if (!$recursion) {
             if (!is_dir($from)) {
-                throw new \InvalidArgumentException("Arguments must directory.");
+                throw new \InvalidArgumentException("Arguments must directory: `{$from}`.");
             }
             if (!$this->is_usable_path($from)["dir"]) {
                 throw new \ErrorException("No have permission to Read/Write: `{$from}`.");

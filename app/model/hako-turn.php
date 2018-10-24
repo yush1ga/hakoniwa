@@ -116,7 +116,6 @@ class Turn
 
         // 残存判定のために現在の島数を一時保存
         $remainNumber = $hako->islandNumber;
-
         foreach ($order as $i) {
             // 管理人預かり中の場合スキップ
             if ($hako->islands[$i]['keep']) {
@@ -128,7 +127,7 @@ class Turn
             $this->doIslandProcess($hako, $island);
 
             // 島滅亡判定
-            // （すでに放棄を決定したか、人口か得点がゼロ）
+            // （コマンドから放棄を選択したか、人口か得点がゼロ）
             if (($island['isBF']!=1) && ($island['pop']==0 || $island['point']==0)) {
                 $island['isDead'] = true;
                 // 死滅メッセージ
@@ -6357,10 +6356,16 @@ class Turn
  * ポイントを比較 in usort()
  * @param  [type] $x [description]
  * @param  [type] $y [description]
- * @return [type]    [description]
+ * @return integer   xが高ければ-1 yが高ければ1 ほか0
  */
 function popComp($x, $y)
 {
+    if ($x["isDead"] ?? false) {
+        return 1;
+    } elseif ($y["isDead"] ?? false) {
+        return -1;
+    }
+
     if ($x['isBF'] && !$y['isBF']) {
         return 1;
     } elseif ($y['isBF'] && !$x['isBF']) {

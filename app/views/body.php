@@ -17,6 +17,5 @@
 </header>
 <div class="container">
 <?php if (DEBUG) {
-    dump($_GET);
-    dump($_POST);
+    dump($_GET, $_POST);
 } ?>
