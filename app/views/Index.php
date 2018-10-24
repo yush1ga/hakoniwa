@@ -48,7 +48,7 @@ function remainTime(int $nextTime): string
 
 <div class="lastModified">
     <p>最終更新時間： <?=date("Y年n月j日G時i分 (T)", (int)$hako->islandLastTime)?><br>
-        <?=remainTime($hako->islandLastTime + $init->unitTime)?> <a class="btn btn-xs btn-default" href="reload" onclick="window.location.reload()">ページ更新</a></p>
+        <?=remainTime($hako->islandLastTime + $init->unitTime)?> <a class="btn btn-xs btn-default" href="#" onclick="window.location.reload();return !1;">ページ更新</a></p>
 </div>
 
 <hr>

@@ -13,7 +13,7 @@ printf(" (CPU time: %.3fs)", $tmp4-$tmp2+$tmp3-$tmp1);
 
 <a href="<?= $init->baseDir ?>/hako-admin.php"><span class="small label label-default">管理画面</span></a>
 </p>
-<p class="small text-muted">sources: <a href="https://www.github.com/sotalbireo/hakoniwa" target="_blank">hakoniwa - GitHub</a></p>
+<p class="small text-muted">sources: <a href="https://www.github.com/sotalbireo/hakoniwa" target="_blank">hakoniwa - GitHub</a>. Licensed by <a href="https://choosealicense.com/licenses/agpl-3.0/" target="_blank">AGPLv3</a>.</p>
 </footer>
 
 <script>if(typeof(init)=="function")document.addEventListener("DOMContentLoaded",init());</script>

@@ -129,7 +129,7 @@ EOM;
         global $init;
 
         $dirName = strcmp($id, "") == 0 ? $init->dirName : $init->dirName.".bak$id";
-        $this->rmTree($dirName);
+        $this->rimraf($dirName);
     }
 
     public function timeMode(): void
@@ -167,16 +167,6 @@ EOM;
 
         $this->rimraf($init->dirName);
         $this->cp_a($init->dirName.".bak{$id}/", $init->dirName);
-    }
-
-    /**
-     * 引数にとったディレクトリの中身をすべて削除する
-     * @param  string $dirName 子ファイルを削除したいディレクトリ
-     * @return void
-     */
-    public function rmTree($dirName): void
-    {
-        $this->rimraf($dirName);
     }
 
     public function setupMode()

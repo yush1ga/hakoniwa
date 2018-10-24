@@ -572,15 +572,7 @@ class File
         }
     }
 
-    /**
-     * 不要なディレクトリとファイルを削除
-     * @param  string $dirName Directory that to delete.
-     * @return void
-     */
-    public function rmTree(string $dirName): void
-    {
-        $this->rimraf($dirName);
-    }
+
 
     /**
      * プレゼント管理ファイル読込み
