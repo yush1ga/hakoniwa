@@ -25,3 +25,6 @@ indent_size = 2
 
 [*.css]
 indent_style = space
+
+[LICENSE]
+indent_style = space

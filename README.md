@@ -2,6 +2,8 @@
 
 **[テストプレイできます](https://hakoniwa.cgi-game-preservations.org/)**
 
+<strong style="color:wine;">本プログラムを利用してサーバーを立ち上げる際は下記[「利用条件」](#%E5%88%A9%E7%94%A8%E6%9D%A1%E4%BB%B6)をお読みの上、同意ください。</strong>
+
 ## 概要
 
 「[箱庭諸島 S.E ver23_r09](http://hakoniwa.symphonic-net.com/)」、および「[Hakoniwa R.A.](http://www5b.biglobe.ne.jp/~k-e-i/)」、「箱庭諸島 海戦」のいいとこどりをしようという小学生じみた発想をそのままやってしまおうという魂胆のなんか面倒なやつ
@@ -32,6 +34,14 @@
 * PHP 7.1
 	* 7.3のstableが出たら更新する予定
 
+## 利用条件
+
+以下をすべて守ってください。
+
+* ユーザーが簡単にアクセスできる位置（e.g. 各ページの最下部）に、このページ（ https://github.com/sotalbireo/hakoniwa ）へのリンクを明記すること。
+* ライセンス「GNU Affero General Public License v3.0 (GNU AGPL v3, Affero GPL v3.0)」に準拠すること。（参考：[「たくさんあるオープンソースライセンスのそれぞれの特徴のまとめ | コリス」](https://coliss.com/articles/build-websites/operation/work/choose-a-license-by-github.html#h210)）
+* ゲームのトップディレクトリに本リポジトリ付属の「LICENSE」ファイルを必ず置くこと
+
 ## はうつーぷれい
 
 1. **前提環境**：
@@ -60,8 +70,8 @@
 * **最適化**
 	* そこまでガッツリとはやらない
 * **レガシー対応の削除**
-	* HTML5で廃止される要素の削除
-	* 古いIEやNetscapeなど、レガシーブラウザ特有の対応を削除
+	* 各種モダンウェブ規格で廃止される要素の削除
+	* IEやNetscapeなどレガシーブラウザ固有の処理・対応を削除
 	* 文字コード変換モジュール（jcode.phps）の廃止
 * **モジュール化**
 	* ブロック遊びをするようにゲームシステムをアレンジできるように

@@ -8,7 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/Sotalbireo/hakoniwa.git"
   },
-  "license": "MIT",
+  "license": "AGPLv3",
   "bugs": {
     "url": "https://github.com/Sotalbireo/hakoniwa/issues"
   },
