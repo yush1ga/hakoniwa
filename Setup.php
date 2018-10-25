@@ -13,12 +13,8 @@ date_default_timezone_set("Asia/Tokyo");
 ini_set("default_charset", "UTF-8");
 ini_set("mbstring.language", "Japanese");
 
-if (!defined("WINDOWS")) {
-    define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
-}
-if (!defined("DEBUG")) {
-    define("DEBUG", true);
-}
+defined("WINDOWS") || define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
+defined("DEBUG") || define("DEBUG", true);
 
 require "app/model/FileIO.php";
 
@@ -31,7 +27,7 @@ final class Setup
 {
     use \Hakoniwa\Model\FileIO;
 
-    const DOCROOT = __DIR__;
+    const ROOT = __DIR__;
     private $head_tmp;
     private $current_tmp;
     private $rnd;
@@ -92,11 +88,11 @@ final class Setup
 
         // - copy
         echo ".";
-        $this->cp_a(self::DOCROOT, $this->current_tmp);
+        $this->cp_a(self::ROOT, $this->current_tmp);
 
         // - verify
         echo ".";
-        if (!$this->is_same(self::DOCROOT, $this->current_tmp)) {
+        if (!$this->is_same(self::ROOT, $this->current_tmp)) {
             throw new \RuntimeException(
                 <<<EOL
 
@@ -191,16 +187,16 @@ EOT;
         echo "Overwrite...";
 
         // - flush
-        if (!$this->rimraf(self::DOCROOT)) {
+        if (!$this->rimraf(self::ROOT)) {
             echo "\nERR! Abort system and Rollback...\n";
-            $this->cp_a($this->current_tmp, self::DOCROOT, true);
+            $this->cp_a($this->current_tmp, self::ROOT, true);
         }
         // - copy
         echo "..";
-        $this->cp_a($this->head_tmp, self::DOCROOT);
+        $this->cp_a($this->head_tmp, self::ROOT);
         // - velify
         echo "...";
-        if (!$this->is_same($this->current_tmp, self::DOCROOT)) {
+        if (!$this->is_same($this->current_tmp, self::ROOT)) {
             throw new \RuntimeException(
                 <<<EOL
 
