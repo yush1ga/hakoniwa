@@ -1,8 +1,8 @@
 <?php
 
 require_once realpath(__DIR__.'/../../').'/config.php';
-require_once MODELPATH.'hako-file.php';
-require_once MODELPATH.'hako-cgi.php';
+require_once MODEL.'hako-file.php';
+require_once MODEL.'hako-cgi.php';
 
 /**
  * 箱庭諸島 S.E
@@ -141,7 +141,7 @@ class Main
 
                     break;
                 }
-                require_once MODELPATH."hako-log.php";
+                require_once MODEL."hako-log.php";
                 (new LogIO)->write_noticefile($hako, $cgi->dataSet);
                 /*. missing_break; .*/
                 // no break

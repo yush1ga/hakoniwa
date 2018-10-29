@@ -6,7 +6,7 @@ namespace Hakoniwa\Admin\Maintenance;
 
 require_once __DIR__."/../../../config.php";
 
-require_once MODELPATH.'/admin.php';
+require_once MODEL.'/admin.php';
 
 use \HakoError;
 

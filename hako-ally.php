@@ -7,9 +7,9 @@
  */
 
 require_once __DIR__."/config.php";
-require_once MODELPATH."/hako-cgi.php";
+require_once MODEL."/hako-cgi.php";
 require_once PRESENTER."/hako-html.php";
-require_once MODELPATH."/Alliance.php";
+require_once MODEL."/Alliance.php";
 
 use \Hakoniwa\Helper\Util_alliance as Util;
 

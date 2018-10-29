@@ -2,7 +2,7 @@
 
 namespace Hakoniwa\Admin;
 
-require_once MODELPATH.'/admin.php';
+require_once MODEL.'/admin.php';
 
 /**
  * 箱庭諸島 S.E
@@ -49,7 +49,7 @@ class BF extends \Admin
             if (!$hako->islands[$num]['isBF']) {
                 $hako->islands[$num]['isBF'] = 1;
                 $hako->islandNumberBF++;
-                require_once APPPATH.'/model/hako-turn.php';
+                require_once APP.'/model/hako-turn.php';
                 \Turn::islandSort($hako);
                 $hako->writeIslandsFile();
             }
@@ -65,7 +65,7 @@ class BF extends \Admin
             if ($hako->islands[$num]['isBF']) {
                 $hako->islands[$num]['isBF'] = 0;
                 $hako->islandNumberBF--;
-                require_once APPPATH.'/model/hako-turn.php';
+                require_once APP.'/model/hako-turn.php';
                 \Turn::islandSort($hako);
                 $hako->writeIslandsFile();
             }

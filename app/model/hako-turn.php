@@ -2,8 +2,8 @@
 
 require_once 'config.php';
 
-require_once APPPATH.'/model/hako-log.php';
-require_once APPPATH.'/model/hako-make.php';
+require_once APP.'/model/hako-log.php';
+require_once APP.'/model/hako-make.php';
 
 /**
  * 箱庭諸島 S.E - ターン更新用ファイル -
