@@ -4309,20 +4309,24 @@ class Turn
                             }
                         }
                     }
-                    // ワープする
+
+                    // ワープできる
                     if ($special & 0x40) {
-                        if (random_int(0, 100) < 20) { // 20%
-                            // ワープ実行
-                            $tg;
-                            $tIsland = $island;
-                            if (random_int(0, 100) < 50) { // 50%
-                                // ワープする島を決める
-                                $tg = Util::random($hako->islandNumber);
-                                $tIsland = $hako->islands[$tg];
-                                // 初心者期間中の島にはワープしない（自島へワープ）
-                                if ((($hako->islandTurn - $tIsland['starturn']) < $init->noAssist) && ($tIsland['isBF'] != 1)) {
-                                    $tIsland = $island;
-                                }
+                        // 確率でワープ発生
+                        if (random_int(0, 100) < 20) {
+                            $tg = -999;
+                            $tIsland = [];
+
+                            // 自分の島にワープする（初期値）
+                            // 確率で他島
+                            $tg = (random_int(0, 1) === 1)
+                                ? Util::random($hako->islandNumber)
+                                : Util::nameToNumber($hako, $island["name"]);
+
+                            $tIsland = $hako->islands[$tg];
+                            // 初心者期間中の島にはワープしない（自島へワープ）
+                            if (($hako->islandTurn - $tIsland['starturn']) < $init->noAssist) {
+                                $tIsland = $island;
                             }
                             $tId   = $tIsland['id'];
                             $tName = $tIsland['name'];
@@ -4348,27 +4352,20 @@ class Turn
                             $this->log->monsWarp($id, $tId, $name, $mName, "($x, $y)", $tName);
                             $this->log->monsCome($tId, $tName, $mName, "($bx, $by)", $this->landName($tLand[$bx][$by], $tLandValue[$bx][$by]));
 
-                            if ($id == $tId) {
-                                $land[$bx][$by]       = $init->landMonster;
-                                $landValue[$bx][$by]  = $lv;
-                            } else {
-                                $tLand[$bx][$by]      = $init->landMonster;
-                                $tLandValue[$bx][$by] = $lv;
-                            }
+
+                            $tLand[$bx][$by]      = $init->landMonster;
+                            $tLandValue[$bx][$by] = $lv;
                             $monsterMove[$bx][$bx] = 2;
                             $land[$x][$y]      = $init->landWaste;
                             $landValue[$x][$y] = 0;
-
-                            if ($id != $tId) {
-                                // ターゲットが異なる場合は、値を戻す
-                                $tIsland['land']      = $tLand;
-                                $tIsland['landValue'] = $tLandValue;
-                                $hako->islands[$tg]   = $tIsland;
-                            }
+                            $hako->islands[$tg]['land']      = $tLand;
+                            $hako->islands[$tg]['landValue'] = $tLandValue;
+                            unset($tg, $tIsland, $tId, $tName, $tLand, $tLandValue, $w, $bx, $by, $candidates);
 
                             break;
                         }
                     }
+
                     // 瀕死になると大爆発
                     if ($special & 0x400) {
                         // 残り体力1以下なら爆発する
