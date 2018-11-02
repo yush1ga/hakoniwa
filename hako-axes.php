@@ -10,9 +10,9 @@ namespace Hakoniwa\Admin;
  */
 
 require_once 'config.php';
-require_once MODELPATH.'/hako-cgi.php';
+require_once MODEL.'/hako-cgi.php';
 require_once PRESENTER.'/hako-html.php';
-require_once CONTROLLERPATH.'/admin/axes.php';
+require_once CONTROLLER.'/admin/axes.php';
 
 $init  = new \Hakoniwa\Init();
 $exec = new Axes();

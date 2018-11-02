@@ -6,19 +6,14 @@ declare(strict_types=1);
  * @copyright 2017 Re:箱庭諸島
  */
 define("VERSION", "0.0.1");
-
-if (!defined("WINDOWS")) {
-    define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
-}
+defined("WINDOWS") || define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
 
 /**
  * Debug mode:
- * If the server running as cli-server, "DEBUG" is always true.
+ * If the server running for test as cli-server, "DEBUG" is always true.
  * cf. "Router.php".
  */
-if (!defined("DEBUG")) {
-    define("DEBUG", false);
-}
+defined("DEBUG") || define("DEBUG", false);
 
 /**
  * Global settings
@@ -31,13 +26,16 @@ define("LOCK_RETRY_COUNT", 10);
 define("READ_LINE", 1024);
 define("DS", DIRECTORY_SEPARATOR);
 // [Common directories]
-define("DOCROOT", __DIR__.DS);
-define("APPPATH", realpath(__DIR__.DS."app".DS).DS);
-define("CONTROLLERPATH", realpath(APPPATH.DS."controller".DS).DS);
-define("HELPERPATH", realpath(APPPATH.DS."helper".DS).DS);
-define("MODELPATH", realpath(APPPATH.DS."model".DS).DS);
-define("PRESENTER", realpath(APPPATH.DS."presenter".DS).DS);
-define("VIEWS", realpath(APPPATH.DS."views".DS).DS);
+define("ROOT", __DIR__.DS);
+define("APP", realpath(__DIR__.DS."app".DS).DS);
+define("CONTROLLER", realpath(APP.DS."controller".DS).DS);
+define("HELPER", realpath(APP.DS."helper".DS).DS);
+define("MODEL", realpath(APP.DS."model".DS).DS);
+define("PRESENTER", realpath(APP.DS."presenter".DS).DS);
+define("VIEWS", realpath(APP.DS."views".DS).DS);
+
+// LaunchTest
+require_once __DIR__."/LaunchTest.php";
 
 // Composer/Autoloader
 if (mb_substr(__DIR__, 0, mb_strlen(sys_get_temp_dir())) !== sys_get_temp_dir() && is_file("vendor/autoload.php")) {
@@ -47,4 +45,4 @@ if (mb_substr(__DIR__, 0, mb_strlen(sys_get_temp_dir())) !== sys_get_temp_dir() 
 // Common requires.
 use \Hakoniwa\Helper\Util;
 
-// require_once HELPERPATH."Enum.php";
+// require_once HELPER."Enum.php";

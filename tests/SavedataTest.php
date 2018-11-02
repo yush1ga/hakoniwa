@@ -12,6 +12,5 @@ final class SavedataTest extends TestCase
     public function testCorrectSavedataTypes(): void
     {
         $this->markTestIncomplete();
-        $this->assertTrue(true);
     }
 }

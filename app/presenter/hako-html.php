@@ -6,9 +6,9 @@
  * @author hiro <@hiro0218>
  */
 
-require_once HELPERPATH.'/message/error.php';
-require_once HELPERPATH.'/message/success.php';
-require_once APPPATH.'/model/hako-log.php';
+require_once HELPER.'/message/error.php';
+require_once HELPER.'/message/success.php';
+require_once APP.'/model/hako-log.php';
 
 class HTML
 {

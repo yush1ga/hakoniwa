@@ -25,5 +25,5 @@ fclose($fp);?>
     </table>
 </form>
 <script>
-<?php require DOCROOT . '/public/script/axes.js'; ?>
+<?php require ROOT.'/public/script/axes.js';?>
 </script>

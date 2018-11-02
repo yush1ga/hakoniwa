@@ -2,7 +2,7 @@
 
 namespace Hakoniwa\Admin;
 
-require_once MODELPATH.'/admin.php';
+require_once MODEL.'/admin.php';
 /**
  * 箱庭諸島 S.E
  * @author hiro <@hiro0218>
