@@ -1,3 +1,7 @@
+#目的
+見つけたバグFixをプルリクエストするのが中心。
+派生開発とかしない。
+
 # Re:箱庭諸島
 
 **[＜テストプレイできます＞](https://hakoniwa.cgi-game-preservations.org/)**

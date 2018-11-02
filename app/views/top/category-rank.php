@@ -20,8 +20,8 @@ $category_1st = [];
 
 // トップ判定（同値はID降順）
 for ($i = 0, $elements_length = count($elements); $i < $elements_length; $i++) {
+    $max = 1;//elementsごとに$maxを初期化
     for ($ii = 0; $ii < $hako->islandNumber; $ii++) {
-        $max = 1;
         $island = $hako->islands[$ii];
 
         if ($island['isBF'] === 1) {

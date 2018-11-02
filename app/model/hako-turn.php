@@ -5794,8 +5794,9 @@ class Turn
 
         // 収入
         // 農業従事者は最優先で確保。それ以外を工商業に割り当てる
-        $farmer = min($pop, $island['farm']);
-        $no_assignment = $farmer - $pop;
+        $farmer = min($pop, $island['farm']*10);//農業ひと桁足らない気がするので
+        //$no_assignment = $farmer - $pop;
+        $no_assignment = $pop - $farmer;
 
         // 工商業従事可能
         if ($no_assignment > 0) {
@@ -5804,7 +5805,8 @@ class Turn
                 $this->log->Teiden($island['id'], $island['name']);
             } else {
                 $maximum_employees = round($factory + $commerce + $mountain);
-                $workable_employees = min($power_supply, $maximum_employees);
+                //$workable_employees = min($power_supply, $maximum_employees);
+                $workable_employees = max($power_supply, $maximum_employees);//min→max、minだとあまりに収入少なかったので
                 // サラマンダー所持時ブースト
                 $workable_employees *= ($island['zin'][6] == 1) ? 2 : 1;
                 $island['money'] += $workable_employees;
