@@ -103,7 +103,7 @@ require_once VIEWS."/log/info.php";
 
 <?php if ($hako->islandNumber - $hako->islandNumberBF > 0) {
     require_once VIEWS."top/category-rank.php";
-} else if ($hako->islandNumber === 0) {
+} elseif ($hako->islandNumber === 0) {
     // noop
 } else {
     echo <<<EOT
