@@ -4406,11 +4406,9 @@ class Turn
 
                     // 動く方向を決定
                     for ($j = 0; $j < 3; $j++) {
-                        $d = Util::random(6) + 1;
-                        if ($special & 0x200) {
-                            // 飛行移動能力
-                            $d = Util::random(12) + 7;
-                        }
+                        // 飛行能力で移動距離増加
+                        $d = ($special & 0x200) ? Util::random(1, 19) : Util::random(1, 7);
+
                         $sx = $x + $init->ax[$d];
                         $sy = $y + $init->ay[$d];
                         // 行による位置調整
@@ -4813,65 +4811,51 @@ class Turn
             }
 
             // 火災判定
-            // [NOTE] すでに$init->landTownがcaseで使われているのでswitchを別に用意
-            switch ($landKind) {
-                case $init->landTown:
-                case $init->landHaribote:
-                case $init->landFactory:
-                case $init->landHatuden:
-                case $init->landPark:
-                case $init->landSeaResort:
-                case $init->landSyoubou:
-                case $init->landSsyoubou:
-                case $init->landSeaCity:
-                case $init->landFroCity:
-                case $init->landNewtown:
-                case $init->landBigtown:
-                    if (Turn::countAround($land, $x, $y, 19, [$init->landSyoubou, $init->landSsyoubou]) > 0) {
-                        break;
-                    }
-                    if ((($landKind == $init->landSeaResort) && ($lv <= 30)) ||
-                        ($landKind == $init->landFactory && ($lv >= 100)) ||
-                        ($landKind == $init->landHatuden && ($lv >= 100)) ||
-                        ($landKind == $init->landTown && ($lv <= 30))) {
-                        break;
-                    }
-                    // 防火（消火）判定
-                    if (!(Util::random(1000) < $init->disFire - intdiv($island['eisei'][0], 20))) {
-                        break;
-                    }
+            if ($this->is_fireable($landKind)) {
+                // 【回避】
+                // - 周囲2hex内に「消防署」類がある
+                // - 「防災衛星」による判定
+                // - 隣接hexに「森」「風車」「記念碑」「防災都市」がある
+                if (Turn::countAround($land, $x, $y, 19, [$init->landSyoubou, $init->landSsyoubou]) > 0) {
+                    continue;
+                }
+                if (!(Util::random(1000) < $init->disFire - intdiv($island['eisei'][0], 20))) {
+                    continue;
+                }
+                if (Turn::countAround($land, $x, $y, 7, [$init->landForest, $init->landFusya, $init->landMonument, $init->landProcity]) > 0) {
+                    continue;
+                }
 
-                    // 周囲の森と記念碑を数える
-                    if (Turn::countAround($land, $x, $y, 7, [$init->landForest, $init->landProcity, $init->landFusya, $init->landMonument]) == 0) {
-                        // 無かった場合、火災で壊滅
-                        $l = $land[$x][$y];
-                        $lv = $landValue[$x][$y];
-                        $point = "($x, $y)";
-                        $lName = $this->landName($l, $lv);
+                $point = "($x, $y)";
+                $lName = $this->landName($land[$x][$y], $landValue[$x][$y]);
 
-                        // ニュータウン、現代都市の場合
-                        if (($landKind == $init->landNewtown) || ($landKind == $init->landBigtown)) {
-                            $landValue[$x][$y] -= Util::random(100) + 50;
-                            $this->log->firenot($id, $name, $lName, $point);
-                            if ($landValue[$x][$y] <= 0) {
-                                $land[$x][$y] = $init->landWaste;
-                                $landValue[$x][$y] = 0;
-                                $this->log->fire($id, $name, $lName, $point);
-                            }
-                        } elseif (($landKind == $init->landSeaCity) || ($landKind == $init->landFroCity)) {
-                            // 海上・海底都市
-                            $land[$x][$y] = $init->landSea;
-                            $landValue[$x][$y] = 0;
-                            $this->log->fire($id, $name, $lName, $point);
-                        } else {
-                            // ほか
-                            $land[$x][$y] = $init->landWaste;
-                            $landValue[$x][$y] = 0;
-                            $this->log->fire($id, $name, $lName, $point);
-                        }
+                // ニュータウン、現代都市の場合
+                // ：人口が減る
+                // ：人口がゼロなら荒地
+                if (($landKind == $init->landNewtown) || ($landKind == $init->landBigtown)) {
+                    $landValue[$x][$y] -= Util::random(50);
+                    if ($landValue[$x][$y] <= 0) {
+                        $land[$x][$y] = $init->landWaste;
+                        $landValue[$x][$y] = 0;
                     }
+                } elseif ($this->is_in_the_sea($landKind)) {
+                    // 海上・海底建築物（→海になる）
+                    $land[$x][$y] = $init->landSea;
+                    $landValue[$x][$y] = 0;
+                } else {
+                    // ほか
+                    $land[$x][$y] = $init->landWaste;
+                    $landValue[$x][$y] = 0;
+                }
 
-                    break;
+                // ログ出力
+                // ：1単位以上残れば「火災」
+                // ：残らなければ「全焼」
+                if ($landValue[$x][$y] >= 0) {
+                    $this->log->firenot($id, $name, $lName, $point);
+                } else {
+                    $this->log->fire($id, $name, $lName, $point);
+                }
             }
         }
         // 変更された可能性のある変数を書き戻す
@@ -6341,6 +6325,49 @@ class Turn
                 return '海底消防署';
 
         }
+    }
+
+    public function is_fireable($land_kind): bool
+    {
+        global $init;
+
+        $fireable = [
+            $init->landTown,
+            $init->landHaribote,
+            $init->landFactory,
+            $init->landHatuden,
+            $init->landPark,
+            $init->landSeaResort,
+            $init->landSyoubou,
+            $init->landSsyoubou,
+            $init->landSeaCity,
+            $init->landFroCity,
+            $init->landNewtown,
+            $init->landBigtown
+        ];
+
+        return in_array($land_kind, $fireable, true);
+    }
+
+    public function is_in_the_sea($land_kind): bool
+    {
+        global $init;
+
+        $in_the_sea = [
+            $init->landSea,
+            $init->landShip,
+            $init->landZorasu,
+            $init->landSfarm,
+            $init->landNursery,
+            $init->landSdefence,
+            $init->landSbase,
+            $init->landSeaCity,
+            $init->landFroCity,
+            $init->landOil,
+            $init->landSsyoubou
+        ];
+
+        return in_array($land_kind, $in_the_sea, true);
     }
 }
 
