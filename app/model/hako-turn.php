@@ -4321,11 +4321,13 @@ class Turn
                             // 確率で他島
                             $tg = (random_int(0, 1) === 1)
                                 ? Util::random($hako->islandNumber)
-                                : Util::nameToNumber($hako, $island["name"]);
+                                : $id;
 
                             $tIsland = $hako->islands[$tg];
-                            // 初心者期間中の島にはワープしない（自島へワープ）
-                            if (($hako->islandTurn - $tIsland['starturn']) < $init->noAssist) {
+                            // 初心者期間中 / cold sleeping /  の島にはワープしない（自島へワープ）
+                            if ($tIsland["isBF"]) {
+                                // noop
+                            } else if (Util::hasIslandAttribute($tIsland, ["newbie", "sleep", "monster"], ["islandTurn" => $hako->islandTurn, "level" => $monsSpec["kind"]])) {
                                 $tIsland = $island;
                             }
                             $tId   = $tIsland['id'];
