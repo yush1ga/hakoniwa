@@ -4313,8 +4313,8 @@ class Turn
                     // ワープできる
                     if ($special & 0x40) {
                         // 確率でワープ発生
-                        if (random_int(0, 100) < 20) {
-                            $tg = -999;
+                        // if (random_int(0, 100) < 20) {
+                        if (true) {
                             $tIsland = [];
 
                             // 自分の島にワープする（初期値）
@@ -4322,18 +4322,19 @@ class Turn
                             $tg = (random_int(0, 1) === 1)
                                 ? Util::random($hako->islandNumber)
                                 : $id;
-
                             $tIsland = $hako->islands[$tg];
-                            // 初心者期間中 / cold sleeping /  の島にはワープしない（自島へワープ）
+                            unset($tg);
+                            // 初心者期間 / 凍結中 / 当該怪獣発生条件未達 の島にはワープさせない
+                            // （自島にワープ；ただしBFを除く）
                             if ($tIsland["isBF"]) {
                                 // noop
-                            } else if (Util::hasIslandAttribute($tIsland, ["newbie", "sleep", "monster"], ["islandTurn" => $hako->islandTurn, "level" => $monsSpec["kind"]])) {
+                            } elseif (Util::hasIslandAttribute($tIsland, ["newbie", "sleep", "monster"], ["islandTurn" => $hako->islandTurn, "level" => $monsSpec["rank"]])) {
                                 $tIsland = $island;
                             }
-                            $tId   = $tIsland['id'];
-                            $tName = $tIsland['name'];
 
                             // ワープ地点を決める
+                            $tId   = $tIsland['id'];
+                            $tName = $tIsland['name'];
                             $tLand      = $tIsland['land'];
                             $tLandValue = $tIsland['landValue'];
                             for ($w = 0; $w < $init->pointNumber; $w++) {
@@ -4354,15 +4355,19 @@ class Turn
                             $this->log->monsWarp($id, $tId, $name, $mName, "($x, $y)", $tName);
                             $this->log->monsCome($tId, $tName, $mName, "($bx, $by)", $this->landName($tLand[$bx][$by], $tLandValue[$bx][$by]));
 
-
-                            $tLand[$bx][$by]      = $init->landMonster;
-                            $tLandValue[$bx][$by] = $lv;
                             $monsterMove[$bx][$bx] = 2;
-                            $land[$x][$y]      = $init->landWaste;
-                            $landValue[$x][$y] = 0;
-                            $hako->islands[$tg]['land']      = $tLand;
-                            $hako->islands[$tg]['landValue'] = $tLandValue;
-                            unset($tg, $tIsland, $tId, $tName, $tLand, $tLandValue, $w, $bx, $by, $candidates);
+                            if ($id == $tId) {
+                                $land[$x][$y]      = $init->landWaste;
+                                $landValue[$x][$y] = 0;
+                                $land[$bx][$by]      = $init->landMonster;
+                                $landValue[$bx][$by] = $lv;
+                            } else {
+                                $land[$x][$y]      = $init->landWaste;
+                                $landValue[$x][$y] = 0;
+                                $hako->islands[$tId]['land'][$bx][$by]      = $tLand;
+                                $hako->islands[$tId]['landValue'][$bx][$by] = $tLandValue;
+                            }
+                            unset($tIsland, $tId, $tName, $tLand, $tLandValue, $w, $bx, $by, $candidates);
 
                             break;
                         }
