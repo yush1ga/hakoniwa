@@ -71,7 +71,14 @@ class Util
         // 体力
         $hp = $lv % 100;
 
-        return ['kind' => $kind, 'name' => $name, 'hp' => $hp];
+        // monster rank
+        $rank = $kind <= $init->disMonsBorder1 ? 1
+            : ($kind <= $init->disMonsBorder2 ? 2
+                : ($kind <= $init->disMonsBorder3 ? 3
+                    :($kind <= $init->disMonsBorder4 ? 4
+                        : 5)));
+
+        return ['kind' => $kind, 'name' => $name, 'hp' => $hp, 'rank' => $rank];
     }
 
     /**
@@ -212,6 +219,52 @@ class Util
             return $num > 1 ? random_int(0, $num - 1) : 0;
         }
     }
+
+    public static function hasIslandAttribute($island, array $flags = [], array $opt = []): bool
+    {
+        global $init;
+
+        $match = false;
+        foreach ($flags as $f) {
+            switch ($f) {
+                case "newbie":
+                    if (!array_key_exists("islandTurn", $opt)) {
+                        throw new \InvalidArgumentException("You must set \$opt['islandTurn'] when you'll check `newbie`.");
+                    }
+                    if (($opt["islandTurn"] - $island['starturn']) < $init->noAssist) {
+                        $match = true;
+                    }
+
+                    break;
+                case "sleep": // "keep"
+                    if ($island["keep"]) {
+                        $match = true;
+                    }
+
+                    break;
+                case "monster":
+                    if (!array_key_exists("level", $opt)) {
+                        throw new \InvalidArgumentException("You must set \$opt['level'] when you'll check `monster`.");
+                    }
+                    $level = "disMonsBorder".$opt["level"];
+                    if (!property_exists($init, $level)) {
+                        throw new \InvalidArgumentException("Don't exist `\$init->{$level}`, probably wrong \$opt['level'] (=> {$opt['level']})?");
+                    }
+                    if ($island["pop"] >= $init->$level) {
+                        $match = true;
+                    }
+                    unset($level);
+
+                    break;
+                default:
+                    throw new \InvalidArgumentException("Wrong attribute: `{$f}`.");
+            }
+        }
+        unset($flags, $opt, $f);
+
+        return $match;
+    }
+
 
     /**
      * ランダムな座標配列を生成
