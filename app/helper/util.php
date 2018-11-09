@@ -563,9 +563,10 @@ class Util
             return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerce'] /3 + $p['mountain'] /4);
         }
         /**
-         * 【電力供給率】
+         * 【電力発電量】
          */
-        if ($cat === 'power_supply_rate') {
+        if ($cat === 'power_supply') {
+            return $p["hatuden"] * 1000;
         }
         /**
          * 【総合ポイント】

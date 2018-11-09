@@ -5766,10 +5766,11 @@ class Turn
         global $init;
 
         $pop      = $island['pop']/*00.*/;
-        $factory  = $island['factory']/*00.*/  / 10;
-        $commerce = $island['commerce']/*00.*/ / 10;
-        $mountain = $island['mountain']/*00.*/ / 10;
-        $power_supply = $island['hatuden'];
+        $farmer   = $island['farm'] * 100;
+        $factory  = $island['factory']/*00.*/  * 100;
+        $commerce = $island['commerce']/*00.*/ * 100;
+        $mountain = $island['mountain']/*00.*/ * 100;
+        $power_supply = Util::calc("power_supply", $island);
 
         /**
          * 仕様
@@ -5789,8 +5790,7 @@ class Turn
 
         // 収入
         // 農業従事者は最優先で確保。それ以外を工商業に割り当てる
-        $farmer = min($pop, $island['farm']*10);//農業ひと桁足らない気がするので
-        //$no_assignment = $farmer - $pop;
+        $farmer = min($pop, $farmer);
         $no_assignment = $pop - $farmer;
 
         // 工商業従事可能
@@ -5800,12 +5800,13 @@ class Turn
                 $this->log->Teiden($island['id'], $island['name']);
             } else {
                 $maximum_employees = round($factory + $commerce + $mountain);
-                //$workable_employees = min($power_supply, $maximum_employees);
-                $workable_employees = max($power_supply, $maximum_employees);//min→max、minだとあまりに収入少なかったので
+                $workable_employees = min($power_supply, $maximum_employees);
                 // サラマンダー所持時ブースト
                 $workable_employees *= ($island['zin'][6] == 1) ? 2 : 1;
                 $island['money'] += $workable_employees;
             }
+            // [TODO] 「工商業ゼロ・発電量ゼロ」のときでも若干金銭収入を生やす
+            // ・5% くらい？
         }
 
         // 農業（ジン所持時ブースト）
