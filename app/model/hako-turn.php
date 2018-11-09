@@ -5765,58 +5765,51 @@ class Turn
     {
         global $init;
 
-        $pop      = $island['pop']/*00.*/;
-        $farmer   = $island['farm'] * 100;
-        $factory  = $island['factory']/*00.*/  * 100;
-        $commerce = $island['commerce']/*00.*/ * 100;
-        $mountain = $island['mountain']/*00.*/ * 100;
-        $power_supply = Util::calc("power_supply", $island);
-
+        $pop      = $island['pop']/*00.*/ * 100;
+        $farmer   = $island['farm']/*00.*/* 100;
+        $factory  = $island['factory']/*00.*/ * 100;
+        $commerce = $island['commerce']/*00.*/* 100;
+        $mountain = $island['mountain']/*00.*/* 100;
         /**
          * 仕様
-         * 農場　10000人ー>10000t
-         * 工場　10000人ー>10億
-         * 採掘場　10000人ー>10億
-         * 商業ビル　10000人ー>10億
-         * 電力　1000kwー>1000人分
+         * 農場　100,00人ー>10000t
+         * 工場　100,00人ー>100億
+         * 採掘場　100,00人ー>100億
+         * 商業ビル　100,00人ー>100億
+         * 電力　1,000kwー>1000人分
          */
-        /**
-         * 現行
-         * 電力 1kw -> 100人
-         * 電力消費量
-         * (人/100 + 2工場/3 + 商業/3 + 採掘/4)四捨五入
-         */
-
 
         // 収入
         // 農業従事者は最優先で確保。それ以外を工商業に割り当てる
         $farmer = min($pop, $farmer);
-        $no_assignment = $pop - $farmer;
+        $employee = $pop - $farmer;
 
-        // 工商業従事可能
-        if ($no_assignment > 0) {
+        // 工商業従事
+        if ($employee > 0) {
             // 停電（天候が「雷」かつ確率）：金銭収入なし
             if (Util::event_flag('blackout') && ($island['tenki'] == 4)) {
                 $this->log->Teiden($island['id'], $island['name']);
             } else {
-                $maximum_employees = round($factory + $commerce + $mountain);
-                $workable_employees = min($power_supply, $maximum_employees);
+                $maximum_employees = min($employee, $factory + $commerce + $mountain)/100;
+                $power_supply_rate = Util::calc("power_supply_rate_1", $island);
+
+                $income = $maximum_employees * $power_supply_rate;
                 // サラマンダー所持時ブースト
-                $workable_employees *= ($island['zin'][6] == 1) ? 2 : 1;
-                $island['money'] += $workable_employees;
+                $income *= ($island['zin'][6] == 1) ? 2 : 1;
+                $island['money'] += $income;
             }
-            // [TODO] 「工商業ゼロ・発電量ゼロ」のときでも若干金銭収入を生やす
-            // ・5% くらい？
+
+            // 電力使用量がゼロだった場合、工商業従事予定者もささやかに農業をする
+            if (Util::calc("power_consumption", $island) == 0) {
+                $island['food'] += round($employee / 2000);
+            }
         }
+        unset($employee);
 
         // 農業（ジン所持時ブースト）
         $farmer *= ($island['zin'][5] == 1) ? 2 : 1;
         $island['food'] += $farmer;
 
-        // 電力使用量がゼロだった場合、工商業従事予定者もささやかに農業をする
-        if (Util::calc('power_consumption', $island) === 0) {
-            $island['food'] += round(0.2 * $no_assignment);
-        }
 
 
         // $island[present][item]が0の時、
@@ -5831,10 +5824,12 @@ class Turn
                 $this->log->presentFood($island['id'], $island['name'], $island['present']['py']);
             }
         }
-        // 食料消費
-        $island['food'] -= round($pop * $init->eatenFood);
 
-        // 船舶の管理維持コスト
+        // 【固定消費】
+        // 食料
+        $island['food'] -= $pop/100 * $init->eatenFood;
+
+        // 船舶の維持コスト
         $shipCost = 0;
         for ($i = 0, $c=$init->shipKind; $i < $c; $i++) {
             $shipCost += $init->shipCost[$i] * $island['ship'][$i];

@@ -762,7 +762,7 @@ class HtmlMap extends HTML
         println('<p class="text-center">開始ターン：', $island['starturn'], '</p>');
 
         if (isset($island['soccer']) && $island['soccer'] > 0) {
-//サッカースコアもレスポンシブ対応
+            //サッカースコアもレスポンシブ対応
             echo <<<END
 <div class="table-responsive">
     <table class="table table-bordered table-condensed">
