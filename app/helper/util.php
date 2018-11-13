@@ -553,7 +553,7 @@ class Util
          * => 「人口-農業枠」か「工業枠*3/2 ＋ 商業枠 ＋ 採掘場枠/2」の小さい方
          */
         if ($cat === 'power_consumption') {
-            $civil_without_farmer = $p['pop'] - $p['farm'];
+            $civil_without_farmer = $p['pop'] - ($p['farm'] * 10);
             $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) < 1;
             if ($civil_without_farmer < 1 || $not_have_industry) {
                 unset($civil_without_farmer);
@@ -562,7 +562,7 @@ class Util
             }
             unset($is_civil_farmer_all, $not_have_industry);
 
-            return min($civil_without_farmer, $p['factory']*3/2 + $p['commerce'] + $p['mountain']/2) * 100;
+            return min($civil_without_farmer, 10 * ($p['factory']*3/2 + $p['commerce'] + $p['mountain']/2)) * 100;
         }
         /**
          * 【電力発電量】
@@ -573,10 +573,17 @@ class Util
         /**
          * 【電力供給率】
          */
-        if ($cat === 'power_supply_rate_1') {
-            $psr = self::calc('power_consumption', $p) / self::calc("power_supply", $p);
+        if ($cat === 'power_supply_rate') {
+            $pc = self::calc('power_consumption', $p);
+            $pc = $pc !== 0 ?: INF;
 
-            return min(1.0, $psr);
+            return self::calc("power_supply", $p) / $pc;
+        }
+        if ($cat === 'power_supply_rate_1') {
+            $pc = self::calc('power_consumption', $p);
+            $pc = $pc !== 0 ?: INF;
+
+            return min(1.0, self::calc("power_supply", $p) / $pc);
         }
         /**
          * 【総合ポイント】

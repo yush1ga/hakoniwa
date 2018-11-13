@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-error_reporting(-1);
-
 use \PHPUnit\Framework\TestCase;
 use \Hakoniwa\Helper\Util;
 
@@ -31,18 +29,45 @@ final class TurnTest extends TestCase
     }
     public function dpIncome()
     {
-        $d["pop"] = 10000;
-        $d["money"] = $d["food"] = 1000;
-        $d["farm"] = $d["factory"] = $d["commerce"] = $d["mountain"] = $d["hatuden"] = 100;
-        $d["tenki"] = 1;
-        $d["id"] = "-999";
-        $d["name"] = "test";
-        $d["zin"] = array_fill(0, 7, 0);
-        $d["port"] = 0;
-        $d["ship"] = array_fill(0, 7, 0);
+        /**
+         * Unit:
+         *   - pop:     100
+         *   - hatuden: 1000
+         *   - money:   1
+         *   - food:    100
+         *   - farm:    1000
+         *   - factory: 1000
+         *   - commerce:1000
+         *   - mountain:1000
+         */
+        $b["pop"] = 1000;
+        $b["money"] = $b["food"] = 1000;
+        $b["hatuden"] = 100;
+        $b["farm"] = $b["factory"] = $b["commerce"] = $b["mountain"] = 10;
+        $b["tenki"] = 1;
+        $b["id"] = "-999";
+        $b["name"] = "test";
+        $b["zin"] = array_fill(0, 7, 0);
+        $b["port"] = 0;
+        $b["ship"] = array_fill(0, 7, 0);
 
-        $exp = $d;
-
+        $exp = $d = $b;
+        $exp["money"] = 1600.0;
+        $exp["food"]  = 900.0;
         yield "#1" => [$exp, $d];
+
+        $exp = $d = $b;
+        $exp["hatuden"] = $d["hatuden"] = 0;
+        $exp["farm"] = $d["farm"] = 0;
+        $exp["money"] = 1000.0;
+        $exp["food"] = 800.0;
+        yield "#2" => [$exp, $d];
+
+        $exp = $d = $b;
+        $exp["zin"][6] = $d["zin"][6] = 1;
+        $exp["zin"][5] = $d["zin"][5] = 1;
+        $exp["money"] = 2200.0;
+        $exp["food"] = 1000.0;
+        yield "#3" => [$exp, $d];
     }
 }
