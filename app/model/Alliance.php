@@ -108,6 +108,19 @@ class Alliance
             $is_valid = false;
         }
 
+        // [NOTE]
+        // : 設定から同盟結成権が GM のみになっていた場合、ほかの警告出してもしょうがないので全部上書き
+        if ($init->allyUse === 2 && !$admin_mode) {
+            $checked["id"]["status"] = true;
+            $checked["pass"]["status"] = true;
+            $checked["name"]["status"] = true;
+            $checked["sign"]["status"] = true;
+            $checked["color"]["status"] = true;
+            $checked["other"]["status"] = false;
+            $checked["other"]["messages"] = ["admin_only"];
+            $is_valid = false;
+        }
+
         if (!$dry_run) {
             header("Content-Type:application/json;charset=utf-8");
             echo json_encode($checked);

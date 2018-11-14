@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 $estb = $init->costMakeAlly
-    ? '<span class="cash">'.$init->costMakeAlly.$init->unitMoney.'</span>必要です。'
+    ? '<span class="cash">'.$init->costMakeAlly.$init->unitMoney.'</span>必要です。<br>（ただし、管理者権限を利用した場合は費用がかかりません。）'
     : '必要ありません。';
 $keep = $init->costKeepAlly
     ? '<span class="cash">'.$init->costKeepAlly.$init->unitMoney.'</span>必要です。<br>（維持費は毎ターン、同盟に所属する島で均等に負担されます）'
@@ -11,6 +11,11 @@ $keep = $init->costKeepAlly
 </style>
 
 <h2>同盟の結成</h2>
+<?php if ($init->allyUse === 2):?>
+<div class="alert alert-danger">
+    <p class="lead">設定により、現在GM（管理者）以外の同盟結成は禁止されています。</p>
+</div>
+<?php endif;?>
 <div class="alert alert-info">
     <p><strong class="text-danger">（注意）</strong></p>
     <p>同盟の結成には費用が<?= $estb ?></p>

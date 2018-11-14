@@ -98,6 +98,7 @@
 
         //[TODO] PHP側に用意する
         const messageTemplate = {
+            admin_only: '<strong>同盟の結成には<abbr title="管理者">GM</abbr>権限が必要です</strong>',
             master_can_not_join_other_alliances: '<strong>他の同盟に参加しているときに別の同盟を立ち上げることはできません</strong>',
             wrong_password: '入力されたパスワードが間違っています',
             no_password: 'パスワードを入力してください',
