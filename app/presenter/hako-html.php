@@ -2359,7 +2359,7 @@ class HtmlAlly extends HTML
     {
         global $init;
 
-        require VIEWS . 'Alliance/Index.php';
+        require VIEWS.'Alliance/Index.php';
     }
 
     /**
@@ -2390,6 +2390,7 @@ class HtmlAlly extends HTML
 
             $alliances[] = $alliance;
         }
+        unset($i);
 
         return [$alliances_number, $alliances];
     }

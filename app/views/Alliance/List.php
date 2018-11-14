@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
-if ($alliances_number === 0): ?>
+
+if ($alliances_number === 0):?>
 
 <p>現在、同盟はありません。</p>
 
@@ -41,10 +42,8 @@ if ($alliances_number === 0): ?>
         <tr>
             <td class="CommentCell" colspan=4><span class="head"><?=$alliance['owner']?>： </span><?=$alliance['comment'] ?? ''?></td>
         </tr>
-<?php endforeach; ?>
+<?php endforeach;?>
     </tbody>
 </table>
 </div>
-<?php endif; ?>
-
-<?php
+<?php endif;

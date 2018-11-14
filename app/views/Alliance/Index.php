@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 parent::pageTitle($init->title, '同盟管理ページ');
+
+[$alliances_number, $alliances] = $this->allyInfo($hako);
 ?>
 
 <p>
@@ -9,9 +11,6 @@ parent::pageTitle($init->title, '同盟管理ページ');
 <?php if ($hako->allyNumber > 0):?>
 <a id="Withdrawal" href="<?=$this->this_file?>?p=withdrawal" class="btn btn-danger">同盟の脱退</a>
 <?php
-
-[$alliances_number, $alliances] = $this->allyInfo($hako);
-
 $alliance_list = [];
 foreach ($alliances as $alliance) {
     $alliance_list[] = "<option value=\"{$alliance['id']}\" data-c=\"{$alliance['color']}\">{$alliance['mark']} {$alliance['name']}</option>";
