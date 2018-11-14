@@ -5776,8 +5776,9 @@ class Turn
          * 農場      1,000人 -> 10,00t
          * 工場      1,000人 -> 20,億
          * 採掘場    1,000人 -> 20,億
-         * 商業ビル  1,000人 -> 20,億
-         * 電力　    1,000kw -> 10,00人分
+         * 商業ビル   1,000人 -> 20,億
+         * 発電所    1,000人 -> [TODO]
+         * 電力      1,000kw -> 10,00人分
          */
 
         // 収入
@@ -5789,12 +5790,8 @@ class Turn
         $income *= ($island['zin'][5] == 1) ? 2 : 1;
         $island['food'] += $income;
 
-        $island["farmer"] = $farmer;
-        $island["income_f"] = $income;
-
         // 工商業従事予定者
         $employee = $pop - $farmer;
-        $island["employee"] = $employee;
         unset($farmer, $income);
 
         // 工商業従事
@@ -5811,9 +5808,6 @@ class Turn
                 $income *= ($island['zin'][6] == 1) ? 2 : 1;
                 $island['money'] += $income;
 
-                $island["workable_employees"] = $workable_employees;
-                $island["power_supply_rate"] = $power_supply_rate;
-                $island["income"] = $income;
                 unset($workable_employees, $power_supply_rate, $income);
             }
         }
@@ -5826,7 +5820,7 @@ class Turn
         }
 
         // [NOTE] $island[present][item]が0の時、
-        //        [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている。
+        //        [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている
         if (isset($island['present']) && $island['present']['item'] == 0) {
             if ($island['present']['px'] != 0) {
                 $island['money'] += $island['present']['px'];
@@ -5849,13 +5843,9 @@ class Turn
         }
         $island['money'] -= $shipCost;
 
-        // ゼロ以下ならゼロに
-        if ($island['money'] < 0) {
-            $island['money'] = 0;
-        }
-        if ($island['food'] < 0) {
-            $island['food'] = 0;
-        }
+        // 小数点切捨
+        $island['money'] = $island['money'] < 1 ? 0.0 : floor($island['money']);
+        $island['food'] = $island['food'] < 1 ? 0.0 : floor($island['food']);
     }
 
     /**

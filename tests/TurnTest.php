@@ -69,5 +69,21 @@ final class TurnTest extends TestCase
         $exp["money"] = 2200.0;
         $exp["food"] = 1000.0;
         yield "#3" => [$exp, $d];
+
+        $exp = $d = $b;
+        $exp["hatuden"] = $d["hatuden"] = 15;
+        $exp["money"] = 1300.0;
+        $exp["food"]  = 900.0;
+        yield "#4" => [$exp, $d];
+
+        $exp = $d = $b;
+        $exp["money"] = $d["money"] = 0;
+        $exp["food"] = $d["food"] = 0;
+        $exp["farm"] = $d["farm"] = $exp["factory"] = $d["factory"] = 0;
+        $exp["commerce"] = $d["commerce"] = $exp["mountain"] = $d["mountain"] = 0;
+        $exp["ship"][3] = $d["ship"][3] = 2;
+        $exp["money"] = 0.0;
+        $exp["food"]  = 0.0;
+        yield "#5" => [$exp, $d];
     }
 }

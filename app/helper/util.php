@@ -562,26 +562,26 @@ class Util
             }
             unset($is_civil_farmer_all, $not_have_industry);
 
-            return min($civil_without_farmer, 10 * ($p['factory']*3/2 + $p['commerce'] + $p['mountain']/2)) * 100;
+            return min($civil_without_farmer, 10 * ($p['factory']*3/2 + $p['commerce'] + $p['mountain']/2));
         }
         /**
          * 【電力発電量】
          */
         if ($cat === 'power_supply') {
-            return $p["hatuden"] * 1000;
+            return $p["hatuden"] * 10;
         }
         /**
          * 【電力供給率】
          */
         if ($cat === 'power_supply_rate') {
             $pc = self::calc('power_consumption', $p);
-            $pc = $pc !== 0 ?: INF;
+            $pc = $pc !== 0.0 ? $pc : INF;
 
             return self::calc("power_supply", $p) / $pc;
         }
         if ($cat === 'power_supply_rate_1') {
             $pc = self::calc('power_consumption', $p);
-            $pc = $pc !== 0 ?: INF;
+            $pc = $pc !== 0.0 ? $pc : INF;
 
             return min(1.0, self::calc("power_supply", $p) / $pc);
         }
