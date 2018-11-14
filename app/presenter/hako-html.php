@@ -6,9 +6,9 @@
  * @author hiro <@hiro0218>
  */
 
-require_once HELPERPATH.'/message/error.php';
-require_once HELPERPATH.'/message/success.php';
-require_once APPPATH.'/model/hako-log.php';
+require_once HELPER.'/message/error.php';
+require_once HELPER.'/message/success.php';
+require_once APP.'/model/hako-log.php';
 
 class HTML
 {
@@ -762,29 +762,32 @@ class HtmlMap extends HTML
         println('<p class="text-center">開始ターン：', $island['starturn'], '</p>');
 
         if (isset($island['soccer']) && $island['soccer'] > 0) {
+            //サッカースコアもレスポンシブ対応
             echo <<<END
-<table class="table table-bordered">
-	<thead>
-		<tr>
-			<th class="TitleCell head">総合得点</th>
-			<th class="TitleCell head">成績</th>
-			<th class="TitleCell head">攻撃力</th>
-			<th class="TitleCell head">守備力</th>
-			<th class="TitleCell head">得点</th>
-			<th class="TitleCell head">失点</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td class="InfoCell">{$island['team']}</td>
-			<td class="InfoCell">{$island['shiai']}戦{$island['kachi']}勝{$island['make']}敗{$island['hikiwake']}分</td>
-			<td class="InfoCell">{$island['kougeki']}</td>
-			<td class="InfoCell">{$island['bougyo']}</td>
-			<td class="InfoCell">{$island['tokuten']}</td>
-			<td class="InfoCell">{$island['shitten']}</td>
-		</tr>
-	</tbody>
-</table>
+<div class="table-responsive">
+    <table class="table table-bordered table-condensed">
+        <thead>
+            <tr>
+                <th class="TitleCell head">総合得点</th>
+                <th class="TitleCell head">成績</th>
+                <th class="TitleCell head">攻撃力</th>
+                <th class="TitleCell head">守備力</th>
+                <th class="TitleCell head">得点</th>
+                <th class="TitleCell head">失点</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="InfoCell">{$island['team']}</td>
+                <td class="InfoCell">{$island['shiai']}戦{$island['kachi']}勝{$island['make']}敗{$island['hikiwake']}分</td>
+                <td class="InfoCell">{$island['kougeki']}</td>
+                <td class="InfoCell">{$island['bougyo']}</td>
+                <td class="InfoCell">{$island['tokuten']}</td>
+                <td class="InfoCell">{$island['shitten']}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 END;
         }
     }
@@ -1350,7 +1353,9 @@ function cominput(theForm, x, k, z) {
 		str = '<font color="#C7243A"><strong>■ 未送信 ■<\\/strong><\\/font><br>' + str;
 		disp(str,"white");
 		outp();
-		newNs = i+1;
+        //上ボタンの挙動修正
+		//newNs = i+1;
+		newNs = i;
 	} else if(x == 5) {
 		i = Math.floor(a);
 		if (i == $init->commandMax - 1){ return true; }

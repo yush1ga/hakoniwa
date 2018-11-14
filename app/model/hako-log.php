@@ -1,14 +1,5 @@
 <?php
 /**
- * 箱庭諸島 S.E - ログ出力用ファイル -
- * @copyright 箱庭諸島 ver2.30
- * @since 箱庭諸島 S.E ver23_r09 by SERA
- * @author hiro <@hiro0218>
- */
-//hako-turn.php
-
-
-/**
  * ログ関連各種関数
  */
 class LogIO
@@ -84,36 +75,28 @@ class LogIO
         println('</div>');
         fclose($fp);
     }
-    //---------------------------------------------------
-    // 発見の記録を出力
-    //---------------------------------------------------
+    /**
+     * 海域の近況を出力
+     */
     public function historyPrint(): void
     {
-        $fileName = $this->init->dirName . "/hakojima.his";
-
+        $fileName = $this->init->dirName."/hakojima.his";
         if (!is_file($fileName)) {
             return;
         }
 
-        $fp = fopen($fileName, "r");
-        $history = [];
-        $k = 0;
-        while (false !== ($line = fgets($fp, READ_LINE))) {
-            $history[] = trim($line);
-            $k++;
-        }
-
-        for ($i = 0; $i < $k; $i++) {
-            [$turn, $his] = explode(",", array_pop($history), 2);
-            println('<li><span class="number">ターン', $turn, '</span>：', $his, '</li>');
+        $histories = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?? [];
+        foreach (array_reverse($histories) as $history) {
+            [$turn, $log] = explode(",", $history, 2);
+            println('<li><span class="number">ターン', $turn, '</span>：', $log, '</li>');
         }
     }
     /**
      * 発見の記録を保存
      */
-    public function history($str): void
+    public function history(string $str): void
     {
-        $fileName = $this->init->dirName . '/hakojima.his';
+        $fileName = $this->init->dirName."/hakojima.his";
         file_put_contents($fileName, "{$GLOBALS['ISLAND_TURN']},{$str}\n", FILE_APPEND | LOCK_EX);
     }
     /**
@@ -122,25 +105,21 @@ class LogIO
     public function historyTrim(): void
     {
         $count = 0;
-        $fileName = $this->init->dirName . '/hakojima.his';
+        $fileName = $this->init->dirName.'/hakojima.his';
 
-        if (is_file($fileName)) {
-            $fp = fopen($fileName, "r");
+        if (!is_file($fileName)) {
+            return;
+        }
 
-            $line = [];
-            while (false !== ($l = fgets($fp, READ_LINE))) {
-                $line[] =  rtrim($l);
-                $count++;
+        $histories = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?? [];
+        $n_histories = count($histories);
+
+        if (($i = $n_histories - $this->init->historyMax) > 0) {
+            $fp = fopen($fileName, "w");
+            for (; $i < $n_histories; $i++) {
+                fwrite($fp, $histories[$i]."\n");
             }
             fclose($fp);
-
-            if ($count > $this->init->historyMax) {
-                $fp = fopen($fileName, "w");
-                for ($i = ($count - $this->init->historyMax); $i < $count; $i++) {
-                    fwrite($fp, $line[$i] . "\n");
-                }
-                fclose($fp);
-            }
         }
     }
     /**

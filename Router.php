@@ -58,7 +58,6 @@ if (php_sapi_name() === "cli-server") {
     error_reporting(E_ALL);
     header("Cache-Control: no-cache, no-store, must-revalidate");
     header("Expires: Sat, 01 Apr 2017 09:00:00 GMT");
-    require_once __DIR__."/LaunchTest.php";
 
     return false;
 }

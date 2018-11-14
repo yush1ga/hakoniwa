@@ -534,9 +534,12 @@ class Util
      */
     public static function calc(string $cat, array $p, array $mod = []): float
     {
+        $opt = [];
         foreach ($mod as $k => $v) {
             if (array_key_exists($k, $p)) {
                 $p[$k] = $v;
+            } else {
+                $opt[$k] = $v;
             }
         }
         unset($mod, $k, $v);
@@ -547,25 +550,40 @@ class Util
         /**
          * 【電力消費量】
          * 「人口が農業枠未満」か「Σ(工業,商業,採掘場枠)がゼロ」→ ゼロ
-         * => 「人口-農業枠」か「工業枠*2/3 ＋ 商業枠/3 ＋ 採掘場枠/4」の小さい方
+         * => 「人口-農業枠」か「工業枠*3/2 ＋ 商業枠 ＋ 採掘場枠/2」の小さい方
          */
         if ($cat === 'power_consumption') {
-            $civil_without_farmer = $p['pop'] - $p['farm'];
-            $is_civil_farmer_all = $civil_without_farmer <= 0;
-            $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) <= 0;
-            if ($is_civil_farmer_all || $not_have_industry) {
+            $civil_without_farmer = $p['pop'] - ($p['farm'] * 10);
+            $not_have_industry = max($p['factory'], $p['commerce'], $p['mountain']) < 1;
+            if ($civil_without_farmer < 1 || $not_have_industry) {
                 unset($civil_without_farmer);
 
                 return 0;
             }
             unset($is_civil_farmer_all, $not_have_industry);
 
-            return min($civil_without_farmer, $p['factory'] * 2/3 + $p['commerce'] /3 + $p['mountain'] /4);
+            return min($civil_without_farmer, 10 * ($p['factory']*3/2 + $p['commerce'] + $p['mountain']/2));
+        }
+        /**
+         * 【電力発電量】
+         */
+        if ($cat === 'power_supply') {
+            return $p["hatuden"] * 10;
         }
         /**
          * 【電力供給率】
          */
         if ($cat === 'power_supply_rate') {
+            $pc = self::calc('power_consumption', $p);
+            $pc = $pc !== 0.0 ? $pc : INF;
+
+            return self::calc("power_supply", $p) / $pc;
+        }
+        if ($cat === 'power_supply_rate_1') {
+            $pc = self::calc('power_consumption', $p);
+            $pc = $pc !== 0.0 ? $pc : INF;
+
+            return min(1.0, self::calc("power_supply", $p) / $pc);
         }
         /**
          * 【総合ポイント】
@@ -591,7 +609,7 @@ class Util
                 return round($p['hatuden'] / Util::calc('enesyouhi', $p) * 100);
         }
 
-        throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
+        throw new InvalidArgumentException("Parameter `{$cat}` is not defined. maybe wrong.");
     }
 
     /**

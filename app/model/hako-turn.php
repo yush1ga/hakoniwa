@@ -2,8 +2,8 @@
 
 require_once 'config.php';
 
-require_once APPPATH.'/model/hako-log.php';
-require_once APPPATH.'/model/hako-make.php';
+require_once APP.'/model/hako-log.php';
+require_once APP.'/model/hako-make.php';
 
 /**
  * 箱庭諸島 S.E - ターン更新用ファイル -
@@ -5758,6 +5758,7 @@ class Turn
 
     /**
      * 収入、消費フェイズ
+     * [TODO]
      * @param  [type] &$island プレイヤーデータ
      * @return void
      */
@@ -5766,58 +5767,60 @@ class Turn
         global $init;
 
         $pop      = $island['pop']/*00.*/;
-        $factory  = $island['factory']/*00.*/  / 10;
-        $commerce = $island['commerce']/*00.*/ / 10;
-        $mountain = $island['mountain']/*00.*/ / 10;
-        $power_supply = $island['hatuden'];
-
+        $farmer   = $island['farm']/*000.*/    *10;
+        $factory  = $island['factory']/*000.*/ *10;
+        $commerce = $island['commerce']/*000.*/*10;
+        $mountain = $island['mountain']/*000.*/*10;
         /**
          * 仕様
-         * 農場　10000人ー>10000t
-         * 工場　10000人ー>10億
-         * 採掘場　10000人ー>10億
-         * 商業ビル　10000人ー>10億
-         * 電力　1000kwー>1000人分
+         * 農場      1,000人 -> 10,00t
+         * 工場      1,000人 -> 20,億
+         * 採掘場    1,000人 -> 20,億
+         * 商業ビル   1,000人 -> 20,億
+         * 発電所    1,000人 -> [TODO]
+         * 電力      1,000kw -> 10,00人分
          */
-        /**
-         * 現行
-         * 電力 1kw -> 100人
-         * 電力消費量
-         * (人/100 + 2工場/3 + 商業/3 + 採掘/4)四捨五入
-         */
-
 
         // 収入
         // 農業従事者は最優先で確保。それ以外を工商業に割り当てる
-        $farmer = min($pop, $island['farm']);
-        $no_assignment = $farmer - $pop;
 
-        // 工商業従事可能
-        if ($no_assignment > 0) {
+        // 農業（ジン所持時ブースト）
+        $farmer = min($pop, $farmer);
+        $income = $farmer;
+        $income *= ($island['zin'][5] == 1) ? 2 : 1;
+        $island['food'] += $income;
+
+        // 工商業従事予定者
+        $employee = $pop - $farmer;
+        unset($farmer, $income);
+
+        // 工商業従事
+        if ($employee > 0) {
             // 停電（天候が「雷」かつ確率）：金銭収入なし
             if (Util::event_flag('blackout') && ($island['tenki'] == 4)) {
                 $this->log->Teiden($island['id'], $island['name']);
             } else {
-                $maximum_employees = round($factory + $commerce + $mountain);
-                $workable_employees = min($power_supply, $maximum_employees);
+                $workable_employees = min($employee, $factory + $commerce + $mountain);
+                $power_supply_rate = Util::calc("power_supply_rate_1", $island);
+
+                $income = 2 * $workable_employees * $power_supply_rate;
                 // サラマンダー所持時ブースト
-                $workable_employees *= ($island['zin'][6] == 1) ? 2 : 1;
-                $island['money'] += $workable_employees;
+                $income *= ($island['zin'][6] == 1) ? 2 : 1;
+                $island['money'] += $income;
+
+                unset($workable_employees, $power_supply_rate, $income);
             }
         }
+        unset($employee);
 
-        // 農業（ジン所持時ブースト）
-        $farmer *= ($island['zin'][5] == 1) ? 2 : 1;
-        $island['food'] += $farmer;
-
-        // 電力使用量がゼロだった場合、工商業従事予定者もささやかに農業をする
-        if (Util::calc('power_consumption', $island) === 0) {
-            $island['food'] += round(0.2 * $no_assignment);
+        // ships income
+        if ($island['port'] > 0) {
+            $island['money'] += $init->shipIncom * $island['ship'][0];
+            $island['food']  += $init->shipFood  * $island['ship'][1];
         }
 
-
-        // $island[present][item]が0の時、
-        // [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている。
+        // [NOTE] $island[present][item]が0の時、
+        //        [px]に資金プレゼント、[py]に食料プレゼントの数値が入るようになっている
         if (isset($island['present']) && $island['present']['item'] == 0) {
             if ($island['present']['px'] != 0) {
                 $island['money'] += $island['present']['px'];
@@ -5828,27 +5831,21 @@ class Turn
                 $this->log->presentFood($island['id'], $island['name'], $island['present']['py']);
             }
         }
-        // 食料消費
-        $island['food'] -= round($pop * $init->eatenFood);
 
-        // 船舶の管理維持コスト
+        // 【固定消費】
+        // 食料
+        $island['food'] -= $pop * $init->eatenFood;
+
+        // 船舶の維持コスト
         $shipCost = 0;
         for ($i = 0, $c=$init->shipKind; $i < $c; $i++) {
             $shipCost += $init->shipCost[$i] * $island['ship'][$i];
         }
         $island['money'] -= $shipCost;
-        if ($island['port'] > 0) {
-            $island['money'] += $init->shipIncom * $island['ship'][0];
-            $island['food']  += $init->shipFood  * $island['ship'][1];
-        }
 
-        // ゼロ以下ならゼロに
-        if ($island['money'] < 0) {
-            $island['money'] = 0;
-        }
-        if ($island['food'] < 0) {
-            $island['food'] = 0;
-        }
+        // 小数点切捨
+        $island['money'] = $island['money'] < 1 ? 0.0 : floor($island['money']);
+        $island['food'] = $island['food'] < 1 ? 0.0 : floor($island['food']);
     }
 
     /**
@@ -6105,7 +6102,7 @@ class Turn
         $island['enesyouhi'] = Util::calc('power_consumption', $island);
 
         // 電力過不足量
-        $island['enehusoku'] = $island['hatuden'] - $island['enesyouhi'];
+        $island['enehusoku'] = Util::calc('power_supply', $island) - $island['enesyouhi'];
 
         // サッカーポイント計算
         // 2*勝数 - 2*敗数 + 引分け + 攻撃力 + 防御力 + 得点数 - 失点数

@@ -72,7 +72,6 @@ final class FileIOTest extends TestCase
 
 
     /**
-     * @requires OSFAMILY Linux
      * @dataProvider asset4ParsePathForThrowError
      */
     public function testParsePathForThrowError(string $path, string $errorClass): void
@@ -86,7 +85,9 @@ final class FileIOTest extends TestCase
     public function asset4ParsePathForThrowError()
     {
         yield "test #1" => ["/foo/C:/bar", \RuntimeException::class];
-        yield "test #2" => ["C:\\foo", \InvalidArgumentException::class];
+        if (!WINDOWS) {
+            yield "test #2" => ["C:\\foo", \InvalidArgumentException::class];
+        }
     }
 
 

@@ -13,7 +13,7 @@ require_once realpath(dirname(__FILE__, 3)).DIRECTORY_SEPARATOR.'config.php';
 
 $init = new \Hakoniwa\Init();
 
-$filePath = DOCROOT.DIRECTORY_SEPARATOR.$init->dirName.DIRECTORY_SEPARATOR.$init->logname;
+$filePath = ROOT.DS.$init->dirName.DS.$init->logname;
 
 $file = file_exists($filePath)? file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : false;
 $return = [];

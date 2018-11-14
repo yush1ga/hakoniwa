@@ -7,11 +7,11 @@
  */
 
 require_once __DIR__."/config.php";
-require_once MODELPATH."/hako-cgi.php";
-require_once MODELPATH."/hako-file.php";
-require_once MODELPATH."/hako-turn.php";
+require_once MODEL."/hako-cgi.php";
+require_once MODEL."/hako-file.php";
+require_once MODEL."/hako-turn.php";
 require_once PRESENTER."/hako-html.php";
-require_once CONTROLLERPATH."/main.php";
+require_once CONTROLLER."/main.php";
 
 $init  = new \Hakoniwa\Init;
 $start = new Main;

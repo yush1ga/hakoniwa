@@ -7,7 +7,7 @@
  */
 
 require_once 'config.php';
-require_once MODELPATH.'/hako-file.php';
+require_once MODEL.'/hako-file.php';
 require_once PRESENTER.'/hako-html.php';
 
 $init = new \Hakoniwa\Init;
