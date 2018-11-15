@@ -83,6 +83,21 @@ class Mente extends \Admin
 
                 break;
 
+            case "download":
+                global $init;
+
+                if (\Util::checkAdminPassword($this->dataSet["PASSWORD"])) {
+                    $suf = $this->dataSet["NUMBER"];
+                    $dirName = strcmp($suf, "") == 0 ? $init->dirName : $init->dirName.".bak$suf";
+                    $dirName = $this->parse_path(ROOT.DS.$dirName);
+                    if (is_dir($dirName)) {
+                        $zipper = new \Hakoniwa\Utility\Zipper();
+                        $zipper->backup_playdata($dirName, true)
+                            ->download();
+                    }
+                }
+            /* no_break */
+            // no break
             default:
                 $html->enter();
 

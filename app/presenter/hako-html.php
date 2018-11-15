@@ -2259,7 +2259,13 @@ EOT;
     <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
     <input type="hidden" name="mode" value="DELETE">
     <input type="hidden" name="NUMBER" value="$suf">
-    <button type="submit" class="btn btn-danger btn-sm">このデータを削除</button>
+    <button type="submit" class="btn btn-danger btn-sm" onClick="return confirm('sure?');">このデータを削除</button>
+</form>
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="download">
+    <input type="hidden" name="NUMBER" value="$suf">
+    <button type="submit" class="btn btn-info">ダウンロードする</button>
 </form>
 END;
         if (strcmp($suf, "") == 0) {

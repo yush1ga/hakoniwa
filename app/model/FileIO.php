@@ -199,6 +199,13 @@ trait FileIO
 
 
 
+    final protected function prune(string $path): bool
+    {
+        return false;
+    }
+
+
+
     final protected function cp_a(string $from, string $to, bool $recursion = false): void
     {
         $from = $this->parse_path($from);

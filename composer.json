@@ -17,7 +17,8 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "consolidation/robo": "@stable",
-        "ramsey/uuid": "^3.8"
+        "ramsey/uuid": "^3.8",
+        "nelexa/zip": "@stable"
     },
     "scripts": {
         "fix": "php-cs-fixer fix --allow-risky=yes",

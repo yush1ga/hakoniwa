@@ -161,6 +161,8 @@ class Util
 
     public static function checkAdminPassword(string $p): bool
     {
+        global $init;
+
         if (!file_exists($init->passwordFile)) {
             \HakoError::probrem();
 
