@@ -10,7 +10,7 @@ defined("WINDOWS") || define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
 
 /**
  * Debug mode:
- * If the server running for test as cli-server, "DEBUG" is always true.
+ * If the server running for test with npm-script, "DEBUG" is always true.
  * cf. "Router.php".
  */
 defined("DEBUG") || define("DEBUG", false);

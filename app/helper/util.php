@@ -7,9 +7,8 @@ declare(strict_types=1);
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class Util
+final class Util
 {
-
     /**
      * 資金を丸めて表示する
      * @param  integer $money 資金額
@@ -505,12 +504,22 @@ class Util
 
     /**
      * ランダムな文字列を返す
-     * @param  integer $max [description]
+     * @param  integer $length [description]
      * @return [type]       [description]
      */
-    public static function rand_string(int $max = 32): string
+    public static function random_str(int $length = 8): string
     {
-        return mb_substr(md5(uniqid(rand_number(), true)), 0, $max);
+        static $seeds;
+
+        if (!$seeds) {
+            $seeds = array_flip(array_merge(range("a", "z"), range("A", "Z"), range("0", "9")));
+        }
+        $str = "";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= array_rand($seeds);
+        }
+
+        return $str;
     }
 
     /**
@@ -658,6 +667,58 @@ class Util
         }
 
         return $s;
+    }
+
+    /**
+     * 文字列$strが$prefixから始まるかどうか
+     * @param  string $str    検索対象
+     * @param  mixed  $prefix 検索したい文字列・文字列の配列
+     * @return bool
+     */
+    public static function starts_with(string $str, $prefix): bool
+    {
+        $type = gettype($prefix);
+        switch ($type) {
+            case "string":
+                return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
+            case "array":
+                foreach ($prefix as $p) {
+                    if (mb_substr($str, 0, mb_strlen($p)) === $p) {
+                        return true;
+                    }
+                }
+
+                return false;
+        }
+
+        throw new \InvalidArgumentException("Arguments #1 require type of `String[] | String` (Actual `{$type}`)");
+    }
+
+
+
+    public static function get_anonymous_usage_stats(string $path = "")
+    {
+        $outtype_flg = is_dir($path);
+        $fileIO = (new class {
+            use \Hakoniwa\Model\FileIO;
+        });
+
+        ob_start();
+        phpinfo();
+        $_phpinfo = ob_get_contents();
+        ob_end_clean();
+
+        // [TODO] これいる？
+        // if (strpos($_phpinfo, "phpinfo() has been disabled for security reasons") ===false) {
+        //     $_phpinfo = "";
+        // }
+
+        if ($outtype_flg) {
+            $path = $path.DS.self::random_str();
+            $fileIO->mkfile($path."/phpinfo.html", $_phpinfo);
+        }
+
+        return $outtype_flg ? $path : ["phpinfo" => $_phpinfo];
     }
 }
 

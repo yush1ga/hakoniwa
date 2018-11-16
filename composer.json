@@ -18,7 +18,8 @@
         "ext-zip": "*",
         "consolidation/robo": "@stable",
         "ramsey/uuid": "^3.8",
-        "nelexa/zip": "@stable"
+        "nelexa/zip": "@stable",
+        "cebe/markdown": "@stable"
     },
     "scripts": {
         "fix": "php-cs-fixer fix --allow-risky=yes",

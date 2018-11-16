@@ -8,6 +8,8 @@ if (!defined("WINDOWS")) {
     throw new \ErrorException("Not defined: `WINDOWS`.");
 }
 
+require_once __DIR__."/../helper/util.php";
+
 trait FileIO
 {
     // abstract private $file_path;
@@ -51,7 +53,7 @@ trait FileIO
     {
     }
 
-    final private function mkfile(string $filepath, string $content = ""): bool
+    final public function mkfile(string $filepath, string $content = ""): bool
     {
         $info = pathinfo($this->parse_path($filepath));
 
@@ -74,7 +76,7 @@ trait FileIO
 
 
 
-    final private function parse_path(string $path): string
+    final public function parse_path(string $path): string
     {
         $segments = preg_split("/(\/|\\\\)/", $path);
         $parsed_path = [];
@@ -268,7 +270,7 @@ trait FileIO
         $filelist = [];
         foreach ($rii as $key => $value) {
             $rel = mb_substr(realpath($key), mb_strlen($dir));
-            if (!$this->starts_with($rel, $exclude_prefix)) {
+            if (!\Util::starts_with($rel, $exclude_prefix)) {
                 $filelist[$rel] = $value;
             }
         }
@@ -310,52 +312,12 @@ trait FileIO
 
     final protected function mkdir_tmp(string $suffix = "")
     {
-        $suffix = $suffix !== "" ?: $this->random_str();
+        $suffix = $suffix !== "" ?: \Util::random_str();
         $tmp_dir = $this->parse_path(sys_get_temp_dir().DIRECTORY_SEPARATOR.$suffix);
         if (mkdir($tmp_dir, 0777, true)) {
             return $tmp_dir;
         }
 
         return false;
-    }
-
-
-    // [TODO] move to \Util
-    final private function random_str(int $length = 8): string
-    {
-        static $seeds;
-
-        if (!$seeds) {
-            $seeds = array_flip(array_merge(range("a", "z"), range("A", "Z"), range("0", "9")));
-        }
-        $str = "";
-        for ($i = 0; $i < $length; $i++) {
-            $str .= array_rand($seeds);
-        }
-
-        return $str;
-    }
-
-    // [TODO] move to \
-    final private function starts_with(string $str, $prefix): bool
-    {
-        $type = gettype($prefix);
-        switch ($type) {
-            case "string":
-                $prefix = $prefix[0] === DIRECTORY_SEPARATOR ?: DIRECTORY_SEPARATOR.$prefix;
-
-                return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
-            case "array":
-                foreach ($prefix as $p) {
-                    $p = $p[0] === DIRECTORY_SEPARATOR ?: DIRECTORY_SEPARATOR.$p;
-                    if (mb_substr($str, 0, mb_strlen($p)) === $p) {
-                        return true;
-                    }
-                }
-
-                return false;
-        }
-
-        throw new \InvalidArgumentException("Arguments #1 require type of `String[] | String` (Actual `{$type}`)");
     }
 }

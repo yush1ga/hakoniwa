@@ -2231,6 +2231,16 @@ EOT;
             }
         }
         closedir($dir);
+        echo <<<EOT
+<hr>
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="download">
+    <input type="hidden" name="debug_logging" value="1">
+    <button type="submit" class="btn btn-default btn-block" onclick="return confirm('実行確認？')">【ベータ機能】 全データをダウンロードする（zip形式；時間がかかる事があります）</button>
+</form>
+<p>Ｑ「しばらく画面が固まったと思ったら真っ白になってデータもダウンロードできないんですが」<br>Ａ「あきらめてください（対処法を検討中です）」</p>
+EOT;
     }
 
     // 表示モード
@@ -2265,7 +2275,7 @@ EOT;
     <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
     <input type="hidden" name="mode" value="download">
     <input type="hidden" name="NUMBER" value="$suf">
-    <button type="submit" class="btn btn-info">ダウンロードする</button>
+    <button type="submit" class="btn btn-info">ダウンロードする (zip)</button>
 </form>
 END;
         if (strcmp($suf, "") == 0) {

@@ -27,10 +27,10 @@ class Mente extends \Admin
         $cgi->getCookies();
 
         $this->dataSet['PASSWORD'] = $this->dataSet['PASSWORD'] ?? '';
-        $html->header();
 
         switch ($this->mode) {
             case "NEW":
+                $html->header();
                 if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->newMode();
                 }
@@ -39,6 +39,7 @@ class Mente extends \Admin
                 break;
 
             case "CURRENT":
+                $html->header();
                 if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->currentMode($this->dataSet['NUMBER']);
                 }
@@ -47,6 +48,7 @@ class Mente extends \Admin
                 break;
 
             case "DELETE":
+                $html->header();
                 if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->delMode($this->dataSet['NUMBER']);
                 }
@@ -55,6 +57,7 @@ class Mente extends \Admin
                 break;
 
             case "NTIME":
+                $html->header();
                 if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->timeMode();
                 }
@@ -63,6 +66,7 @@ class Mente extends \Admin
                 break;
 
             case "STIME":
+                $html->header();
                 if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $this->stimeMode($this->dataSet['SSEC']);
                 }
@@ -71,14 +75,18 @@ class Mente extends \Admin
                 break;
 
             case "setup":
+                $html->header();
                 $this->setupMode();
                 $html->enter();
 
                 break;
 
             case "enter":
+                $html->header();
                 if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
                     $html->main($this->dataSet);
+                } else {
+                    $html->enter();
                 }
 
                 break;
@@ -87,18 +95,19 @@ class Mente extends \Admin
                 global $init;
 
                 if (\Util::checkAdminPassword($this->dataSet["PASSWORD"])) {
-                    $suf = $this->dataSet["NUMBER"];
-                    $dirName = strcmp($suf, "") == 0 ? $init->dirName : $init->dirName.".bak$suf";
+                    $debug_logging = ($this->dataSet["debug_logging"] ?? "0") === "1";
+                    $suf = $this->dataSet["NUMBER"] ?? "";
+                    $dirName = strcmp($suf, "") === 0 ? $init->dirName : $init->dirName.".bak$suf";
                     $dirName = $this->parse_path(ROOT.DS.$dirName);
                     if (is_dir($dirName)) {
-                        $zipper = new \Hakoniwa\Utility\Zipper();
-                        $zipper->backup_playdata($dirName, true)
+                        $zipper = new \Hakoniwa\Utility\Zipper("hakoniwa.zip");
+                        $zipper->backup_localdata($dirName, $debug_logging)
                             ->download();
                     }
                 }
-            /* no_break */
             // no break
             default:
+                $html->header();
                 $html->enter();
 
                 break;
