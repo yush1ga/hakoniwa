@@ -65,7 +65,7 @@ final class FileIOTest extends TestCase
             yield "for Linux... #8" => ["/foo/with space/bar.ext", "/foo/with space/bar.ext"];
             yield "for Linux... #9" => [getcwd()."/foo/bar.ext", "./foo/bar.ext"];
             yield "for Linux... #10" => [mb_substr(getcwd(), 0, mb_strrpos(getcwd(), "/"))."/foo.ext", "./../foo.ext"];
-            yield "for Linux... #11" => [getenv("USERPROFILE", true)."/foo.ext", "~/foo.ext"];
+            yield "for Linux... #11" => [$_SERVER["HOME"]."/foo.ext", "~/foo.ext"];
         }
     }
 
