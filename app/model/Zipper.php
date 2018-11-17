@@ -78,10 +78,19 @@ final class Zipper
                     ->addDirRecursive($src_dir, "hakoniwa/{$src_rel_dir}/")
                     ->addFile(ROOT."config.php", "hakoniwa/config.php")
                     ->addFile(ROOT."hako-init.php", "hakoniwa/hako-init.php")
-                    ->deleteFromGlob("test*")
                     ->deleteFromGlob("**.zip")
-                    ->addFile(ROOT."LICENSE", "hakoniwa/LICENSE.txt")
-                    ->addFromString("hakoniwa/README.html", $md_parser->parse(file_get_contents(ROOT."README.md")));
+                    ->addFromString("hakoniwa/LICENSE.txt", file_get_contents("https://www.gnu.org/licenses/agpl-3.0.txt"))
+                    ->addFromString("hakoniwa/README.html", <<<EOL
+<!doctype html>
+<html lang="ja">
+<head>
+<meta encoding="utf-8">
+<title>Read me</title>
+</head>
+<body>
+
+EOL
+                        .$md_parser->parse(file_get_contents(ROOT."README.md"))."</body>\n</html>\n");
             }
             $aus = _::get_anonymous_usage_stats();
             $this->zip

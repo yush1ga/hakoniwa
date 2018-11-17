@@ -19,9 +19,13 @@ if (php_sapi_name() === "cli-server") {
             $str .= ob_get_contents();
             ob_end_clean();
         }
-        echo "<pre>".PHP_EOL;
-        echo htmlspecialchars($str, ENT_QUOTES | ENT_HTML5);
-        echo "</pre>".PHP_EOL;
+        if (extension_loaded("xdebug")) {
+            echo $str;
+        } else {
+            echo "<pre>".PHP_EOL;
+            echo htmlspecialchars($str, ENT_QUOTES | ENT_HTML5);
+            echo "</pre>".PHP_EOL;
+        }
     }
     function dump_r(...$var): void
     {

@@ -91,7 +91,7 @@ trait FileIO
         }
 
         if ($segments[0] === "~") {
-            $home = WINDOWS ? getenv("USERPROFILE") : (getenv("PATH") ?? posix_getpwuid(posix_geteuid())["dir"]);
+            $home = WINDOWS ? getenv("USERPROFILE") : ($_SERVER["HOME"] ?? posix_getpwuid(posix_geteuid())["dir"]);
 
             if (false !== $home) {
                 return $this->parse_path($home.mb_substr($path, 1));

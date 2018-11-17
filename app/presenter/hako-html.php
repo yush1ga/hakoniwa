@@ -2239,7 +2239,8 @@ EOT;
     <input type="hidden" name="debug_logging" value="1">
     <button type="submit" class="btn btn-default btn-block" onclick="return confirm('実行確認？')">【ベータ機能】 全データをダウンロードする（zip形式；時間がかかる事があります）</button>
 </form>
-<p>Ｑ「しばらく画面が固まったと思ったら真っ白になってデータもダウンロードできないんですが」<br>Ａ「あきらめてください（対処法を検討中です）」</p>
+<p>Ｑ「しばらく画面が固まったと思ったら真っ白になってデータもダウンロードできないんですが」<br>
+    Ａ「あきらめてください（対処法を検討中です）」</p>
 EOT;
     }
 
