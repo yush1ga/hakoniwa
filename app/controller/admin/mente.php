@@ -95,14 +95,15 @@ class Mente extends \Admin
                 global $init;
 
                 if (\Util::checkAdminPassword($this->dataSet["PASSWORD"])) {
-                    $debug_logging = ($this->dataSet["debug_logging"] ?? "0") === "1";
+                    $all_data = ($this->dataSet["all_data"] ?? "0") === "1";
                     $suf = $this->dataSet["NUMBER"] ?? "";
                     $dirName = strcmp($suf, "") === 0 ? $init->dirName : $init->dirName.".bak$suf";
                     $dirName = $this->parse_path(ROOT.DS.$dirName);
                     if (is_dir($dirName)) {
                         $zipper = new \Hakoniwa\Utility\Zipper("hakoniwa.zip");
-                        $zipper->backup_localdata($dirName, $debug_logging)
-                            ->download();
+                        $zipper->backup_localdata($dirName, $all_data)
+                            ->download()
+                            ->close();
                     }
                 }
             // no break

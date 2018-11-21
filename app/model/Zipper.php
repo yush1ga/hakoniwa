@@ -45,6 +45,8 @@ final class Zipper
         $this->__destruct();
     }
 
+
+
     public function backup_localdata(string $src_dir, bool $verbose = false)
     {
         if (!is_dir($src_dir)) {
@@ -70,27 +72,14 @@ final class Zipper
                 $this->zip
                     ->addFilesFromIterator($ignoreIterator, "hakoniwa/");
             } else {
-                $md_parser = new \cebe\markdown\GithubMarkdown();
-                $md_parser->html5 = true;
-                $md_parser->enableNewlines = true;
                 $src_rel_dir = mb_substr($src_dir, mb_strlen($root_dir));
                 $this->zip
                     ->addDirRecursive($src_dir, "hakoniwa/{$src_rel_dir}/")
                     ->addFile(ROOT."config.php", "hakoniwa/config.php")
                     ->addFile(ROOT."hako-init.php", "hakoniwa/hako-init.php")
                     ->deleteFromGlob("**.zip")
-                    ->addFromString("hakoniwa/LICENSE.txt", file_get_contents("https://www.gnu.org/licenses/agpl-3.0.txt"))
-                    ->addFromString("hakoniwa/README.html", <<<EOL
-<!doctype html>
-<html lang="ja">
-<head>
-<meta encoding="utf-8">
-<title>Read me</title>
-</head>
-<body>
-
-EOL
-                        .$md_parser->parse(file_get_contents(ROOT."README.md"))."</body>\n</html>\n");
+                    ->addFromString("hakoniwa/LICENSE.html", file_get_contents("https://www.gnu.org/licenses/agpl-3.0-standalone.html"))
+                    ->addFromString("hakoniwa/README.html", $this->md2html(ROOT."README.md"));
             }
             $aus = _::get_anonymous_usage_stats();
             $this->zip
@@ -145,5 +134,30 @@ EOL
         }
 
         return $this;
+    }
+
+
+
+    private function md2html(string $path): string
+    {
+        $md = new \cebe\markdown\GithubMarkdown;
+        $md->html5 = true;
+        $md->enableNewlines = true;
+        $html = $md->parse(file_get_contents($path));
+
+        return <<<EOL
+<!doctype html>
+<html lang="ja">
+<head>
+<meta encoding="utf-8">
+<title>Read me</title>
+</head>
+<body>
+$html
+
+</body>
+</html>
+
+EOL;
     }
 }
