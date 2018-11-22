@@ -720,6 +720,21 @@ final class Util
 
         return $outtype_flg ? $path : ["phpinfo" => $_phpinfo];
     }
+
+
+
+    public static function ls(string $dir): array
+    {
+        $directory = new \DirectoryIterator($dir);
+        $ls = ["dir" => [], "file" => []];
+        foreach ($directory as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $ls[$fileinfo->getType()][] = $fileinfo->getPathname();
+            }
+        }
+
+        return $ls;
+    }
 }
 
 

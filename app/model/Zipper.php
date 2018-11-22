@@ -23,8 +23,8 @@ final class Zipper
         ini_set("max_execution_time", "300");
         ini_set("memory_limit", "-1");
 
-        gc_collect_cycles();
-        gc_mem_caches();
+        @gc_collect_cycles();
+        @gc_mem_caches();
 
         $this->init = $init;
         $this->zip = new \PhpZip\ZipFile();
