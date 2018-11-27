@@ -735,6 +735,33 @@ final class Util
 
         return $ls;
     }
+
+
+    /**
+     * Thanks: https://stackoverflow.com/questions/17316873/convert-array-to-an-ini-file
+     * @return string
+     */
+    public static function arr2ini(array $arr, array $parent = []): string
+    {
+        $out = '';
+        foreach ($arr as $k => $v)
+        {
+            if (is_array($v)) {
+                // subsection case
+                // merge all the sections into one array...
+                $sec = array_merge((array)$parent, (array)$k);
+                //add section information to the output
+                $out .= '['.join('.', $sec).']'.PHP_EOL;
+                //recursively traverse deeper
+                $out .= self::arr2ini($v, $sec);
+            } else {
+                //plain key->value case
+                $v = (string)$v === "".(int)$v ? $v : "\"$v\"";
+                $out .= "$k=$v".PHP_EOL;
+            }
+        }
+        return $out;
+    }
 }
 
 

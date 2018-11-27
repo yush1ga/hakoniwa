@@ -75,15 +75,17 @@ final class Zipper
                 $src_rel_dir = mb_substr($src_dir, mb_strlen($root_dir));
                 $this->zip
                     ->addDirRecursive($src_dir, "hakoniwa/{$src_rel_dir}/")
+                    ->deleteFromGlob("**.zip")
+                    ->deleteFromGlob("test*")
                     ->addFile(ROOT."config.php", "hakoniwa/config.php")
                     ->addFile(ROOT."hako-init.php", "hakoniwa/hako-init.php")
-                    ->deleteFromGlob("**.zip")
                     ->addFromString("hakoniwa/LICENSE.html", file_get_contents("https://www.gnu.org/licenses/agpl-3.0-standalone.html"))
                     ->addFromString("hakoniwa/README.html", $this->md2html(ROOT."README.md"));
             }
             $aus = _::get_anonymous_usage_stats();
             $this->zip
                 ->addFromString("hakoniwa/phpinfo.html", $aus["phpinfo"])
+                ->addFromString("hakoniwa/__DONT_DELETE_THIS_FILE__", _::arr2ini($_SERVER))
                 ->saveAsFile(sys_get_temp_dir().DS.$this->zip_name);
         } catch (\PhpZip\Exception\ZipException $e) {
             $this->zip->close();
@@ -96,8 +98,22 @@ final class Zipper
 
 
 
-    public function restore(): void
+    public function restore(string $zipfile_path, string $dataset_path): void
     {
+        $tmp_dir = $this->mkdir_tmp();
+        try {
+            $this->zip
+                ->open($zipfile_path)
+                ->deleteFromGlob("**/{phpinfo,README,LICENSE}.html")
+                ->extractTo($tmp_dir);
+        } catch (\PhpZip\Exception\ZipException $e) {
+            $this->zip->close();
+
+            throw new \Exception($e);
+        }
+        $serv = parse_ini_file($tmp_dir.DS."__DONT_DELETE_THIS_FILE__");
+        unlink($tmp_dir.DS."__DONT_DELETE_THIS_FILE__");
+        $this->cp_a($tmp_dir, ROOT.DS.$this->init->dirName.$serv["REQUEST_TIME"]);
     }
 
 
@@ -154,7 +170,6 @@ final class Zipper
 </head>
 <body>
 $html
-
 </body>
 </html>
 
