@@ -696,29 +696,16 @@ final class Util
 
 
 
-    public static function get_anonymous_usage_stats(string $path = "")
+    public static function get_anonymous_usage_arr(array $opt = [])
     {
-        $outtype_flg = is_dir($path);
-        $fileIO = (new class {
-            use \Hakoniwa\Model\FileIO;
-        });
-
         ob_start();
         phpinfo();
         $_phpinfo = ob_get_contents();
         ob_end_clean();
 
-        // [TODO] これいる？
-        // if (strpos($_phpinfo, "phpinfo() has been disabled for security reasons") ===false) {
-        //     $_phpinfo = "";
-        // }
 
-        if ($outtype_flg) {
-            $path = $path.DS.self::random_str();
-            $fileIO->mkfile($path."/phpinfo.html", $_phpinfo);
-        }
 
-        return $outtype_flg ? $path : ["phpinfo" => $_phpinfo];
+        return ["phpinfo" => $_phpinfo];
     }
 
 
@@ -744,14 +731,13 @@ final class Util
     public static function arr2ini(array $arr, array $parent = []): string
     {
         $out = '';
-        foreach ($arr as $k => $v)
-        {
+        foreach ($arr as $k => $v) {
             if (is_array($v)) {
                 // subsection case
                 // merge all the sections into one array...
                 $sec = array_merge((array)$parent, (array)$k);
                 //add section information to the output
-                $out .= '['.join('.', $sec).']'.PHP_EOL;
+                $out .= '['.implode('.', $sec).']'.PHP_EOL;
                 //recursively traverse deeper
                 $out .= self::arr2ini($v, $sec);
             } else {
@@ -760,7 +746,34 @@ final class Util
                 $out .= "$k=$v".PHP_EOL;
             }
         }
+
         return $out;
+    }
+
+
+
+    public static function filelist(string $dir, array $exclude_prefix = []): array
+    {
+        $rii =  new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $dir,
+                \FilesystemIterator::SKIP_DOTS
+                | \FilesystemIterator::KEY_AS_PATHNAME
+                | \FilesystemIterator::CURRENT_AS_PATHNAME
+            ),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        $dir = realpath($dir);
+
+        $filelist = [];
+        foreach ($rii as $key => $value) {
+            $rel = mb_substr(realpath($key), mb_strlen($dir));
+            if (!self::starts_with($rel, $exclude_prefix)) {
+                $filelist[$rel] = $value;
+            }
+        }
+
+        return $filelist;
     }
 }
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 final class HtmlCore
 {
@@ -9,6 +11,10 @@ final class HtmlCore
         global $init;
         $title = $title !== "" ? $title : $init->title;
         require ROOT."beta/ssi/_head.php";
+
+        if (DEBUG) {
+            dump($_GET, $_POST);
+        }
 
         return $this;
     }
@@ -26,7 +32,7 @@ final class HtmlCore
 
 
 
-    public function h1(string $title, string $subtitle = "")
+    public function h1(string $title, string $subtitle = ""): void
     {
         if ($subtitle === "") {
             echo '<h1 class="title">', $title, "</h1>\n";
@@ -59,10 +65,10 @@ trait HtmlUtility
     final public function iniVal2rawVal(string $iniVal)
     {
         $iniVal = trim($iniVal);
-        $suf = strtolower(mb_substr($iniVal, -1));
+        $suf = mb_strtolower(mb_substr($iniVal, -1));
         $base = intVal(mb_substr($iniVal, 0, mb_strlen($iniVal)-1), 10);
         $sufExp = ["k" => 1, "m" => 2, "g" => 3];
 
-        return $base * pow(1024, $sufExp[$suf]);
+        return $base * 1024** $sufExp[$suf];
     }
 }

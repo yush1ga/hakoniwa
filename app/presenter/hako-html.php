@@ -2314,7 +2314,7 @@ END;
         println('</section>');
     }
 
-    private function dataPrintAlt($data, $container_dir)
+    private function dataPrintAlt($data, $container_dir): void
     {
         global $init;
         $this_file = $init->baseDir."/hako-mente.php";

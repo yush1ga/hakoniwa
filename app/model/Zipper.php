@@ -82,15 +82,36 @@ final class Zipper
                     ->addFromString("hakoniwa/LICENSE.html", file_get_contents("https://www.gnu.org/licenses/agpl-3.0-standalone.html"))
                     ->addFromString("hakoniwa/README.html", $this->md2html(ROOT."README.md"));
             }
-            $aus = _::get_anonymous_usage_stats();
+            $anon_u = _::get_anonymous_usage_arr();
+            $g_data = array_merge(["GAME_TITLE" => $this->init->title], $_SERVER);
+
             $this->zip
-                ->addFromString("hakoniwa/phpinfo.html", $aus["phpinfo"])
-                ->addFromString("hakoniwa/__DONT_DELETE_THIS_FILE__", _::arr2ini($_SERVER))
+                ->addFromString("hakoniwa/phpinfo.html", $anon_u["phpinfo"])
+                ->addFromString("hakoniwa/__DONT_DELETE_THIS_FILE__", _::arr2ini($g_data))
                 ->saveAsFile(sys_get_temp_dir().DS.$this->zip_name);
         } catch (\PhpZip\Exception\ZipException $e) {
             $this->zip->close();
 
-            throw new \Exception($e);
+            throw new \Exception($e->message, $e->code, $e);
+        }
+
+        return $this;
+    }
+
+
+
+    public function extractTo(string $zip_path, string &$extract_to = null)
+    {
+        try {
+            $extract_to = $extract_to ?? $this->mkdir_tmp();
+            $this->zip
+                ->openFile($this->parse_path($zip_path))
+                ->deleteFromGlob("**/{phpinfo,README,LICENSE}.html")
+                ->extractTo($this->parse_path($extract_to));
+        } catch (\PhpZip\Exception\ZipException $e) {
+            $this->zip->close();
+
+            throw new \PhpZip\Exception\ZipException();
         }
 
         return $this;
@@ -101,6 +122,7 @@ final class Zipper
     public function restore(string $zipfile_path, string $dataset_path): void
     {
         $tmp_dir = $this->mkdir_tmp();
+
         try {
             $this->zip
                 ->open($zipfile_path)
@@ -109,7 +131,7 @@ final class Zipper
         } catch (\PhpZip\Exception\ZipException $e) {
             $this->zip->close();
 
-            throw new \Exception($e);
+            throw new \Exception($e->message, $e->code, $e);
         }
         $serv = parse_ini_file($tmp_dir.DS."__DONT_DELETE_THIS_FILE__");
         unlink($tmp_dir.DS."__DONT_DELETE_THIS_FILE__");
@@ -118,7 +140,7 @@ final class Zipper
 
 
 
-    public function save_to(string $path)
+    public function saveTo(string $path)
     {
         if (!is_dir($path)) {
             throw new \InvalidArgumentException("IAE: `{$path}`");
@@ -130,7 +152,7 @@ final class Zipper
         } catch (\PhpZip\Exception\ZipException $e) {
             $this->zip->close();
 
-            throw new \Exception($e);
+            throw new \Exception($e->message, $e->code, $e);
         }
 
         return $this;
@@ -146,7 +168,7 @@ final class Zipper
         } catch (\PhpZip\Exception\ZipException $e) {
             $this->zip->close();
 
-            throw new \Exception($e);
+            throw new \Exception($e->message, $e->code, $e);
         }
 
         return $this;
