@@ -6,9 +6,10 @@ if (get_included_files()[0] === __FILE__) {
     exit;
 }
 
-require __DIR__."/../config.php";
+require __DIR__."/../../config.php";
 
 $file = $_FILES["ImportZip"];
+$init = new \Hakoniwa\Init;
 
 
 
@@ -52,14 +53,17 @@ if (is_uploaded_file($file["tmp_name"])) {
     if ($ddtf_path === "" || count($hkjm_path) !== 1) {
         header("Content-Type:application/json;charset=utf-8");
         echo json_encode([
-            "error" => "仕様外のzipファイルです。正しいファイルを再度アップロードしてください。"
+            "error" => "仕様外のzipファイルです。正しいファイルを再度アップロードしてください。",
+            "dir"    => $tmp_extract_to
         ]);
         rimraf($tmp_extract_to);
         exit;
     }
+
+
     $g_data = parse_ini_file($ddtf_path);
     $hkjm = file($hkjm_path[0], FILE_IGNORE_NEW_LINES);
-    $restoreTo = mb_substr($hkjm_path[0], mb_strlen($tmp_extract_to), mb_strlen($hkjm_path[0]) - 12);
+    $restoreTo = "hakoniwa".date("Ymd-HisT", $hkjm[1]);
 
     // verify & data input
     $data = [
@@ -67,7 +71,8 @@ if (is_uploaded_file($file["tmp_name"])) {
         "backupDate" => $hkjm[1] ?? -1,
         "backupTurn" => $hkjm[0] ?? -1,
         "zippedDate" => $g_data["REQUEST_TIME"] ?? 0,
-        "restoreTo"  => $restoreTo ?? ""
+        "restoreTo"  => $restoreTo ?? "",
+        "dir"        => $tmp_extract_to
     ];
 }
 

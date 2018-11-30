@@ -30,7 +30,7 @@ $htmlCore->head("test")->gnav();
 <div class="ui container">
 <div class="ui raised segment">
     <h2>data select...</h2>
-    <form name="DataImporter" action="<?=$init->baseDir?>/api/upload.php" method="post" enctype="multipart/form-data" class="ui form">
+    <form name="DataImporter" action="<?=$init->baseDir?>/api/upload/upload.php" method="post" enctype="multipart/form-data" class="ui form">
         <div class="field">
             <label for="ImportZip">ファイルを選ぶ（利用可能なファイルの最大サイズ： <?=$max_size["h"]["file"]?>iB）</label>
             <input id="ImportZip" name="ImportZip" type="file" accept="application/zip">
@@ -39,48 +39,53 @@ $htmlCore->head("test")->gnav();
             <button id="PostZip" name="PostZip" class="ui fluid button" disabled>バックアップデータを取り込む</button>
         </div>
     </form>
-    <button onclick="$('#Check').modal('show');return !1;">show</button>
+    <button onclick="$('#jsCheck').modal('show');return !1;">show</button>
 </div>
 
 </div>
-<script>
-const $max_size = <?=json_encode($max_size)?>;
-<?php require "Script/dataImporter.js";?>
-</script>
-<div id="Check" class="ui small modal">
-    <i class="close icon"></i>
+<div id="jsCheck" class="ui small modal">
     <div class="header">確認</div>
     <div class="content">
         <div class="ui header">以下のデータをサーバーに展開しますか？</div>
-        <p class="ui block header">hogefuga</p>
+        <p id="jsGameTitle" class="ui block center aligned header">--------</p>
         <table class="ui compact definition table">
             <tbody>
                 <tr>
                     <td class="five wide">ターン数</td>
-                    <td class="eleven wide">ｄｆｇｄ</td>
+                    <td id="jsBackupTurn" class="eleven wide">----</td>
                 </tr>
                 <tr>
                     <td>更新時刻<br>（ターン処理時刻）</td>
-                    <td>dadfhadfhad</td>
+                    <td id="jsBackupDate">--------</td>
                 </tr>
                 <tr>
                     <td>バックアップ<br>ファイルDL日時</td>
-                    <td>dfhadfh</td>
+                    <td id="jsZippedDate">--------</td>
                 </tr>
                 <tr>
-                    <td>レストア先</td>
-                    <td>adfhdhafdda</td>
+                    <td>展開フォルダ名</td>
+                    <td id="jsRestoreTo">--------</td>
                 </tr>
             </tbody>
         </table>
     </div>
+    <div class="content" style="display:none">
+        <p></p>
+    </div>
     <div class="actions">
-        <button class="ui grey deny button">やっぱやめる</button>
+        <button class="ui grey deny left labeled icon button" disabled>
+            <i class="close icon"></i> やっぱやめる
+        </button>
         <button class="ui positive right labeled icon button" disabled>
             展開する <i class="checkmark icon"></i>
         </button>
     </div>
 </div>
+<script>
+const $max_size = <?=json_encode($max_size)?>;
+const $baseDir = "<?=$init->baseDir?>";
+<?php require "Script/dataImporter.js";?>
+</script>
 </section>
 
 
