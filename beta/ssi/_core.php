@@ -69,6 +69,6 @@ trait HtmlUtility
         $base = intVal(mb_substr($iniVal, 0, mb_strlen($iniVal)-1), 10);
         $sufExp = ["k" => 1, "m" => 2, "g" => 3];
 
-        return $base * 1024** $sufExp[$suf];
+        return $base * (1024 ** ($sufExp[$suf] ?? 0));
     }
 }

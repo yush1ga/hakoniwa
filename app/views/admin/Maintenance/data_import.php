@@ -19,6 +19,7 @@ $max_size = [
 
 
 
+
 $htmlCore->head("test")->gnav();
 ?>
 
@@ -39,7 +40,7 @@ $htmlCore->head("test")->gnav();
             <button id="PostZip" name="PostZip" class="ui fluid button" disabled>バックアップデータを取り込む</button>
         </div>
     </form>
-    <button onclick="$('#jsCheck').modal('show');return !1;">show</button>
+    <button onclick="$('#jsCheck').modal({closable:false}).modal('show');return !1;">show</button>
 </div>
 
 </div>
@@ -73,10 +74,10 @@ $htmlCore->head("test")->gnav();
         <p></p>
     </div>
     <div class="actions">
-        <button class="ui grey deny left labeled icon button" disabled>
+        <button class="ui grey cancel left labeled icon button" disabled>
             <i class="close icon"></i> やっぱやめる
         </button>
-        <button class="ui positive right labeled icon button" disabled>
+        <button class="ui ok right labeled icon button" disabled>
             展開する <i class="checkmark icon"></i>
         </button>
     </div>
