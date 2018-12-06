@@ -32,7 +32,16 @@ $(document).ready(()=>{
 
 
 
-    const onApprove = event => {};
+    const onApprove = event => {
+        $('#jsCheck .ui.button').attr('disabled', true);
+        axios.post($baseDir+'/api/data/restore/', guest, axiosConf)
+            .then(r => {
+                console.dir(r);
+            })
+            .catch(e => {
+                console.dir(e);
+            });
+    };
     const onDeny = event => {
         $('#jsCheck .ui.button').attr('disabled', true);
         axios.post($baseDir+'/api/delete/', {dir: guest.dir}, axiosConf)
@@ -79,6 +88,7 @@ $(document).ready(()=>{
                 _$Check.find('.content').eq(0).show();
                 _$Check.find('.content').eq(1).hide();
                 guest.dir = data.dir;
+                guest.restoreTo = data.restoreTo;
 
                 if (data.hasOwnProperty('error')) {
                     _$Check.children('.header').text('【問題が発生しました】');
@@ -98,7 +108,7 @@ $(document).ready(()=>{
             })
             .catch(err => {
                 _$Check.find('.header').text('【問題が発生しました】');
-                _$Check.find('.content').eq(1).find('p').html('予期しないエラーが発生したため、動作に失敗しました。<br>数分時間をおき、ページを再読み込みのうえ、再度お試しください。<br>引き続き失敗する場合は、お手数ですが、サーバ管理者またはシステム開発者までお問い合わせください。');
+                _$Check.find('.content').eq(1).find('p').html('何らかのエラーが発生したため、作業に失敗しました。<br>数分ほど時間をおき、ページを再読み込みしたうえ、再度お試しください。<br>引き続き失敗する場合は、お手数ですが、サーバ管理者またはシステム開発者までお問い合わせください。');
                 _$Check.find('.content').eq(0).hide();
                 _$Check.find('.content').eq(1).show();
             })

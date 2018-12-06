@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 // [NOTE] 開発中だと"Router.php"が頭にくるので不発
 $fail_1 = get_included_files()[0] === __FILE__;

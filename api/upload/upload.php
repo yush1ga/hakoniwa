@@ -63,7 +63,7 @@ if (is_uploaded_file($file["tmp_name"])) {
 
     $g_data = parse_ini_file($ddtf_path);
     $hkjm = file($hkjm_path[0], FILE_IGNORE_NEW_LINES);
-    $restoreTo = "hakoniwa".date("Ymd-HisT", $hkjm[1]);
+    $restoreTo = "hakoniwa".date("Ymd-HisT", $hkjm[1]).\Util::random_str(2);
 
     // verify & data input
     $data = [
