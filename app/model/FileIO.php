@@ -12,6 +12,7 @@ require_once __DIR__."/../helper/util.php";
 
 trait FileIO
 {
+    // abstract private $init;
     // abstract private $file_path;
 
     final protected function read_gameboard_file(): bool
@@ -184,8 +185,23 @@ trait FileIO
 
     final protected function rimraf(string $path): bool
     {
-        if (is_file($this->parse_path($path))) {
-            return unlink(realpath($this->parse_path($path)));
+        if (!defined("ROOT")) {
+            throw new \RuntimeException("const `\ROOT` is not defined!");
+        }
+        $allowed_directory = [
+            ROOT,
+            sys_get_temp_dir()
+        ];
+        $path = $this->parse_path($path);
+
+        if (!\Util::starts_with($path, $allowed_directory)) {
+            throw new \InvalidArgumentException("path `$path` is not allowed to delete. [`{$allowed_directory[0]}`, `{$allowed_directory[1]}`]", 1);
+        }
+
+
+
+        if (is_file($path)) {
+            return unlink(realpath($path));
         }
 
         $ls = array_diff(scandir($path), [".", ".."]);
@@ -215,7 +231,7 @@ trait FileIO
 
         if (!$recursion) {
             if (!is_dir($from)) {
-                throw new \InvalidArgumentException("Arguments must directory: `{$from}`.");
+                throw new \InvalidArgumentExceptionException("Arguments must directory: `{$from}`.");
             }
             if (!$this->is_usable_path($from)["dir"]) {
                 throw new \ErrorException("No have permission to Read/Write: `{$from}`.");
@@ -305,7 +321,7 @@ trait FileIO
             return hash_equals(hash_file("sha256", $orig), hash_file("sha256", $targ));
         }
 
-        throw new \InvalidArgumentException("You have to choose arguments pair either \"Directory-Directory\" or \"File-File\".");
+        throw new \InvalidArgumentExceptionException("You have to choose arguments pair either \"Directory-Directory\" or \"File-File\".");
     }
 
 

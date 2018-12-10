@@ -15,7 +15,13 @@ function rimraf(string $path): bool
 }
 
 $data["exist"] = is_dir($INPUT["dir"]);
-$data["result"] = $data["exist"] ? rimraf($INPUT["dir"]) : false;
+if ($data["exist"]) {
+    try {
+        $data["result"] = rimraf($INPUT["dir"]);
+    } catch (\InvalidArgumentException $e) {
+        $data["result"] = false;
+    }
+}
 
 
 

@@ -10,6 +10,8 @@ use \Hakoniwa\Model\FileIO;
 $init = new \Hakoniwa\Init;
 $test_dir = "/test".time();
 
+
+
 final class FileIOTest extends TestCase
 {
     protected static $mock;
@@ -86,7 +88,7 @@ final class FileIOTest extends TestCase
     {
         yield "test #1" => ["/foo/C:/bar", \RuntimeException::class];
         if (!WINDOWS) {
-            yield "test #2" => ["C:\\foo", \InvalidArgumentException::class];
+            yield "test #2 (exclude Win)" => ["C:\\foo", \InvalidArgumentException::class];
         }
     }
 
@@ -147,6 +149,14 @@ final class FileIOTest extends TestCase
 
         $path = $this->parse_path(getcwd()."/{$init->dirName}".$test_dir);
         yield "save_dir" => [$path];
+    }
+    public function testRimrafForThrowError(): void
+    {
+        $method = self::$class->getMethod("rimraf");
+        $method->setAccessible(true);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $method->invoke(self::$mock, "/var/log/fontconfig.log");
     }
 
 

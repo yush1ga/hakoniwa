@@ -34,7 +34,7 @@ $(document).ready(()=>{
 
     const onApprove = event => {
         $('#jsCheck .ui.button').attr('disabled', true);
-        axios.post($baseDir+'/api/data/restore/', guest, axiosConf)
+        axios.post($baseDir+'/api/upload/zip_restore/', guest, axiosConf)
             .then(r => {
                 console.dir(r);
             })
@@ -44,7 +44,7 @@ $(document).ready(()=>{
     };
     const onDeny = event => {
         $('#jsCheck .ui.button').attr('disabled', true);
-        axios.post($baseDir+'/api/delete/', {dir: guest.dir}, axiosConf)
+        axios.post($baseDir+'/api/delete/', guest, axiosConf)
             .then()
             .catch(err => {
                 console.dir(err);
@@ -107,7 +107,7 @@ $(document).ready(()=>{
                 _$Check.find('button.cancel').attr('disable', false);
             })
             .catch(err => {
-                _$Check.find('.header').text('【問題が発生しました】');
+                _$Check.children('.header').text('【問題が発生しました】');
                 _$Check.find('.content').eq(1).find('p').html('何らかのエラーが発生したため、作業に失敗しました。<br>数分ほど時間をおき、ページを再読み込みしたうえ、再度お試しください。<br>引き続き失敗する場合は、お手数ですが、サーバ管理者またはシステム開発者までお問い合わせください。');
                 _$Check.find('.content').eq(0).hide();
                 _$Check.find('.content').eq(1).show();
