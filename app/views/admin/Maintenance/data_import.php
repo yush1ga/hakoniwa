@@ -40,7 +40,6 @@ $htmlCore->head("test")->gnav();
             <button id="PostZip" name="PostZip" class="ui fluid button" disabled>バックアップデータを取り込む</button>
         </div>
     </form>
-    <button onclick="$('#jsCheck').modal({closable:false}).modal('show');return !1;">show</button>
 </div>
 
 </div>
@@ -77,7 +76,7 @@ $htmlCore->head("test")->gnav();
         <button class="ui grey cancel left labeled icon button" disabled>
             <i class="close icon"></i> やっぱやめる
         </button>
-        <button class="ui ok right labeled icon button" disabled>
+        <button class="ui primary ok right labeled icon button" disabled>
             展開する <i class="checkmark icon"></i>
         </button>
     </div>

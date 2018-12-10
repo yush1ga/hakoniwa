@@ -1,26 +1,37 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 require __DIR__."/../../_/getPostApi.php";
 require __DIR__."/../../../config.php";
 
 $init = new \Hakoniwa\Init;
 
-console_dir($INPUT);
-
-function cp_a (string $from, string $to): bool
+function cp_a(string $from, string $to): bool
 {
     return (new class {
-        use \Hakoniwa\Model\FileIO;
-        public function a($f, $t): void
-        {
-            return $this->cp_a($f, $t);
+        use \Hakoniwa\Model\FileIO {
+            cp_a as public;
         }
-    })->a($from, $to);
+    })->cp_a($from, $to);
+}
+function rimraf(string $p): void
+{
+    (new class {
+        use \Hakoniwa\Model\FileIO {
+            rimraf as public;
+        }
+    })->rimraf($p);
 }
 
 
 
-$data["done"] = cp_a($INPUT["dir"], dirname(ROOT."/{$init->baseDir}")."/{$INPUT["restoreTo"]}");
+$f = sys_get_temp_dir().DS.$INPUT["extract"].DS."hakoniwa".DS."data";
+$t = dirname(ROOT.$init->dirName).DS.$INPUT["restoreTo"];
+
+$data["done"] = cp_a($f, $t);
+rimraf($f);
+
 
 
 header("Content-Type:application/json;charset=utf-8");

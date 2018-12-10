@@ -16,12 +16,10 @@ $init = new \Hakoniwa\Init;
 function rimraf(string $path): void
 {
     (new class {
-        use \Hakoniwa\Model\FileIO;
-        public function a($p): void
-        {
-            $this->rimraf($p);
+        use \Hakoniwa\Model\FileIO {
+            rimraf as public;
         }
-    })->a($path);
+    })->rimraf($path);
 }
 
 
@@ -54,7 +52,7 @@ if (is_uploaded_file($file["tmp_name"])) {
         header("Content-Type:application/json;charset=utf-8");
         echo json_encode([
             "error" => "仕様外のzipファイルです。正しいファイルを再度アップロードしてください。",
-            "dir"    => $tmp_extract_to
+            "extract"    => $tmp_extract_to
         ]);
         rimraf($tmp_extract_to);
         exit;
@@ -63,7 +61,7 @@ if (is_uploaded_file($file["tmp_name"])) {
 
     $g_data = parse_ini_file($ddtf_path);
     $hkjm = file($hkjm_path[0], FILE_IGNORE_NEW_LINES);
-    $restoreTo = "hakoniwa".date("Ymd-HisT", $hkjm[1]).\Util::random_str(2);
+    $restoreTo = "data".date("Ymd-HisT", $hkjm[1])."_".\Util::random_str(2);
 
     // verify & data input
     $data = [
@@ -72,7 +70,7 @@ if (is_uploaded_file($file["tmp_name"])) {
         "backupTurn" => $hkjm[0] ?? -1,
         "zippedDate" => $g_data["REQUEST_TIME"] ?? 0,
         "restoreTo"  => $restoreTo ?? "",
-        "dir"        => $tmp_extract_to
+        "extract"    => basename($tmp_extract_to)
     ];
 }
 

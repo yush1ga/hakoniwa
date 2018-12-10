@@ -74,7 +74,7 @@ final class Zipper
             } else {
                 $src_rel_dir = mb_substr($src_dir, mb_strlen($root_dir));
                 $this->zip
-                    ->addDirRecursive($src_dir, "hakoniwa/{$src_rel_dir}/")
+                    ->addDirRecursive($src_dir, "hakoniwa/data/")
                     ->deleteFromGlob("**.zip")
                     ->deleteFromGlob("test*")
                     ->addFile(ROOT."config.php", "hakoniwa/config.php")

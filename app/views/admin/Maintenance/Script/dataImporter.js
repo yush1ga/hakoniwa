@@ -36,7 +36,11 @@ $(document).ready(()=>{
         $('#jsCheck .ui.button').attr('disabled', true);
         axios.post($baseDir+'/api/upload/zip_restore/', guest, axiosConf)
             .then(r => {
-                console.dir(r);
+                if (r.data.hasOwnProperty('done') && r.data.done) {
+                    alert('データのインポートが正常に終了しました！');
+                } else {
+                    alert(`なんらかの理由で失敗しました。\nページを再読み込みのうえ、もう一度お試しください。`);
+                }
             })
             .catch(e => {
                 console.dir(e);
@@ -50,7 +54,6 @@ $(document).ready(()=>{
                 console.dir(err);
             });
     };
-
 
 
 
@@ -87,7 +90,7 @@ $(document).ready(()=>{
                 const data = resp.data;
                 _$Check.find('.content').eq(0).show();
                 _$Check.find('.content').eq(1).hide();
-                guest.dir = data.dir;
+                guest.extract = data.extract;
                 guest.restoreTo = data.restoreTo;
 
                 if (data.hasOwnProperty('error')) {
@@ -102,9 +105,9 @@ $(document).ready(()=>{
                     $('#jsBackupDate').text(getDate(data.backupDate));
                     $('#jsZippedDate').text(getDate(data.zippedDate));
                     $('#jsRestoreTo').text(data.restoreTo);
-                    _$Check.find('button.ok').attr('disable', false);
+                    _$Check.find('button.ok').attr('disabled', false);
                 }
-                _$Check.find('button.cancel').attr('disable', false);
+                _$Check.find('button.cancel').attr('disabled', false);
             })
             .catch(err => {
                 _$Check.children('.header').text('【問題が発生しました】');

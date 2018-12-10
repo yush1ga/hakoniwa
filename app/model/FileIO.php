@@ -185,20 +185,7 @@ trait FileIO
 
     final protected function rimraf(string $path): bool
     {
-        if (!defined("ROOT")) {
-            throw new \RuntimeException("const `\ROOT` is not defined!");
-        }
-        $allowed_directory = [
-            ROOT,
-            sys_get_temp_dir()
-        ];
-        $path = $this->parse_path($path);
-
-        if (!\Util::starts_with($path, $allowed_directory)) {
-            throw new \InvalidArgumentException("path `$path` is not allowed to delete. [`{$allowed_directory[0]}`, `{$allowed_directory[1]}`]", 1);
-        }
-
-
+        $this->is_permittable_directory($path);
 
         if (is_file($path)) {
             return unlink(realpath($path));
@@ -224,14 +211,17 @@ trait FileIO
 
 
 
-    final protected function cp_a(string $from, string $to, bool $recursion = false): void
+    final protected function cp_a(string $from, string $to, bool $recursion = false): bool
     {
         $from = $this->parse_path($from);
         $to = $this->parse_path($to);
 
         if (!$recursion) {
+            $this->is_permittable_directory($from);
+            $this->is_permittable_directory($to);
+
             if (!is_dir($from)) {
-                throw new \InvalidArgumentExceptionException("Arguments must directory: `{$from}`.");
+                throw new \InvalidArgumentException("Arguments must directory: `{$from}`.");
             }
             if (!$this->is_usable_path($from)["dir"]) {
                 throw new \ErrorException("No have permission to Read/Write: `{$from}`.");
@@ -241,12 +231,10 @@ trait FileIO
                     throw new \ErrorException("No have permission to Read/Write: `{$to}`.");
                 }
             } else {
-                $t[0] = $this->is_usable_path($to)["dir"];
-                $t[1] = $this->filelist($to);
-                if (!$t[0]) {
+                if (!$this->is_usable_path($to)["dir"]) {
                     throw new \ErrorException("Already exists, but not be allow read/write: `{$to}`.");
                 }
-                if ($t[1] !== []) {
+                if ($this->filelist($to) !== []) {
                     throw new \ErrorException("Already exists and not empty directory: `{$to}`.");
                 }
             }
@@ -265,7 +253,7 @@ trait FileIO
         }
         unset($f, $t, $ls);
 
-        return;
+        return true;
     }
 
 
@@ -321,7 +309,7 @@ trait FileIO
             return hash_equals(hash_file("sha256", $orig), hash_file("sha256", $targ));
         }
 
-        throw new \InvalidArgumentExceptionException("You have to choose arguments pair either \"Directory-Directory\" or \"File-File\".");
+        throw new \InvalidArgumentException("You have to choose arguments pair either \"Directory-Directory\" or \"File-File\".");
     }
 
 
@@ -335,5 +323,24 @@ trait FileIO
         }
 
         return false;
+    }
+
+
+
+    final protected function is_permittable_directory(string $path): void
+    {
+        if (!defined("ROOT")) {
+            throw new \RuntimeException("const `ROOT` is not defined!");
+        }
+        $allowed_directory = [
+            ROOT,
+            sys_get_temp_dir(),
+            realpath(sys_get_temp_dir())
+        ];
+        $path = $this->parse_path(realpath($path) ?: $path);
+
+        if (!\Util::starts_with($path, $allowed_directory)) {
+            throw new \InvalidArgumentException("path `$path` is not allowed file I/O. [`{$allowed_directory[0]}`, `{$allowed_directory[1]}`, `{$allowed_directory[2]}`]", 1);
+        }
     }
 }
