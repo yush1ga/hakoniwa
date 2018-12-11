@@ -16,6 +16,7 @@ ini_set("mbstring.language", "Japanese");
 defined("WINDOWS") || define("WINDOWS", defined("PHP_WINDOWS_VERSION_MAJOR"));
 defined("DEBUG") || define("DEBUG", true);
 
+require "app/Helper/Util.php";
 require "app/model/FileIO.php";
 
 
@@ -36,7 +37,7 @@ final class Setup
     {
         $this->head_tmp = $this->mkdir_tmp();
         $this->current_tmp = $this->mkdir_tmp();
-        $this->rnd = $this->random_str();
+        $this->rnd = Util::random_str();
     }
 
 

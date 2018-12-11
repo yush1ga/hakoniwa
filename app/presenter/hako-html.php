@@ -2220,17 +2220,37 @@ class HtmlMente extends HTML
 EOT;
         }
         // バックアップデータがあれば表示
-        $dir = opendir(dirname($dirName));
-        $dirCld = false !== mb_strpos($dirName, "/") ? mb_substr(mb_strrchr($dirName, "/"), 1) : $dirName;
-        while (false !== ($dn = readdir($dir))) {
-            $_dirName = preg_quote($dirCld);
-            if (preg_match("/{$_dirName}\.bak(.*)$/", $dn, $matches)) {
+        $dir_parent = dirname($dirName);
+        $dir_escendant = false !== mb_strpos($dirName, "/") ? mb_substr(mb_strrchr($dirName, "/"), 1) : $dirName;
+        $preg_dir_escendant = preg_quote($dir_escendant);
+        $ls = \Util::ls($dir_parent)["dir"];
+
+        // [NOTE] 別順で並べたいからこんなザマだが、なにかいい方法はないですかね
+        foreach ($ls as $dir) {
+            if (preg_match("/{$preg_dir_escendant}\.bak(\d*)$/", $dir, $matches)) {
                 if (is_file("$dirName.bak{$matches[1]}/hakojima.dat")) {
                     $this->dataPrint($data, $matches[1]);
                 }
             }
         }
-        closedir($dir);
+        foreach ($ls as $dir) {
+            if (!preg_match("/{$preg_dir_escendant}\.bak(\d*)$/", $dir)) {
+                if (realpath($dir) !== realpath($dirName) && is_file("$dir/hakojima.dat")) {
+                    $this->dataPrintAlt($data, "$dir");
+                }
+            }
+        }
+        echo <<<EOT
+<hr>
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="download">
+    <input type="hidden" name="all_data" value="1">
+    <button type="submit" class="btn btn-default btn-block" onclick="return confirm('実行確認？')">【ベータ機能】 全データをダウンロードする（zip形式；時間がかかる事があります）</button>
+</form>
+<p>Ｑ「しばらく画面が固まったと思ったら真っ白になってデータもダウンロードできないんですが」<br>
+    Ａ「あきらめてください（対処法を検討中です）」</p>
+EOT;
     }
 
     // 表示モード
@@ -2254,19 +2274,25 @@ EOT;
 
         echo <<<END
 <h3>ターン：$lastTurn</h3>
-<p><strong>最終更新時刻</strong>：$timeString</p>
+<p><strong>更新時刻</strong>： $timeString</p>
 <form action="$this_file" method="post" class="form-group">
     <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
     <input type="hidden" name="mode" value="DELETE">
     <input type="hidden" name="NUMBER" value="$suf">
-    <button type="submit" class="btn btn-danger btn-sm">このデータを削除</button>
+    <button type="submit" class="btn btn-danger btn-sm" onClick="return confirm('sure?');">このデータを削除</button>
+</form>
+<form action="$this_file" method="post" class="form-group">
+    <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+    <input type="hidden" name="mode" value="download">
+    <input type="hidden" name="NUMBER" value="$suf">
+    <button type="submit" class="btn btn-info">ダウンロードする (zip)</button>
 </form>
 END;
         if (strcmp($suf, "") == 0) {
             $date = date('Y-m-d', $lastTime);
             $time = date('H:i', $lastTime);
             echo <<<END
-<h4>最終更新時刻の変更</h4>
+<h4>更新時刻の変更</h4>
 <form action="$this_file" method="post" class="form-inline">
 	<input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
 	<input type="hidden" name="mode" value="NTIME">
@@ -2286,6 +2312,41 @@ END;
 END;
         }
         println('</section>');
+    }
+
+    private function dataPrintAlt($data, $container_dir): void
+    {
+        global $init;
+        $this_file = $init->baseDir."/hako-mente.php";
+
+        $fp = fopen($container_dir."/hakojima.dat", "r");
+        $turn = (int)rtrim(fgets($fp, READ_LINE));
+        $time = (int)rtrim(fgets($fp, READ_LINE));
+        fclose($fp);
+        $str_time = self::timeToString($time);
+        $container_dir = \Util::htmlEscape($container_dir);
+
+        echo <<<EOL
+<hr>
+<section>
+    <h2>バックアップ <small>（<code>$container_dir</code>）</small></h2>
+    <h3>ターン：$turn</h3>
+    <p><strong>更新時刻</strong>：$str_time</p>
+    <form action="$this_file" method="post" class="form-group">
+        <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+        <input type="hidden" name="mode" value="DELETE">
+        <input type="hidden" name="targ" value="$container_dir">
+        <button type="submit" class="btn btn-danger btn-sm" onClick="return confirm('sure?');">このデータを削除</button>
+    </form>
+    <form action="$this_file" method="post" class="form-group">
+        <input type="hidden" name="PASSWORD" value="{$data['PASSWORD']}">
+        <input type="hidden" name="mode" value="download">
+        <input type="hidden" name="targ" value="$container_dir">
+        <button type="submit" class="btn btn-info">ダウンロードする (zip)</button>
+    </form>
+</section>
+
+EOL;
     }
 }
 

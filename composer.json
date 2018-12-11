@@ -1,10 +1,10 @@
 {
     "require-dev": {
         "friendsofphp/php-cs-fixer": "@stable",
-        "jakub-onderka/php-parallel-lint": "@stable",
         "jakub-onderka/php-console-highlighter": "@stable",
-        "psy/psysh": "@stable",
-        "phpunit/phpunit": "^7"
+        "jakub-onderka/php-parallel-lint": "@stable",
+        "phpunit/phpunit": "^7",
+        "psy/psysh": "^0.9.9"
     },
     "autoload": {
         "psr-4": {
@@ -17,7 +17,9 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "consolidation/robo": "@stable",
-        "ramsey/uuid": "^3.8"
+        "ramsey/uuid": "^3.8",
+        "nelexa/zip": "@stable",
+        "cebe/markdown": "@stable"
     },
     "scripts": {
         "fix": "php-cs-fixer fix --allow-risky=yes",

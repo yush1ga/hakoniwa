@@ -7,9 +7,8 @@ declare(strict_types=1);
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-class Util
+final class Util
 {
-
     /**
      * 資金を丸めて表示する
      * @param  integer $money 資金額
@@ -161,6 +160,8 @@ class Util
 
     public static function checkAdminPassword(string $p): bool
     {
+        global $init;
+
         if (!file_exists($init->passwordFile)) {
             \HakoError::probrem();
 
@@ -503,12 +504,22 @@ class Util
 
     /**
      * ランダムな文字列を返す
-     * @param  integer $max [description]
+     * @param  integer $length [description]
      * @return [type]       [description]
      */
-    public static function rand_string(int $max = 32): string
+    public static function random_str(int $length = 8): string
     {
-        return mb_substr(md5(uniqid(rand_number(), true)), 0, $max);
+        static $seeds;
+
+        if (!$seeds) {
+            $seeds = array_flip(array_merge(range("a", "z"), range("A", "Z"), range("0", "9")));
+        }
+        $str = "";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= array_rand($seeds);
+        }
+
+        return $str;
     }
 
     /**
@@ -656,6 +667,113 @@ class Util
         }
 
         return $s;
+    }
+
+    /**
+     * 文字列$strが$prefixから始まるかどうか
+     * @param  string $str    検索対象
+     * @param  mixed  $prefix 検索したい文字列・文字列の配列
+     * @return bool
+     */
+    public static function starts_with(string $str, $prefix): bool
+    {
+        $type = gettype($prefix);
+        switch ($type) {
+            case "string":
+                return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
+            case "array":
+                foreach ($prefix as $p) {
+                    if (mb_substr($str, 0, mb_strlen($p)) === $p) {
+                        return true;
+                    }
+                }
+
+                return false;
+        }
+
+        throw new \InvalidArgumentException("Arguments #1 require type of `String[] | String` (Actual `{$type}`)");
+    }
+
+
+
+    public static function get_anonymous_usage_arr(array $opt = [])
+    {
+        ob_start();
+        phpinfo();
+        $_phpinfo = ob_get_contents();
+        ob_end_clean();
+
+
+
+        return ["phpinfo" => $_phpinfo];
+    }
+
+
+
+    public static function ls(string $dir): array
+    {
+        $directory = new \DirectoryIterator($dir);
+        $ls = ["dir" => [], "file" => []];
+        foreach ($directory as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $ls[$fileinfo->getType()][] = $fileinfo->getPathname();
+            }
+        }
+
+        return $ls;
+    }
+
+
+    /**
+     * Thanks: https://stackoverflow.com/questions/17316873/convert-array-to-an-ini-file
+     * @return string
+     */
+    public static function arr2ini(array $arr, array $parent = []): string
+    {
+        $out = '';
+        foreach ($arr as $k => $v) {
+            if (is_array($v)) {
+                // subsection case
+                // merge all the sections into one array...
+                $sec = array_merge((array)$parent, (array)$k);
+                //add section information to the output
+                $out .= '['.implode('.', $sec).']'.PHP_EOL;
+                //recursively traverse deeper
+                $out .= self::arr2ini($v, $sec);
+            } else {
+                //plain key->value case
+                $v = (string)$v === "".(int)$v ? $v : "\"$v\"";
+                $out .= "$k=$v".PHP_EOL;
+            }
+        }
+
+        return $out;
+    }
+
+
+
+    public static function filelist(string $dir, array $exclude_prefix = []): array
+    {
+        $rii =  new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $dir,
+                \FilesystemIterator::SKIP_DOTS
+                | \FilesystemIterator::KEY_AS_PATHNAME
+                | \FilesystemIterator::CURRENT_AS_PATHNAME
+            ),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        $dir = realpath($dir);
+
+        $filelist = [];
+        foreach ($rii as $key => $value) {
+            $rel = mb_substr(realpath($key), mb_strlen($dir));
+            if (!self::starts_with($rel, $exclude_prefix)) {
+                $filelist[$rel] = $value;
+            }
+        }
+
+        return $filelist;
     }
 }
 

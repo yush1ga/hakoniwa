@@ -8,8 +8,11 @@ if (!defined("WINDOWS")) {
     throw new \ErrorException("Not defined: `WINDOWS`.");
 }
 
+require_once __DIR__."/../helper/util.php";
+
 trait FileIO
 {
+    // abstract private $init;
     // abstract private $file_path;
 
     final protected function read_gameboard_file(): bool
@@ -51,7 +54,7 @@ trait FileIO
     {
     }
 
-    final private function mkfile(string $filepath, string $content = ""): bool
+    final public function mkfile(string $filepath, string $content = ""): bool
     {
         $info = pathinfo($this->parse_path($filepath));
 
@@ -74,7 +77,7 @@ trait FileIO
 
 
 
-    final private function parse_path(string $path): string
+    final public function parse_path(string $path): string
     {
         $segments = preg_split("/(\/|\\\\)/", $path);
         $parsed_path = [];
@@ -89,7 +92,7 @@ trait FileIO
         }
 
         if ($segments[0] === "~") {
-            $home = WINDOWS ? getenv("USERPROFILE") : (getenv("PATH") ?? posix_getpwuid(posix_geteuid())["dir"]);
+            $home = WINDOWS ? getenv("USERPROFILE") : ($_SERVER["HOME"] ?? posix_getpwuid(posix_geteuid())["dir"]);
 
             if (false !== $home) {
                 return $this->parse_path($home.mb_substr($path, 1));
@@ -182,8 +185,10 @@ trait FileIO
 
     final protected function rimraf(string $path): bool
     {
-        if (is_file($this->parse_path($path))) {
-            return unlink(realpath($this->parse_path($path)));
+        $this->is_permittable_directory($path);
+
+        if (is_file($path)) {
+            return unlink(realpath($path));
         }
 
         $ls = array_diff(scandir($path), [".", ".."]);
@@ -199,12 +204,22 @@ trait FileIO
 
 
 
-    final protected function cp_a(string $from, string $to, bool $recursion = false): void
+    final protected function prune(string $path): bool
+    {
+        return false;
+    }
+
+
+
+    final protected function cp_a(string $from, string $to, bool $recursion = false): bool
     {
         $from = $this->parse_path($from);
         $to = $this->parse_path($to);
 
         if (!$recursion) {
+            $this->is_permittable_directory($from);
+            $this->is_permittable_directory($to);
+
             if (!is_dir($from)) {
                 throw new \InvalidArgumentException("Arguments must directory: `{$from}`.");
             }
@@ -216,12 +231,10 @@ trait FileIO
                     throw new \ErrorException("No have permission to Read/Write: `{$to}`.");
                 }
             } else {
-                $t[0] = $this->is_usable_path($to)["dir"];
-                $t[1] = $this->filelist($to);
-                if (!$t[0]) {
+                if (!$this->is_usable_path($to)["dir"]) {
                     throw new \ErrorException("Already exists, but not be allow read/write: `{$to}`.");
                 }
-                if ($t[1] !== []) {
+                if ($this->filelist($to) !== []) {
                     throw new \ErrorException("Already exists and not empty directory: `{$to}`.");
                 }
             }
@@ -240,7 +253,7 @@ trait FileIO
         }
         unset($f, $t, $ls);
 
-        return;
+        return true;
     }
 
 
@@ -261,7 +274,7 @@ trait FileIO
         $filelist = [];
         foreach ($rii as $key => $value) {
             $rel = mb_substr(realpath($key), mb_strlen($dir));
-            if (!$this->starts_with($rel, $exclude_prefix)) {
+            if (!\Util::starts_with($rel, $exclude_prefix)) {
                 $filelist[$rel] = $value;
             }
         }
@@ -303,7 +316,7 @@ trait FileIO
 
     final protected function mkdir_tmp(string $suffix = "")
     {
-        $suffix = $suffix !== "" ?: $this->random_str();
+        $suffix = $suffix !== "" ?: \Util::random_str();
         $tmp_dir = $this->parse_path(sys_get_temp_dir().DIRECTORY_SEPARATOR.$suffix);
         if (mkdir($tmp_dir, 0777, true)) {
             return $tmp_dir;
@@ -313,42 +326,21 @@ trait FileIO
     }
 
 
-    // [TODO] move to \Util
-    final private function random_str(int $length = 8): string
+
+    final protected function is_permittable_directory(string $path): void
     {
-        static $seeds;
-
-        if (!$seeds) {
-            $seeds = array_flip(array_merge(range("a", "z"), range("A", "Z"), range("0", "9")));
+        if (!defined("ROOT")) {
+            throw new \RuntimeException("const `ROOT` is not defined!");
         }
-        $str = "";
-        for ($i = 0; $i < $length; $i++) {
-            $str .= array_rand($seeds);
+        $allowed_directory = [
+            ROOT,
+            sys_get_temp_dir(),
+            realpath(sys_get_temp_dir())
+        ];
+        $path = $this->parse_path(realpath($path) ?: $path);
+
+        if (!\Util::starts_with($path, $allowed_directory)) {
+            throw new \InvalidArgumentException("path `$path` is not allowed file I/O. [`{$allowed_directory[0]}`, `{$allowed_directory[1]}`, `{$allowed_directory[2]}`]", 1);
         }
-
-        return $str;
-    }
-
-    // [TODO] move to \
-    final private function starts_with(string $str, $prefix): bool
-    {
-        $type = gettype($prefix);
-        switch ($type) {
-            case "string":
-                $prefix = $prefix[0] === DIRECTORY_SEPARATOR ?: DIRECTORY_SEPARATOR.$prefix;
-
-                return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
-            case "array":
-                foreach ($prefix as $p) {
-                    $p = $p[0] === DIRECTORY_SEPARATOR ?: DIRECTORY_SEPARATOR.$p;
-                    if (mb_substr($str, 0, mb_strlen($p)) === $p) {
-                        return true;
-                    }
-                }
-
-                return false;
-        }
-
-        throw new \InvalidArgumentException("Arguments #1 require type of `String[] | String` (Actual `{$type}`)");
     }
 }
