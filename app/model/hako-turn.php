@@ -4313,7 +4313,8 @@ class Turn
                     // ワープできる
                     if ($special & 0x40) {
                         // 確率でワープ発生
-                        if (random_int(0, 100) < 20) {
+                        // if (random_int(0, 100) < 20) {
+                        if (false) { // [WIP]
                             $tIsland = [];
 
                             // 自分の島にワープする（初期値）
@@ -4326,7 +4327,11 @@ class Turn
                             // （自島にワープ；ただしBFを除く）
                             if ($tIsland["isBF"]) {
                                 // noop
-                            } elseif (Util::hasIslandAttribute($tIsland, ["newbie", "sleep", "monster"], ["islandTurn" => $hako->islandTurn, "level" => $monsSpec["rank"]])) {
+                            } elseif (Util::hasIslandAttribute(
+                                $tIsland,
+                                ["newbie", "sleep", "monster"],
+                                ["islandTurn" => $hako->islandTurn, "level" => $monsSpec["rank"]]
+                            )) {
                                 $tIsland =& $island;
                             }
 
