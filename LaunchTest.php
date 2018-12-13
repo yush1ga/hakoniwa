@@ -56,7 +56,7 @@ final class LaunchTest extends \Hakoniwa\Init
         $hash_local = hash_file("sha256", ROOT."/LICENSE");
         $hash_remote = hash_file("sha256", "https://www.gnu.org/licenses/agpl-3.0.txt");
         if (!hash_equals($hash_local, $hash_remote)) {
-            throw new \Exception("ライセンスファイルの内容が間違っています。ライセンス内容を今一度確認のうえ、プログラムの再インストールを推奨します。");
+            throw new \Exception("ライセンスファイルの内容が間違っています。プログラムの再インストールを推奨します。");
         }
     }
 
