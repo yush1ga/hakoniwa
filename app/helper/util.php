@@ -332,7 +332,7 @@ final class Util
         global $init;
 
         // それぞれずらす
-        array_splice($command, $number, 1);
+        array_splice($command, (int)$number, 1);
 
         // 最後に資金繰り
         $command[$init->commandMax - 1] = [
@@ -775,14 +775,4 @@ final class Util
 
         return $filelist;
     }
-}
-
-
-
-function println(...$strs): void
-{
-    foreach ($strs as $str) {
-        echo $str;
-    }
-    echo PHP_EOL;
 }

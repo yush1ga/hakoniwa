@@ -28,7 +28,7 @@ class File
      * String csv to integers array
      * @param  string $csv
      */
-    protected function csv2ia(string $csv): array
+    protected function csv2intArr(string $csv): array
     {
         $str_arr = explode(",", $csv);
 
@@ -107,7 +107,7 @@ class File
         $name = rtrim(fgets($fp, READ_LINE));
         [$name, $owner, $monster, $port, $ship0, $ship1, $ship2, $ship3, $ship4, $ship5, $ship6, $ship7, $ship8, $ship9, $ship10, $ship11, $ship12, $ship13, $ship14] = array_pad(explode(",", $name), 20, 0);
         $id = rtrim(fgets($fp, READ_LINE));
-        [$id, $starturn, $isBF, $keep] = array_pad(explode(",", $id), 4, 0);
+        [$id, $starturn, $isBF, $keep] = array_pad($this->csv2intArr($id), 4, 0);
         if ($isBF) {
             $isBF = 1;
         }
@@ -115,32 +115,29 @@ class File
             $keep = 1;
         }
         $prize = rtrim(fgets($fp, READ_LINE));
-        $absent = rtrim(fgets($fp, READ_LINE));
+        $absent = (int)rtrim(fgets($fp, READ_LINE));
         $comment = rtrim(fgets($fp, READ_LINE));
         [$comment, $comment_turn] = array_pad(explode(",", $comment), 2, 0);
         $password = rtrim(fgets($fp, READ_LINE));
         $point = rtrim(fgets($fp, READ_LINE));
-        [$point, $pots] = array_pad($this->csv2ia($point), 2, null);
+        [$point, $pots] = array_pad($this->csv2intArr($point), 2, null);
         $eisei = rtrim(fgets($fp, READ_LINE));
-        [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5] = array_pad($this->csv2ia($eisei), 6, 0);
         $zin = rtrim(fgets($fp, READ_LINE));
-        [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6] = array_pad($this->csv2ia($zin), 7, 0);
         $item = rtrim(fgets($fp, READ_LINE));
-        [$item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19, $item20] = array_pad(explode(",", $item), 21, null);
         $money = rtrim(fgets($fp, READ_LINE));
-        [$money, $lot, $gold] = array_pad($this->csv2ia($money), 3, 0);
+        [$money, $lot, $gold] = array_pad($this->csv2intArr($money), 3, 0);
         $food = rtrim(fgets($fp, READ_LINE));
-        [$food, $rice] = array_pad($this->csv2ia($food), 2, 0);
+        [$food, $rice] = array_pad($this->csv2intArr($food), 2, 0);
         $pop = rtrim(fgets($fp, READ_LINE));
-        [$pop, $peop] = array_pad($this->csv2ia($pop), 2, 0);
-        $area = rtrim(fgets($fp, READ_LINE));
+        [$pop, $peop] = array_pad($this->csv2intArr($pop), 2, 0);
+        $area = (int)rtrim(fgets($fp, READ_LINE));
         $job = rtrim(fgets($fp, READ_LINE));
-        [$farm, $factory, $commerce, $mountain, $hatuden] = array_pad($this->csv2ia($job), 5, 0);
+        [$farm, $factory, $commerce, $mountain, $hatuden] = array_pad($this->csv2intArr($job), 5, 0);
         $power = rtrim(fgets($fp, READ_LINE));
-        [$taiji, $rena, $fire] = array_pad($this->csv2ia($power), 3, 0);
+        [$taiji, $rena, $fire] = array_pad($this->csv2intArr($power), 3, 0);
         $tenki = rtrim(fgets($fp, READ_LINE));
         $soccer = rtrim(fgets($fp, READ_LINE));
-        [$soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten] = array_pad($this->csv2ia($soccer), 10, 0);
+        [$soccer, $team, $shiai, $kachi, $make, $hikiwake, $kougeki, $bougyo, $tokuten, $shitten] = array_pad($this->csv2intArr($soccer), 10, 0);
 
         $this->idToName[$id] = $name;
 
@@ -228,12 +225,11 @@ class File
             'land'         => $land ?? "",
             'landValue'    => $landValue ?? "",
             'command'      => $command ?? "",
-            'lbbs'         => $lbbs ?? "",
             'port'         => $port,
             'ship'         => [$ship0, $ship1, $ship2, $ship3, $ship4, $ship5, $ship6, $ship7, $ship8, $ship9, $ship10, $ship11, $ship12, $ship13, $ship14],
-            'eisei'        => [$eisei0, $eisei1, $eisei2, $eisei3, $eisei4, $eisei5],
-            'zin'          => [$zin0, $zin1, $zin2, $zin3, $zin4, $zin5, $zin6],
-            'item'         => [$item0, $item1, $item2, $item3, $item4, $item5, $item6, $item7, $item8, $item9, $item10, $item11, $item12, $item13, $item14, $item15, $item16, $item17, $item18, $item19, $item20],
+            'eisei'        => array_pad($this->csv2intArr($eisei), 6, 0),
+            'zin'          => array_pad($this->csv2intArr($zin), 7, 0),
+            'item'         => array_pad(explode(",", $item), 21, null),
         ];
     }
     /**
@@ -262,8 +258,8 @@ class File
 
         for ($y = 0; $y < $init->islandSize; $y++) {
             for ($x = 0; $x < $init->islandSize; $x++) {
-                $land[$x][$y] %= 256;// 0-FF
-                $landValue[$x][$y] %= 1048576;// 0-FFFFF
+                $land[$x][$y] %= 0xFF;
+                $landValue[$x][$y] %= 0xFFFFF;
                 $l = sprintf("%02x%05x", $land[$x][$y], $landValue[$x][$y]);
                 fwrite($fp_i, $l);
             }
@@ -273,14 +269,14 @@ class File
         $commands = $island['command'];
         for ($i = 0; $i < $init->commandMax; $i++) {
             $com = sprintf(
-                "%d,%d,%d,%d,%d\n",
+                "%d,%d,%d,%d,%d",
                 $commands[$i]['kind'],
                 $commands[$i]['target'],
                 $commands[$i]['x'],
                 $commands[$i]['y'],
                 $commands[$i]['arg']
             );
-            fwrite($fp_i, $com);
+            fwrite($fp_i, $com."\n");
         }
 
         fclose($fp_i);

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 // [NOTE] 開発中だと"Router.php"が頭にくるので不発
-$fail_1 = get_included_files()[0] === __FILE__;
+$fail_1 = in_array(__FILE__, [get_included_files()[0], get_included_files()[1]], true);
 $fail_2 = $_SERVER["REQUEST_METHOD"] !== "POST";
 if ($fail_1 || $fail_2) {
     header("HTTP/1.0 500 Internal Server Error", true, 500);

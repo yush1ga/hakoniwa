@@ -16,10 +16,10 @@ function rimraf(string $path): bool
     })->rimraf($path);
 }
 
-$data["exist"] = is_dir($INPUT["dir"]);
+$data["exist"] = is_dir($INPUT["extract"]);
 if ($data["exist"]) {
     try {
-        $data["result"] = rimraf($INPUT["dir"]);
+        $data["result"] = rimraf($INPUT["extract"]);
     } catch (\InvalidArgumentException $e) {
         $data["result"] = false;
     }

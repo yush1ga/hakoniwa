@@ -10,7 +10,8 @@
         "psr-4": {
             "load\\": "./"
         },
-        "classmap": ["./"]
+        "classmap": ["./"],
+        "files": ["src/fnc.php"]
     },
     "require": {
         "php": ">=7.1.0",
