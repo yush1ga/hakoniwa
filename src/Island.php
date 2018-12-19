@@ -1,7 +1,11 @@
 <?php
 
-abstract class Island
+class Island
 {
+    /**
+     * 島名
+     * @var string
+     */
     private $name;
     private $owner_name;
     private $num_monster;

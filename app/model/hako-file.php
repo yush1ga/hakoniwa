@@ -9,17 +9,17 @@ class File
 {
     use \Hakoniwa\Model\FileIO;
 
-    public $islandTurn;      // 現在ターン数
-    public $islandLastTime;  // 最終更新時刻
-    public $islandNumber;    // 島の総数
-    public $islandNextID;    // 次に割り当てる島ID
-    public $islands;         // 全島の情報を格納
-    public $idToNumber;
-    public $idToName;
+    public $islandTurn;       // 現在ターン数
+    public $islandLastTime;   // 最終更新時刻
+    public $islandNumber;     // 島の総数
+    public $islandNextID;     // 次に割り当てる島ID
+    public $islands;          // 全島の情報を格納
+    public $idToNumber;       // 島IDから @islands[] のキー番への索引
+    public $idToName;         // 島IDから島名への索引
     public $islandNumberBF;   // BFに設定されている島の数
-    public $islandNumberNoBF; // 普通の島の数
+    public $islandNumberNoBF; // BFではない島の数
     public $islandNumberKP;   // 管理人預かりに設定されている島の数
-    public $islandNumberNoKP; // 普通の島の数
+    public $islandNumberNoKP; // 管理人預かりではない島の数
     public $allyNumber;       // 同盟の総数
     public $ally;             // 各同盟の情報を格納
     public $idToAllyNumber;
@@ -51,6 +51,7 @@ class File
             return false;
         }
         $fp = fopen($fileName, "r");
+
         $this->islandTurn = (int)rtrim(fgets($fp, READ_LINE));
         $this->islandLastTime = (int)rtrim(fgets($fp, READ_LINE));
         $str = rtrim(fgets($fp, READ_LINE));
@@ -68,10 +69,11 @@ class File
             $num = -1;
         }
 
-        // 特殊島の数かぞえ
+        // 特殊島の数
         $islandNumberBF = $islandNumberKP = 0;
         for ($i = 0; $i < $this->islandNumber; $i++) {
             $this->islands[$i] = $this->readIsland($fp, $num);
+
             if ($this->islands[$i]['isBF']) {
                 $islandNumberBF++;
             }
@@ -97,10 +99,10 @@ class File
     /**
      * datから島ひとつ分読み込む
      * @param  [type] $fp  [description]
-     * @param  [type] $num [description]
+     * @param  int    $num [description]
      * @return [type]      [description]
      */
-    public function readIsland($fp, $num)
+    public function readIsland($fp, int $num)
     {
         global $init;
 
@@ -108,12 +110,6 @@ class File
         [$name, $owner, $monster, $port, $ship0, $ship1, $ship2, $ship3, $ship4, $ship5, $ship6, $ship7, $ship8, $ship9, $ship10, $ship11, $ship12, $ship13, $ship14] = array_pad(explode(",", $name), 20, 0);
         $id = rtrim(fgets($fp, READ_LINE));
         [$id, $starturn, $isBF, $keep] = array_pad($this->csv2intArr($id), 4, 0);
-        if ($isBF) {
-            $isBF = 1;
-        }
-        if ($keep) {
-            $keep = 1;
-        }
         $prize = rtrim(fgets($fp, READ_LINE));
         $absent = (int)rtrim(fgets($fp, READ_LINE));
         $comment = rtrim(fgets($fp, READ_LINE));
@@ -141,16 +137,17 @@ class File
 
         $this->idToName[$id] = $name;
 
-        if (($num == -1) || ($num == $id)) {
+        if (($num === -1) || ($num === $id)) {
 
             // データファイルの存在チェック
-            $fp_i = (file_exists("{$init->dirName}/island.{$id}")) ? fopen("{$init->dirName}/island.{$id}", "r") : false;
+            $fp_i = (file_exists("{$init->dirName}/island.{$id}"))
+                ? fopen("{$init->dirName}/island.{$id}", "r")
+                : false;
             if ($fp_i === false) {
                 HTML::header();
                 HakoError::problem();
                 exit;
             }
-
 
             // 地形
             $offset = 7; // 一対のデータが何文字か
