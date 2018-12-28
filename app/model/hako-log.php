@@ -37,6 +37,9 @@ class LogIO
             }
         }
     }
+
+
+
     /**
      * 最近の出来事を出力
      * @param  integer $num  [description]
@@ -46,8 +49,7 @@ class LogIO
      */
     public function logFilePrint($num = 0, $id = 0, $mode = 0): void
     {
-        global $init;
-        $fileName = $init->dirName . "/hakojima.log" . $num;
+        $fileName = $this->init->dirName . "/hakojima.log" . $num;
         if (!is_file($fileName)) {
             return;
         }
@@ -75,6 +77,9 @@ class LogIO
         println('</div>');
         fclose($fp);
     }
+
+
+
     /**
      * 海域の近況を出力
      */
@@ -84,13 +89,15 @@ class LogIO
         if (!is_file($fileName)) {
             return;
         }
-
         $histories = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?? [];
         foreach (array_reverse($histories) as $history) {
             [$turn, $log] = explode(",", $history, 2);
             println('<li><span class="number">ターン', $turn, '</span>：', $log, '</li>');
         }
     }
+
+
+
     /**
      * 発見の記録を保存
      */
@@ -99,6 +106,9 @@ class LogIO
         $fileName = $this->init->dirName."/hakojima.his";
         file_put_contents($fileName, "{$GLOBALS['ISLAND_TURN']},{$str}\n", FILE_APPEND | LOCK_EX);
     }
+
+
+
     /**
      * 発見の記録ログ調整
      */
@@ -122,6 +132,9 @@ class LogIO
             fclose($fp);
         }
     }
+
+
+    
     /**
      * 通常ログ
      * @param  string $str log statement
@@ -133,6 +146,8 @@ class LogIO
     {
         $this->logPool[] = "0,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}";
     }
+
+
 
     /**
      * 機密ログ
@@ -157,6 +172,9 @@ class LogIO
     {
         $this->lateLogPool[] = "0,{$GLOBALS['ISLAND_TURN']},{$id},{$tid},{$str}";
     }
+
+
+
     //---------------------------------------------------
     // ログ書き出し
     //---------------------------------------------------
