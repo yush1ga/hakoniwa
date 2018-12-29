@@ -53,7 +53,8 @@ return PhpCsFixer\Config::create()
 		'no_unneeded_curly_braces' => true,
 		'no_whitespace_before_comma_in_array' => true,
 		'no_whitespace_in_blank_line' => true,
-		'trailing_comma_in_multiline_array' => false
+		'trailing_comma_in_multiline_array' => false,
+		'standardize_not_equals' => true
 	])
 	->setFinder($finder)
 ;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Hakoniwa;
 
 require_once __DIR__."/config.php";
-require_once __DIR__."/hako-init.php";
 
 /**
 * LaunchTest (Assert)
@@ -14,7 +13,6 @@ final class LaunchTest extends \Hakoniwa\Init
 {
     private $needExts = [
         "mbstring",
-        "zip",
         "pdo", // composer周りで使う
         "dom" // composer周りで使う
     ];

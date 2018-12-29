@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Hakoniwa;
 
+require_once "config.php";
+
 /**
  * 箱庭諸島 S.E
  * @copyright 箱庭諸島 ver2.30
  * @since 箱庭諸島 S.E ver23_r09 by SERA
  * @author hiro <@hiro0218>
  */
-
-require_once "config.php";
-
 class InitDefault
 {
     /**
