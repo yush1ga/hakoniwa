@@ -1778,7 +1778,11 @@ class HakoEdit extends File
 
 class HakoPresent extends File
 {
-    public $islandList; // 島リスト
+    /**
+     * 島リスト
+     * @var [type]
+     */
+    public $islandList = '<option value="0"></option>'.PHP_EOL;
 
     public function init($cgi): void
     {
@@ -1786,7 +1790,6 @@ class HakoPresent extends File
         $this->readIslandsFile($cgi);
         $this->readPresentFile();
 
-        $this->islandList = '<option value="0"></option>'.PHP_EOL;
         for ($i = 0; $i < ($this->islandNumber); $i++) {
             $name = $this->islands[$i]['name'];
             $id   = $this->islands[$i]['id'];

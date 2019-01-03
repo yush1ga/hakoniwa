@@ -11,7 +11,7 @@
         "psr-4": {
             "Rekoniwa\\": "src/"
         },
-        "files": ["src/fnc.php"]
+        "files": ["src/function.php"]
     },
     "require": {
         "php": ">=7.1.0",

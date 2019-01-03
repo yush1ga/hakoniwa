@@ -257,6 +257,10 @@ final class Util
                     unset($level);
 
                     break;
+                case "absent":
+                    $match = $island['absent'] > $init->giveupTurn;
+
+                    break;
                 default:
                     throw new \InvalidArgumentException("Wrong attribute: `{$f}`.");
             }

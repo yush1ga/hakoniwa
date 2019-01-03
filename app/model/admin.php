@@ -5,7 +5,7 @@
  */
 class Admin
 {
-    protected $mode;
+    public $mode;
     protected $dataSet = [];
     protected $d_dataSet = [];
     private const POINTER = [

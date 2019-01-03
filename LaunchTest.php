@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Hakoniwa;
 
-require_once __DIR__."/config.php";
+require_once "hako-init-default.php";
+require_once "hako-init.php";
 
 /**
 * LaunchTest (Assert)
+  [NOTE] autoload より先に居ないとチェック走らす意味がないので
+         ここまではrequire地獄
 */
 final class LaunchTest extends \Hakoniwa\Init
 {
@@ -32,7 +35,7 @@ final class LaunchTest extends \Hakoniwa\Init
             }
         }
         if ($noHaveExt !== "") {
-            $noHaveExt = mb_substr($noHaveExt, 2);
+            $noHaveExt = substr($noHaveExt, 2);
 
             throw new \Error("動作に必要なPHPモジュール`$noHaveExt`が読み込まれていません。");
         }

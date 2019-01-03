@@ -97,8 +97,9 @@ class Turn
                 continue;
             }
             // 戻り値1になるまで繰り返し
-            while ($this->doCommand($hako, $hako->islands[$i]) == 0) {
+            while ($this->doCommand($hako, $hako->islands[$i]) === 0) {
             }
+
             // 整地ログ（出力をまとめる場合）
             if ($init->logOmit) {
                 $this->logMatome($hako->islands[$i]);
@@ -152,11 +153,12 @@ class Turn
         $this->islandSort($hako);
 
         // ターン杯対象ターンだったら、その処理
-        if (($hako->islandTurn % $init->turnPrizeUnit) == 0) {
+        if ($hako->islandTurn % $init->turnPrizeUnit === 0) {
             $island = $hako->islands[0];
             $this->log->prize($island['id'], $island['name'], $hako->islandTurn.$init->prizeName[0]);
             $hako->islands[0]['prize'] .= $hako->islandTurn.",";
         }
+
         // 残存島数更新
         $hako->islandNumber = $remainNumber;
 
@@ -171,7 +173,7 @@ class Turn
         }
 
         // バックアップ実行 ターン判定・処理
-        if ($hako->islandTurn % $init->backupTurn == 0) {
+        if ($hako->islandTurn % $init->backupTurn === 0) {
             $hako->backUp();
         }
 
@@ -252,10 +254,7 @@ class Turn
         $prize     = &$island['prize'];
 
         if ($kind == $init->comDoNothing) {
-            if ($island['isBF'] == 1) {
-                $island['money'] = $init->maxMoney;
-                $island['food'] = $init->maxFood;
-            } else {
+            if ($island['isBF'] !== 1) {
                 $island['money'] += 10;
                 $island['absent']++;
                 if (DEBUG) {
@@ -5754,6 +5753,13 @@ class Turn
     public function income(&$island): void
     {
         global $init;
+
+        if ($island["isBF"] === 1) {
+            $island['money'] = $init->maxMoney;
+            $island['food'] = $init->maxFood;
+
+            return;
+        }
 
         $pop      = $island['pop']/*00.*/;
         $farmer   = $island['farm']/*000.*/    *10;

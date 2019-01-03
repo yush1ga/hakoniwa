@@ -12,6 +12,11 @@ require_once __DIR__."/../config.php";
  */
 final class Island
 {
+    private const RATE_FOOD_PER_FARMER = 10;
+    private const RATE_MONEY_PER_INDUSTRY = 20;
+    private const RATE_MONEY_PER_COMMERCE = 20;
+
+
     /**
      * 島名
      * @var string
@@ -52,7 +57,7 @@ final class Island
 
 
 
-    public function __constract($ordinal)
+    public function __construct($ordinal)
     {
         // $init = new \Hakoniwa\Init;
 
@@ -66,13 +71,24 @@ final class Island
         $hakojimadat_eachsize = 18;
         $_base = $hakojimadat_offset + ($hakojimadat_eachsize * $ordinal);
 
-        function csv2mixedArr(string $csv, mixed $pad = ""): array
+        function csv2mixedArr(string $csv, $pad = ""): array
         {
-            return array_pad(explode(",", $csv), mb_substr_count($csv, ",") + 1, $pad);
+            return array_pad(
+                explode(",", $csv),
+                mb_substr_count($csv, ",") + 1,
+                $pad
+            );
         }
-        function csv2intArr(string $csv, mixed $pad = 0): array
+        function csv2intArr(string $csv, $pad = 0): array
         {
-            return array_map("intval", array_pad($csv, mb_substr_count($csv, ",") + 1, $pad));
+            return array_map(
+                "intval",
+                array_pad(
+                    explode(",", $csv),
+                    mb_substr_count($csv, ",") + 1,
+                    $pad
+                )
+            );
         }
 
         $hakojimadat = file(ROOT.DS.$init->dirName.DS."hakojima.dat", FILE_IGNORE_NEW_LINES);
@@ -94,7 +110,7 @@ final class Island
             $this->is_battlefield, $this->is_keep
         ] = csv2intArr($hakojimadat[$_base + 1]);
         $this->prizes = trim($hakojimadat[$_base + 2]);
-        $this->absent = trim($hakojimadat[$_base + 3]);
+        $this->absent = intval(trim($hakojimadat[$_base + 3]), 10);
         [
             $this->comment, $this->comment_date_turn
         ] = csv2mixedArr($hakojimadat[$_base + 4]);
@@ -132,7 +148,7 @@ final class Island
             $this->millitary_force_lv,
             $this->num_launchable_missile
         ] = csv2intArr($hakojimadat[$_base + 15]);
-        $this->weather = trim($hakojimadat[$_base + 16]);
+        $this->weather = intval(trim($hakojimadat[$_base + 16]), 10);
         [
             $this->soccer["point"],
             $this->soccer["match"],
@@ -145,5 +161,67 @@ final class Island
             $this->soccer["got"],
             $this->soccer["stole"]
         ] = csv2intArr($hakojimadat[$_base + 17]);
+    }
+
+
+
+    public function getPublicDataJson(): string
+    {
+        $list = [
+            "name",
+            "owner_name",
+            "num_monster",
+            "num_port",
+            "ships",
+            "id",
+            "start_turn",
+            "is_battlefield",
+            "is_keep",
+            "prizes",
+            "absent",
+            "comment",
+            "comment_date_turn",
+            "point",
+            "point_priv",
+            "satelites",
+            "zins",
+            "items",
+            "money",
+            "money_priv",
+            "num_lottery",
+            "food",
+            "food_priv",
+            "population",
+            "population_priv",
+            "area",
+            "population_of",
+            "num_defeat_monster",
+            "millitary_force_lv",
+            "num_launchable_missile",
+            "weather",
+            "soccer",
+        ];
+
+        $preJsonArray = [];
+
+        foreach ($list as $v) {
+            $preJsonArray[$v] = $this->$v;
+        }
+
+        $json = json_encode($preJsonArray, JSON_UNESCAPED_UNICODE);
+
+        return $json !== false ? $json : "{}";
+    }
+
+
+
+    public function income()
+    {
+
+    }
+
+    public function expense()
+    {
+
     }
 }

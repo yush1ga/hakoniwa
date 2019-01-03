@@ -1,8 +1,4 @@
-interface CommandRequire {
-	readonly TARGET_RIVAL: boolean,
-	readonly POINT: boolean,
-	readonly NET: boolean
-}
+type CommandRequire = 'TARGET_RIVAL' | 'POINT' | 'NET';
 
 interface CommandCost {
 	readonly CASH?: number,
@@ -25,15 +21,18 @@ abstract class CommandBase
 	abstract NAME: string;
 	abstract COST: CommandCost;
 	abstract REWARD: CommandReward;
-	abstract REQUIRE: CommandRequire;
-    abstract exec: () => boolean;
-    abstract isExecutable: () => boolean;
+	abstract REQUIRE: CommandRequire[] | null;
+	abstract exec: () => boolean;
+	abstract isExecutable: () => boolean;
 }
 
 
 class 整地 extends CommandBase
 {
+	NAME = '整地';
 	COST = {
 		CASH: 5
-	}
+	};
+	REQUIRE = ['POINT'];
+
 }

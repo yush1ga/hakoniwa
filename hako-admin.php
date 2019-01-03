@@ -8,9 +8,6 @@
 namespace Hakoniwa;
 
 require_once 'config.php';
-require_once MODEL.'/hako-cgi.php';
-require_once PRESENTER.'/hako-html.php';
-require_once CONTROLLER.'/admin/index.php';
 
-$init = new \Hakoniwa\Init();
-$exec = new Admin\Main();
+$init = new \Hakoniwa\Init;
+$exec = new Admin\Main;

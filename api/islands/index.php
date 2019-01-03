@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 require __DIR__."/../../config.php";
 
-use \Rekoniwa\Island;
+
 
 $gethost = function () {
     $https  = $_SERVER["HTTPS"] ?? "";
@@ -25,13 +25,14 @@ if ($_SERVER["HTTP_ORIGIN"] ?? "" !== $gethost["host"]) {
 
 
 // $requiredID = parse_url($gethost["url"], PHP_URL_FRAGMENT);
-parse_str(parse_url($gethost["url"], PHP_URL_QUERY), $query);
+parse_str(parse_url($gethost["url"], PHP_URL_QUERY) ?? "", $query);
 
-// dump($query);
+
 
 // (int)$query["r"]
 
-$isl = new Island((int)$query["r"]);
-// $isl = new \Hakoniwa\Init;
-dump($isl);
+$isl = new \Rekoniwa\Island((int)$query["r"]);
+
+dump($isl->getPublicDataJson());
+// dump($isl);
 // dump($isl->getIslandDataFromLegacyDB());

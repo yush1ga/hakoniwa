@@ -19,7 +19,7 @@ class Present extends \Admin
         $cgi->getCookies();
         $html->header();
 
-        if (\Util::checkPassword('', $this->dataSet['PASSWORD'])) {
+        if (\Util::checkPassword('', $this->dataSet['PASSWORD'] ?? "")) {
             switch ($this->mode) {
                 case "PRESENT":
                     $this->presents($this->dataSet, $hako);

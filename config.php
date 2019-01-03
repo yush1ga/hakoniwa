@@ -34,15 +34,19 @@ define("MODEL", realpath(APP.DS."model".DS).DS);
 define("PRESENTER", realpath(APP.DS."presenter".DS).DS);
 define("VIEWS", realpath(APP.DS."views".DS).DS);
 
+// LaunchTest
+// [NOTE] autoload より先に居ないとチェック走らす意味がないので
+//        ここまではrequire地獄
+require_once __DIR__."/LaunchTest.php";
+
 // Composer/Autoloader
-if ((mb_substr(__DIR__, 0, mb_strlen(sys_get_temp_dir())) !== sys_get_temp_dir())
+// [NOTE] Autoload前なのでfunction.php利用不可
+if (
+    (mb_substr(__DIR__, 0, mb_strlen(sys_get_temp_dir())) !== sys_get_temp_dir())
     && is_file(ROOT."vendor/autoload.php")
 ) {
     require_once "vendor/autoload.php";
 }
-
-// LaunchTest
-require_once __DIR__."/LaunchTest.php";
 
 // Common requires.
 use \Hakoniwa\Helper\Util;

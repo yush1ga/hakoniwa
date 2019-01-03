@@ -10,12 +10,7 @@ namespace Hakoniwa;
  */
 
 require_once 'config.php';
-require_once MODEL.'/admin.php';
-require_once MODEL.'/hako-cgi.php';
-require_once MODEL.'/hako-file.php';
-require_once PRESENTER.'/hako-html.php';
-require_once CONTROLLER.'/admin/present.php';
 
-$init  = new \Hakoniwa\Init();
-$start = new Admin\Present();
+$init  = new \Hakoniwa\Init;
+$start = new Admin\Present;
 $start->execute();
