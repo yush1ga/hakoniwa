@@ -1,0 +1,77 @@
+[
+    {
+        "id": "SE\\StructureMonument\\0001",
+        "name": "戦の碑",
+        "ability": [],
+        "changeTo": []
+    },
+    {
+        "id": "SE\\StructureMonument\\0002",
+        "name": "農の碑",
+        "ability": [
+            {
+                "category": "aglicalture",
+                "skill": "addition",
+                "probability" : "0.05"
+            }
+        ],
+        "changeTo": []
+    },
+    {
+        "id": "SE\\StructureMonument\\0003",
+        "name": "鉱の碑",
+        "ability": [],
+        "changeTo": []
+    },
+    {
+        "id": "SE\\StructureMonument\\0004",
+        "name": "匠の碑",
+        "ability": [],
+        "changeTo": []
+    },
+    {
+        "id": "SE\\StructureMonument\\0005",
+        "name": "平和の碑",
+        "ability": [],
+        "changeTo": []
+    },
+    {
+        "id": "SE\\StructureMonument\\0006",
+        "name": "キャッスル城",
+        "ability": [
+            {
+                "category": "commerse",
+                "skill": "addition",
+                "probability": "0.05"
+            }
+        ],
+        "changeTo": []
+    },
+    {
+        "id": "SE\\StructureMonument\\0007",
+        "name": "モノリス",
+        "ability": [
+            {
+                "category": "commerse",
+                "skill": "addition",
+                "probability": "0.05"
+            }
+        ],
+        "changeTo": []
+    },
+
+
+
+    {
+        "id": "SE\\StructureMonument\\0016",
+        "name": "貯金箱",
+        "ability": [],
+        "changeTo": [
+            {
+                "id": "SE\\StructureBank",
+                "probability": "0.05"
+            }
+        ]
+    },
+
+]
