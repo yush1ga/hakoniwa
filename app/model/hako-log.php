@@ -134,7 +134,7 @@ class LogIO
     }
 
 
-    
+
     /**
      * 通常ログ
      * @param  string $str log statement

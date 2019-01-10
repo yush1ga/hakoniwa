@@ -547,7 +547,7 @@ class Turn
                     break;
                 }
                 // 対象の標高レベルを１下げる
-                // [NOTE] 山 ＞ 各種土地 ＞ 浅瀬 ＞ 海
+                // [NOTE] 山 ＞ 各種陸地 ＞ 浅瀬 ＞ 海
                 if ($landKind == $init->landMountain) {
                     $land[$x][$y] = $init->landWaste;
                     $landValue[$x][$y] = 0;
@@ -1310,9 +1310,9 @@ class Turn
                             $arg = 1;
                         }
                         // セキュリティと貯蓄を算出
-                        $sec = (int)($landValue[$x][$y] / 100);
+                        $securiryLV = intval($landValue[$x][$y], 100);
                         $tyo = $landValue[$x][$y] % 100;
-                        if ($tyo == 99 && $flags != 1) {
+                        if ($tyo === 99 && $flags !== 1) {
                             $str = "倉庫が一杯だった";
                             $cost = 0;
                             $this->log->SoukoMax($id, $name, $comName, $point, $str);
@@ -1320,7 +1320,7 @@ class Turn
                             return 0;
 
                             break;
-                        } elseif ($sec == 10 && $flags == 1) {
+                        } elseif ($securiryLV == 10 && $flags == 1) {
                             $str = "倉庫のセキュリティレベルが最大値に達していた";
                             $cost = 0;
                             $this->log->SoukoMax($id, $name, $comName, $point, $str);
@@ -1345,9 +1345,9 @@ class Turn
                             // すでに倉庫の場合
                             if ($flags == 1) {
                                 $arg = 0;
-                                $sec += 1;
-                                if ($sec > 10) {
-                                    $sec = 10;
+                                $securiryLV += 1;
+                                if ($securiryLV > 10) {
+                                    $securiryLV = 10;
                                 }
                                 $str ="(セキュリティ強化)";
                             } else {
@@ -1366,12 +1366,12 @@ class Turn
 
                             if ($flags == 1) {
                                 $arg = 0;
-                                $sec = 1;
+                                $securiryLV = 1;
                                 $str ="(セキュリティ強化)";
                             }
                             $tyo = $arg;
                         }
-                        $landValue[$x][$y] = $sec * 100 + $tyo;
+                        $landValue[$x][$y] = $securiryLV * 100 + $tyo;
                         $this->log->Souko($id, $name, $comName, $point, $str);
 
                         break;
@@ -1387,7 +1387,7 @@ class Turn
                             $flagm = 0;
                         }
                         // セキュリティと貯蓄を算出
-                        $sec = (int)($landValue[$x][$y] / 100);
+                        $securiryLV = intval($landValue[$x][$y], 100);
                         $tyo = $landValue[$x][$y] % 100;
                         if ($arg > $tyo) {
                             $arg = $tyo;
@@ -1409,7 +1409,7 @@ class Turn
                         if ($tyo < 0) {
                             $tyo = 0;
                         }
-                        $landValue[$x][$y] = $sec * 100 + $tyo;
+                        $landValue[$x][$y] = $securiryLV * 100 + $tyo;
                         $this->log->Souko($id, $name, $comName, $point, $str);
                         $returnMode = 0;
 
@@ -3600,6 +3600,7 @@ class Turn
         // バトルフィールド（30,30）、
         // 食糧不足（-30）、 海賊船滞留中（0）、
         // 誘致活動（30,3）、遊園地がある（20,1)
+        // [NOTE]: pop2は非負整数
         if ($island['isBF'] ?? false) {
             $addpop = $addpop2 = 30;
         } elseif ($island['food'] <= 0) {
@@ -3657,9 +3658,6 @@ class Turn
                             if ($landKind === $init->landTown) {
                                 $land[$x][$y] = $init->landPlains;
                             }
-                            $landValue[$x][$y] = 0;
-
-                            continue;
                         }
                         // 人口増
                     } elseif ($addpop !== 0) {
@@ -3675,15 +3673,17 @@ class Turn
                             }
                         }
                     }
-                    // 最大値は250
+                    // [0, 250]
+                    $lv = (int)floor($lv);
+                    $lv = max($lv, 0);
                     $landValue[$x][$y] = min($lv, 250);
 
                     break;
 
-                // ニュータウン系
+                // ニュータウン
                 case $init->landNewtown:
-                    $townCount = Turn::countAround($land, $x, $y, 19, [$init->landTown, $init->landNewtown, $init->landBigtown]);
-                    if ($townCount > 17) {
+                        // 街を集中させると転生できる
+                    if (Turn::countAround($land, $x, $y, 19, [$init->landTown, $init->landNewtown, $init->landBigtown]) > 17) {
                         if (Util::random(1000) < 3) {
                             if ($lv > 200) {
                                 $land[$x][$y] = $init->landBigtown;
@@ -3696,30 +3696,26 @@ class Turn
                         if ($lv < 1) {
                             // 平地に戻す
                             $land[$x][$y] = $init->landPlains;
-                            $landValue[$x][$y] = 0;
-
-                            continue;
                         }
                         // 人口増
                     } elseif ($addpop !== 0) {
                         if ($lv < 100) {
                             $lv += Util::random($addpop) + 1;
-                            if ($lv > 100) {
-                                $lv = 100;
-                            }
+                            $lv = min($lv, 100);
                         } else {
-                            // 都市になると成長遅い
                             if ($addpop2 > 0) {
                                 $lv += Util::random($addpop2) + 1;
                             }
                         }
                     }
-                    // 最大値は300
-                    $landValue[$x][$y] = min(300, $lv);
+                    // [0, 250]
+                    $lv = (int)floor($lv);
+                    $lv = max($lv, 0);
+                    $landValue[$x][$y] = min($lv, 250);
 
                     break;
 
-                // 現代都市系
+                // 現代都市
                 case $init->landBigtown:
                     // 人口減少
                     if ($addpop < 0) {
@@ -3727,32 +3723,28 @@ class Turn
                         // 平地に戻す
                         if ($lv < 1) {
                             $land[$x][$y] = $init->landPlains;
-                            $landValue[$x][$y] = 0;
-
-                            continue;
                         }
                     } else {
-                        // 成長
+                        // 増加
                         if ($lv < 200) {
                             $lv += Util::random($addpop) + 1;
-                            if ($lv > 200) {
-                                $lv = 200;
-                            }
+                            $lv = min($lv, 200);
                         } else {
-                            // 都市になると成長遅い
                             if ($addpop2 > 0) {
                                 $lv += Util::random($addpop2) + 1;
                             }
                         }
                     }
-                    // 最大値は500
-                    $landValue[$x][$y] = min(500, $lv);
+                    // [0, 500]
+                    $lv = (int)floor($lv);
+                    $lv = max($lv, 0);
+                    $landValue[$x][$y] = min($lv, 500);
 
                     break;
 
                 // 平地
                 case $init->landPlains:
-                    if ($island['isBF'] == 1) { // BF勝手に村生成
+                    if ($island['isBF'] == 1) { // BFなら勝手に村生成
                         $land[$x][$y] = $init->landTown;
                         $landValue[$x][$y] = 50;
                     } elseif (Util::random(5) == 0) {
@@ -3760,7 +3752,7 @@ class Turn
                         // 確率でニュータウン化
                         if ($this->countGrow($land, $landValue, $x, $y)) {
                             $land[$x][$y] = $init->landTown;
-                            $landValue[$x][$y] = 1;
+                            $landValue[$x][$y] = Util::random(1, 3);
                             if (Util::random(1000) < 75) {
                                 $land[$x][$y] = $init->landNewtown;
                             }
@@ -3789,9 +3781,6 @@ class Turn
                         $lv -= (Util::random(-$addpop) + 1);
                         if ($lv < 1) {
                             $land[$x][$y] = $init->landPlains;
-                            $landValue[$x][$y] = 0;
-
-                            continue;
                         }
                     } elseif ($addpop !== 0) {
                         // 成長
@@ -3799,12 +3788,13 @@ class Turn
                             $lv += Util::random($addpop) + 1;
                             $lv = min($lv, 100);
                         } else {
-                            // 都市になると成長遅い
                             if ($addpop2 > 0) {
                                 $lv += Util::random($addpop2) + 1;
                             }
                         }
                     }
+                    $lv = (int)floor($lv);
+                    $lv = max($lv, 0);
                     $landValue[$x][$y] = min(200, $lv);
 
                     break;
@@ -4496,15 +4486,13 @@ class Turn
 
                 // 捕獲怪獣
                 case $init->landSleeper:
-                    // 各要素の取り出し
                     $monsSpec = Util::monsterSpec($landValue[$x][$y]);
-                    $special  = $init->monsterSpecial[$monsSpec['kind']];
-                    $mName    = $monsSpec['name'];
+                    $monsName    = $monsSpec['name'];
+                    // (怪獣の体力 * 10)‰ の確率で捕獲解除
                     if (Util::random(1000) < $monsSpec['hp'] * 10) {
-                        // (怪獣の体力 * 10)% の確率で捕獲解除
                         $point = "($x, $y)";
                         $land[$x][$y] = $init->landMonster; // 捕獲解除
-                        $this->log->MonsWakeup($id, $name, $lName, $point, $mName);
+                        $this->log->MonsWakeup($id, $name, $lName, $point, $monsName);
                     }
 
                     break;
@@ -4512,7 +4500,7 @@ class Turn
                 // 船舶
                 case $init->landShip:
                     //船が既に動いていた時
-                    if (!isset($shipMove[$x][$y]) || $shipMove[$x][$y] == 1) {
+                    if ($shipMove[$x][$y] ?? 0 === 1) {
                         break;
                     }
                     $ship = Util::navyUnpack($landValue[$x][$y]);
@@ -4892,7 +4880,7 @@ class Turn
         }
         if (isset($island['bank'])) {
             if ($island['bank'] > 0) {
-                $value = (int)($island['money'] * 0.005);
+                $value = (int)floor($island['money'] * 0.005);
                 $island['money'] += $value;
                 $this->log->oilMoney($id, $name, "銀行", "", '総額'.$value.$init->unitMoney);
             }

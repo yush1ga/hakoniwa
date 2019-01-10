@@ -180,7 +180,7 @@ class MakeAlly
         if (Util::checkPassword($ally['password'], $data['Allypact'])) {
             $ally['comment'] = Util::htmlEscape($data['ALLYCOMMENT']);
             $ally['title'] = Util::htmlEscape($data['ALLYTITLE']);
-            $ally['message'] = Util::htmlEscape($data['ALLYMESSAGE'], 1);
+            $ally['message'] = Util::htmlEscape($data['ALLYMESSAGE'], true);
 
             $hako->ally[$hako->idToAllyNumber[$data['ALLYID']]] = $ally;
             // データ書き出し

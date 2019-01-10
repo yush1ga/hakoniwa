@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require __DIR__."/../../config.php";
@@ -10,6 +11,7 @@ $gethost = function () {
     $scheme = $https === "off" || $https === "" ? "" : "s";
     $host   = $_SERVER["HTTP_HOST"];
     $path   = $_SERVER["REQUEST_URI"];
+
     return [
         "url"  => "http{$scheme}://{$host}{$path}",
         "host" => "http{$scheme}://{$host}"

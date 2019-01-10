@@ -151,7 +151,7 @@ final class Util
         if (!$isLegacyHash) {
             return password_verify($p2, $p1);
         }
-        if (strcmp($p1, Util::encode($p2)) == 0) {
+        if (strcmp($p1, self::encode($p2)) == 0) {
             return true;
         }
 
@@ -371,22 +371,19 @@ final class Util
         ];
     }
 
-    //---------------------------------------------------
-    // 船情報のUnpack
-    //---------------------------------------------------
+    /**
+     * 船情報の展開
+     * i:5bit:島ID
+     * |    t:3bit:船種類
+     * |    |  d:4bit:耐久値
+     * |    |  |   e:4bit:経験値
+     * |    |  |   |   f:4bit:フラグ
+     * iiiiitttddddeeeeffff
+     * @param  integer $lv 座標メタデータ
+     * @return array       船データ
+     */
     public static function navyUnpack($lv)
     {
-        global $init;
-
-        // bit 意味
-        //-----------
-        //  5  島ID
-        //  3  種類
-        //  4  耐久力
-        //  4  経験値
-        //  4  フラグ
-        // 20  合計
-
         $flag = $lv & 0x0f;
         $lv >>= 4;
         $exp  = $lv & 0x0f;
@@ -403,10 +400,8 @@ final class Util
     //---------------------------------------------------
     // 船情報のPack
     //---------------------------------------------------
-    public static function navyPack($id, $kind, $hp, $exp, $flag)
+    public static function navyPack(int $id, int $kind, int $hp, int $exp, int $flag): int
     {
-        global $init;
-
         // bit 意味
         //-----------
         //  5  島ID
@@ -499,7 +494,7 @@ final class Util
      * @param  string $status  アラート種類："success","info","warning","danger".
      * @return void
      */
-    public static function makeTagMessage($message, $status = 'success'): void
+    public static function makeTagMessage(string $message, string $status = 'success'): void
     {
         echo '<div class="alert alert-'.$status.'" role="alert">';
         echo nl2br($message, false);
@@ -627,6 +622,8 @@ final class Util
         throw new InvalidArgumentException("Parameter `{$cat}` is not defined. maybe wrong.");
     }
 
+
+
     /**
      * 各種イベントが発生するかどうかの判定
      * @param  string $cat イベント名称（あらかじめ定義しておく）
@@ -643,6 +640,8 @@ final class Util
         throw new InvalidArgumentException('Parameter ' . $cat . ' is not defined. maybe wrong.');
     }
 
+
+
     /**
      * WIP
      * @param  boolean $withGet [description]
@@ -655,13 +654,15 @@ final class Util
         $mode = $_POST['mode'] ?? '';
     }
 
+
+
     /**
      * 文字のエスケープ処理
      * @param  string  $s    任意の入力文字列
-     * @param  integer $mode boolキャスト：nl2brの有無（複数改行の圧縮機能あり）
+     * @param  boolean $mode nl2br の有無（複数改行の圧縮機能あり）
      * @return string        キャスト済み文字列
      */
-    public static function htmlEscape($s, $mode = 0): string
+    public static function htmlEscape(string $s, bool $mode = false): string
     {
         $s = preg_replace('/&amp;(?=#[\d;])/', '&', htmlspecialchars($s, ENT_QUOTES, 'UTF-8'));
 
@@ -673,31 +674,6 @@ final class Util
         return $s;
     }
 
-    /**
-     * 文字列$strが$prefixから始まるかどうか
-     * @param  string $str    検索対象
-     * @param  mixed  $prefix 検索したい文字列・文字列の配列
-     * @return bool
-     */
-    public static function starts_with(string $str, $prefix): bool
-    {
-        $type = gettype($prefix);
-        switch ($type) {
-            case "string":
-                return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
-            case "array":
-                foreach ($prefix as $p) {
-                    if (mb_substr($str, 0, mb_strlen($p)) === $p) {
-                        return true;
-                    }
-                }
-
-                return false;
-        }
-
-        throw new \InvalidArgumentException("Arguments #1 require type of `String[] | String` (Actual `{$type}`)");
-    }
-
 
 
     public static function get_anonymous_usage_arr(array $opt = [])
@@ -707,25 +683,9 @@ final class Util
         $_phpinfo = ob_get_contents();
         ob_end_clean();
 
-
-
         return ["phpinfo" => $_phpinfo];
     }
 
-
-
-    public static function ls(string $dir): array
-    {
-        $directory = new \DirectoryIterator($dir);
-        $ls = ["dir" => [], "file" => []];
-        foreach ($directory as $fileinfo) {
-            if (!$fileinfo->isDot()) {
-                $ls[$fileinfo->getType()][] = $fileinfo->getPathname();
-            }
-        }
-
-        return $ls;
-    }
 
 
     /**
@@ -752,31 +712,5 @@ final class Util
         }
 
         return $out;
-    }
-
-
-
-    public static function filelist(string $dir, array $exclude_prefix = []): array
-    {
-        $rii =  new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
-                $dir,
-                \FilesystemIterator::SKIP_DOTS
-                | \FilesystemIterator::KEY_AS_PATHNAME
-                | \FilesystemIterator::CURRENT_AS_PATHNAME
-            ),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        $dir = realpath($dir);
-
-        $filelist = [];
-        foreach ($rii as $key => $value) {
-            $rel = mb_substr(realpath($key), mb_strlen($dir));
-            if (!self::starts_with($rel, $exclude_prefix)) {
-                $filelist[$rel] = $value;
-            }
-        }
-
-        return $filelist;
     }
 }

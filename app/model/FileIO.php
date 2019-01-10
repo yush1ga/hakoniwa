@@ -8,6 +8,7 @@ if (!defined("WINDOWS")) {
     throw new \ErrorException("Not defined: `WINDOWS`.");
 }
 
+require_once __DIR__."/../../vendor/autoload.php";
 require_once __DIR__."/../helper/util.php";
 
 trait FileIO
@@ -234,7 +235,7 @@ trait FileIO
                 if (!$this->is_usable_path($to)["dir"]) {
                     throw new \ErrorException("Already exists, but not be allow read/write: `{$to}`.");
                 }
-                if ($this->filelist($to) !== []) {
+                if (ls_R($to) !== []) {
                     throw new \ErrorException("Already exists and not empty directory: `{$to}`.");
                 }
             }
@@ -258,39 +259,13 @@ trait FileIO
 
 
 
-    final private function filelist(string $dir, array $exclude_prefix = []): array
-    {
-        $rii =  new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
-                $dir,
-                \FilesystemIterator::SKIP_DOTS
-                | \FilesystemIterator::KEY_AS_PATHNAME
-                | \FilesystemIterator::CURRENT_AS_PATHNAME
-            ),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        $dir = realpath($dir);
-
-        $filelist = [];
-        foreach ($rii as $key => $value) {
-            $rel = mb_substr(realpath($key), mb_strlen($dir));
-            if (!\Util::starts_with($rel, $exclude_prefix)) {
-                $filelist[$rel] = $value;
-            }
-        }
-
-        return $filelist;
-    }
-
-
-
     final protected function is_same(string $orig, string $targ, array $exclude = []): bool
     {
         $exclude = array_unique(array_merge($exclude, [".git", "vendor", "node_modules"]));
 
         if (is_dir($orig) && is_dir($targ)) {
-            $orig_files = $this->filelist($orig, $exclude);
-            $targ_files = $this->filelist($targ, $exclude);
+            $orig_files = ls_R($orig, $exclude);
+            $targ_files = ls_R($targ, $exclude);
 
             foreach ($orig_files as $rel => $orig_path) {
                 if (array_key_exists($rel, $targ_files)) {
@@ -339,7 +314,7 @@ trait FileIO
         ];
         $path = $this->parse_path(realpath($path) ?: $path);
 
-        if (!\Util::starts_with($path, $allowed_directory)) {
+        if (!startsWith($path, $allowed_directory)) {
             throw new \InvalidArgumentException("path `$path` is not allowed file I/O. [`{$allowed_directory[0]}`, `{$allowed_directory[1]}`, `{$allowed_directory[2]}`]", 1);
         }
     }

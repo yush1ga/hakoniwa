@@ -16,8 +16,9 @@ final class LaunchTest extends \Hakoniwa\Init
 {
     private $needExts = [
         "mbstring",
-        "pdo", // composer周りで使う
-        "dom" // composer周りで使う
+        "curl", // composer周りで使ってる
+        "pdo", // composer周りで使ってる
+        "dom" // composer周りで使ってる
     ];
     private function HasExtension(string $extName): bool
     {
@@ -57,7 +58,7 @@ final class LaunchTest extends \Hakoniwa\Init
         $hash_local = hash_file("sha256", ROOT."/LICENSE");
         $hash_remote = hash_file("sha256", "https://www.gnu.org/licenses/agpl-3.0.txt");
         if (!hash_equals($hash_local, $hash_remote)) {
-            throw new \Exception("ライセンスファイルの内容が間違っています。プログラムの再インストールを推奨します。");
+            throw new \Exception("ライセンスファイルの内容が間違っているか、何らかの変更が認められます。\nプログラムの再インストールを推奨します。");
         }
     }
 
@@ -123,7 +124,7 @@ END;
 
     public function print_nl2br($str): void
     {
-        echo "<div class=\"ui stacked left aligned segment\">", $str, "</div>\n";
+        echo "<div class=\"ui stacked left aligned segment\">", nl2br($str, false), "</div>\n";
     }
 
     public function print_debug(...$args): void

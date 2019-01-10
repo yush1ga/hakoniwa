@@ -2,6 +2,49 @@
 
 declare(strict_types=1);
 
+
+
+function ls(string $dir): array
+{
+    $directory = new \DirectoryIterator($dir);
+    $ls = ["dir" => [], "file" => []];
+    foreach ($directory as $fileinfo) {
+        if (!$fileinfo->isDot()) {
+            $ls[$fileinfo->getType()][] = $fileinfo->getPathname();
+        }
+    }
+
+    return $ls;
+}
+
+
+
+function ls_R(string $dir, array $exclude_prefix = []): array
+{
+    $rii =  new \RecursiveIteratorIterator(
+        new \RecursiveDirectoryIterator(
+            $dir,
+            \FilesystemIterator::SKIP_DOTS
+            | \FilesystemIterator::KEY_AS_PATHNAME
+            | \FilesystemIterator::CURRENT_AS_PATHNAME
+        ),
+        \RecursiveIteratorIterator::LEAVES_ONLY
+    );
+    $dir = realpath($dir);
+
+    $filelist = [];
+    foreach ($rii as $key => $value) {
+        $rel = mb_substr(realpath($key), mb_strlen($dir));
+        if (startsWith($rel, $exclude_prefix)) {
+            $filelist[$rel] = $value;
+        }
+    }
+
+    return $filelist;
+}
+
+
+
 function println(...$strs): void
 {
     foreach ($strs as $str) {
@@ -18,16 +61,16 @@ function println(...$strs): void
  * @param  mixed  $prefix 検索したい文字列・文字列の配列
  * @return bool
  */
-function startsWith(string $str, mixed $prefix): bool
+function startsWith(string $str, $prefix): bool
 {
     $type = gettype($prefix);
     if ($type === "string") {
         return mb_substr($str, 0, mb_strlen($prefix)) === $prefix;
-    } else if ($type === "array") {
-        return (0 !== count(array_filter($prefix, function($p) {
-            return mb_substr($str, 0, mb_strlen($p)) === $p;
-        })));
+    } elseif ($type === "array") {
+        return 0 !== count(array_filter($prefix, function ($v) use ($str) {
+            return mb_substr($str, 0, mb_strlen($v)) === $v;
+        }));
     }
-
-    return false;
+    trigger_error("Arguments #1 require type of `String[] | String` (Actual `{$type}`)", E_USER_WARNING);
+    // return false;
 }

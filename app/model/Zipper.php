@@ -54,7 +54,7 @@ final class Zipper
         }
         $src_dir = $this->parse_path($src_dir);
         $root_dir = $this->parse_path(ROOT);
-        if (!_::starts_with($src_dir, $root_dir)) {
+        if (!startsWith($src_dir, $root_dir)) {
             throw new \InvalidArgumentException("ERROR `{$src_dir}` `{$root_dir}`");
         }
 

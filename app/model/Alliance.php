@@ -613,7 +613,7 @@ class Alliance
         }
         $ally['comment'] = Util::htmlEscape($data['ALLYCOMMENT']);
         $ally['title']   = Util::htmlEscape($data['ALLYTITLE']);
-        $ally['message'] = Util::htmlEscape($data['ALLYMESSAGE'], 1);
+        $ally['message'] = Util::htmlEscape($data['ALLYMESSAGE'], true);
 
         // データ書き出し
         $hako->ally[$hako->idToAllyNumber[$data['ALLYID']]] = $ally;

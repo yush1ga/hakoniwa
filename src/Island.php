@@ -215,13 +215,11 @@ final class Island
 
 
 
-    public function income()
+    public function income(): void
     {
-
     }
 
-    public function expense()
+    public function expense(): void
     {
-
     }
 }

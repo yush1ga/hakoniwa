@@ -50,6 +50,7 @@ final class TurnTest extends TestCase
         $b["zin"] = array_fill(0, 7, 0);
         $b["port"] = 0;
         $b["ship"] = array_fill(0, 7, 0);
+        $b["isBF"] = 0;
 
         $exp = $d = $b;
         $exp["money"] = 1600.0;

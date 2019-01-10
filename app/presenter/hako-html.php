@@ -2223,7 +2223,7 @@ EOT;
         $dir_parent = dirname($dirName);
         $dir_escendant = false !== mb_strpos($dirName, "/") ? mb_substr(mb_strrchr($dirName, "/"), 1) : $dirName;
         $preg_dir_escendant = preg_quote($dir_escendant);
-        $ls = \Util::ls($dir_parent)["dir"];
+        $ls = ls($dir_parent)["dir"];
 
         // [NOTE] 別順で並べたいからこんなザマだが、なにかいい方法はないですかね
         foreach ($ls as $dir) {
