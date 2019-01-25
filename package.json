@@ -40,7 +40,9 @@
     "updatephp:linux:darwin": "bin/composer selfupdate && bin/composer update"
   },
   "dependencies": {
-    "axios": "^0.18.0"
+    "@types/jquery": "^3.3.29",
+    "axios": "^0.18.0",
+    "jquery": "^3.3.1"
   },
   "devDependencies": {
     "@types/globule": "^1.1.3",
