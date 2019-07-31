@@ -1,0 +1,7 @@
+version: '3'
+services:
+  hakoniwa:
+    build: .
+    ports:
+      - 8000:80
+    restart: always
